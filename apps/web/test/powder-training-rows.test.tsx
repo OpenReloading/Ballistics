@@ -1,8 +1,10 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { Powder } from '@rangefoundry/schema'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import type { PowderSummary } from '../src/lib/api-types.ts'
 import { defined } from './defined.ts'
 
@@ -25,7 +27,12 @@ const { PowderFit } = await import('../src/components/powder-fit.tsx')
 const { orderPowders } = await import('../src/lib/burn-rate.ts')
 const { packPowders } = await import('../src/lib/powder-rows.ts')
 
-const html = (node: ReactNode) => renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+const html = (node: ReactNode) =>
+  renderToStaticMarkup(
+    <MantineProvider>
+      <I18nProvider i18n={linguiOf('en')}>{node}</I18nProvider>
+    </MantineProvider>,
+  )
 
 /** A synthetic catalogue powder with a curve and, when given, the training rows of its fit. */
 const summary = (

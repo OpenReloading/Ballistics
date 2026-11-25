@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { toSi } from '@rangefoundry/schema'
 import { Plus } from 'lucide-react'
@@ -37,6 +38,7 @@ export function CaseList({
   cartridgeNames: Record<string, string>
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const [records, removeRow, read] = useUserRecords()
   // the browser's groups first: a few rows would sit unseen behind the catalogue's
@@ -123,14 +125,14 @@ export function CaseList({
       actions={
         <>
           <Button component={Link} href="/cases/editor" leftSection={<Plus aria-hidden="true" />}>
-            {t('New brass group')}
+            {i18n._({ id: 'cases.new', message: 'New brass group' })}
           </Button>
           <UnitsIconButton />
         </>
       }
       state={state}
       set={set}
-      placeholder={t('Manufacturer, name or cartridge…')}
+      placeholder={i18n._({ id: 'cases.search', message: 'Manufacturer, name or cartridge…' })}
       columns={columns}
       counts={counts}
       table={
@@ -147,8 +149,12 @@ export function CaseList({
           label={productLabel}
           caption={
             named.length === 0
-              ? t('All brass')
-              : t('Brass, {filters}', { filters: named.join(', ') })
+              ? i18n._({ id: 'cases.all', message: 'All brass' })
+              : i18n._({
+                  id: 'cases.filtered',
+                  message: 'Brass, {filters}',
+                  values: { filters: named.join(', ') },
+                })
           }
           noun="cases"
           sort={state.sort}
@@ -163,10 +169,12 @@ export function CaseList({
             read && counts.user === 0 && on.length === 1 && on[0] === 'user' ? (
               <EmptyNote
                 icon={<Plus size={24} aria-hidden="true" />}
-                title={t('No brass groups of your own yet')}
-                description={t(
-                  'A brass group keeps the cases you measured, with their water capacity, in this browser.',
-                )}
+                title={i18n._({ id: 'cases.noneOwn', message: 'No brass groups of your own yet' })}
+                description={i18n._({
+                  id: 'cases.noneOwnHint',
+                  message:
+                    'A brass group keeps the cases you measured, with their water capacity, in this browser.',
+                })}
                 action={
                   <Button
                     component={Link}
@@ -174,7 +182,7 @@ export function CaseList({
                     variant="default"
                     size={controlSize.row.button}
                   >
-                    {t('New brass group')}
+                    {i18n._({ id: 'cases.new', message: 'New brass group' })}
                   </Button>
                 }
               />

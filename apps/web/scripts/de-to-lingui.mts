@@ -8,19 +8,25 @@ import { type PoCatalog, readCatalog, writeCatalog } from './po-catalog.mts'
 const pluralOfCount =
   /^\{count, plural, one \{((?:[^{}]|\{\w+\})*)\} other \{((?:[^{}]|\{\w+\})*)\}\}$/
 
-/** The `de.json` key of a Lingui English text: a `count` plural as its `one|other` pair with `{count}` for `#`, after its context. */
+/** The `de.json` key of a Lingui English text: a `count` plural as its `one|other` pair with `{count}` for `#`, after its context, with `''` read as `'`. */
 function ownKey(english: string, context?: string) {
   const forms = pluralOfCount.exec(english)
-  const text = forms ? `${forms[1]}|${forms[2]}`.replaceAll('#', '{count}') : english
+  const text = (forms ? `${forms[1]}|${forms[2]}`.replaceAll('#', '{count}') : english).replaceAll(
+    "''",
+    "'",
+  )
   return context ? `${context}\u0004${text}` : text
 }
+
+// ICU quoting: a lone apostrophe before a brace would quote the placeholder instead of filling it
+const quoted = (text: string) => text.replaceAll("'", "''")
 
 /** A `de.json` entry as a Lingui message: plural forms become a `count` plural with `#` for `{count}`. */
 const linguiText = (entry: Catalogue[string]) =>
   typeof entry === 'string'
-    ? entry
+    ? quoted(entry)
     : `{count, plural, ${Object.entries(entry)
-        .map(([form, text]) => `${form} {${text.replaceAll('{count}', '#')}}`)
+        .map(([form, text]) => `${form} {${quoted(text).replaceAll('{count}', '#')}}`)
         .join(' ')}}`
 
 /** `de` with the German of `german` for every id whose English (from `en`) it holds; an id with other German keeps it. */
@@ -33,7 +39,8 @@ export function convert(en: PoCatalog, de: PoCatalog, german: Catalogue) {
     const english = en[id]?.translation
     if (current.obsolete || !english) continue
     const key = ownKey(english, en[id]?.context)
-    const found = german[key]
+    // an inherited name such as `constructor` is no entry
+    const found = Object.hasOwn(german, key) ? german[key] : undefined
     if (found === undefined) {
       missing.push(id)
       continue

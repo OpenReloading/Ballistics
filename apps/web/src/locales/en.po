@@ -7,11 +7,89 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
+msgid "events.imported"
+msgstr "{added} events added, {equal} already in this browser, {replaced} replaced."
+
+msgid "powders.trainingCartridges"
+msgstr "{count, plural, one {# cartridge} other {# cartridges}}"
+
+msgid "events.count"
+msgstr "{count, plural, one {# competition event in this browser} other {# competition events in this browser}}"
+
+msgid "events.heldCount"
+msgstr "{count, plural, one {# event not imported: a record of this browser has its id.} other {# events not imported: records of this browser have their ids.}}"
+
+msgid "events.replaceCount"
+msgstr "{count, plural, one {# event of the file differs from the one in this browser. Replace it?} other {# events of the file differ from the ones in this browser. Replace them?}}"
+
+msgid "events.otherKinds"
+msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
+
+msgid "targets.rings"
+msgstr "{count, plural, one {# ring} other {# rings}}"
+
+msgid "powders.trainingRows"
+msgstr "{count, plural, one {# training row} other {# training rows}}"
+
+msgid "events.addRounds"
+msgstr "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
+
+msgid "powders.range"
+msgstr "{low} to {high}"
+
+msgid "events.noRoundCount"
+msgstr "{name} has no round count; set one on the Firearms page to add the event to it."
+
+msgid "events.stageScore"
+msgstr "{points} points, hit factor {hf}"
+
+msgid "cases.noneOwnHint"
+msgstr "A brass group keeps the cases you measured, with their water capacity, in this browser."
+
+msgid "events.add"
+msgstr "Add"
+
+msgid "events.addSeries"
+msgstr "Add series"
+
+msgid "events.addStage"
+msgstr "Add stage"
+
+msgid "events.addRoundsTitle"
+msgstr "Add to the round count?"
+
+msgid "cases.all"
+msgstr "All brass"
+
+msgid "bullets.all"
+msgstr "All bullets"
+
+msgid "cartridges.all"
+msgstr "All cartridges"
+
+msgid "disciplines.all"
+msgstr "All disciplines"
+
+msgid "disciplines.federationsAll"
+msgstr "All federations"
+
+msgid "powders.all"
+msgstr "All powders"
+
+msgid "primers.all"
+msgstr "All primers"
+
+msgid "targets.all"
+msgstr "All targets"
+
 msgid "page.cases"
 msgstr "Brass"
 
 msgid "page.casesEditor"
 msgstr "Brass group"
+
+msgid "cases.filtered"
+msgstr "Brass, {filters}"
 
 msgid "page.bulletsDesigner"
 msgstr "Bullet designer"
@@ -19,32 +97,245 @@ msgstr "Bullet designer"
 msgid "page.bullets"
 msgstr "Bullets"
 
+msgid "bullets.filtered"
+msgstr "Bullets, {filters}"
+
+msgid "powders.burnRates"
+msgstr "Burn rates"
+
+msgid "powders.burnRateOrder"
+msgstr "burn-rate order {order}"
+
+msgid "events.cancel"
+msgstr "Cancel"
+
 msgid "page.cartridgesDesigner"
 msgstr "Cartridge designer"
 
 msgid "page.cartridges"
 msgstr "Cartridges"
 
+msgid "cartridges.filtered"
+msgstr "Cartridges, {filters}"
+
+msgid "events.outOfRange"
+msgstr "Check the event: a value is out of its range."
+
 msgid "page.bulletsCompare"
 msgstr "Compare bullets"
+
+msgid "events.title"
+msgstr "Competition events"
 
 msgid "page.events"
 msgstr "Competition events"
 
+msgid "events.date"
+msgstr "Date"
+
+msgid "events.delete"
+msgstr "Delete {name}"
+
+msgid "events.deleteOfFailed"
+msgstr "Delete of {name} failed: {reason}"
+
+msgid "events.deletedFromThisBrowser"
+msgstr "Deleted {name} from this browser."
+
+msgid "events.discipline"
+msgstr "Discipline"
+
 msgid "page.disciplines"
 msgstr "Disciplines"
+
+msgid "disciplines.filtered"
+msgstr "Disciplines, {filters}"
+
+msgid "events.disqualifiedNoTotal"
+msgstr "Disqualified: no total."
+
+msgid "events.division"
+msgstr "Division"
+
+msgid "events.edit"
+msgstr "Edit event"
+
+msgid "events.nameHint"
+msgstr "Empty: the event type and the day."
+
+msgid "events.roundsFiredHint"
+msgstr "Empty: the shots of the series, where each lists them."
+
+msgid "events.total"
+msgstr "Event total: {total}"
+
+msgid "events.totalAddSeries"
+msgstr "Event total: add a series."
+
+msgid "events.totalFromResult"
+msgstr "Event total: enter the stage points from the official result."
+
+msgid "events.eventType"
+msgstr "Event type"
+
+msgid "events.exportCsv"
+msgstr "Export CSV"
+
+msgid "events.exportJson"
+msgstr "Export JSON"
 
 msgid "page.federations"
 msgstr "Federations"
 
+msgid "disciplines.federationsFiltered"
+msgstr "Federations, {filters}"
+
+msgid "events.firearm"
+msgstr "Firearm"
+
 msgid "page.firearms"
 msgstr "Firearms"
+
+msgid "bullets.fits"
+msgstr "Fits {name}"
+
+msgid "bullets.fitting"
+msgstr "fitting {name}"
+
+msgid "events.stagePointsHint"
+msgstr "From the official result, where published."
+
+msgid "events.hitFactor"
+msgstr "Hit factor"
+
+msgid "events.importJson"
+msgstr "Import JSON"
+
+msgid "disciplines.international"
+msgstr "International"
+
+msgid "events.level"
+msgstr "Level"
+
+msgid "events.load"
+msgstr "Load"
 
 msgid "page.workbench"
 msgstr "Load workbench"
 
+msgid "events.major"
+msgstr "Major"
+
+msgid "powders.search"
+msgstr "Manufacturer or name, DP40…"
+
+msgid "cases.search"
+msgstr "Manufacturer, name or cartridge…"
+
+msgid "primers.search"
+msgstr "Manufacturer, name or size…"
+
+msgid "bullets.search"
+msgstr "Manufacturer, name, 168, .308 or 7.82…"
+
+msgid "events.metal"
+msgstr "Metal"
+
+msgid "events.minor"
+msgstr "Minor"
+
+msgid "events.misses"
+msgstr "Misses"
+
+msgid "events.name"
+msgstr "Name"
+
+msgid "cartridges.search"
+msgstr "Name or alias, 308, 7,62 or .308…"
+
+msgid "disciplines.federationsSearch"
+msgstr "Name, abbreviation or country, DSB…"
+
+msgid "targets.search"
+msgstr "Name, federation or event, 25 m…"
+
+msgid "disciplines.search"
+msgstr "Name, number, federation or caliber, 2.53…"
+
+msgid "cases.new"
+msgstr "New brass group"
+
+msgid "bullets.new"
+msgstr "New bullet"
+
+msgid "cartridges.new"
+msgstr "New cartridge"
+
+msgid "events.new"
+msgstr "New event"
+
+msgid "powders.new"
+msgstr "New powder"
+
+msgid "targets.new"
+msgstr "New target"
+
+msgid "primers.no"
+msgstr "No"
+
+msgid "cases.noneOwn"
+msgstr "No brass groups of your own yet"
+
+msgid "events.noDisciplineFound"
+msgstr "No discipline found"
+
+msgid "events.noEventYet"
+msgstr "No event yet."
+
+msgid "events.noFirearm"
+msgstr "No firearm saved in this browser yet"
+
+msgid "powders.none"
+msgstr "No powders yet"
+
+msgid "events.nothingToExport"
+msgstr "No saved event to export."
+
+msgid "events.noTargetSheet"
+msgstr "No target sheet saved yet"
+
+msgid "events.noShoots"
+msgstr "No-shoots"
+
+msgid "events.none"
+msgstr "None"
+
+msgid "events.notImported"
+msgstr "Not imported: {reason}"
+
+msgid "events.notInBrowser"
+msgstr "Not in this browser"
+
+msgid "events.notSaved"
+msgstr "Not saved: {reason}"
+
+msgid "events.notes"
+msgstr "Notes"
+
 msgid "page.offline"
 msgstr "Offline"
+
+msgid "events.penalties"
+msgstr "Penalties"
+
+msgid "bullets.pickToCompare"
+msgstr "Pick 2 to {max}"
+
+msgid "events.place"
+msgstr "Place"
+
+msgid "events.points"
+msgstr "Points"
 
 msgid "page.powdersBurnRates"
 msgstr "Powder burn rates"
@@ -55,14 +346,71 @@ msgstr "Powder designer"
 msgid "page.powders"
 msgstr "Powders"
 
+msgid "powders.filtered"
+msgstr "Powders, {filters}"
+
+msgid "events.powerFactor"
+msgstr "Power factor"
+
 msgid "page.primers"
 msgstr "Primers"
+
+msgid "primers.filtered"
+msgstr "Primers, {filters}"
+
+msgid "events.printList"
+msgstr "Print the list of events"
+
+msgid "events.printOpen"
+msgstr "Print the open event"
+
+msgid "events.procedurals"
+msgstr "Procedurals"
 
 msgid "page.range"
 msgstr "Range mode"
 
+msgid "events.removeStage"
+msgstr "Remove {name}"
+
+msgid "events.removeSeries"
+msgstr "Remove series {n}"
+
+msgid "events.replace"
+msgstr "Replace"
+
+msgid "events.replaceEvents"
+msgstr "Replace events?"
+
+msgid "events.result"
+msgstr "Result"
+
+msgid "events.shotsHint"
+msgstr "Ring values separated by spaces, such as 10 9 10."
+
+msgid "events.roundCountOf"
+msgstr "Round count of {name}: {count}."
+
+msgid "events.roundsFired"
+msgstr "Rounds fired"
+
+msgid "events.saveEvent"
+msgstr "Save event"
+
+msgid "events.seriesHeading"
+msgstr "Series"
+
+msgid "events.seriesNumber"
+msgstr "Series {n}"
+
+msgid "events.seriesTotal"
+msgstr "Series total"
+
 msgid "page.session"
 msgstr "Session summary"
+
+msgid "events.shootingLog"
+msgstr "Shooting log"
 
 msgid "page.firearmsLog"
 msgstr "Shooting log"
@@ -70,11 +418,59 @@ msgstr "Shooting log"
 msgid "page.groups"
 msgstr "Shot groups"
 
+msgid "events.shots"
+msgstr "Shots"
+
+msgid "events.stageNumber"
+msgstr "Stage {n}"
+
+msgid "events.stageName"
+msgstr "Stage name"
+
+msgid "events.stagePoints"
+msgstr "Stage points"
+
+msgid "events.stages"
+msgstr "Stages"
+
 msgid "page.targetsDesigner"
 msgstr "Target designer"
+
+msgid "events.targetSheet"
+msgstr "Target sheet"
 
 msgid "page.targets"
 msgstr "Targets"
 
+msgid "targets.filtered"
+msgstr "Targets, {filters}"
+
+msgid "powders.noneHint"
+msgstr "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
+
+msgid "events.readFailed"
+msgstr "The records of this browser could not be read."
+
+msgid "events.roundCountHeld"
+msgstr "The round count of {name} holds this event already."
+
+msgid "events.roundCountUnchanged"
+msgstr "The round count of {name} is unchanged."
+
+msgid "events.time"
+msgstr "Time (s)"
+
+msgid "events.totalHeading"
+msgstr "Total"
+
+msgid "events.partTotal"
+msgstr "Total {total}"
+
 msgid "page.powdersTune"
 msgstr "Tune a powder"
+
+msgid "events.undoOfFailed"
+msgstr "Undo of {name} failed: {reason}"
+
+msgid "primers.yes"
+msgstr "Yes"

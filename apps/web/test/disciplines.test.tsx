@@ -1,8 +1,10 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { toSi } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
@@ -114,7 +116,9 @@ it('scopes by federation, searches the rest and keeps the federation in the URL'
 it('renders the discipline list: one row per discipline linking its page, no federation button', () => {
   const out = renderToStaticMarkup(
     <MantineProvider>
-      <DisciplineList items={rows} faces={[]} />
+      <I18nProvider i18n={linguiOf('en')}>
+        <DisciplineList items={rows} faces={[]} />
+      </I18nProvider>
     </MantineProvider>,
   )
   expect(out).toContain(`${records.length} disciplines`)
@@ -168,7 +172,9 @@ it('counts per federation its disciplines and renders the list with the tabs and
   expect(items.find((r) => r.id === 'issf')?.country).toBe('International')
   const out = renderToStaticMarkup(
     <MantineProvider>
-      <FederationList items={items} />
+      <I18nProvider i18n={linguiOf('en')}>
+        <FederationList items={items} />
+      </I18nProvider>
     </MantineProvider>,
   )
   expect(out).toContain(`${federationRecords.length} federations`)

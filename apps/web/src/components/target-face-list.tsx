@@ -1,11 +1,13 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { toSi } from '@rangefoundry/schema'
 import { Plus } from 'lucide-react'
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
+import { ungrouped } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import { facetNames } from '../lib/facets.ts'
@@ -43,7 +45,8 @@ export function TargetFaceList({
   /** The names of the disciplines by id, for the Discipline filter. */
   disciplines: readonly { id: string; name: string }[]
 }) {
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const [records, removeRow] = useUserRecords()
   // the browser's faces first: a few rows would sit unseen behind the catalogue's
@@ -127,7 +130,11 @@ export function TargetFaceList({
       r.organization,
       r.distances.length > 0 ? `${distances(r)} ${system.range.symbol}` : '',
       r.outer !== undefined && `${outer(r)} ${system.length.symbol}`,
-      tn(r.rings, '{count} ring', '{count} rings'),
+      i18n._(
+        'targets.rings',
+        { count: r.rings },
+        { message: '{count, plural, one {# ring} other {# rings}}', formats: ungrouped },
+      ),
     ]
       .filter(Boolean)
       .join(' · ')
@@ -144,14 +151,14 @@ export function TargetFaceList({
             href="/targets/designer"
             leftSection={<Plus aria-hidden="true" />}
           >
-            {t('New target')}
+            {i18n._({ id: 'targets.new', message: 'New target' })}
           </Button>
           <UnitsIconButton />
         </>
       }
       state={state}
       set={set}
-      placeholder={t('Name, federation or event, 25 m…')}
+      placeholder={i18n._({ id: 'targets.search', message: 'Name, federation or event, 25 m…' })}
       columns={columns}
       counts={counts}
       filters={
@@ -173,8 +180,12 @@ export function TargetFaceList({
           label={(r) => r.name}
           caption={
             named.filter(Boolean).length === 0
-              ? t('All targets')
-              : t('Targets, {filters}', { filters: named.filter(Boolean).join(', ') })
+              ? i18n._({ id: 'targets.all', message: 'All targets' })
+              : i18n._({
+                  id: 'targets.filtered',
+                  message: 'Targets, {filters}',
+                  values: { filters: named.filter(Boolean).join(', ') },
+                })
           }
           noun="faces"
           sort={state.sort}

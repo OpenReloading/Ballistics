@@ -45,6 +45,35 @@ it('writes the German of every id whose English de.json holds, with a note of th
   expect(unused).toBe(2)
 })
 
+it('quotes each apostrophe of the German so a placeholder after one still fills', () => {
+  const quotedEn: PoCatalog = {
+    'profile.named': entry("Profile ''{name}''"),
+    'profile.count': entry("{count, plural, one {# profile of ''{name}''} other {# profiles}}"),
+  }
+  const de: PoCatalog = { 'profile.named': entry(''), 'profile.count': entry('') }
+  const { catalog } = convert(quotedEn, de, {
+    "Profile '{name}'": "Profil '{name}'",
+    "{count} profile of '{name}'|{count} profiles": {
+      one: "{count} Profil von '{name}'",
+      other: '{count} Profile',
+    },
+  })
+  expect(catalog['profile.named']?.translation).toBe("Profil ''{name}''")
+  expect(catalog['profile.count']?.translation).toBe(
+    "{count, plural, one {# Profil von ''{name}''} other {# Profile}}",
+  )
+})
+
+it('takes no German from a name the entries only inherit', () => {
+  const { catalog, missing } = convert(
+    { 'object.constructor': entry('constructor') },
+    { 'object.constructor': entry('') },
+    {},
+  )
+  expect(catalog['object.constructor']?.translation).toBe('')
+  expect(missing).toEqual(['object.constructor'])
+})
+
 it('keeps German that differs from de.json and only adds the note where it is the same', () => {
   const de: PoCatalog = {
     'list.bullets': entry('Kugeln', undefined, ['checked']),
