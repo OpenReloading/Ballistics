@@ -18,7 +18,7 @@ export function PageError({ error }: ErrorComponentProps) {
   const router = useRouter()
   return (
     <>
-      <PageBar title={msg('Something went wrong')} translated />
+      <PageBar title={/*i18n*/ { id: 'page.error', message: 'Something went wrong' }} translated />
       <ErrorNote
         title={t('This page could not be shown.')}
         onRetry={() => void router.invalidate()}

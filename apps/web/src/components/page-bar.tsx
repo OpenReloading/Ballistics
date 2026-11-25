@@ -1,5 +1,7 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { useMediaQuery, useMounted } from '@mantine/hooks'
 import { Ellipsis } from 'lucide-react'
@@ -16,6 +18,7 @@ import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 import { tipEvents } from '../lib/theme.ts'
 import { titleTemplate } from '../lib/title-template.ts'
+import { say } from '../lib/wording.ts'
 import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
@@ -157,12 +160,13 @@ export function PageBar({
     }
   | {
       /** The h1: a message of the catalogue (a list's title), which the language shown translates. */
-      title: Message
+      title: Message | MessageDescriptor
       translated: true
     }
 )) {
   const { t } = useTranslation()
-  const title = translated ? t(given) : given
+  const { i18n } = useLingui()
+  const title = translated ? say(i18n, t, given) : given
   // React writes Next's English metadata title back after hydration: keep the tab in the language shown
   useEffect(() => {
     if (!translated) return

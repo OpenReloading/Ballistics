@@ -33,7 +33,7 @@ The shared base keeps its own texts in Lingui catalogs, the format the rebuilt w
 
 The app's texts with explicit ids live in `apps/web/src/locales/en.po` and `de.po`, extracted from the Start routes (`src/routes`) and the views (`src/components`) by the app's `typecheck` (`lingui check sync`). Both app roots provide them through `I18nProvider` in the language that `src/i18n/language.ts` shows, so one language switch changes these texts and the text keys above together; the German catalog loads beside `de.json` when German is chosen.
 
-- `pnpm --filter @rangefoundry/web run lingui:de` writes the German of `src/i18n/de.json` into `de.po` for each id whose English text is a key there (a `{count, plural, one {…} other {…}}` text matches its `one|other` key, a `msgctxt` its context). It prints how many it wrote, the ids `de.json` has no German for, and the ids whose German in `de.po` differs, which it keeps.
+- `pnpm --filter @rangefoundry/web run lingui:de` writes the German of `src/i18n/de.json` into `de.po` for each id whose English text is a key there (a `{count, plural, one {…} other {…}}` text matches its `one|other` key, a `{x, decimal}` argument its `{x}`, a `msgctxt` its context). It prints how many it wrote, the ids `de.json` has no German for, and the ids whose German in `de.po` differs, which it keeps.
 - Each German entry carries a `# en: "<English>"` note with the English text it translates. The `typecheck` fails while a note is missing or names other English than `en.po` holds: check the German, then update it and the note.
 
 ## Numbers, dates and country names
@@ -42,7 +42,7 @@ These follow the language shown and need no catalogue text. Under German a decim
 
 What the app stores and exports never changes: field values, URLs, share links, saved loads, your data files, CSV, JSON, downloads and the table copied as CSV keep the point (`2.5`).
 
-- Write a number on screen with `formatNumber`, `fixedNumber`, `plainNumber` or `localizeNumber` (a canonical text) from `src/i18n/number.ts`. Never `toFixed`, `String(n)` or a number in a template string. A number inside a `t` placeholder is already written with the language's mark.
+- Write a number on screen with `formatNumber`, `fixedNumber`, `plainNumber` or `localizeNumber` (a canonical text) from `src/i18n/number.ts`. Never `toFixed`, `String(n)` or a number in a template string. A number inside a `t` placeholder is already written with the language's mark; inside a Lingui message write it `{x, decimal}` (a plain `{x}` keeps the point, `{x, number}` groups and rounds to 3 decimals).
 - A number inside text that a server build wrote takes `<Decimal text>` or a `numeric` field row; a date `dayText` and a country `countryName`.
 - A file or the clipboard writes the canonical form: pass `'en'` to `formatNumber`, or `canonicalNumberText` for text that came from the screen.
 - Read typed or pasted text only with `parseNumber(input, { min, max, integer }, language)`. Do not run text the app generated through it.

@@ -672,7 +672,12 @@ export function CartridgeDesigner() {
 
   return (
     <>
-      <PageBar title={msg('Cartridge designer')} translated fold={toolbar} actions={actions} />
+      <PageBar
+        title={/*i18n*/ { id: 'page.cartridgesDesigner', message: 'Cartridge designer' }}
+        translated
+        fold={toolbar}
+        actions={actions}
+      />
       <div className="designer">
         {/* outside the tabs: the results panel is hidden on the phone Inputs tab */}
         <p role="status" className="status visually-hidden">

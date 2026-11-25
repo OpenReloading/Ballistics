@@ -1,6 +1,5 @@
 import { millerStability, type Projectile } from '@rangefoundry/ballistics'
 import { type Bullet, baseTypes, fromSi, toSi } from '@rangefoundry/schema'
-import { msg } from '../i18n/translate.ts'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
 
@@ -247,9 +246,12 @@ export function computedBulletRows(
       ? []
       : [
           {
-            label: msg('Sectional density'),
+            label: /*i18n*/ { id: 'bullet.sectionalDensity', message: 'Sectional density' },
             value: { quantity: 'sectionalDensity', si: density },
-            method: msg('Computed: mass over diameter squared.'),
+            method: /*i18n*/ {
+              id: 'bullet.sectionalDensityMethod',
+              message: 'Computed: mass over diameter squared.',
+            },
           } satisfies FieldRow,
         ]),
     ...(twist === undefined
@@ -257,14 +259,19 @@ export function computedBulletRows(
       : [
           {
             // the target of `millerStabilityTarget`
-            label: msg('Twist for Sg 1.5'),
+            label: /*i18n*/ { id: 'bullet.millerTwist', message: 'Twist for Sg 1.5' },
             value: { quantity: 'twist', si: twist },
             method:
               r.tip?.type === 'polymer-tip'
-                ? msg(
-                    "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is not fitted to plastic tips.",
-                  )
-                : msg("Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg."),
+                ? /*i18n*/ {
+                    id: 'bullet.millerMethodPolymerTip',
+                    message:
+                      "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is not fitted to plastic tips.",
+                  }
+                : /*i18n*/ {
+                    id: 'bullet.millerMethod',
+                    message: "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg.",
+                  },
           } satisfies FieldRow,
         ]),
   ]

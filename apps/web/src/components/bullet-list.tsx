@@ -6,7 +6,6 @@ import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'
 import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { bulletKinds, bulletSectionalDensity } from '../lib/bullet-kinds.ts'
 import {
   bulletFacetKeys,
@@ -68,7 +67,6 @@ export function BulletList({
   packed: PackedBullet[]
   cartridges?: FitCartridge[]
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userBullets)
@@ -86,7 +84,7 @@ export function BulletList({
   // a cartridge id the list does not know filters nothing and shows as no scope
   const fits = fitting.get(state.fits ?? '')
   const fit = fitting.get(filters.fits ?? '')?.fit
-  const facets = useMemo(() => bulletFacets(t), [t])
+  const facets = useMemo(() => bulletFacets(i18n), [i18n])
   const searched = useMemo(
     () =>
       items.filter(
@@ -105,8 +103,11 @@ export function BulletList({
   const cell = (b: BulletRow) => cells.get(b.id) ?? rowCells(b, system)
   const ids = useMemo(() => new Set(items.map((b) => b.id)), [items])
   // the Type column's text, once per row and language: also its sort key
-  const types = useMemo(() => new Map(items.map((b) => [b.id, bulletTypeText(t, b)])), [items, t])
-  const typeOf = (b: BulletRow) => types.get(b.id) ?? bulletTypeText(t, b)
+  const types = useMemo(
+    () => new Map(items.map((b) => [b.id, bulletTypeText(i18n, b)])),
+    [items, i18n],
+  )
+  const typeOf = (b: BulletRow) => types.get(b.id) ?? bulletTypeText(i18n, b)
   // the compare view's columns, in the order ticked; a bullet record's Compare (`compareFrom`) links with that bullet ticked
   const [picked, untick, replace] = usePicks(
     maxComparedBullets,

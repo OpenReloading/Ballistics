@@ -3,7 +3,6 @@
 import { useLingui } from '@lingui/react'
 import type { Powder } from '@rangefoundry/schema'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import {
   classifyPowder,
@@ -14,7 +13,7 @@ import {
 } from '../lib/burn-rate.ts'
 import type { ManufacturerNames } from '../lib/manufacturers.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
-import { sayOwn, verbatim } from '../lib/wording.ts'
+import { verbatim } from '../lib/wording.ts'
 import { Decimal } from './decimal.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
@@ -78,7 +77,6 @@ export function BurnRateSummary({
   place?: BurnRatePlace | undefined
   names: ManufacturerNames
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const p = classifyPowder(powder, names)
   const n2 = (x: number) => formatNumber(x, 2)
@@ -159,7 +157,7 @@ export function BurnRateSummary({
           )}
         </>
       ) : (
-        <p className="record-note">{sayOwn(t, p.why)}</p>
+        <p className="record-note">{i18n._(p.why)}</p>
       )}
     </Panel>
   )

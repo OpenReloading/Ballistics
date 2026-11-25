@@ -64,6 +64,15 @@ it('quotes each apostrophe of the German so a placeholder after one still fills'
   )
 })
 
+it('writes a decimal argument of the English into the German, whose de.json key has it plain', () => {
+  const { catalog } = convert(
+    { 'fit.exponent': entry('exponent {exponent, decimal} of {name}') },
+    { 'fit.exponent': entry('') },
+    { 'exponent {exponent} of {name}': 'Exponent {exponent} von {name}' },
+  )
+  expect(catalog['fit.exponent']?.translation).toBe('Exponent {exponent, decimal} von {name}')
+})
+
 it('takes no German from a name the entries only inherit', () => {
   const { catalog, missing } = convert(
     { 'object.constructor': entry('constructor') },

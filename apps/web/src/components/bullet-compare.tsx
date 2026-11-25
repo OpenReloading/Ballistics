@@ -169,7 +169,7 @@ export function BulletCompare({
                 </TableTh>
               </TableTr>
             </TableThead>
-            {compareGroups(bullets, system, t).map((g) => (
+            {compareGroups(bullets, system, t, i18n).map((g) => (
               <TableTbody key={say(i18n, t, g.title)}>
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={bullets.length + 3}>
@@ -177,8 +177,8 @@ export function BulletCompare({
                   </TableTh>
                 </TableTr>
                 {g.rows.map((row, k) => {
-                  const marks = differenceMarks(row.values, turnPrefixOf(t))
-                  const deltas = differenceToFirst(row.values, turnPrefixOf(t))
+                  const marks = differenceMarks(row.values, turnPrefixOf(i18n))
+                  const deltas = differenceToFirst(row.values, turnPrefixOf(i18n))
                   return (
                     // oxlint-disable-next-line react/no-array-index-key -- a label can repeat
                     <TableTr key={k} data-differs={rowDiffers(row.values) || undefined}>

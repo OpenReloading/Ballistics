@@ -1,4 +1,4 @@
-import { type Message, msg } from '../i18n/translate.ts'
+import type { Message } from '../i18n/translate.ts'
 import { sections } from '../lib/sections.ts'
 import { NotFoundState } from './offline-state.tsx'
 import { PageBar } from './page-bar.tsx'
@@ -7,7 +7,7 @@ import { PageBar } from './page-bar.tsx'
 export function PageNotFound() {
   return (
     <>
-      <PageBar title={msg('Page not found')} translated />
+      <PageBar title={/*i18n*/ { id: 'page.notFound', message: 'Page not found' }} translated />
       <NotFoundState
         links={sections.flatMap((s): readonly { href: string; label: Message }[] => s.pages)}
       />

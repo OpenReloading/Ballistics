@@ -148,17 +148,26 @@ msgstr "{label}, Z to A"
 msgid "powders.range"
 msgstr "{low} to {high}"
 
+msgid "values.materialCore"
+msgstr "{material} core"
+
+msgid "construction.materialJacket"
+msgstr "{material} jacket"
+
 msgid "disciplines.cover.discipline"
-msgstr "{n, number} {unit} for the discipline"
+msgstr "{n, decimal} {unit} for the discipline"
 
 msgid "disciplines.cover.series"
-msgstr "{n, number} {unit} per series"
+msgstr "{n, decimal} {unit} per series"
 
 msgid "disciplines.cover.shot"
-msgstr "{n, number} {unit} per shot"
+msgstr "{n, decimal} {unit} per shot"
 
 msgid "disciplines.cover.stage"
-msgstr "{n, number} {unit} per stage"
+msgstr "{n, decimal} {unit} per stage"
+
+msgid "construction.drivingBands"
+msgstr "{n} driving bands"
 
 msgid "burnRateCompare.userDesign"
 msgstr "{name} (user design)"
@@ -189,6 +198,9 @@ msgstr "{value} ({low} to {high}) {unit}"
 
 msgid "burnRate.mean"
 msgstr "{value} {unit}"
+
+msgid "recordFields.turnIn"
+msgstr "1 turn in {length}"
 
 msgid "cases.noneOwnHint"
 msgstr "A brass group keeps the cases you measured, with their water capacity, in this browser."
@@ -304,6 +316,12 @@ msgstr "At least one source stays on"
 msgid "directoryTable.full"
 msgstr "At most {max} at once"
 
+msgid "values.ball"
+msgstr "ball"
+
+msgid "bulletCompare.coefficients"
+msgstr "Ballistic coefficients"
+
 msgid "bulletRecord.coefficients"
 msgstr "Ballistic coefficients"
 
@@ -322,11 +340,44 @@ msgstr "Barrel twist"
 msgid "powders.column.base"
 msgstr "Base"
 
+msgid "recordFields.baseDiameter"
+msgstr "Base diameter"
+
+msgid "recordFields.baseLength"
+msgstr "Base length"
+
+msgid "recordFields.baseToOgive"
+msgstr "Base to ogive"
+
 msgid "bullets.facet.base"
+msgstr "Base type"
+
+msgid "recordFields.baseType"
 msgstr "Base type"
 
 msgid "fieldTable.coefficientUnit"
 msgstr "BC ({unit})"
+
+msgid "bulletCompare.coefficient"
+msgstr "BC {model}"
+
+msgid "recordFields.bearingLength"
+msgstr "Bearing length"
+
+msgid "values.blackOxide"
+msgstr "black oxide"
+
+msgid "values.boatTail"
+msgstr "boat-tail"
+
+msgid "recordFields.boatTailAngle"
+msgstr "Boat-tail angle"
+
+msgid "values.bonded"
+msgstr "bonded"
+
+msgid "values.boronNitride"
+msgstr "boron nitride"
 
 msgid "values.brass"
 msgstr "Brass"
@@ -342,6 +393,9 @@ msgstr "Brass group"
 
 msgid "cases.filtered"
 msgstr "Brass, {filters}"
+
+msgid "recordFields.build"
+msgstr "Build"
 
 msgid "bulletCompare.data"
 msgstr "Bullet data"
@@ -478,8 +532,14 @@ msgstr "Case length L3"
 msgid "cartridges.column.type"
 msgstr "Case type"
 
+msgid "values.caseContact"
+msgstr "case-contact"
+
 msgid "cartridgeRecord.meaning.case"
 msgstr "Case: the case type, derived from the record"
+
+msgid "values.cast"
+msgstr "cast"
 
 msgid "disciplines.facet.category"
 msgstr "Category"
@@ -492,6 +552,12 @@ msgstr "Category"
 
 msgid "federationRecord.column.category"
 msgstr "Category"
+
+msgid "recordFields.cavityDepth"
+msgstr "Cavity depth"
+
+msgid "recordFields.cavityDiameter"
+msgstr "Cavity diameter"
 
 msgid "cartridgeRecord.side.chamber"
 msgstr "Chamber"
@@ -562,17 +628,53 @@ msgstr "Compound"
 msgid "recordSources.kind.computed"
 msgstr "computed"
 
+msgid "recordFields.computed"
+msgstr "Computed"
+
+msgid "bullet.sectionalDensityMethod"
+msgstr "Computed: mass over diameter squared."
+
+msgid "bullet.millerMethod"
+msgstr "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg."
+
+msgid "bullet.millerMethodPolymerTip"
+msgstr "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is not fitted to plastic tips."
+
 msgid "firearms.column.configuration"
 msgstr "Configuration"
 
 msgid "log.column.confirmed"
 msgstr "Confirmed by"
 
+msgid "values.conicalHollowBase"
+msgstr "conical-hollow-base"
+
 msgid "bullets.facet.construction"
+msgstr "Construction"
+
+msgid "recordFields.construction"
 msgstr "Construction"
 
 msgid "recordActions.copied"
 msgstr "Copied"
+
+msgid "values.copper"
+msgstr "copper"
+
+msgid "values.cupCopper"
+msgstr "Copper"
+
+msgid "values.copperAlloy"
+msgstr "copper alloy"
+
+msgid "values.copperCladSteel"
+msgstr "copper clad steel"
+
+msgid "values.copperPlatedSteel"
+msgstr "copper plated steel"
+
+msgid "values.copperWash"
+msgstr "copper wash"
 
 msgid "recordActions.copyFailed"
 msgstr "Copy failed"
@@ -582,6 +684,12 @@ msgstr "Copy hash {hash}"
 
 msgid "recordActions.copyLink"
 msgstr "Copy link"
+
+msgid "recordFields.core"
+msgstr "Core"
+
+msgid "recordFields.coreHardness"
+msgstr "Core hardness (HBW)"
 
 msgid "units.quantity.correction"
 msgstr "Corrections"
@@ -609,6 +717,12 @@ msgstr "Course of fire"
 
 msgid "recordSources.column.covers"
 msgstr "Covers"
+
+msgid "values.crusher"
+msgstr "crusher"
+
+msgid "values.cupAndCore"
+msgstr "cup-and-core"
 
 msgid "powderRecord.curveValues"
 msgstr "Curve values"
@@ -654,6 +768,9 @@ msgstr "derived"
 
 msgid "disciplines.classBasis.derived"
 msgstr "Derived from the range or gauge the rule book states"
+
+msgid "recordFields.diameter"
+msgstr "Diameter"
 
 msgid "bullets.column.diameter"
 msgstr "Diameter"
@@ -730,6 +847,9 @@ msgstr "Distance"
 msgid "events.division"
 msgstr "Division"
 
+msgid "values.double"
+msgstr "double"
+
 msgid "fieldTable.column.dragModel"
 msgstr "Drag model"
 
@@ -744,6 +864,9 @@ msgstr "Drawings"
 
 msgid "bulletCompare.drawingsRegion"
 msgstr "Drawings"
+
+msgid "recordFields.drivingBands"
+msgstr "Driving bands"
 
 msgid "units.quantity.lineOfSightOffset"
 msgstr "Drop, windage"
@@ -783,6 +906,9 @@ msgstr "Empty: the event type and the day."
 
 msgid "events.roundsFiredHint"
 msgstr "Empty: the shots of the series, where each lists them."
+
+msgid "values.energy"
+msgstr "energy"
 
 msgid "units.quantity.energy"
 msgstr "Energy"
@@ -827,11 +953,17 @@ msgstr "Events ({count})"
 msgid "faceRecord.eventsTable"
 msgstr "Events table"
 
+msgid "burnRate.exponentDetail"
+msgstr "exponent {exponent, decimal}"
+
 msgid "events.exportCsv"
 msgstr "Export CSV"
 
 msgid "events.exportJson"
 msgstr "Export JSON"
+
+msgid "values.extruded"
+msgstr "extruded"
 
 msgid "powderRecord.faster"
 msgstr "Faster ({unit})"
@@ -893,6 +1025,12 @@ msgstr "Firearm mass up to"
 msgid "page.firearms"
 msgstr "Firearms"
 
+msgid "burnRate.unresolvedReason"
+msgstr "Fit unresolved: the interval of the fitted vivacity ({value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}) reaches 0, so the powder is not placed."
+
+msgid "burnRate.unfit.unresolved"
+msgstr "Fit unresolved: the interval of the fitted vivacity (plus and minus {factor} standard uncertainties) reaches 0, so the powder is not placed."
+
 msgid "bullets.fits"
 msgstr "Fits {name}"
 
@@ -905,8 +1043,20 @@ msgstr "Fitted M3 curve"
 msgid "bullets.fitting"
 msgstr "fitting {name}"
 
+msgid "values.flake"
+msgstr "flake"
+
+msgid "values.flat"
+msgstr "flat"
+
+msgid "values.flatNose"
+msgstr "flat-nose"
+
 msgid "powders.column.form"
 msgstr "Form"
+
+msgid "values.frangible"
+msgstr "frangible"
 
 msgid "disciplines.rule.freehand"
 msgstr "freehand"
@@ -917,6 +1067,9 @@ msgstr "From the official result, where published."
 msgid "disciplines.rule.fullMetalJacket"
 msgstr "full metal jacket"
 
+msgid "values.fullMetalJacket"
+msgstr "full-metal-jacket"
+
 msgid "bullets.column.g1"
 msgstr "G1"
 
@@ -926,11 +1079,20 @@ msgstr "G7"
 msgid "standardBadge.gap"
 msgstr "Gap"
 
+msgid "construction.gasCheck"
+msgstr "gas check"
+
+msgid "recordFields.gasCheck"
+msgstr "Gas check"
+
 msgid "disciplineRecord.column.gauge"
 msgstr "Gauge"
 
 msgid "faceRecord.column.gauge"
 msgstr "Gauge"
+
+msgid "values.gildingMetal"
+msgstr "gilding metal"
 
 msgid "disciplines.row.handloads"
 msgstr "Handloads"
@@ -956,11 +1118,20 @@ msgstr "Hole edge, outward"
 msgid "disciplines.rule.hollowPoint"
 msgstr "hollow point"
 
+msgid "values.hollowPoint"
+msgstr "hollow-point"
+
+msgid "recordFields.hollowPointMouthDiameter"
+msgstr "Hollow-point mouth diameter"
+
 msgid "disciplines.column.website"
 msgstr "Homepage"
 
 msgid "federationRecord.homepage"
 msgstr "Homepage"
+
+msgid "values.hybrid"
+msgstr "hybrid"
 
 msgid "events.importJson"
 msgstr "Import JSON"
@@ -983,8 +1154,20 @@ msgstr "International"
 msgid "disciplineRecord.international"
 msgstr "International discipline"
 
+msgid "construction.jacket"
+msgstr "jacket"
+
+msgid "recordFields.jacket"
+msgstr "Jacket"
+
+msgid "recordFields.jacketThickness"
+msgstr "Jacket thickness"
+
 msgid "disciplines.rule.jacketed"
 msgstr "jacketed"
+
+msgid "bulletCompare.keyValues"
+msgstr "Key values"
 
 msgid "faceRecord.column.kind"
 msgstr "Kind"
@@ -1013,14 +1196,32 @@ msgstr "Latest chronograph session of these loads."
 msgid "disciplines.rule.lead"
 msgstr "lead"
 
+msgid "values.lead"
+msgstr "lead"
+
+msgid "values.leadAlloy"
+msgstr "lead alloy"
+
+msgid "construction.leadFree"
+msgstr "lead free"
+
 msgid "values.leadFree"
 msgstr "Lead free"
 
 msgid "values.leadStyphnate"
 msgstr "Lead styphnate"
 
+msgid "values.leadWash"
+msgstr "lead wash"
+
 msgid "bullets.facet.leadfree"
 msgstr "Lead-free"
+
+msgid "recordFields.leadFree"
+msgstr "Lead-free"
+
+msgid "recordFields.length"
+msgstr "Length"
 
 msgid "bullets.column.length"
 msgstr "Length"
@@ -1211,6 +1412,9 @@ msgstr "Manufacturer, name or size…"
 msgid "bullets.search"
 msgstr "Manufacturer, name, 168, .308 or 7.82…"
 
+msgid "recordFields.mass"
+msgstr "Mass"
+
 msgid "bullets.column.mass"
 msgstr "Mass"
 
@@ -1246,6 +1450,9 @@ msgstr "measured"
 
 msgid "federationRecord.memberOf"
 msgstr "Member of"
+
+msgid "recordFields.meplatDiameter"
+msgstr "Meplat diameter"
 
 msgid "events.metal"
 msgstr "Metal"
@@ -1288,6 +1495,12 @@ msgstr "Model output from fitted M3 parameters, not manufacturer data."
 
 msgid "powderRecord.modelParameters"
 msgstr "Model parameters"
+
+msgid "values.moly"
+msgstr "moly"
+
+msgid "values.monolithic"
+msgstr "monolithic"
 
 msgid "disciplines.row.minMuzzleEnergy"
 msgstr "Muzzle energy from"
@@ -1373,6 +1586,12 @@ msgstr "New target"
 msgid "values.nickelPlatedBrass"
 msgstr "Nickel plated brass"
 
+msgid "values.no"
+msgstr "no"
+
+msgid "values.noTitle"
+msgstr "No"
+
 msgid "primers.no"
 msgstr "No"
 
@@ -1427,6 +1646,9 @@ msgstr "No firearm saved in this browser yet"
 msgid "states.noMatch.firearms"
 msgstr "No firearms match these filters."
 
+msgid "burnRate.noFit"
+msgstr "No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges."
+
 msgid "recordSources.noPage"
 msgstr "No page stated"
 
@@ -1471,6 +1693,12 @@ msgstr "None"
 
 msgid "events.none"
 msgstr "None"
+
+msgid "recordFields.noseLength"
+msgstr "Nose length"
+
+msgid "burnRate.notMetallic"
+msgstr "Not a metallic-cartridge powder"
 
 msgid "disciplines.notAllowed"
 msgstr "Not allowed"
@@ -1520,6 +1748,15 @@ msgstr "Number"
 msgid "page.offline"
 msgstr "Offline"
 
+msgid "recordFields.ogive"
+msgstr "Ogive"
+
+msgid "recordFields.ogiveRadius"
+msgstr "Ogive radius"
+
+msgid "recordFields.ogiveRadiusRatio"
+msgstr "Ogive radius ratio"
+
 msgid "listSources.ok"
 msgstr "OK"
 
@@ -1538,6 +1775,9 @@ msgstr "Open in designer"
 msgid "recordActions.openInShotGroups"
 msgstr "Open in shot groups"
 
+msgid "values.openMeplat"
+msgstr "open-meplat"
+
 msgid "firearms.column.optic"
 msgstr "Optic, zero"
 
@@ -1549,6 +1789,9 @@ msgstr "Origin"
 
 msgid "disciplines.rule.original"
 msgstr "original"
+
+msgid "values.other"
+msgstr "other"
 
 msgid "targets.column.outer"
 msgstr "Outer diameter"
@@ -1568,6 +1811,15 @@ msgstr "Page"
 msgid "recordSources.page"
 msgstr "Page {page}"
 
+msgid "page.notFound"
+msgstr "Page not found"
+
+msgid "values.paint"
+msgstr "paint"
+
+msgid "values.partitioned"
+msgstr "partitioned"
+
 msgid "bulletDrawing.assumed"
 msgstr "Parts drawn dashed are assumed, not from the record."
 
@@ -1576,6 +1828,9 @@ msgstr "Penalties"
 
 msgid "bullets.pickToCompare"
 msgstr "Pick 2 to {max}"
+
+msgid "values.piezo"
+msgstr "piezo"
 
 msgid "values.pistol"
 msgstr "Pistol"
@@ -1586,6 +1841,9 @@ msgstr "Place"
 msgid "log.column.place"
 msgstr "Place"
 
+msgid "values.plated"
+msgstr "plated"
+
 msgid "burnRate.bandNote"
 msgstr "Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound."
 
@@ -1595,8 +1853,14 @@ msgstr "Pmax"
 msgid "events.points"
 msgstr "Points"
 
+msgid "values.polymerCoat"
+msgstr "polymer coat"
+
 msgid "values.polymerCoatedSteel"
 msgstr "Polymer coated steel"
+
+msgid "values.polymerTip"
+msgstr "polymer-tip"
 
 msgid "disciplines.row.positions"
 msgstr "Positions"
@@ -1636,6 +1900,12 @@ msgstr "Preset"
 
 msgid "units.quantity.pressure"
 msgstr "Pressure"
+
+msgid "burnRate.exponentReason"
+msgstr "Pressure exponent {exponent, decimal}, not 1: the burn rate per pressure depends on the pressure, so there is no single curve."
+
+msgid "burnRate.unfit.exponent"
+msgstr "Pressure exponent other than 1: the burn rate per pressure depends on the pressure, so there is no single curve."
 
 msgid "states.unavailable.primer"
 msgstr "Primer data is unavailable right now."
@@ -1739,6 +2009,12 @@ msgstr "Range, distance"
 msgid "sources.rangefoundry"
 msgstr "RangeFoundry"
 
+msgid "values.rebatedBoatTail"
+msgstr "rebated-boat-tail"
+
+msgid "recordFields.recommendedTwist"
+msgstr "Recommended twist"
+
 msgid "disciplines.rule.reflex"
 msgstr "reflex"
 
@@ -1814,6 +2090,12 @@ msgstr "Rings"
 msgid "events.roundCountOf"
 msgstr "Round count of {name}: {count}."
 
+msgid "values.roundNose"
+msgstr "round-nose"
+
+msgid "values.roundedHollowBase"
+msgstr "rounded-hollow-base"
+
 msgid "log.column.rounds"
 msgstr "Rounds"
 
@@ -1871,6 +2153,9 @@ msgstr "Search"
 msgid "fieldTable.search"
 msgstr "Search {title}"
 
+msgid "values.secant"
+msgstr "secant"
+
 msgid "disciplines.row.section"
 msgstr "Section"
 
@@ -1879,6 +2164,9 @@ msgstr "Section"
 
 msgid "disciplineRecord.section"
 msgstr "section {section}, {page}"
+
+msgid "bullet.sectionalDensity"
+msgstr "Sectional density"
 
 msgid "bullets.column.sdHelp"
 msgstr "Sectional density, computed: mass over diameter squared."
@@ -1910,6 +2198,9 @@ msgstr "Service rifle"
 msgid "page.session"
 msgstr "Session summary"
 
+msgid "recordFields.shape"
+msgstr "Shape"
+
 msgid "events.shootingLog"
 msgstr "Shooting log"
 
@@ -1924,6 +2215,9 @@ msgstr "Shot groups"
 
 msgid "page.groups"
 msgstr "Shot groups"
+
+msgid "burnRate.unfit.shotgun"
+msgstr "Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges."
 
 msgid "events.shots"
 msgstr "Shots"
@@ -1964,11 +2258,17 @@ msgstr "Sights"
 msgid "bulletDrawing.simplified"
 msgstr "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
 
+msgid "values.single"
+msgstr "single"
+
 msgid "disciplines.rule.singleShot"
 msgstr "single shot"
 
 msgid "disciplines.rule.sitting"
 msgstr "sitting"
+
+msgid "recordFields.size"
+msgstr "Size"
 
 msgid "primers.column.size"
 msgstr "Size"
@@ -1979,6 +2279,9 @@ msgstr "sling"
 msgid "powderRecord.slower"
 msgstr "Slower ({unit})"
 
+msgid "recordFields.slowestTwist"
+msgstr "Slowest twist"
+
 msgid "values.smallPistol"
 msgstr "Small pistol"
 
@@ -1988,8 +2291,14 @@ msgstr "Small rifle"
 msgid "bulletCompare.smallest"
 msgstr "smallest"
 
+msgid "values.softPoint"
+msgstr "soft-point"
+
 msgid "bulletCompare.notFound"
 msgstr "Some bullets were not found."
+
+msgid "page.error"
+msgstr "Something went wrong"
 
 msgid "directoryTable.sort"
 msgstr "Sort"
@@ -2036,8 +2345,23 @@ msgstr "Stages"
 msgid "disciplines.rule.standing"
 msgstr "standing"
 
+msgid "values.steel"
+msgstr "steel"
+
+msgid "values.cupSteel"
+msgstr "Steel"
+
+msgid "recordFields.structure"
+msgstr "Structure"
+
 msgid "disciplines.row.support"
 msgstr "Support"
+
+msgid "recordFields.surface"
+msgstr "Surface"
+
+msgid "values.swaged"
+msgstr "swaged"
 
 msgid "bulletCompare.symbol"
 msgstr "Symbol"
@@ -2056,6 +2380,9 @@ msgstr "Table"
 
 msgid "cartridgeRecord.meaning.table"
 msgstr "Table: the CIP table of the record, I to XI, by cartridge class"
+
+msgid "values.tangent"
+msgstr "tangent"
 
 msgid "disciplines.facet.face"
 msgstr "Target"
@@ -2180,11 +2507,23 @@ msgstr "Time (s)"
 msgid "disciplines.row.timeLimit"
 msgstr "Time limit"
 
+msgid "values.tin"
+msgstr "tin"
+
 msgid "bulletCompare.legend"
 msgstr "Tinted: values differ. ▲ largest, ▼ smallest in a row. In brackets: difference to the first bullet."
 
 msgid "bullets.facet.tip"
 msgstr "Tip"
+
+msgid "recordFields.tip"
+msgstr "Tip"
+
+msgid "recordFields.tipAndBase"
+msgstr "Tip and base"
+
+msgid "recordFields.tipLength"
+msgstr "Tip length"
 
 msgid "federationRecord.column.title"
 msgstr "Title"
@@ -2210,8 +2549,14 @@ msgstr "Total {total}"
 msgid "powders.column.rows"
 msgstr "Training rows"
 
+msgid "values.transducer"
+msgstr "transducer"
+
 msgid "disciplines.row.minTriggerWeight"
 msgstr "Trigger weight from"
+
+msgid "values.triple"
+msgstr "triple"
 
 msgid "page.powdersTune"
 msgstr "Tune a powder"
@@ -2219,11 +2564,26 @@ msgstr "Tune a powder"
 msgid "powderRecord.tuneFromStrings"
 msgstr "Tune from strings"
 
+msgid "values.tungsten"
+msgstr "tungsten"
+
+msgid "values.tungstenDisulfide"
+msgstr "tungsten disulfide"
+
+msgid "recordFields.twist"
+msgstr "Twist"
+
 msgid "firearms.column.twist"
 msgstr "Twist"
 
+msgid "bullet.millerTwist"
+msgstr "Twist for Sg 1.5"
+
 msgid "bullets.column.type"
 msgstr "Type"
+
+msgid "burnRate.typed"
+msgstr "Typed model parameters"
 
 msgid "events.undoOfFailed"
 msgstr "Undo of {name} failed: {reason}"
@@ -2291,6 +2651,9 @@ msgstr "Variants table"
 msgid "units.quantity.velocity"
 msgstr "Velocity"
 
+msgid "burnRate.unresolvedDetail"
+msgstr "vivacity {value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}"
+
 msgid "disciplines.rule.wadcutter"
 msgstr "wadcutter"
 
@@ -2303,6 +2666,9 @@ msgstr "Water capacity"
 msgid "cases.column.capacityHelp"
 msgstr "Water to the case mouth, as the manufacturer states."
 
+msgid "values.waxLube"
+msgstr "wax lube"
+
 msgid "recordSources.wholeRecord"
 msgstr "whole record"
 
@@ -2311,6 +2677,12 @@ msgstr "Wind speed"
 
 msgid "burnRateCompare.noCurve"
 msgstr "Without a curve"
+
+msgid "values.yes"
+msgstr "yes"
+
+msgid "values.yesTitle"
+msgstr "Yes"
 
 msgid "primers.yes"
 msgstr "Yes"

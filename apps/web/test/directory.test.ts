@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { english, translator } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { bulletKinds, bulletSectionalDensity } from '../src/lib/bullet-kinds.ts'
 import {
   bulletFacets,
@@ -77,25 +77,15 @@ it('computes the sectional density from mass and diameter, none without both', (
 })
 
 it('names the type by tip and base, and the construction by structure or core', () => {
-  const t = english.t
-  expect(bulletTypeText(t, b({ tipType: 'hollow-point', baseType: 'boat-tail' }))).toBe(
+  const i18n = linguiOf('en')
+  expect(bulletTypeText(i18n, b({ tipType: 'hollow-point', baseType: 'boat-tail' }))).toBe(
     'Hollow point, boat tail',
   )
-  expect(bulletTypeText(t, b({ baseType: 'flat' }))).toBe('Flat')
-  expect(bulletTypeText(t, b({}))).toBe('')
-  expect(constructionText(t, 'cup-and-core')).toBe('Cup and core')
-  expect(constructionText(t, 'lead-core')).toBe('Lead core')
-  const de = translator({ 'hollow-point': 'Hohlspitze', 'boat-tail': 'Bootsheck' }, 'de')
-  expect(bulletTypeText(de.t, b({ tipType: 'hollow-point', baseType: 'boat-tail' }))).toBe(
-    'Hohlspitze, Bootsheck',
-  )
+  expect(bulletTypeText(i18n, b({ baseType: 'flat' }))).toBe('Flat')
+  expect(bulletTypeText(i18n, b({}))).toBe('')
   // a structure that ends in "-core" is no core material
-  const deBuild = translator(
-    { 'cup-and-core': 'Mantel mit Kern', lead: 'Blei', '{material} core': 'Kern aus {material}' },
-    'de',
-  )
-  expect(constructionText(deBuild.t, 'cup-and-core')).toBe('Mantel mit Kern')
-  expect(constructionText(deBuild.t, 'lead-core')).toBe('Kern aus Blei')
+  expect(constructionText(i18n, 'cup-and-core')).toBe('Cup and core')
+  expect(constructionText(i18n, 'lead-core')).toBe('Lead core')
 })
 
 it("takes a design's first G1 and G7, tip, base, construction and lead-free from its record", () => {
@@ -144,7 +134,7 @@ it('filters by construction, tip, base and lead-free, and leaves out a filter of
     b({ id: 'd', tipType: 'hollow-point', baseType: 'boat-tail', construction: 'bonded' }),
     b({ id: 'e' }),
   ]
-  const facets = bulletFacets(english.t)
+  const facets = bulletFacets(linguiOf('en'))
   const ids = (s: Record<string, string[]>) => facetRows(rows, facets, s).map((r) => r.id)
   expect(ids({ tip: ['hollow-point'] })).toEqual(['a', 'd'])
   expect(ids({ construction: ['monolithic', 'bonded'] })).toEqual(['c', 'd'])

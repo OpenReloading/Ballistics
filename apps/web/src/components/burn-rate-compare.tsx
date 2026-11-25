@@ -7,7 +7,6 @@ import { ChartLine } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { storedRecords } from '@/platform/user-store.ts'
-import { useTranslation } from '../i18n/language.ts'
 import { fetchPowder } from '../lib/api-client.ts'
 import {
   bandNote,
@@ -21,13 +20,11 @@ import {
   type OverlayPick,
   overlayFrom,
   type UnfittedPowder,
-  uncertaintyFactor,
   unfitTitles,
   unfittedGroups,
 } from '../lib/burn-rate.ts'
 import { designCurves } from '../lib/powder-rows.ts'
 import { userRecordId, userRowId } from '../lib/sources.ts'
-import { sayOwn } from '../lib/wording.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
@@ -294,7 +291,7 @@ export function BurnRatesLead() {
 
 /** The powders without a curve, in groups by the reason, each a link to its record. */
 export function NoCurve({ powders }: { powders: UnfittedPowder[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const groups = unfittedGroups(powders)
   if (groups.length === 0) return null
   return (
@@ -306,12 +303,12 @@ export function NoCurve({ powders }: { powders: UnfittedPowder[] }) {
     >
       {groups.map((g) => (
         <div key={g.kind}>
-          <p>{t(unfitTitles[g.kind], { factor: uncertaintyFactor })}</p>
+          <p>{i18n._(unfitTitles[g.kind])}</p>
           <ul className="inline-list">
             {g.powders.map((p) => (
               <li key={p.id}>
                 <Link href={`/powders/${p.id}`}>{p.label}</Link>
-                {p.detailWhy && ` (${sayOwn(t, p.detailWhy)})`}
+                {p.detailWhy && ` (${i18n._(p.detailWhy)})`}
               </li>
             ))}
           </ul>

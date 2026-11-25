@@ -178,8 +178,8 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           message:
             'Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
         }),
-        t(unfitTitles.none),
-        t(unfitTitles.shotgun),
+        i18n._(unfitTitles.none),
+        i18n._(unfitTitles.shotgun),
       ].join(' '),
       width: '13rem',
       num: true,

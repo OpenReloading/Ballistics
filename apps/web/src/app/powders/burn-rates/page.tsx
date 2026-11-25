@@ -8,7 +8,6 @@ import {
 } from '../../../components/burn-rate-compare.tsx'
 import { PageBar } from '../../../components/page-bar.tsx'
 import { Loading, ServerDataError } from '../../../components/states.tsx'
-import { msg } from '../../../i18n/translate.ts'
 import { getManufacturerNames, listAllPowders } from '../../../lib/api.ts'
 import { classifyPowder, isFitted, type UnfittedPowder } from '../../../lib/burn-rate.ts'
 
@@ -38,7 +37,12 @@ async function Compare() {
 export default function BurnRatesPage() {
   return (
     <>
-      <PageBar title={msg('Powder burn rates')} translated single actions={<PowdersByBurnRate />} />
+      <PageBar
+        title={/*i18n*/ { id: 'page.powdersBurnRates', message: 'Powder burn rates' }}
+        translated
+        single
+        actions={<PowdersByBurnRate />}
+      />
       <BurnRatesLead />
       <Suspense fallback={<Loading what="powders" />}>
         <Compare />

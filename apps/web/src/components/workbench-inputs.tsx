@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Anchor,
@@ -241,9 +243,9 @@ const lengthCell = (system: UnitSystem, mm: number) =>
   inchText(lengthText('diameter', system, toSi('length', mm)), system.length.symbol)
 
 /** The construction on one line: the structure, the full wording on hover; else the wording. */
-function constructionCell(c: Bullet['construction'], t: Translator['t']) {
-  const text = constructionRows(c, t)[0]?.text
-  const short = c?.structure && structureText(c.structure, t)
+function constructionCell(c: Bullet['construction'], i18n: I18n) {
+  const text = constructionRows(c, i18n)[0]?.text
+  const short = c?.structure && structureText(c.structure, i18n)
   return short && short !== text ? <Noted value={short} notes={[text as string]} inline /> : text
 }
 
@@ -1769,6 +1771,7 @@ function CardMore({ panel }: { panel: InputPanel }) {
 function MoreRows({ panel }: { panel: InputPanel }) {
   const { specValue, system, allDiameters, setAllDiameters, bullet } = useLoad()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const l6 = specValue('cartridge', 'L6')
   if (panel === 'cartridge')
     return (
@@ -1794,7 +1797,7 @@ function MoreRows({ panel }: { panel: InputPanel }) {
     <>
       <BulletValueFields more />
       <BaseFormFields />
-      {recordRow(t('Construction'), constructionCell(bullet?.construction, t))}
+      {recordRow(t('Construction'), constructionCell(bullet?.construction, i18n))}
       <Switch
         className="wide"
         label={t('Bullets of all diameters')}

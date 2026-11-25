@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { ActionIcon, NativeSelect, Tooltip } from '@mantine/core'
 import { baseTypes } from '@rangefoundry/schema'
 import { RotateCcw } from 'lucide-react'
@@ -15,7 +17,7 @@ import {
 import { bulletIncomplete } from '../lib/complete-records.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { controlSize } from '../lib/theme.ts'
-import { sayOwn } from '../lib/wording.ts'
+import { sayLingui } from '../lib/wording.ts'
 import { useLoad } from './workbench-context.ts'
 
 /** The hollow bases get shorter names: the select is too narrow for the full type name. */
@@ -25,10 +27,10 @@ const shortLabels: Record<string, Message> = {
 }
 
 /** A form's name: the German word, in English the type with spaces. */
-function label(type: string, t: Translator['t']) {
+function label(type: string, t: Translator['t'], i18n: I18n) {
   const short = shortLabels[type]
   if (short) return t(short)
-  const word = sayOwn(t, rawWording(type))
+  const word = sayLingui(i18n, rawWording(type))
   return word === type ? type.replaceAll('-', ' ') : word
 }
 
@@ -46,11 +48,12 @@ export function BaseFormField() {
   const { bulletRecord, bulletBaseType, baseChanged, setTypedBullet, markChanged, resetKeys } =
     useLoad()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!bulletRecord) return null
   const recorded = bulletRecord.base?.type
   const restore = t('Reset {label} to the record value {value}', {
     label: t('Base type'),
-    value: recorded ? label(recorded, t) : t('Not given'),
+    value: recorded ? label(recorded, t, i18n) : t('Not given'),
   })
   return (
     <NativeSelect
@@ -64,7 +67,7 @@ export function BaseFormField() {
       value={bulletBaseType ?? recorded ?? ''}
       data={[
         ...(recorded ? [] : [{ value: '', label: t('Not given') }]),
-        ...baseTypes.options.map((o) => ({ value: o, label: label(o, t) })),
+        ...baseTypes.options.map((o) => ({ value: o, label: label(o, t, i18n) })),
       ]}
       rightSection={
         baseChanged ? (

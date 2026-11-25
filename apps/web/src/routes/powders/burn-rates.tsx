@@ -6,7 +6,6 @@ import {
   PowdersByBurnRate,
 } from '../../components/burn-rate-compare.tsx'
 import { PageBar } from '../../components/page-bar.tsx'
-import { msg } from '../../i18n/translate.ts'
 import type { PowderSummary } from '../../lib/api-types.ts'
 import { classifyPowder, isFitted, type UnfittedPowder } from '../../lib/burn-rate.ts'
 import { manufacturerNames } from '../../lib/manufacturers.ts'
@@ -39,7 +38,12 @@ function BurnRatesPage() {
   const { options, unfitted } = Route.useLoaderData()
   return (
     <>
-      <PageBar title={msg('Powder burn rates')} translated single actions={<PowdersByBurnRate />} />
+      <PageBar
+        title={/*i18n*/ { id: 'page.powdersBurnRates', message: 'Powder burn rates' }}
+        translated
+        single
+        actions={<PowdersByBurnRate />}
+      />
       <BurnRatesLead />
       <BurnRateCompare options={options} />
       <NoCurve powders={unfitted} />

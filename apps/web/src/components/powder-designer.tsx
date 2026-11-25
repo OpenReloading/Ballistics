@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Button,
@@ -42,7 +43,7 @@ import { controlSize } from '../lib/theme.ts'
 import { tunePowderHref } from '../lib/tune-href.ts'
 import { namedKey } from '../lib/user-data.ts'
 import { userRef } from '../lib/variants.ts'
-import { sayOwn, verbatim } from '../lib/wording.ts'
+import { sayLingui, verbatim } from '../lib/wording.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
@@ -103,6 +104,7 @@ function RecordPanel({
   keyed: number
 }) {
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const status =
     'powder' in built
       ? built.powder.interior
@@ -129,10 +131,13 @@ function RecordPanel({
       label: msg('Provenance'),
       text: design.provenanceKind && t(provenanceText[design.provenanceKind]),
     },
-    { label: msg('Grain form'), text: design.grainForm && sayOwn(t, rawWording(design.grainForm)) },
+    {
+      label: msg('Grain form'),
+      text: design.grainForm && sayLingui(i18n, rawWording(design.grainForm)),
+    },
     {
       label: msg('Propellant base'),
-      text: design.propellantBase && sayOwn(t, rawWording(design.propellantBase)),
+      text: design.propellantBase && sayLingui(i18n, rawWording(design.propellantBase)),
     },
   ].flatMap(({ label, text }) => (text ? [{ label: verbatim(t(label)), text }] : []))
   return (
@@ -176,6 +181,7 @@ function RecordPanel({
 /** The draft is kept in this browser on every change (a record of kind `powder`), and once it passes the schema the workbench's Powder card offers it; `?record=` opens a browser record, a Mine row's link. */
 export function PowderDesigner() {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const [history, dispatch] = useReducer(reduce, undefined, () => historyOf(newDesign()))
   const design = history.present
@@ -260,7 +266,8 @@ export function PowderDesigner() {
     options: readonly string[],
     action: (v: string) => Action,
     error?: string,
-    text: (o: string) => string = (o) => (o === '' ? t('Not stated') : sayOwn(t, rawWording(o))),
+    text: (o: string) => string = (o) =>
+      o === '' ? t('Not stated') : sayLingui(i18n, rawWording(o)),
   ) => (
     <div className="designer-field" data-error={error ? true : undefined}>
       <NativeSelect
@@ -471,7 +478,7 @@ export function PowderDesigner() {
   return (
     <>
       <PageBar
-        title={msg('Powder designer')}
+        title={/*i18n*/ { id: 'page.powdersDesigner', message: 'Powder designer' }}
         translated
         fold={
           <DesignerToolbar
