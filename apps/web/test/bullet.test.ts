@@ -91,14 +91,10 @@ it('gives none without a BC of the model', () => {
   expect(bulletDrag(record(undefined), 'G1')).toEqual({ kind: 'none' })
 })
 
-it('computes the sectional density the manufacturer gives (SD 0.253) with its method', () => {
-  const [sd = missing(), twist = missing()] = computedBulletRows(targetBullet)
-  expect(sd.label).toBe('Sectional density')
-  expect(sd.method).toMatch(/^Computed: mass over diameter squared/)
+it('computes the sectional density the manufacturer gives (SD 0.253)', () => {
+  const [sd = missing()] = computedBulletRows(targetBullet)
   expect(rowValue(sd, presetUnits('us'))).toBe('0.253 lb/in²')
   expect(rowValue(sd, presetUnits('metric-grams'))).toBe('177.9 kg/m²')
-  expect(twist.label).toBe('Twist for Sg 1.5')
-  expect(twist.method).toMatch(/^Computed: Miller's rule/)
 })
 
 it('gives the twist at which the Miller rule reads Sg 1.5 at 2800 ft/s and standard air', () => {

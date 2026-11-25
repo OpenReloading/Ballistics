@@ -17,7 +17,7 @@ const links = [
 function OfflinePage() {
   return (
     <>
-      <PageBar title={msg('Offline')} translated />
+      <PageBar title={/*i18n*/ { id: 'page.offline', message: 'Offline' }} translated />
       <OfflineState links={links} />
     </>
   )

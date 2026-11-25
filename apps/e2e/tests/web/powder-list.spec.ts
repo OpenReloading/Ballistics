@@ -42,7 +42,7 @@ test("adds the browser's own powder to the burn-rate overlay, marked as a user d
   await row.getByRole('checkbox').check()
   await page.getByRole('link', { name: 'Compare 1' }).click()
   await expect(page).toHaveURL(/add=user:6e5d4c3b/)
-  await expect(page.getByText('Mine Fitted (user design)')).toBeVisible()
+  await expect(page.getByText('Mine Fitted (user design)', { exact: true })).toBeVisible()
   await expect(
     page.getByRole('img', { name: /Dynamic vivacity of the chosen powders/ }),
   ).toBeVisible()

@@ -1,14 +1,14 @@
 /** The bullet list page's own data, apart from `bullet-rows.ts`, which the site search of every page loads. */
+import type { I18n } from '@lingui/core'
 import { toSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
-import { msg, type Translator } from '../i18n/translate.ts'
 import { bulletSectionalDensity } from './bullet-kinds.ts'
 import type { BulletItem, BulletRow } from './bullet-rows.ts'
 import { present } from './directory.ts'
 import type { Facet } from './facets.ts'
-import { rawWording, spacedWording } from './record-values.ts'
+import { materialCore, rawWording, spacedWording, yesNo } from './record-values.ts'
 import { inchText, type UnitSystem } from './units.ts'
-import { sayOwn } from './wording.ts'
+import { sayLingui } from './wording.ts'
 
 /** The Diameter (inches to 4 decimals, mm to 3) and SD cells in the preset's units; empty without a value. */
 export function listCells(b: BulletRow, system: UnitSystem) {
@@ -38,24 +38,26 @@ export const coefficientText = (value: number | null) =>
 const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 /** A tip, base or structure value as a word, hyphens as spaces: "hollow point". */
-const kindWord = (t: Translator['t'], value: string) =>
-  sayOwn(t, rawWording(value)).replaceAll('-', ' ')
+const kindWord = (i18n: I18n, value: string) =>
+  sayLingui(i18n, rawWording(value)).replaceAll('-', ' ')
 
 /** A list item's construction as a name: "Cup and core", "Lead core". */
-export function constructionText(t: Translator['t'], value: string) {
+export function constructionText(i18n: I18n, value: string) {
   // the one structure that ends in "-core" is no core material
   const core = value === 'cup-and-core' ? undefined : /^(.+)-core$/.exec(value)?.[1]
   return capitalised(
-    core ? t('{material} core', { material: sayOwn(t, spacedWording(core)) }) : kindWord(t, value),
+    core
+      ? i18n._({ ...materialCore, values: { material: sayLingui(i18n, spacedWording(core)) } })
+      : kindWord(i18n, value),
   )
 }
 
 /** A tip or base value as a name: "Hollow point", "Boat tail". */
-const kindText = (t: Translator['t'], value: string) => capitalised(kindWord(t, value))
+const kindText = (i18n: I18n, value: string) => capitalised(kindWord(i18n, value))
 
 /** The Type column: tip and base, "Hollow point, boat tail"; empty without either. */
-export function bulletTypeText(t: Translator['t'], b: Pick<BulletRow, 'tipType' | 'baseType'>) {
-  const words = [b.tipType, b.baseType].flatMap((v) => (v ? [kindWord(t, v)] : []))
+export function bulletTypeText(i18n: I18n, b: Pick<BulletRow, 'tipType' | 'baseType'>) {
+  const words = [b.tipType, b.baseType].flatMap((v) => (v ? [kindWord(i18n, v)] : []))
   return capitalised(words.join(', '))
 }
 
@@ -63,31 +65,31 @@ export function bulletTypeText(t: Translator['t'], b: Pick<BulletRow, 'tipType' 
 export const bulletFacetKeys = ['construction', 'tip', 'base', 'leadfree']
 
 /** A filter whose rows give it one value only is left out (`facetOptions`). */
-export function bulletFacets(t: Translator['t']): Facet<BulletRow>[] {
+export function bulletFacets(i18n: I18n): Facet<BulletRow>[] {
   return [
     {
       key: 'construction',
       label: /*i18n*/ { id: 'bullets.facet.construction', message: 'Construction' },
       values: (b) => (b.construction ? [b.construction] : []),
-      text: (v) => constructionText(t, v),
+      text: (v) => constructionText(i18n, v),
     },
     {
       key: 'tip',
       label: /*i18n*/ { id: 'bullets.facet.tip', message: 'Tip' },
       values: (b) => (b.tipType ? [b.tipType] : []),
-      text: (v) => kindText(t, v),
+      text: (v) => kindText(i18n, v),
     },
     {
       key: 'base',
       label: /*i18n*/ { id: 'bullets.facet.base', message: 'Base type' },
       values: (b) => (b.baseType ? [b.baseType] : []),
-      text: (v) => kindText(t, v),
+      text: (v) => kindText(i18n, v),
     },
     {
       key: 'leadfree',
       label: /*i18n*/ { id: 'bullets.facet.leadfree', message: 'Lead-free' },
       values: (b) => (b.leadFree === undefined ? [] : [b.leadFree ? 'yes' : 'no']),
-      text: (v) => t(v === 'yes' ? msg('Yes') : msg('No')),
+      text: (v) => i18n._(yesNo(v === 'yes', true)),
       order: (a, b) => (a === b ? 0 : a === 'yes' ? -1 : 1),
     },
   ]

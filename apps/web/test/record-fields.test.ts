@@ -41,7 +41,7 @@ const target = targetBullet
 /** The rows of a bullet's data groups, the computed ones left out. */
 const dataRows = (b: Bullet) =>
   bulletDataGroups(b)
-    .filter((g) => g.title !== 'Computed')
+    .filter((g) => !g.title || say(linguiOf('en'), english, g.title) !== 'Computed')
     .flatMap((g) => g.rows)
 
 it('lists the cavity diameter and a measured cavity depth of a hollow base', () => {
@@ -54,7 +54,8 @@ it('lists the cavity diameter and a measured cavity depth of a hollow base', () 
     ['Cavity diameter', '5.00 mm'],
     ['Cavity depth', '4.00 mm'],
   ])
-  expect(rows.find((r) => r.label === 'Cavity depth')?.symbol).toBeUndefined()
+  const depth = rows.find((r) => say(linguiOf('en'), english, r.label) === 'Cavity depth')
+  expect(defined(depth).symbol).toBeUndefined()
 })
 
 it('splits the build into structure, jacket, core and surface, the manufacturer wording as printed on the first', () => {
@@ -89,7 +90,10 @@ it('splits the build into structure, jacket, core and surface, the manufacturer 
 
 it('shows the jacket wall, core hardness, gas check, driving bands and the derived lead-free flag', () => {
   const rows = (construction: Bullet['construction']) =>
-    buildRows(construction).map((r) => [r.label, r.text ?? r.value?.si])
+    buildRows(construction).map((r) => [
+      say(linguiOf('en'), english, r.label),
+      r.text ?? r.value?.si,
+    ])
   expect(
     rows({
       raw: 'x',
@@ -129,7 +133,7 @@ it('names the added construction values in one line', () => {
   expect(
     constructionRows(
       { raw: 'x', structure: 'cast', core: { material: 'lead' }, gasCheck: true },
-      english,
+      linguiOf('en'),
     )[0]?.text,
   ).toBe('Cast, lead core, gas check')
   expect(
@@ -140,7 +144,7 @@ it('names the added construction values in one line', () => {
         core: { material: 'copper' },
         drivingBands: 3,
       },
-      english,
+      linguiOf('en'),
     )[0]?.text,
   ).toBe('Monolithic, copper core, 3 driving bands, lead free')
 })
@@ -212,7 +216,7 @@ it('leaves the identity fields to the title and badges and gives text fields as 
     ['Boat-tail angle', '8.3333 deg'],
   ])
   // the groups the record fills, each dimension with its drawing symbol
-  expect(bulletDataGroups(b).map((g) => g.title)).toEqual([
+  expect(bulletDataGroups(b).map((g) => g.title && say(linguiOf('en'), english, g.title))).toEqual([
     'Size',
     'Shape',
     'Tip and base',

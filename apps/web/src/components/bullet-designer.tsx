@@ -1,5 +1,6 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Anchor, Button, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
@@ -42,7 +43,7 @@ import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { resolveBullet } from '../lib/variants.ts'
-import { sayOwn } from '../lib/wording.ts'
+import { sayLingui } from '../lib/wording.ts'
 import { description } from './bullet-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -80,11 +81,11 @@ const shortLabels: Record<string, Message> = {
 }
 
 /** An option's name: a stored value the catalogue has is translated, English shows it with spaces. */
-function optionLabel(o: string, t: Translator['t']) {
+function optionLabel(o: string, t: Translator['t'], i18n: I18n) {
   if (o === '') return t('Not given')
   const short = shortLabels[o]
   if (short) return t(short)
-  const word = sayOwn(t, rawWording(o))
+  const word = sayLingui(i18n, rawWording(o))
   return word === o ? o.replaceAll('-', ' ') : word
 }
 
@@ -164,6 +165,7 @@ const ChoiceSelect = memo(function ChoiceSelect({
   dispatch: (a: Action) => void
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     // the message is the description (screen readers, the grid's help line) and the title: it moves nothing
     <div className="designer-field" data-error={error ? true : undefined}>
@@ -173,7 +175,7 @@ const ChoiceSelect = memo(function ChoiceSelect({
         value={value}
         description={error}
         error={!!error}
-        data={['', ...choiceOptions[k]].map((o) => ({ value: o, label: optionLabel(o, t) }))}
+        data={['', ...choiceOptions[k]].map((o) => ({ value: o, label: optionLabel(o, t, i18n) }))}
         onChange={(ev) => dispatch({ type: 'choice', key: k, value: ev.currentTarget.value })}
       />
     </div>
@@ -289,6 +291,7 @@ const printRows = (
   design: Design,
   manufacturer: string | undefined,
   t: Translator['t'],
+  i18n: I18n,
 ): FieldRow[] => [
   ...(
     [
@@ -298,7 +301,7 @@ const printRows = (
   ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
   ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
     design.choices[k]
-      ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k], t) }]
+      ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k], t, i18n) }]
       : [],
   ),
   ...designerSpecs.flatMap((s): FieldRow[] => {
@@ -521,13 +524,13 @@ export function BulletDesigner() {
     e.computed.length > 0
       ? t('Computed from the design: {values}.', {
           values: e.computed
-            .map((r) => `${rowLabel(r, system, t)} ${rowValue(r, system, t)}`)
+            .map((r) => `${rowLabel(r, system, t, i18n)} ${rowValue(r, system, t, i18n)}`)
             .join(', '),
         })
       : ''
 
   // print: the drawing and the values, not the form
-  const values = printRows(design, manufacturers.nameOf(design.manufacturer), t)
+  const values = printRows(design, manufacturers.nameOf(design.manufacturer), t, i18n)
 
   const results = (
     <>
@@ -606,7 +609,12 @@ export function BulletDesigner() {
 
   return (
     <>
-      <PageBar translated title={msg('Bullet designer')} fold={toolbar} actions={actions} />
+      <PageBar
+        translated
+        title={/*i18n*/ { id: 'page.bulletsDesigner', message: 'Bullet designer' }}
+        fold={toolbar}
+        actions={actions}
+      />
       <div
         ref={root}
         className="designer"

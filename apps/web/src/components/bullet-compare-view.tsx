@@ -9,7 +9,6 @@ import { type BulletProfile, recordProfile } from '@rangefoundry/svg-drawings/bu
 import { ArrowLeftRight, CircleExclamationPoint } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import { useSearchParams } from '@/platform/navigation.ts'
-import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { sharedScale } from '../lib/bullet-compare.ts'
 import { compareHref, maxComparedBullets, parseCompareIds } from '../lib/compare-ids.ts'
@@ -144,7 +143,7 @@ export function CompareBar({ actions }: { actions: boolean }) {
   const { i18n } = useLingui()
   return (
     <PageBar
-      title={msg('Compare bullets')}
+      title={/*i18n*/ { id: 'page.bulletsCompare', message: 'Compare bullets' }}
       translated
       actions={
         actions ? (

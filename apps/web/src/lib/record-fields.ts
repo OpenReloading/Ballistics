@@ -1,4 +1,4 @@
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import {
   type Bullet,
   type Case,
@@ -14,6 +14,7 @@ import { type Message, msg, type Translator, translator } from '../i18n/translat
 import { computedBulletRows } from './bullet.ts'
 import {
   cupWording,
+  materialCore,
   rawWording,
   spacedWording,
   titleFromKebab,
@@ -30,7 +31,7 @@ import {
   waterVolume,
   withUnit,
 } from './units.ts'
-import { say, sayOwn, verbatim, type Wording, worded } from './wording.ts'
+import { say, sayLingui, verbatim, type Wording, worded } from './wording.ts'
 
 export { titleFromKebab }
 
@@ -90,6 +91,9 @@ export const rowText = (row: FieldRow, t: Translate, i18n: I18n) =>
       ? localizeDecimals(row.text ?? '')
       : row.text
 
+/** A twist's length per turn as text. */
+export const turnIn = /*i18n*/ { id: 'recordFields.turnIn', message: '1 turn in {length}' }
+
 /** A row's value as shown in `system`: rounded to the unit's decimals, with its symbol. */
 export function rowValue(
   row: FieldRow,
@@ -104,7 +108,7 @@ export function rowValue(
   }
   const { quantity: q, si, significantDigits: sig } = row.value
   const shown = `${sig ? inchText(formatSignificant(system[q].fromSi(si), sig), system[q].symbol) : formatQuantity(q, system, si)}${system[q].symbol ? ` ${system[q].symbol}` : ''}`
-  return q === 'twist' ? t('1 turn in {length}', { length: shown }) : shown
+  return q === 'twist' ? i18n._({ ...turnIn, values: { length: shown } }) : shown
 }
 
 /** A row's value split into its text and its unit symbol, for a unit column or a label. */
@@ -157,27 +161,80 @@ function formatSignificant(x: number, n: number): string {
 const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 /** A bullet's structure as a name: "Cup and core". */
-export const structureText = (structure: string, t: Translator['t']) =>
-  capitalised(sayOwn(t, rawWording(structure)).replaceAll('-', ' '))
+export const structureText = (structure: string, i18n: I18n) =>
+  capitalised(sayLingui(i18n, rawWording(structure)).replaceAll('-', ' '))
+
+/** The group titles and row labels of a bullet's data. */
+export const bulletLabels = {
+  construction: /*i18n*/ { id: 'recordFields.construction', message: 'Construction' },
+  structure: /*i18n*/ { id: 'recordFields.structure', message: 'Structure' },
+  jacket: /*i18n*/ { id: 'recordFields.jacket', message: 'Jacket' },
+  jacketThickness: /*i18n*/ { id: 'recordFields.jacketThickness', message: 'Jacket thickness' },
+  core: /*i18n*/ { id: 'recordFields.core', message: 'Core' },
+  coreHardness: /*i18n*/ { id: 'recordFields.coreHardness', message: 'Core hardness (HBW)' },
+  surface: /*i18n*/ { id: 'recordFields.surface', message: 'Surface' },
+  gasCheck: /*i18n*/ { id: 'recordFields.gasCheck', message: 'Gas check' },
+  drivingBands: /*i18n*/ { id: 'recordFields.drivingBands', message: 'Driving bands' },
+  leadFree: /*i18n*/ { id: 'recordFields.leadFree', message: 'Lead-free' },
+  size: /*i18n*/ { id: 'recordFields.size', message: 'Size' },
+  diameter: /*i18n*/ { id: 'recordFields.diameter', message: 'Diameter' },
+  mass: /*i18n*/ { id: 'recordFields.mass', message: 'Mass' },
+  length: /*i18n*/ { id: 'recordFields.length', message: 'Length' },
+  shape: /*i18n*/ { id: 'recordFields.shape', message: 'Shape' },
+  noseLength: /*i18n*/ { id: 'recordFields.noseLength', message: 'Nose length' },
+  baseToOgive: /*i18n*/ { id: 'recordFields.baseToOgive', message: 'Base to ogive' },
+  bearingLength: /*i18n*/ { id: 'recordFields.bearingLength', message: 'Bearing length' },
+  ogive: /*i18n*/ { id: 'recordFields.ogive', message: 'Ogive' },
+  ogiveRadius: /*i18n*/ { id: 'recordFields.ogiveRadius', message: 'Ogive radius' },
+  ogiveRadiusRatio: /*i18n*/ { id: 'recordFields.ogiveRadiusRatio', message: 'Ogive radius ratio' },
+  meplatDiameter: /*i18n*/ { id: 'recordFields.meplatDiameter', message: 'Meplat diameter' },
+  tipAndBase: /*i18n*/ { id: 'recordFields.tipAndBase', message: 'Tip and base' },
+  tip: /*i18n*/ { id: 'recordFields.tip', message: 'Tip' },
+  tipLength: /*i18n*/ { id: 'recordFields.tipLength', message: 'Tip length' },
+  hollowPointMouthDiameter: /*i18n*/ {
+    id: 'recordFields.hollowPointMouthDiameter',
+    message: 'Hollow-point mouth diameter',
+  },
+  baseType: /*i18n*/ { id: 'recordFields.baseType', message: 'Base type' },
+  baseLength: /*i18n*/ { id: 'recordFields.baseLength', message: 'Base length' },
+  baseDiameter: /*i18n*/ { id: 'recordFields.baseDiameter', message: 'Base diameter' },
+  cavityDiameter: /*i18n*/ { id: 'recordFields.cavityDiameter', message: 'Cavity diameter' },
+  cavityDepth: /*i18n*/ { id: 'recordFields.cavityDepth', message: 'Cavity depth' },
+  boatTailAngle: /*i18n*/ { id: 'recordFields.boatTailAngle', message: 'Boat-tail angle' },
+  build: /*i18n*/ { id: 'recordFields.build', message: 'Build' },
+  twist: /*i18n*/ { id: 'recordFields.twist', message: 'Twist' },
+  recommendedTwist: /*i18n*/ { id: 'recordFields.recommendedTwist', message: 'Recommended twist' },
+  slowestTwist: /*i18n*/ { id: 'recordFields.slowestTwist', message: 'Slowest twist' },
+  computed: /*i18n*/ { id: 'recordFields.computed', message: 'Computed' },
+} satisfies Record<string, MessageDescriptor>
 
 /** The manufacturer's wording shows as the printed text. */
-export function constructionRows(c: Bullet['construction'], t: Translator['t']): FieldRow[] {
+export function constructionRows(c: Bullet['construction'], i18n: I18n): FieldRow[] {
   if (!c) return []
-  const material = (value: string) => sayOwn(t, spacedWording(value))
+  const material = (value: string) => sayLingui(i18n, spacedWording(value))
   const parts = [
-    c.structure && structureText(c.structure, t),
-    c.core && t('{material} core', { material: material(c.core.material) }),
+    c.structure && structureText(c.structure, i18n),
+    c.core && i18n._({ ...materialCore, values: { material: material(c.core.material) } }),
     c.jacket &&
       (c.jacket.material
-        ? t('{material} jacket', { material: material(c.jacket.material) })
-        : t('jacket')),
+        ? i18n._({
+            id: 'construction.materialJacket',
+            message: '{material} jacket',
+            values: { material: material(c.jacket.material) },
+          })
+        : i18n._({ id: 'construction.jacket', message: 'jacket' })),
     ...(c.surface ?? []).map(material),
-    c.gasCheck && t('gas check'),
-    c.drivingBands && t('{n} driving bands', { n: c.drivingBands }),
-    leadFree(c) && t('lead free'),
+    c.gasCheck && i18n._({ id: 'construction.gasCheck', message: 'gas check' }),
+    c.drivingBands &&
+      i18n._({
+        id: 'construction.drivingBands',
+        message: '{n} driving bands',
+        values: { n: c.drivingBands },
+      }),
+    leadFree(c) && i18n._({ id: 'construction.leadFree', message: 'lead free' }),
   ].filter(Boolean)
   const text = parts.length > 0 ? capitalised(parts.join(', ')) : c.raw
-  return [{ label: msg('Construction'), text, ...(text !== c.raw && { printed: c.raw }) }]
+  return [{ label: bulletLabels.construction, text, ...(text !== c.raw && { printed: c.raw }) }]
 }
 
 const yesNoText = (value: boolean | undefined, capitalised = false) =>
@@ -196,7 +253,7 @@ const text = (label: Wording, value: string | undefined): FieldRow[] =>
 
 /** A text row whose value is a stored word: its English as `value` shows it, its words from `wording`. */
 const word = (
-  label: Message,
+  label: Wording,
   value: string | undefined,
   wording: (value: string) => Wording,
   shownText = value,
@@ -206,7 +263,7 @@ const word = (
     : [{ label, text: shownText, words: [wording(value)] }]
 
 /** A yes or no row. */
-const flag = (label: Message, value: boolean | undefined, capitalised = false): FieldRow[] =>
+const flag = (label: Wording, value: boolean | undefined, capitalised = false): FieldRow[] =>
   value === undefined
     ? []
     : [{ label, text: yesNoText(value, capitalised) ?? '', words: [yesNo(value, capitalised)] }]
@@ -238,29 +295,34 @@ export function buildRows(c: Bullet['construction']): FieldRow[] {
   const material = (m: string) => m.replaceAll('-', ' ')
   const jacket = c.jacket
   const rows: FieldRow[] = [
-    ...word(msg('Structure'), c.structure, rawWording),
+    ...word(bulletLabels.structure, c.structure, rawWording),
     ...(jacket
       ? jacket.material
-        ? word(msg('Jacket'), jacket.material, spacedWording, material(jacket.material))
-        : flag(msg('Jacket'), true)
+        ? word(bulletLabels.jacket, jacket.material, spacedWording, material(jacket.material))
+        : flag(bulletLabels.jacket, true)
       : []),
-    ...length(msg('Jacket thickness'), jacket?.thickness),
-    ...word(msg('Core'), c.core?.material, spacedWording, c.core && material(c.core.material)),
-    ...text(msg('Core hardness (HBW)'), c.core?.hardness?.value.toString()),
+    ...length(bulletLabels.jacketThickness, jacket?.thickness),
+    ...word(
+      bulletLabels.core,
+      c.core?.material,
+      spacedWording,
+      c.core && material(c.core.material),
+    ),
+    ...text(bulletLabels.coreHardness, c.core?.hardness?.value.toString()),
     ...(c.surface
       ? [
           {
-            label: msg('Surface'),
+            label: bulletLabels.surface,
             text: c.surface.map(material).join(', '),
             words: c.surface.map(spacedWording),
           },
         ]
       : []),
-    ...flag(msg('Gas check'), c.gasCheck),
-    ...text(msg('Driving bands'), c.drivingBands?.toString()),
-    ...flag(msg('Lead-free'), leadFree(c)),
+    ...flag(bulletLabels.gasCheck, c.gasCheck),
+    ...text(bulletLabels.drivingBands, c.drivingBands?.toString()),
+    ...flag(bulletLabels.leadFree, leadFree(c)),
   ]
-  if (rows.length === 0) return [{ label: msg('Construction'), text: c.raw }]
+  if (rows.length === 0) return [{ label: bulletLabels.construction, text: c.raw }]
   return rows.map((row, i) => (i === 0 ? { ...row, printed: c.raw } : row))
 }
 
@@ -269,41 +331,41 @@ export function bulletDataGroups(b: Bullet): FieldGroup[] {
   const angle = b.base?.angle
   return [
     {
-      title: msg('Size'),
+      title: bulletLabels.size,
       rows: [
-        ...length(msg('Diameter'), b.diameter, 'd'),
-        ...stored('mass', 'g')(msg('Mass'), b.mass),
-        ...length(msg('Length'), b.length, 'L'),
+        ...length(bulletLabels.diameter, b.diameter, 'd'),
+        ...stored('mass', 'g')(bulletLabels.mass, b.mass),
+        ...length(bulletLabels.length, b.length, 'L'),
       ],
     },
     {
-      title: msg('Shape'),
+      title: bulletLabels.shape,
       rows: [
-        ...length(msg('Nose length'), b.noseLength, 'n'),
-        ...length(msg('Base to ogive'), b.baseToOgive, 'BTO'),
-        ...length(msg('Bearing length'), b.bearingLength, 'b'),
-        ...word(msg('Ogive'), b.ogive?.form, rawWording),
-        ...length(msg('Ogive radius'), b.ogive?.radius, 'R'),
-        ...stored('ratio', '1')(msg('Ogive radius ratio'), b.ogive?.radiusRatio, 'Rt/R'),
-        ...length(msg('Meplat diameter'), b.meplatDiameter, 'dm'),
+        ...length(bulletLabels.noseLength, b.noseLength, 'n'),
+        ...length(bulletLabels.baseToOgive, b.baseToOgive, 'BTO'),
+        ...length(bulletLabels.bearingLength, b.bearingLength, 'b'),
+        ...word(bulletLabels.ogive, b.ogive?.form, rawWording),
+        ...length(bulletLabels.ogiveRadius, b.ogive?.radius, 'R'),
+        ...stored('ratio', '1')(bulletLabels.ogiveRadiusRatio, b.ogive?.radiusRatio, 'Rt/R'),
+        ...length(bulletLabels.meplatDiameter, b.meplatDiameter, 'dm'),
       ],
     },
     {
-      title: msg('Tip and base'),
+      title: bulletLabels.tipAndBase,
       rows: [
-        ...word(msg('Tip'), b.tip?.type, rawWording),
-        ...length(msg('Tip length'), b.tip?.length, 'lt'),
-        ...length(msg('Hollow-point mouth diameter'), b.tip?.mouthDiameter, 'dh'),
-        ...word(msg('Base type'), b.base?.type, rawWording),
-        ...length(msg('Base length'), b.base?.length, 't'),
-        ...length(msg('Base diameter'), b.base?.diameter, 'db'),
-        ...length(msg('Cavity diameter'), b.base?.cavityDiameter, 'dc'),
-        ...length(msg('Cavity depth'), b.base?.cavityDepth),
+        ...word(bulletLabels.tip, b.tip?.type, rawWording),
+        ...length(bulletLabels.tipLength, b.tip?.length, 'lt'),
+        ...length(bulletLabels.hollowPointMouthDiameter, b.tip?.mouthDiameter, 'dh'),
+        ...word(bulletLabels.baseType, b.base?.type, rawWording),
+        ...length(bulletLabels.baseLength, b.base?.length, 't'),
+        ...length(bulletLabels.baseDiameter, b.base?.diameter, 'db'),
+        ...length(bulletLabels.cavityDiameter, b.base?.cavityDiameter, 'dc'),
+        ...length(bulletLabels.cavityDepth, b.base?.cavityDepth),
         // degrees and minutes on manufacturer sheets: the stored decimal degrees, not rounded to whole degrees
         ...(angle
           ? [
               {
-                label: msg('Boat-tail angle'),
+                label: bulletLabels.boatTailAngle,
                 text: degreeText(angle.value),
                 numeric: true as const,
                 unit: 'deg',
@@ -313,15 +375,15 @@ export function bulletDataGroups(b: Bullet): FieldGroup[] {
           : []),
       ],
     },
-    { title: msg('Build'), rows: buildRows(b.construction) },
+    { title: bulletLabels.build, rows: buildRows(b.construction) },
     {
-      title: msg('Twist'),
+      title: bulletLabels.twist,
       rows: [
-        ...twist(msg('Recommended twist'), b.recommendedTwist),
-        ...twist(msg('Slowest twist'), b.slowestTwist),
+        ...twist(bulletLabels.recommendedTwist, b.recommendedTwist),
+        ...twist(bulletLabels.slowestTwist, b.slowestTwist),
       ],
     },
-    { title: msg('Computed'), rows: computedBulletRows(b) },
+    { title: bulletLabels.computed, rows: computedBulletRows(b) },
   ].filter((g) => g.rows.length > 0)
 }
 

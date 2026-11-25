@@ -1,4 +1,4 @@
-import { type I18n, type Messages, setupI18n } from '@lingui/core'
+import { type Formatter, type I18n, type Messages, setupI18n } from '@lingui/core'
 import { uiMessages } from '@rangefoundry/ui'
 import en from '../locales/en.json' with { type: 'json' }
 import type { Language } from './language.ts'
@@ -6,8 +6,18 @@ import type { Language } from './language.ts'
 /** A compiled catalog's messages: a JSON import types their tokens as arrays, not the tuples Lingui reads. */
 const compiled = (catalog: { messages: object }) => catalog.messages as Messages
 
+/** `{x, decimal}`: a number with the language's decimal mark, ungrouped and unrounded, as `t` writes one. */
+const decimal: Formatter = (value, { locale }) =>
+  new Intl.NumberFormat(locale, { useGrouping: false, maximumFractionDigits: 20 }).format(
+    value as number,
+  )
+
 const instance = (locale: Language, messages: Messages) =>
-  setupI18n({ locale, messages: { [locale]: { ...uiMessages[locale], ...messages } } })
+  setupI18n({
+    locale,
+    messages: { [locale]: { ...uiMessages[locale], ...messages } },
+    formatters: { decimal },
+  })
 
 // one instance per language: activating a shared one changes boundaries that hydrate later (React #418)
 const instances: Record<Language, I18n> = {

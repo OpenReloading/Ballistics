@@ -1,5 +1,7 @@
+import type { I18n } from '@lingui/core'
 import { castHarderThanPeak, cylinderGapLeakage, loadRatio } from '@rangefoundry/ballistics'
 import { fromSi } from '@rangefoundry/schema'
+import { linguiOf } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
@@ -18,7 +20,7 @@ import type {
 } from '../lib/seating-ladder.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import type { CapacityRule } from '../lib/volume-tolerance.ts'
-import { sayOwn } from '../lib/wording.ts'
+import { sayLingui } from '../lib/wording.ts'
 import {
   bandLine,
   bulletLeadTime,
@@ -336,6 +338,7 @@ export function resultNotes(
   warnings: { text: string; name?: string | undefined }[],
   system: UnitSystem,
   t: Translator['t'],
+  i18n: I18n = linguiOf('en'),
 ): ResultNote[] {
   const { ratio } = derived(ok, t)
   const band = bandLine(ok.body, system, t)
@@ -395,7 +398,7 @@ export function resultNotes(
             line: t(
               'Default temperature coefficient of {form} powder: the powder record gives none.',
               {
-                form: sayOwn(t, rawWording(ok.sensitivityDefault.form)),
+                form: sayLingui(i18n, rawWording(ok.sensitivityDefault.form)),
               },
             ),
             text: t(

@@ -1,5 +1,6 @@
 /** Bullets side by side: the rows in the preset, the difference marks, one drawing scale. */
 
+import type { I18n } from '@lingui/core'
 import type { Bullet } from '@rangefoundry/schema'
 import { face, type LengthUnit } from '@rangefoundry/svg-drawings'
 import {
@@ -8,16 +9,19 @@ import {
   bulletFigureModel,
   bulletScreenEm,
 } from '@rangefoundry/svg-drawings/bullet'
-import { msg, type Translator, translator } from '../i18n/translate.ts'
+import { linguiOf } from '../i18n/lingui.ts'
+import { type Translator, translator } from '../i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   bulletDataGroups,
+  bulletLabels,
   type FieldGroup,
   type FieldRow,
   rowParts,
+  turnIn,
 } from './record-fields.ts'
 import { type UnitSystem, withUnit } from './units.ts'
-import { type Wording, worded } from './wording.ts'
+import type { Wording } from './wording.ts'
 
 /** A row of the comparison: one value per bullet as shown in the preset, undefined where absent. */
 interface CompareRow {
@@ -36,18 +40,26 @@ interface CompareGroup {
 }
 
 const groupOrder: Wording[] = [
-  msg('Size'),
-  msg('Shape'),
-  msg('Tip and base'),
-  msg('Build'),
-  msg('Twist'),
-  msg('Computed'),
+  bulletLabels.size,
+  bulletLabels.shape,
+  bulletLabels.tipAndBase,
+  bulletLabels.build,
+  bulletLabels.twist,
+  bulletLabels.computed,
 ]
+
+const coefficientsTitle = /*i18n*/ {
+  id: 'bulletCompare.coefficients',
+  message: 'Ballistic coefficients',
+}
+
+const keyTitle: Wording = /*i18n*/ { id: 'bulletCompare.keyValues', message: 'Key values' }
 
 const untitled: Wording = { verbatim: '' }
 
-/** A wording as a map key: a message by its text, the others by their parts. */
-const keyOf = (w: Wording) => (typeof w === 'string' ? w : JSON.stringify(w))
+/** A wording as a map key: a message by its English text, the others by their parts. */
+const keyOf = (w: Wording) =>
+  typeof w === 'string' ? w : 'id' in w ? (w.message ?? w.id) : JSON.stringify(w)
 
 /** The rows of one bullet's group merged into `rows`: its value at place `at`, a repeated label once per repeat. */
 function mergeRows(
@@ -57,6 +69,7 @@ function mergeRows(
   count: number,
   system: UnitSystem,
   t: Translator['t'],
+  i18n: I18n,
 ) {
   const seen = new Map<string, number>()
   for (const r of own) {
@@ -66,7 +79,7 @@ function mergeRows(
     const n = seen.get(label) ?? 0
     seen.set(label, n + 1)
     const key = `${label}#${n}`
-    const { number, unit } = rowParts(r, system, t)
+    const { number, unit } = rowParts(r, system, t, i18n)
     const row = rows.get(key) ?? {
       label: r.label,
       ...(from !== undefined && { from }),
@@ -81,9 +94,9 @@ function mergeRows(
 
 /** Each by the start of its key (a coefficient's key goes on with its band), with its label in the Key group. */
 const keyRows: { group: Wording; key: string }[] = [
-  { group: msg('Size'), key: 'Mass#' },
-  { group: msg('Size'), key: 'Diameter#' },
-  { group: msg('Size'), key: 'Length#' },
+  { group: bulletLabels.size, key: 'Mass#' },
+  { group: bulletLabels.size, key: 'Diameter#' },
+  { group: bulletLabels.size, key: 'Length#' },
 ]
 
 /** The drag models of the Key group. */
@@ -101,13 +114,18 @@ function take(groups: Map<string, Map<string, CompareRow>>, group: Wording, star
 
 /** The coefficient rows `ids`, taken out of the Ballistic coefficients group, labeled "BC G1", "BC G7". */
 function takeCoefficients(groups: Map<string, Map<string, CompareRow>>, ids: string[]) {
-  const coefficients = groups.get(keyOf(msg('Ballistic coefficients')))
+  const coefficients = groups.get(keyOf(coefficientsTitle))
   return ids.flatMap((id) => {
     const row = coefficients?.get(id)
     if (!row) return []
     coefficients?.delete(id)
     const model = typeof row.label === 'object' && 'verbatim' in row.label ? row.label.verbatim : ''
-    return [[id, { ...row, label: worded(msg('BC {model}'), { model }) }] as const]
+    const label = /*i18n*/ {
+      id: 'bulletCompare.coefficient',
+      message: 'BC {model}',
+      values: { model },
+    }
+    return [[id, { ...row, label }] as const]
   })
 }
 
@@ -119,7 +137,7 @@ function keyGroup(
   return new Map<string, CompareRow>([
     ...keyRows.flatMap((k) => take(groups, k.group, k.key)),
     ...takeCoefficients(groups, bc),
-    ...take(groups, msg('Computed'), 'Sectional density#'),
+    ...take(groups, bulletLabels.computed, 'Sectional density#'),
   ])
 }
 
@@ -142,11 +160,12 @@ export function compareGroups(
   bullets: Bullet[],
   system: UnitSystem,
   t: Translator['t'] = translator().t,
+  i18n: I18n = linguiOf('en'),
 ): CompareGroup[] {
   // the groups in `bulletDataGroups` order, also where the first bullet lacks one
   const titles = new Map<string, Wording>()
   const groups = new Map<string, Map<string, CompareRow>>(
-    [...groupOrder, msg('Ballistic coefficients')].map((title) => {
+    [...groupOrder, coefficientsTitle].map((title) => {
       titles.set(keyOf(title), title)
       return [keyOf(title), new Map()]
     }),
@@ -154,7 +173,7 @@ export function compareGroups(
   bullets.forEach((b, i) => {
     const own: FieldGroup[] = [
       ...bulletDataGroups(b),
-      { title: msg('Ballistic coefficients'), rows: ballisticCoefficientRows(b) },
+      { title: coefficientsTitle, rows: ballisticCoefficientRows(b) },
     ]
     for (const g of own) {
       const wording = g.title ?? untitled
@@ -162,12 +181,12 @@ export function compareGroups(
       titles.set(title, wording)
       const rows = groups.get(title) ?? new Map<string, CompareRow>()
       groups.set(title, rows)
-      mergeRows(rows, g.rows, i, bullets.length, system, t)
+      mergeRows(rows, g.rows, i, bullets.length, system, t, i18n)
     }
   })
   const key = keyGroup(groups, keyCoefficients(bullets, system))
   return [
-    { title: msg('Key values') as Wording, rows: [...key.values()] },
+    { title: keyTitle, rows: [...key.values()] },
     ...[...groups].map(([title, rows]) => ({
       title: titles.get(title) ?? untitled,
       rows: [...rows.values()],
@@ -178,13 +197,13 @@ export function compareGroups(
 /** Whether a row's shown values are not all the same. An absent value differs from a present one. */
 export const rowDiffers = (values: readonly (string | undefined)[]) => new Set(values).size > 1
 
-/** The text before a twist's length per turn in the language of `t`. */
-export const turnPrefixOf = (t: Translator['t']) => t('1 turn in {length}', { length: '' })
+/** The text before a twist's length per turn in the language of `i18n`. */
+export const turnPrefixOf = (i18n: I18n) => i18n._({ ...turnIn, values: { length: '' } })
 
 /** Compared as shown, so two values that read the same are equal; a decimal comma reads as a point. */
 export function differenceMarks(
   shown: readonly (string | undefined)[],
-  turnPrefix = turnPrefixOf(translator().t),
+  turnPrefix = turnPrefixOf(linguiOf('en')),
 ) {
   const xs = shown.map((s) =>
     s === undefined
@@ -207,7 +226,7 @@ const shownNumber = (s: string, turnPrefix: string) => {
 /** Signed (minus U+2212, ±0 where equal), in the longer value's decimals and the values' decimal mark. */
 export function differenceToFirst(
   shown: readonly (string | undefined)[],
-  turnPrefix = turnPrefixOf(translator().t),
+  turnPrefix = turnPrefixOf(linguiOf('en')),
 ): (string | undefined)[] {
   const [first] = shown
   const base = first === undefined ? Number.NaN : shownNumber(first, turnPrefix)

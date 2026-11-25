@@ -295,11 +295,11 @@ const duration = (seconds: number) =>
 const coverWords = {
   discipline: /*i18n*/ {
     id: 'disciplines.cover.discipline',
-    message: '{n, number} {unit} for the discipline',
+    message: '{n, decimal} {unit} for the discipline',
   },
-  stage: /*i18n*/ { id: 'disciplines.cover.stage', message: '{n, number} {unit} per stage' },
-  series: /*i18n*/ { id: 'disciplines.cover.series', message: '{n, number} {unit} per series' },
-  shot: /*i18n*/ { id: 'disciplines.cover.shot', message: '{n, number} {unit} per shot' },
+  stage: /*i18n*/ { id: 'disciplines.cover.stage', message: '{n, decimal} {unit} per stage' },
+  series: /*i18n*/ { id: 'disciplines.cover.series', message: '{n, decimal} {unit} per series' },
+  shot: /*i18n*/ { id: 'disciplines.cover.shot', message: '{n, decimal} {unit} per shot' },
 }
 
 const sighterWords = (included: boolean | undefined): Wording[] =>

@@ -17,6 +17,15 @@ const linguiText = (entry: Catalogue[string]) =>
         .map(([form, text]) => `${form} {${quoted(text).replaceAll('{count}', '#')}}`)
         .join(' ')}}`
 
+const decimalArgument = /\{(\w+), decimal\}/g
+
+/** `text` with each `{name}` that `english` writes `{name, decimal}` in that form: `de.json` keys write every number `{name}`. */
+const withDecimals = (text: string, english: string) =>
+  [...english.matchAll(decimalArgument)].reduce(
+    (s, [argument, name]) => s.replaceAll(`{${name}}`, argument),
+    text,
+  )
+
 /** `de` with the German of `german` for every id whose English (from `en`) it holds; an id with other German keeps it. */
 export function convert(en: PoCatalog, de: PoCatalog, german: Catalogue) {
   const catalog: PoCatalog = { ...de }
@@ -26,7 +35,7 @@ export function convert(en: PoCatalog, de: PoCatalog, german: Catalogue) {
   for (const [id, current] of Object.entries(de)) {
     const english = en[id]?.translation
     if (current.obsolete || !english) continue
-    const key = ownKey(english, en[id]?.context)
+    const key = ownKey(english.replace(decimalArgument, '{$1}'), en[id]?.context)
     // an inherited name such as `constructor` is no entry
     const found = Object.hasOwn(german, key) ? german[key] : undefined
     if (found === undefined) {
@@ -34,7 +43,7 @@ export function convert(en: PoCatalog, de: PoCatalog, german: Catalogue) {
       continue
     }
     used.add(key)
-    const text = linguiText(found)
+    const text = withDecimals(linguiText(found), english)
     if (current.translation && current.translation !== text) {
       report.other.push(id)
       continue

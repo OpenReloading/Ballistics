@@ -388,7 +388,7 @@ export function TargetDesigner() {
   return (
     <>
       <PageBar
-        title={msg('Target designer')}
+        title={/*i18n*/ { id: 'page.targetsDesigner', message: 'Target designer' }}
         translated
         fold={
           <DesignerToolbar

@@ -1,15 +1,14 @@
 /** Dynamic vivacity in 1/(MPa s) from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"), interval ± `uncertaintyFactor` standard uncertainties. */
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@rangefoundry/ballistics'
 import { type Powder, toSi } from '@rangefoundry/schema'
+import { linguiOf } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { PowderSummary } from './api-types.ts'
-import { notMetallic, shotgunOnly } from './complete-records.ts'
+import { shotgunOnly } from './complete-records.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
-import { type OwnWording, sayOwn, worded } from './wording.ts'
 
 /** Dash pattern per color slot of the burn-rate charts: identity is not carried by color alone. */
 export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '6 2 1 2'] as const
@@ -39,26 +38,26 @@ export interface UnfittedPowder {
   kind: UnfitKind
   /** `why` in English: what a reader of the data sees where nothing translates it. */
   reason: string
-  /** `reason` as a message with its numbers, for the language shown (`sayOwn(t, why)`). */
-  why: OwnWording
+  /** `reason` as a message with its numbers, for the language shown (`i18n._(why)`). */
+  why: MessageDescriptor
   /** The powder's own numbers behind `kind`, for a list grouped by kind. */
   detail?: string
   /** `detail` as a message with its numbers. */
-  detailWhy?: OwnWording
+  detailWhy?: MessageDescriptor
 }
 
-const english = translator().t
+const english = linguiOf('en')
 
 /** An unfitted powder with `reason` and `detail` written from their wordings in English. */
 const unfit = (
   p: Pick<UnfittedPowder, 'id' | 'label' | 'kind'>,
-  why: OwnWording,
-  detailWhy?: OwnWording,
+  why: MessageDescriptor,
+  detailWhy?: MessageDescriptor,
 ): UnfittedPowder => ({
   ...p,
-  reason: sayOwn(english, why),
+  reason: english._(why),
   why,
-  ...(detailWhy && { detail: sayOwn(english, detailWhy), detailWhy }),
+  ...(detailWhy && { detail: english._(detailWhy), detailWhy }),
 })
 
 interface RateInterval {
@@ -67,9 +66,16 @@ interface RateInterval {
   high?: number | undefined
 }
 
-const noFitReason = msg(
-  'No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges.',
-)
+const noFitReason = /*i18n*/ {
+  id: 'burnRate.noFit',
+  message:
+    'No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges.',
+}
+
+const notMetallic = /*i18n*/ {
+  id: 'burnRate.notMetallic',
+  message: 'Not a metallic-cartridge powder',
+}
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */
 type BurnSource = Pick<
@@ -81,13 +87,14 @@ type BurnSource = Pick<
 }
 
 /** Why a powder with a fitted pressure exponent `exponent` other than 1 has no curve. */
-const exponentReason = (exponent: number) =>
-  worded(
-    msg(
-      'Pressure exponent {exponent}, not 1: the burn rate per pressure depends on the pressure, so there is no single curve.',
-    ),
-    { exponent },
-  )
+function exponentReason(exponent: number): MessageDescriptor {
+  return /*i18n*/ {
+    id: 'burnRate.exponentReason',
+    message:
+      'Pressure exponent {exponent, decimal}, not 1: the burn rate per pressure depends on the pressure, so there is no single curve.',
+    values: { exponent },
+  }
+}
 
 /** Why the powder has no curve: shotgun use only, no fit, an exponent other than 1, an interval reaching 0; none when it has one. */
 function unfitReason(p: BurnSource, label: string): UnfittedPowder | undefined {
@@ -99,20 +106,28 @@ function unfitReason(p: BurnSource, label: string): UnfittedPowder | undefined {
     return unfit(
       { ...own, kind: 'exponent' },
       exponentReason(i.pressureExponent),
-      worded(msg('exponent {exponent}'), { exponent: i.pressureExponent }),
+      /*i18n*/ {
+        id: 'burnRate.exponentDetail',
+        message: 'exponent {exponent, decimal}',
+        values: { exponent: i.pressureExponent },
+      },
     )
   const { value, standardUncertainty: sigma } = i.vivacity
   if (sigma !== undefined && uncertaintyFactor * sigma >= value) {
     const numbers = { value, factor: uncertaintyFactor, sigma }
     return unfit(
       { ...own, kind: 'unresolved' },
-      worded(
-        msg(
-          'Fit unresolved: the interval of the fitted vivacity ({value} 1/s, plus and minus {factor} times {sigma}) reaches 0, so the powder is not placed.',
-        ),
-        numbers,
-      ),
-      worded(msg('vivacity {value} 1/s, plus and minus {factor} times {sigma}'), numbers),
+      /*i18n*/ {
+        id: 'burnRate.unresolvedReason',
+        message:
+          'Fit unresolved: the interval of the fitted vivacity ({value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}) reaches 0, so the powder is not placed.',
+        values: numbers,
+      },
+      /*i18n*/ {
+        id: 'burnRate.unresolvedDetail',
+        message: 'vivacity {value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}',
+        values: numbers,
+      },
     )
   }
 }
@@ -158,12 +173,12 @@ export const isFitted = (p: FittedPowder | UnfittedPowder): p is FittedPowder =>
 /** SI field values as the workbench sends them: no interval, no record; undefined while a value is missing. */
 export function typedBurn(
   v: Partial<Record<string, number>>,
-  t: Translator['t'] = english,
+  i18n: I18n = english,
 ): FittedPowder | UnfittedPowder | undefined {
   const { vivacity, exponent, referencePressure, formA, formM, formQ, formZ1 } = v
   if (vivacity === undefined || exponent === undefined || referencePressure === undefined) return
   const id = 'typed'
-  const label = t('Typed model parameters')
+  const label = i18n._({ id: 'burnRate.typed', message: 'Typed model parameters' })
   if (exponent !== 1) return unfit({ id, label, kind: 'exponent' }, exponentReason(exponent))
   const form = [formA, formM, formQ, formZ1]
   return {
@@ -256,18 +271,25 @@ export function describeCurve(p: FittedPowder, i18n: I18n): string {
   })
 }
 
-/** The sentence of each group of powders without a curve; the unresolved one has `{factor}` standard uncertainties. */
-export const unfitTitles: Record<UnfitKind, Message> = {
-  shotgun: msg(
-    'Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges.',
-  ),
+/** The sentence of each group of powders without a curve. */
+export const unfitTitles: Record<UnfitKind, MessageDescriptor> = {
+  shotgun: /*i18n*/ {
+    id: 'burnRate.unfit.shotgun',
+    message:
+      'Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges.',
+  },
   none: noFitReason,
-  exponent: msg(
-    'Pressure exponent other than 1: the burn rate per pressure depends on the pressure, so there is no single curve.',
-  ),
-  unresolved: msg(
-    'Fit unresolved: the interval of the fitted vivacity (plus and minus {factor} standard uncertainties) reaches 0, so the powder is not placed.',
-  ),
+  exponent: /*i18n*/ {
+    id: 'burnRate.unfit.exponent',
+    message:
+      'Pressure exponent other than 1: the burn rate per pressure depends on the pressure, so there is no single curve.',
+  },
+  unresolved: /*i18n*/ {
+    id: 'burnRate.unfit.unresolved',
+    message:
+      'Fit unresolved: the interval of the fitted vivacity (plus and minus {factor} standard uncertainties) reaches 0, so the powder is not placed.',
+    values: { factor: uncertaintyFactor },
+  },
 }
 
 /** Powders without a curve in groups by kind, in the order of `unfitTitles`; empty groups left out. */

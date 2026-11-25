@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Menu } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { spotlight } from '@mantine/spotlight'
@@ -1066,6 +1067,7 @@ const customNameKey = (name: string | undefined) => (name?.trim() ? name : '')
 /** The state lives in `useWorkbenchState`; the cards read it through `LoadContext`, the result side through `ResultContext`; the tabs after Results go in an aside from 88em. */
 export function Workbench() {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const load = useWorkbenchState()
   const names = useManufacturerNames()
   const tabs = useLoadTabs(load)
@@ -1192,8 +1194,8 @@ export function Workbench() {
   const burn = useMemo(() => {
     if (powder) return classifyPowder(powder, names)
     const typed = JSON.parse(typedKey) as (number | null)[]
-    return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])), t)
-  }, [powder, names, typedKey, t])
+    return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])), i18n)
+  }, [powder, names, typedKey, i18n])
   // by the result, not the outcome: the band and the cold peak that arrive later would redraw the chart and drop its tooltip
   const runResult = ok?.body.result
   const runMarks = useMemo(() => runMarksOf(runResult, t), [runResult, t])

@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Anchor, Button } from '@mantine/core'
 import { CircleQuestionMark, Info, TriangleExclamationPoint } from 'lucide-react'
 import { useRef, useState } from 'react'
@@ -26,7 +27,8 @@ export const noteLooks: Record<
 export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
   const { warnings, system } = useResult()
   const { t, tn } = useTranslation()
-  const notes = resultNotes(ok, warnings ?? [], system, t)
+  const { i18n } = useLingui()
+  const notes = resultNotes(ok, warnings ?? [], system, t, i18n)
   const { ref, scrolls } = useScrolls()
   const more = useRef<HTMLButtonElement>(null)
   const [Dialog, setDialog] = useState<typeof ResultNotesDialog>()

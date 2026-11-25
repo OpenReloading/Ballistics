@@ -1,3 +1,4 @@
+import { setupI18n } from '@lingui/core'
 import type { Bullet } from '@rangefoundry/schema'
 import { bulletProfile } from '@rangefoundry/svg-drawings/bullet'
 import { expect, it } from 'vitest'
@@ -21,7 +22,7 @@ import { presetUnits } from '../src/lib/units.ts'
 import { say as sayIn, type Wording } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
-/** A wording in the language of `t`; these rows carry no Lingui id. */
+/** A wording in English, or in the language of `t` where it has no Lingui id. */
 const say = (t: Translator['t'], w: Wording) => sayIn(linguiOf('en'), t, w)
 
 it('parses ids: trimmed, deduplicated, at most four, only record id characters', () => {
@@ -100,7 +101,7 @@ it('merges the data tables: the key values first, then the record groups, values
       .find((g) => say(english, g.title) === title)
       ?.rows.find((r) => say(english, r.label) === label)
   expect(row('Key values', 'Diameter')).toEqual({
-    label: 'Diameter',
+    label: { id: 'recordFields.diameter', message: 'Diameter' },
     symbol: 'd',
     unit: 'in',
     values: ['.3080', '.3080'],
@@ -215,20 +216,22 @@ it('raises the shared text size until the tallest drawing fits its height with 1
 })
 
 it('shows the values and the marks of a row in the language of the translator', () => {
-  const german = translator(
-    {
-      Twist: 'Drall',
-      'Recommended twist': 'Empfohlener Drall',
-      '1 turn in {length}': '1 Umdrehung auf {length}',
+  const german = setupI18n({
+    locale: 'de',
+    messages: {
+      de: {
+        'recordFields.twist': 'Drall',
+        'recordFields.recommendedTwist': 'Empfohlener Drall',
+        'recordFields.turnIn': ['1 Umdrehung auf ', ['length']],
+      },
     },
-    'de',
-  ).t
+  })
   const a = record({ recommendedTwist: { value: 254 } } as Partial<Bullet>)
   const b = record({ id: 'y', recommendedTwist: { value: 203.2 } } as Partial<Bullet>)
   const twist = defined(
-    compareGroups([a, b], presetUnits('us'), german)
-      .find((g) => say(german, g.title) === 'Drall')
-      ?.rows.find((r) => say(german, r.label) === 'Empfohlener Drall'),
+    compareGroups([a, b], presetUnits('us'), english, german)
+      .find((g) => sayIn(german, english, g.title) === 'Drall')
+      ?.rows.find((r) => sayIn(german, english, r.label) === 'Empfohlener Drall'),
   )
   expect(twist.values).toEqual(['1 Umdrehung auf 10.0', '1 Umdrehung auf 8.0'])
   expect(differenceMarks(twist.values, turnPrefixOf(german))).toEqual(['max', 'min'])
