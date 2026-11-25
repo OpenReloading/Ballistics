@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import type { Bullet } from '@rangefoundry/schema'
 import { face, type LengthUnit, lengthText } from '@rangefoundry/svg-drawings'
 import {
@@ -10,8 +12,6 @@ import {
   recordProfile,
 } from '@rangefoundry/svg-drawings/bullet'
 import { Ruler } from 'lucide-react'
-import { useTranslation } from '../i18n/language.ts'
-import { type Translator, translator } from '../i18n/translate.ts'
 import { DrawingNotes } from './record-actions.tsx'
 import { EmptyNote } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
@@ -19,23 +19,21 @@ import { TechnicalDrawing } from './technical-drawing.tsx'
 const nameOf = (symbol: string) => bulletSymbols.find((s) => s.symbol === symbol)?.name ?? symbol
 
 /** The dimension names come from the drawing package and stay English. */
-export function description(
-  p: BulletProfile,
-  unit: LengthUnit = 'mm',
-  t: Translator['t'] = translator().t,
-) {
+export function description(p: BulletProfile, unit: LengthUnit, i18n: I18n) {
   const { dimensions, radii } = p.annotation
   const values = [...dimensions, ...radii].map(
     (d) =>
       `${nameOf(d.symbol)} ${d.symbol} ${d.symbol === 'Rt/R' ? d.value : `${lengthText(d.value, unit)} ${unit}`}`,
   )
   const assumed = p.outline.segments.some((s) => s.approximate)
-    ? ` ${t('Parts drawn dashed are assumed, not from the record.')}`
+    ? ` ${i18n._({ id: 'bulletDrawing.assumed', message: 'Parts drawn dashed are assumed, not from the record.' })}`
     : ''
-  return `${t(
-    'Technical drawing of the bullet, full section about the axis, base at the bottom: {values}.',
-    { values: values.join(', ') },
-  )}${assumed}`
+  return `${i18n._({
+    id: 'bulletDrawing.description',
+    message:
+      'Technical drawing of the bullet, full section about the axis, base at the bottom: {values}.',
+    values: { values: values.join(', ') },
+  })}${assumed}`
 }
 
 /** Server-rendered SVG and a life-size print drawing, as the cartridge drawings; length texts in `unit`, a stated reason where the record cannot be drawn. */
@@ -48,43 +46,67 @@ export function BulletDrawing({
   label: string
   unit?: LengthUnit | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const p = recordProfile(record)
   if ('reason' in p)
     return (
       <EmptyNote
         icon={<Ruler size={24} aria-hidden="true" />}
-        title={t('No drawing for this record.')}
+        title={i18n._({ id: 'bulletDrawing.none', message: 'No drawing for this record.' })}
         description={
           p.reason === 'The record has no length.'
-            ? t('{reason} The drawing needs a diameter and a length.', { reason: p.reason })
+            ? i18n._({
+                id: 'bulletDrawing.noLength',
+                message: '{reason} The drawing needs a diameter and a length.',
+                values: { reason: p.reason },
+              })
             : p.reason
         }
       />
     )
   const id = `${record.id}-drawing`
-  const title = t('Outline, {name}', { name: label })
+  const title = i18n._({
+    id: 'bulletDrawing.outline',
+    message: 'Outline, {name}',
+    values: { name: label },
+  })
   const model = bulletFigureModel(p, 'screen', bulletScreenEm(p, unit), 0, unit)
   const assumed = p.outline.segments.some((s) => s.approximate)
   const notes = [
-    t(
-      'Simplified drawing from the record; only values with a source are dimensioned. The table is the data.',
-    ),
+    i18n._({
+      id: 'bulletDrawing.simplified',
+      message:
+        'Simplified drawing from the record; only values with a source are dimensioned. The table is the data.',
+    }),
     ...(assumed
       ? [
-          t(
-            'Dashed in the flag color: parts the record does not give, drawn from an assumed shape.',
-          ),
+          i18n._({
+            id: 'bulletDrawing.dashed',
+            message:
+              'Dashed in the flag color: parts the record does not give, drawn from an assumed shape.',
+          }),
         ]
       : []),
     ...(p.undimensioned.length > 0
-      ? [t('Not dimensioned: {parts}.', { parts: p.undimensioned.join(', ') })]
+      ? [
+          i18n._({
+            id: 'bulletDrawing.notDimensioned',
+            message: 'Not dimensioned: {parts}.',
+            values: { parts: p.undimensioned.join(', ') },
+          }),
+        ]
       : []),
     ...p.outline.notes,
   ]
   return (
     <figure className="drawing-figure">
-      <TechnicalDrawing id={id} title={title} desc={description(p, unit, t)} model={model} linked />
+      <TechnicalDrawing
+        id={id}
+        title={title}
+        desc={description(p, unit, i18n)}
+        model={model}
+        linked
+      />
       {/* the print drawing shares the screen drawing's description */}
       <TechnicalDrawing
         id={`${id}-print`}
@@ -96,7 +118,11 @@ export function BulletDrawing({
       <figcaption>
         <DrawingNotes notes={notes} />
         <span className="print-only">
-          {notes.join(' ')} {t('Printed at 100 % scale, the drawing is life size (1:1).')}
+          {notes.join(' ')}{' '}
+          {i18n._({
+            id: 'bulletDrawing.lifeSize',
+            message: 'Printed at 100 % scale, the drawing is life size (1:1).',
+          })}
         </span>
       </figcaption>
     </figure>

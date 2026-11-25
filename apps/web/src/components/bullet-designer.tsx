@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Anchor, Button, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { type Bullet, toSi, type UserBullet } from '@rangefoundry/schema'
@@ -309,6 +310,7 @@ const printRows = (
 /** The last valid drawing stays while the input is refused. */
 export function BulletDesigner() {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const manufacturers = useManufacturers()
   const reloadManufacturers = manufacturers.reload
   const labelOf = (d: Design) =>
@@ -558,7 +560,7 @@ export function BulletDesigner() {
           <TechnicalDrawing
             id="designer-drawing"
             title={title}
-            desc={description(drawing.profile, drawingLengthUnit(system), t)}
+            desc={description(drawing.profile, drawingLengthUnit(system), i18n)}
             model={drawing.screen}
             linked
           />

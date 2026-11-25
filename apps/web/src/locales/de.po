@@ -139,6 +139,14 @@ msgstr "{count, plural, one {# Trainingszeile} other {# Trainingszeilen}}"
 msgid "events.addRounds"
 msgstr "{count, plural, one {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?} other {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?}}"
 
+# en: "{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}"
+msgid "bulletCompare.notFoundIds"
+msgstr "{count, plural, one {Kein Geschoss mit der ID {ids}.} other {Keine Geschosse mit den IDs {ids}.}}"
+
+# en: "{count, plural, one {Not a bullet id: {ids}.} other {Not bullet ids: {ids}.}}"
+msgid "bulletCompare.invalidIds"
+msgstr "{count, plural, one {Keine Geschoss-ID: {ids}.} other {Keine Geschoss-IDs: {ids}.}}"
+
 # en: "{count} hidden"
 msgid "comparePicks.hidden"
 msgstr "{count} ausgeblendet"
@@ -150,6 +158,10 @@ msgstr "{count} ausgewählt"
 # en: "{count} selected (max {max})"
 msgid "comparePicks.selectedMax"
 msgstr "{count} ausgewählt (höchstens {max})"
+
+# en: "{label} from {velocity}"
+msgid "bulletCompare.labelFrom"
+msgstr "{label} ab {velocity}"
 
 # en: "{label} from {velocity}"
 msgid "fieldStrip.bandFrom"
@@ -199,6 +211,10 @@ msgstr "{n, number} {unit} je Schuss"
 msgid "disciplines.cover.stage"
 msgstr "{n, number} {unit} je Programmteil"
 
+# en: "{name} (user design)"
+msgid "burnRateCompare.userDesign"
+msgstr "{name} (eigener Entwurf)"
+
 # en: "{name} has no round count; set one on the Firearms page to add the event to it."
 msgid "events.noRoundCount"
 msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um den Wettkampf hinzuzurechnen."
@@ -210,6 +226,10 @@ msgstr "{name} wurde nicht gelöscht: Der Browser hat es abgelehnt."
 # en: "{points} points, hit factor {hf}"
 msgid "events.stageScore"
 msgstr "{points} Punkte, Trefferfaktor {hf}"
+
+# en: "{reason} The drawing needs a diameter and a length."
+msgid "bulletDrawing.noLength"
+msgstr "{reason} Für die Zeichnung werden ein Durchmesser und eine Länge benötigt."
 
 # en: "{source} only"
 msgid "sources.only"
@@ -223,6 +243,14 @@ msgstr "{title}: Gruppe"
 msgid "powderRecord.meanInterval"
 msgstr "{value} ({low} bis {high})"
 
+# en: "{value} ({low} to {high}) {unit}"
+msgid "burnRate.meanInterval"
+msgstr "{value} ({low} bis {high}) {unit}"
+
+# en: "{value} {unit}"
+msgid "burnRate.mean"
+msgstr "{value} {unit}"
+
 # en: "A brass group keeps the cases you measured, with their water capacity, in this browser."
 msgid "cases.noneOwnHint"
 msgstr "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer Wasserkapazität in diesem Browser."
@@ -230,6 +258,10 @@ msgstr "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer 
 # en: "A bullet fits a cartridge when its diameter is above the mean of the land and groove diameters F and Z and at most the projectile diameter G1, all from the CIP sheet (G1 to its printed 0.01 mm)."
 msgid "cartridgeRecord.fitRule"
 msgstr "Ein Geschoss passt zu einer Patrone, wenn sein Durchmesser über dem Mittel aus Felddurchmesser F und Zugdurchmesser Z liegt und höchstens dem Geschossdurchmesser G1 entspricht, jeweils nach dem C.I.P.-Blatt (G1 mit der gedruckten Genauigkeit von 0,01 mm)."
+
+# en: "A curve could not be loaded."
+msgid "burnRateCompare.loadError"
+msgstr "Eine Kurve konnte nicht geladen werden."
 
 # en: "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
 msgid "powderRecord.neighborNote"
@@ -258,6 +290,14 @@ msgstr "Aktionen"
 # en: "Add"
 msgid "events.add"
 msgstr "Hinzufügen"
+
+# en: "Add bullet"
+msgid "bulletCompare.add"
+msgstr "Geschoss hinzufügen"
+
+# en: "Add powder"
+msgid "burnRateCompare.add"
+msgstr "Treibladungspulver hinzufügen"
 
 # en: "Add series"
 msgid "events.addSeries"
@@ -416,12 +456,20 @@ msgid "cases.filtered"
 msgstr "Hülsen, {filters}"
 
 # en: "Bullet data"
+msgid "bulletCompare.data"
+msgstr "Geschossdaten"
+
+# en: "Bullet data"
 msgid "bulletRecord.data"
 msgstr "Geschossdaten"
 
 # en: "Bullet data is unavailable right now."
 msgid "states.unavailable.bullet"
 msgstr "Die Geschossdaten sind gerade nicht verfügbar."
+
+# en: "Bullet data table"
+msgid "bulletCompare.dataTable"
+msgstr "Tabelle der Geschossdaten"
 
 # en: "Bullet designer"
 msgid "page.bulletsDesigner"
@@ -623,6 +671,10 @@ msgstr "Längeneinheit des Patronenlagers"
 msgid "events.outOfRange"
 msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
 
+# en: "Choose bullets"
+msgid "bulletCompare.choose"
+msgstr "Geschosse auswählen"
+
 # en: "Clear"
 msgid "comparePicks.clear"
 msgstr "Leeren"
@@ -670,6 +722,10 @@ msgstr "{count} vergleichen"
 # en: "Compare bullets"
 msgid "page.bulletsCompare"
 msgstr "Geschosse vergleichen"
+
+# en: "Compare the others"
+msgid "bulletCompare.compareOthers"
+msgstr "Die übrigen vergleichen"
 
 # en: "Competition event"
 msgid "log.column.event"
@@ -763,6 +819,10 @@ msgstr "Kurvenwerte"
 msgid "units.custom"
 msgstr "Benutzerdefiniert"
 
+# en: "Dashed in the flag color: parts the record does not give, drawn from an assumed shape."
+msgid "bulletDrawing.dashed"
+msgstr "Gestrichelt in der Markierungsfarbe: Teile, die der Datensatz nicht angibt, gezeichnet nach einer angenommenen Form."
+
 # en: "Date"
 msgid "events.date"
 msgstr "Datum"
@@ -814,6 +874,10 @@ msgstr "Abgeleitet aus dem Bereich oder dem Messring, den die Sportordnung angib
 # en: "Diameter"
 msgid "bullets.column.diameter"
 msgstr "Durchmesser"
+
+# en: "difference to the first bullet"
+msgid "bulletCompare.difference"
+msgstr "Unterschied zum ersten Geschoss"
 
 # en: "Discipline"
 msgid "targets.facet.discipline"
@@ -919,6 +983,14 @@ msgstr "Zeichnung"
 msgid "recordActions.drawingNotes"
 msgstr "Hinweise zur Zeichnung"
 
+# en: "Drawings"
+msgid "bulletCompare.drawings"
+msgstr "Zeichnungen"
+
+# en: "Drawings"
+msgid "bulletCompare.drawingsRegion"
+msgstr "Zeichnungen"
+
 # en: "Drop, windage"
 msgid "units.quantity.lineOfSightOffset"
 msgstr "Flugbahnabfall, Seitenabweichung"
@@ -935,9 +1007,25 @@ msgstr "Dynamische Vivacity, gemittelt über den Abbrandanteil 0,1 bis 0,9, plus
 msgid "powderRecord.vivacityTable"
 msgstr "Dynamische Vivacity von {label}"
 
+# en: "Dynamic vivacity of {label} over burnt fraction 0 to 1: {start} {unit} at z 0, highest {top} at z {z}, {end} at z 1. Mean over z 0.1 to 0.9: {mean}."
+msgid "burnRate.curve"
+msgstr "Dynamische Vivacity von {label} über dem abgebrannten Anteil 0 bis 1: {start} {unit} bei z 0, höchster Wert {top} bei z {z}, {end} bei z 1. Mittelwert über z 0,1 bis 0,9: {mean}."
+
 # en: "Dynamic vivacity of {label}, model output"
 msgid "powderRecord.vivacityOf"
 msgstr "Dynamische Vivacity von {label}, Modellausgabe"
+
+# en: "Dynamic vivacity of the chosen powders"
+msgid "burnRateCompare.table"
+msgstr "Dynamische Vivacity der gewählten Treibladungspulver"
+
+# en: "Dynamic vivacity of the chosen powders, model output"
+msgid "burnRateCompare.chart"
+msgstr "Dynamische Vivacity der gewählten Treibladungspulver, Modellergebnis"
+
+# en: "Dynamic vivacity, the burn rate per pressure, over burnt fraction."
+msgid "burnRateCompare.lead"
+msgstr "Dynamische Vivacity, die Abbrandgeschwindigkeit je Druck, über dem abgebrannten Anteil."
 
 # en: "Edit event"
 msgid "events.edit"
@@ -1244,6 +1332,10 @@ msgstr "Pistole, groß"
 msgid "values.largeRifle"
 msgstr "Büchse, groß"
 
+# en: "largest"
+msgid "bulletCompare.largest"
+msgstr "größter Wert"
+
 # en: "Last session"
 msgid "firearms.column.lastSession"
 msgstr "Letzte Sitzung"
@@ -1275,6 +1367,10 @@ msgstr "Länge"
 # en: "Length unit"
 msgid "cartridgeRecord.lengthUnit"
 msgstr "Längeneinheit"
+
+# en: "Length unit of the page: drawings and table"
+msgid "bulletCompare.lengthUnit"
+msgstr "Längeneinheit der Seite: Zeichnungen und Tabelle"
 
 # en: "Lengths"
 msgid "units.quantity.length"
@@ -1612,6 +1708,10 @@ msgstr "Modellanpassung"
 msgid "powderRecord.modelFitTable"
 msgstr "Tabelle der Modellanpassung"
 
+# en: "Model output from fitted M3 parameters, not manufacturer data."
+msgid "burnRate.modelCaption"
+msgstr "Modellergebnis aus angepassten M3-Parametern, keine Herstellerdaten."
+
 # en: "Model parameters"
 msgid "powderRecord.modelParameters"
 msgstr "Modellparameter"
@@ -1623,6 +1723,10 @@ msgstr "Mündungsenergie ab"
 # en: "Muzzle loader"
 msgid "values.muzzleLoader"
 msgstr "Vorderlader"
+
+# en: "n/a"
+msgid "bulletCompare.notAvailable"
+msgstr "k. A."
 
 # en: "n/a"
 msgid "directoryTable.missing"
@@ -1736,6 +1840,10 @@ msgstr "Noch keine eigenen Hülsengruppen"
 msgid "states.noMatch.cases"
 msgstr "Keine Hülsen entsprechen diesen Filtern."
 
+# en: "No bullets chosen."
+msgid "bulletCompare.none"
+msgstr "Keine Geschosse ausgewählt."
+
 # en: "No bullets match these filters."
 msgid "states.noMatch.bullets"
 msgstr "Keine Geschosse entsprechen diesen Filtern."
@@ -1764,6 +1872,14 @@ msgstr "Kein Disziplindatensatz enthält den Namen dieses Verbands."
 msgid "states.noMatch.disciplines"
 msgstr "Keine Disziplinen entsprechen diesen Filtern."
 
+# en: "No drawing for this record."
+msgid "bulletDrawing.none"
+msgstr "Keine Zeichnung für diesen Datensatz."
+
+# en: "No drawing: {reason}"
+msgid "bulletCompare.noDrawing"
+msgstr "Keine Zeichnung: {reason}"
+
 # en: "No entries match these filters."
 msgid "states.noMatch.logEntries"
 msgstr "Keine Einträge passen zu diesen Filtern."
@@ -1787,6 +1903,14 @@ msgstr "Keine Schusswaffen entsprechen diesen Filtern."
 # en: "No page stated"
 msgid "recordSources.noPage"
 msgstr "Keine Seite angegeben"
+
+# en: "No powder in the overlay."
+msgid "burnRateCompare.empty"
+msgstr "Kein Treibladungspulver in der Überlagerung."
+
+# en: "No powder with a curve matches"
+msgid "burnRateCompare.noMatch"
+msgstr "Kein Treibladungspulver mit Kurve passt"
 
 # en: "No powders match these filters."
 msgid "states.noMatch.powders"
@@ -1839,6 +1963,10 @@ msgstr "Keine"
 # en: "Not allowed"
 msgid "disciplines.notAllowed"
 msgstr "Nicht erlaubt"
+
+# en: "Not dimensioned: {parts}."
+msgid "bulletDrawing.notDimensioned"
+msgstr "Nicht bemaßt: {parts}."
 
 # en: "Not imported: {reason}"
 msgid "events.notImported"
@@ -1940,6 +2068,18 @@ msgstr "original"
 msgid "targets.column.outer"
 msgstr "Außendurchmesser"
 
+# en: "Outline, {name}"
+msgid "bulletCompare.outline"
+msgstr "Umriss, {name}"
+
+# en: "Outline, {name}"
+msgid "bulletDrawing.outline"
+msgstr "Umriss, {name}"
+
+# en: "Overlay"
+msgid "burnRateCompare.overlay"
+msgstr "Überlagerung"
+
 # en: "Page"
 msgid "disciplines.row.page"
 msgstr "Seite"
@@ -1947,6 +2087,10 @@ msgstr "Seite"
 # en: "Page {page}"
 msgid "recordSources.page"
 msgstr "Seite {page}"
+
+# en: "Parts drawn dashed are assumed, not from the record."
+msgid "bulletDrawing.assumed"
+msgstr "Gestrichelt gezeichnete Teile sind angenommen und stammen nicht aus dem Datensatz."
 
 # en: "Penalties"
 msgid "events.penalties"
@@ -1967,6 +2111,10 @@ msgstr "Ort"
 # en: "Place"
 msgid "log.column.place"
 msgstr "Ort"
+
+# en: "Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound."
+msgid "burnRate.bandNote"
+msgstr "Plus und minus 2 Standardunsicherheiten der angepassten Vivacity, eine Untergrenze."
 
 # en: "Pmax"
 msgid "cartridges.column.pmax"
@@ -2003,6 +2151,14 @@ msgstr "Treibladungspulver-Editor"
 # en: "Powders"
 msgid "page.powders"
 msgstr "Treibladungspulver"
+
+# en: "Powders by burn rate"
+msgid "burnRateCompare.byRate"
+msgstr "Treibladungspulver nach Abbrandgeschwindigkeit"
+
+# en: "Powders in the overlay"
+msgid "burnRateCompare.powders"
+msgstr "Treibladungspulver in der Überlagerung"
 
 # en: "Powders, {filters}"
 msgid "powders.filtered"
@@ -2047,6 +2203,10 @@ msgstr "Liste der Wettkämpfe drucken"
 # en: "Print the open event"
 msgid "events.printOpen"
 msgstr "Den geöffneten Wettkampf drucken"
+
+# en: "Printed at 100 % scale, the drawing is life size (1:1)."
+msgid "bulletDrawing.lifeSize"
+msgstr "Bei einem Ausdruck im Maßstab 100 % hat die Zeichnung Originalgröße (1:1)."
 
 # en: "Printed: the first {limit} of {total} brass."
 msgid "directoryTable.printed.brass"
@@ -2133,6 +2293,10 @@ msgid "cartridgeRecord.published"
 msgstr "Veröffentlicht"
 
 # en: "Quantity"
+msgid "bulletCompare.quantity"
+msgstr "Größe"
+
+# en: "Quantity"
 msgid "fieldTable.column.quantity"
 msgstr "Größe"
 
@@ -2155,6 +2319,10 @@ msgstr "RangeFoundry"
 # en: "reflex"
 msgid "disciplines.rule.reflex"
 msgstr "Leuchtpunkt"
+
+# en: "Remove {name}"
+msgid "bulletCompare.remove"
+msgstr "{name} entfernen"
 
 # en: "Remove {name}"
 msgid "events.removeStage"
@@ -2444,6 +2612,10 @@ msgstr "Probeschüsse je Durchgang"
 msgid "disciplines.row.sights"
 msgstr "Visierung"
 
+# en: "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
+msgid "bulletDrawing.simplified"
+msgstr "Vereinfachte Zeichnung aus dem Datensatz; nur Werte mit Quelle sind bemaßt. Maßgeblich ist die Tabelle."
+
 # en: "single shot"
 msgid "disciplines.rule.singleShot"
 msgstr "Einzellader"
@@ -2471,6 +2643,14 @@ msgstr "Pistole, klein"
 # en: "Small rifle"
 msgid "values.smallRifle"
 msgstr "Büchse, klein"
+
+# en: "smallest"
+msgid "bulletCompare.smallest"
+msgstr "kleinster Wert"
+
+# en: "Some bullets were not found."
+msgid "bulletCompare.notFound"
+msgstr "Einige Geschosse wurden nicht gefunden."
 
 # en: "Sort"
 msgid "directoryTable.sort"
@@ -2535,6 +2715,10 @@ msgstr "stehend"
 # en: "Support"
 msgid "disciplines.row.support"
 msgstr "Auflage"
+
+# en: "Symbol"
+msgid "bulletCompare.symbol"
+msgstr "Symbol"
 
 # en: "Symbol"
 msgid "cartridgeRecord.symbol"
@@ -2616,6 +2800,10 @@ msgstr "Tabelle der Scheiben"
 msgid "targets.filtered"
 msgstr "Scheiben, {filters}"
 
+# en: "Technical drawing of the bullet, full section about the axis, base at the bottom: {values}."
+msgid "bulletDrawing.description"
+msgstr "Technische Zeichnung des Geschosses, Vollschnitt um die Achse, Boden unten: {values}."
+
 # en: "Temperature"
 msgid "units.quantity.temperature"
 msgstr "Temperatur"
@@ -2656,6 +2844,10 @@ msgstr "Die Wettbewerbe und Disziplinen, in denen auf diese Scheibe Schüsse abg
 msgid "firearms.column.opticHelp"
 msgstr "Die erste Optik der aktiven Konfiguration und ihre Einschießentfernung."
 
+# en: "The link names {count} bullets; at most {max} compare at once."
+msgid "bulletCompare.tooManyText"
+msgstr "Der Link führt {count} Geschosse namentlich auf; höchstens {max} lassen sich gleichzeitig vergleichen."
+
 # en: "The manufacturer's first published BC of this drag model."
 msgid "bullets.column.g1Help"
 msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
@@ -2692,9 +2884,17 @@ msgstr "Die Scheiben, auf die in seinen Disziplinen Schüsse abgegeben werden"
 msgid "matchRounds.shotsUnstated"
 msgstr "Die Zielscheiben dieser Disziplin nennen keine Schusszahl."
 
+# en: "This link is not valid."
+msgid "bulletCompare.invalid"
+msgstr "Dieser Link ist ungültig."
+
 # en: "This page needs JavaScript."
 msgid "recordView.needsJavaScript"
 msgstr "Diese Seite braucht JavaScript."
+
+# en: "Tick 2 to 4 bullets in the list, then Compare."
+msgid "bulletCompare.noneText"
+msgstr "Haken Sie in der Liste 2 bis 4 Geschosse an und wählen Sie dann „Vergleichen“."
 
 # en: "Time (s)"
 msgid "events.time"
@@ -2703,6 +2903,10 @@ msgstr "Zeit (s)"
 # en: "Time limit"
 msgid "disciplines.row.timeLimit"
 msgstr "Schießzeit"
+
+# en: "Tinted: values differ. ▲ largest, ▼ smallest in a row. In brackets: difference to the first bullet."
+msgid "bulletCompare.legend"
+msgstr "Getönt: Werte unterscheiden sich. ▲ größter, ▼ kleinster Wert einer Zeile. In Klammern: Unterschied zum ersten Geschoss."
 
 # en: "Tip"
 msgid "bullets.facet.tip"
@@ -2719,6 +2923,10 @@ msgstr "Toleranzen"
 # en: "Tolerance, clearance"
 msgid "cartridgeRecord.toleranceClearance"
 msgstr "Toleranzen, Spiel"
+
+# en: "Too many bullets."
+msgid "bulletCompare.tooMany"
+msgstr "Zu viele Geschosse."
 
 # en: "Total"
 msgid "events.totalHeading"
@@ -2761,6 +2969,10 @@ msgid "events.undoOfFailed"
 msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
 
 # en: "Unit"
+msgid "bulletCompare.unit"
+msgstr "Einheit"
+
+# en: "Unit"
 msgid "fieldTable.column.unit"
 msgstr "Einheit"
 
@@ -2780,9 +2992,17 @@ msgstr "Abwählen"
 msgid "comparePicks.untickName"
 msgstr "{name} abwählen"
 
+# en: "Up to {max}"
+msgid "burnRateCompare.upTo"
+msgstr "Bis zu {max}"
+
 # en: "US customary"
 msgid "units.preset.us"
 msgstr "US-amerikanisch"
+
+# en: "Use in workbench"
+msgid "bulletCompare.useInWorkbench"
+msgstr "In der Werkbank verwenden"
 
 # en: "Use in workbench"
 msgid "bulletRecord.useInWorkbench"
@@ -2791,6 +3011,10 @@ msgstr "In der Werkbank verwenden"
 # en: "Use in workbench"
 msgid "recordActions.useInWorkbench"
 msgstr "In der Werkbank verwenden"
+
+# en: "Use in workbench: {name}"
+msgid "bulletCompare.useInWorkbenchFor"
+msgstr "In der Werkbank verwenden: {name}"
 
 # en: "Value"
 msgid "cartridgeRecord.value"
@@ -2807,6 +3031,10 @@ msgstr "Werte fehlen: keine Abbrandwerte"
 # en: "Values missing: the record only names the bullet"
 msgid "bulletRecord.valuesMissing"
 msgstr "Werte fehlen: Der Datensatz enthält vom Geschoss nur den Namen"
+
+# en: "Values table"
+msgid "burnRateCompare.valuesTable"
+msgstr "Wertetabelle"
 
 # en: "Variant"
 msgid "cartridgeRecord.variant"
@@ -2847,6 +3075,10 @@ msgstr "ganzer Datensatz"
 # en: "Wind speed"
 msgid "units.quantity.windSpeed"
 msgstr "Windgeschwindigkeit"
+
+# en: "Without a curve"
+msgid "burnRateCompare.noCurve"
+msgstr "Ohne Kurve"
 
 # en: "Yes"
 msgid "primers.yes"

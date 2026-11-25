@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { Text } from '@mantine/core'
 import type { Bullet } from '@rangefoundry/schema'
 import type { LengthUnit } from '@rangefoundry/svg-drawings'
@@ -7,8 +9,7 @@ import { type BulletProfile, recordProfile } from '@rangefoundry/svg-drawings/bu
 import { ArrowLeftRight, CircleExclamationPoint } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import { useSearchParams } from '@/platform/navigation.ts'
-import { useTranslation } from '../i18n/language.ts'
-import { msg, type Translator } from '../i18n/translate.ts'
+import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { sharedScale } from '../lib/bullet-compare.ts'
 import { compareHref, maxComparedBullets, parseCompareIds } from '../lib/compare-ids.ts'
@@ -41,7 +42,7 @@ function Problem({
   rest?: string[] | undefined
   empty?: boolean
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <EmptyNote
       icon={
@@ -57,11 +58,11 @@ function Problem({
         <>
           {rest && rest.length > 0 && (
             <LinkButton href={compareHref(rest)} size={controlSize.row.button}>
-              {t('Compare the others')}
+              {i18n._({ id: 'bulletCompare.compareOthers', message: 'Compare the others' })}
             </LinkButton>
           )}
           <LinkButton href="/bullets" size={controlSize.row.button}>
-            {t('Choose bullets')}
+            {i18n._({ id: 'bulletCompare.choose', message: 'Choose bullets' })}
           </LinkButton>
         </>
       }
@@ -73,7 +74,7 @@ function Problem({
 function drawings(
   records: (Bullet & { manufacturerName: string })[],
   unit: LengthUnit,
-  t: Translator['t'],
+  i18n: I18n,
 ) {
   const profiles = records.map((r) => recordProfile(r))
   const drawn = profiles.filter((p): p is BulletProfile => !('reason' in p))
@@ -84,18 +85,26 @@ function drawings(
     if ('reason' in p)
       return (
         <Text key={b.id} component="p" inherit m={0} c="dimmed" fz="xs">
-          {t('No drawing: {reason}', { reason: p.reason })}
+          {i18n._({
+            id: 'bulletCompare.noDrawing',
+            message: 'No drawing: {reason}',
+            values: { reason: p.reason },
+          })}
         </Text>
       )
     const model = nth(models, drawn.indexOf(p))
     const id = `${b.id}-compare`
-    const title = t('Outline, {name}', { name: productLabel(b) })
+    const title = i18n._({
+      id: 'bulletCompare.outline',
+      message: 'Outline, {name}',
+      values: { name: productLabel(b) },
+    })
     return (
       <Fragment key={b.id}>
         <TechnicalDrawing
           id={id}
           title={title}
-          desc={description(p, unit, t)}
+          desc={description(p, unit, i18n)}
           model={model}
           tallest={tallest}
         />
@@ -132,7 +141,7 @@ async function fetchBullets(ids: string[]): Promise<Fetched> {
 
 /** The actions only where they act on bullets; the length unit sets the whole page (drawings and table, inside `RecordScope`). */
 export function CompareBar({ actions }: { actions: boolean }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <PageBar
       title={msg('Compare bullets')}
@@ -140,7 +149,12 @@ export function CompareBar({ actions }: { actions: boolean }) {
       actions={
         actions ? (
           <>
-            <UnitSwitch label={t('Length unit of the page: drawings and table')} />
+            <UnitSwitch
+              label={i18n._({
+                id: 'bulletCompare.lengthUnit',
+                message: 'Length unit of the page: drawings and table',
+              })}
+            />
             <RecordActions />
           </>
         ) : undefined
@@ -188,31 +202,40 @@ function CompareBody({
   got: Fetched
   retry: () => void
 }) {
-  const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   if (parsed.status === 'empty')
     return (
       <Problem
         empty
-        title={t('No bullets chosen.')}
-        text={t('Tick 2 to 4 bullets in the list, then Compare.')}
+        title={i18n._({ id: 'bulletCompare.none', message: 'No bullets chosen.' })}
+        text={i18n._({
+          id: 'bulletCompare.noneText',
+          message: 'Tick 2 to 4 bullets in the list, then Compare.',
+        })}
       />
     )
   if (parsed.status === 'tooMany')
     return (
       <Problem
-        title={t('Too many bullets.')}
-        text={t('The link names {count} bullets; at most {max} compare at once.', {
-          count: parsed.count,
-          max: maxComparedBullets,
+        title={i18n._({ id: 'bulletCompare.tooMany', message: 'Too many bullets.' })}
+        text={i18n._({
+          id: 'bulletCompare.tooManyText',
+          message: 'The link names {count} bullets; at most {max} compare at once.',
+          values: { count: parsed.count, max: maxComparedBullets },
         })}
       />
     )
   if (parsed.status === 'invalid')
     return (
       <Problem
-        title={t('This link is not valid.')}
-        text={tn(parsed.ids.length, 'Not a bullet id: {ids}.', 'Not bullet ids: {ids}.', {
-          ids: parsed.ids.map((id) => `"${id}"`).join(', '),
+        title={i18n._({ id: 'bulletCompare.invalid', message: 'This link is not valid.' })}
+        text={i18n._({
+          id: 'bulletCompare.invalidIds',
+          message: '{count, plural, one {Not a bullet id: {ids}.} other {Not bullet ids: {ids}.}}',
+          values: {
+            count: parsed.ids.length,
+            ids: parsed.ids.map((id) => `"${id}"`).join(', '),
+          },
         })}
       />
     )
@@ -226,18 +249,21 @@ function CompareBody({
   if (unknown.length > 0)
     return (
       <Problem
-        title={t('Some bullets were not found.')}
-        text={tn(unknown.length, 'No bullet with the id {ids}.', 'No bullets with the ids {ids}.', {
-          ids: unknown.join(', '),
+        title={i18n._({ id: 'bulletCompare.notFound', message: 'Some bullets were not found.' })}
+        text={i18n._({
+          id: 'bulletCompare.notFoundIds',
+          message:
+            '{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}',
+          values: { count: unknown.length, ids: unknown.join(', ') },
         })}
         rest={records.map((b) => b.id)}
       />
     )
-  const inch = drawings(records, 'in', t)
+  const inch = drawings(records, 'in', i18n)
   return (
     <BulletCompare
       bullets={records}
-      drawings={drawings(records, 'mm', t).map((mm, i) => (
+      drawings={drawings(records, 'mm', i18n).map((mm, i) => (
         <ByLengthUnit key={nth(records, i).id} mm={mm} inch={inch[i]} />
       ))}
     />

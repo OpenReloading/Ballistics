@@ -3,7 +3,6 @@
 import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { useState } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { bandNote, describeCurve, type FittedPowder, modelCaption } from '../lib/burn-rate.ts'
 import { CurveTable } from './curve-table.tsx'
@@ -12,7 +11,6 @@ import { Panel } from './panel.tsx'
 
 /** The curve values sit behind the Curve values button in the title row and print open. */
 export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: number | undefined }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const [open, setOpen] = useState(false)
   // z1 of 1 is the end of the axis: a one-stage form, nothing to mark
@@ -56,7 +54,7 @@ export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: numbe
             message: 'Dynamic vivacity of {label}, model output',
             values: { label: powder.label },
           })}
-          description={describeCurve(powder, t)}
+          description={describeCurve(powder, i18n)}
           marks={marks}
         />
         <ul className="curve-legend">
@@ -66,10 +64,10 @@ export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: numbe
           </li>
           <li>
             <span className="curve-key curve-key-band" aria-hidden="true" />
-            {t(bandNote)}
+            {i18n._(bandNote)}
           </li>
         </ul>
-        <p className="screen-only record-note">{t(modelCaption)}</p>
+        <p className="screen-only record-note">{i18n._(modelCaption)}</p>
       </div>
       <div id="curve-values" className="curve-values" data-open={open || undefined}>
         <CurveTable

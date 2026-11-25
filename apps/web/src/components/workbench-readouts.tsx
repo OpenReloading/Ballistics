@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Popover, UnstyledButton } from '@mantine/core'
 import { type FreeRecoil, freeRecoil } from '@rangefoundry/ballistics'
 import { fromSi } from '@rangefoundry/schema'
@@ -688,13 +689,14 @@ export const BurnRate = memo(function BurnRate({
 }) {
   // memoized: the numbers of its text and chart are written in the language shown
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <div className="burn-rate">
       {isFitted(p) ? (
         <LazyVivacityChart
           series={[{ powder: p, slot: 0 }]}
           title={t('Dynamic vivacity of {label}, model output', { label: p.label })}
-          description={describeCurve(p, t)}
+          description={describeCurve(p, i18n)}
           height={height}
           marks={marks}
         />
