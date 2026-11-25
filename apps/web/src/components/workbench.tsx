@@ -1195,8 +1195,8 @@ export function Workbench() {
     return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])), t)
   }, [powder, names, typedKey, t])
   // by the result, not the outcome: the band and the cold peak that arrive later would redraw the chart and drop its tooltip
-  const result = ok?.body.result
-  const runMarks = useMemo(() => runMarksOf(result, t), [result, t])
+  const runResult = ok?.body.result
+  const runMarks = useMemo(() => runMarksOf(runResult, t), [runResult, t])
   const todoKey = JSON.stringify(todo)
   const shownTodo = useMemo(() => JSON.parse(todoKey) as typeof todo, [todoKey])
   const optic = useMemo(
