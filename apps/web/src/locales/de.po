@@ -131,6 +131,18 @@ msgstr "{count, plural, one {# Trainingszeile} other {# Trainingszeilen}}"
 msgid "events.addRounds"
 msgstr "{count, plural, one {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?} other {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?}}"
 
+# en: "{count} hidden"
+msgid "comparePicks.hidden"
+msgstr "{count} ausgeblendet"
+
+# en: "{count} selected"
+msgid "comparePicks.selected"
+msgstr "{count} ausgewählt"
+
+# en: "{count} selected (max {max})"
+msgid "comparePicks.selectedMax"
+msgstr "{count} ausgewählt (höchstens {max})"
+
 # en: "{label}, A to Z"
 msgid "directoryTable.aToZ"
 msgstr "{label}, A bis Z"
@@ -258,6 +270,10 @@ msgstr "Höhenlage"
 # en: "Aluminum"
 msgid "values.aluminum"
 msgstr "Aluminium"
+
+# en: "Any number"
+msgid "matchRounds.anyNumber"
+msgstr "Beliebig viele"
 
 # en: "Areas"
 msgid "units.quantity.area"
@@ -423,6 +439,10 @@ msgstr "Waffenart"
 msgid "events.outOfRange"
 msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
 
+# en: "Clear"
+msgid "comparePicks.clear"
+msgstr "Leeren"
+
 # en: "Clear all"
 msgid "facetFilters.clear"
 msgstr "Alle zurücksetzen"
@@ -435,9 +455,21 @@ msgstr "Filter zurücksetzen"
 msgid "directoryTable.clearSearch"
 msgstr "Suche leeren"
 
+# en: "Clear selection"
+msgid "comparePicks.clearSelection"
+msgstr "Auswahl aufheben"
+
 # en: "COAL, the cartridge maximum of the CIP sheet, shortest variant."
 msgid "cartridges.column.cartridgeLengthHelp"
 msgstr "COAL, Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
+
+# en: "Compare"
+msgid "comparePicks.compare"
+msgstr "Vergleichen"
+
+# en: "Compare {count}"
+msgid "comparePicks.compareCount"
+msgstr "{count} vergleichen"
 
 # en: "Compare bullets"
 msgid "page.bulletsCompare"
@@ -482,6 +514,10 @@ msgstr "Land"
 # en: "Country"
 msgid "disciplines.column.country"
 msgstr "Land"
+
+# en: "Course of fire"
+msgid "disciplineRecord.column.course"
+msgstr "Schießprogramm"
 
 # en: "Custom"
 msgid "units.custom"
@@ -537,6 +573,10 @@ msgstr "Disziplin"
 
 # en: "Discipline"
 msgid "events.discipline"
+msgstr "Disziplin"
+
+# en: "Discipline"
+msgid "disciplineRecord.data"
 msgstr "Disziplin"
 
 # en: "Discipline"
@@ -615,6 +655,10 @@ msgstr "Energie"
 msgid "states.error"
 msgstr "Fehler"
 
+# en: "Event"
+msgid "disciplineRecord.column.event"
+msgstr "Wettbewerb"
+
 # en: "Event total: {total}"
 msgid "events.total"
 msgstr "Gesamtergebnis: {total}"
@@ -639,6 +683,11 @@ msgstr "Wettkampfart"
 msgid "states.unavailable.eventType"
 msgstr "Daten der Wettkampfarten sind gerade nicht verfügbar."
 
+# en: "Events"
+msgctxt "match"
+msgid "matchRounds.events"
+msgstr "Durchgänge"
+
 # en: "Export CSV"
 msgid "events.exportCsv"
 msgstr "CSV exportieren"
@@ -657,6 +706,10 @@ msgstr "Verband"
 
 # en: "Federation"
 msgid "disciplines.column.federation"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "disciplineRecord.federation"
 msgstr "Verband"
 
 # en: "Federation"
@@ -715,6 +768,14 @@ msgstr "G1"
 msgid "bullets.column.g7"
 msgstr "G7"
 
+# en: "Gauge"
+msgid "disciplineRecord.column.gauge"
+msgstr "Messring"
+
+# en: "Hidden by the search or a filter"
+msgid "comparePicks.hiddenTitle"
+msgstr "Von der Suche oder einem Filter ausgeblendet"
+
 # en: "Hit factor"
 msgid "events.hitFactor"
 msgstr "Trefferfaktor"
@@ -730,6 +791,10 @@ msgstr "JSON importieren"
 # en: "International"
 msgid "disciplines.international"
 msgstr "International"
+
+# en: "International discipline"
+msgid "disciplineRecord.international"
+msgstr "Internationale Disziplin"
 
 # en: "Lacquered steel"
 msgid "values.lacqueredSteel"
@@ -1187,6 +1252,10 @@ msgstr "Keine Zündhütchen entsprechen diesen Filtern."
 msgid "events.nothingToExport"
 msgstr "Kein gespeicherter Wettkampf zum Exportieren."
 
+# en: "No target mapping names this discipline."
+msgid "disciplineRecord.noTargets"
+msgstr "Keine Zuordnung enthält den Namen dieser Disziplin."
+
 # en: "No target sheet saved yet"
 msgid "events.noTargetSheet"
 msgstr "Noch kein Scheibenblatt gespeichert"
@@ -1215,6 +1284,10 @@ msgstr "Nicht in diesem Browser"
 msgid "events.notSaved"
 msgstr "Nicht gespeichert: {reason}"
 
+# en: "Not stated"
+msgid "matchRounds.notStated"
+msgstr "Nicht angegeben"
+
 # en: "Note"
 msgid "states.note"
 msgstr "Hinweis"
@@ -1238,6 +1311,14 @@ msgstr "Offline"
 # en: "OK"
 msgid "listSources.ok"
 msgstr "OK"
+
+# en: "Open"
+msgid "disciplineRecord.open"
+msgstr "Öffnen"
+
+# en: "Open {name} in shot groups"
+msgid "disciplineRecord.openStage"
+msgstr "{name} in den Schussbildern öffnen"
 
 # en: "Optic, zero"
 msgid "firearms.column.optic"
@@ -1427,6 +1508,10 @@ msgstr "Ersetzen"
 msgid "events.replaceEvents"
 msgstr "Wettkämpfe ersetzen?"
 
+# en: "Reserve, %"
+msgid "matchRounds.reserve"
+msgstr "Reserve, %"
+
 # en: "Reset to preset"
 msgid "units.reset"
 msgstr "Auf die Voreinstellung zurücksetzen"
@@ -1479,6 +1564,34 @@ msgstr "Patronen"
 msgid "events.roundsFired"
 msgstr "Abgegebene Schüsse"
 
+# en: "Rounds for a match"
+msgid "matchRounds.title"
+msgstr "Patronen für einen Wettkampf"
+
+# en: "Rounds left over"
+msgid "matchRounds.leftOver"
+msgstr "Übrige Patronen"
+
+# en: "Rounds needed"
+msgid "matchRounds.needed"
+msgstr "Benötigte Patronen"
+
+# en: "Rounds on hand"
+msgid "matchRounds.onHand"
+msgstr "Vorhandene Patronen"
+
+# en: "Rounds short"
+msgid "matchRounds.short"
+msgstr "Fehlende Patronen"
+
+# en: "Rule book"
+msgid "disciplineRecord.ruleBook"
+msgstr "Sportordnung"
+
+# en: "Rule book: {value}"
+msgid "matchRounds.ruleBook"
+msgstr "Sportordnung: {value}"
+
 # en: "Save event"
 msgid "events.saveEvent"
 msgstr "Wettkampf speichern"
@@ -1494,6 +1607,10 @@ msgstr "QB"
 # en: "Search"
 msgid "directoryTable.search"
 msgstr "Suchen"
+
+# en: "section {section}, {page}"
+msgid "disciplineRecord.section"
+msgstr "Abschnitt {section}, {page}"
 
 # en: "Sectional density, computed: mass over diameter squared."
 msgid "bullets.column.sdHelp"
@@ -1540,6 +1657,10 @@ msgid "page.firearmsLog"
 msgstr "Schießbuch"
 
 # en: "Shot groups"
+msgid "disciplineRecord.column.groups"
+msgstr "Schussbilder"
+
+# en: "Shot groups"
 msgid "page.groups"
 msgstr "Schussbilder"
 
@@ -1547,9 +1668,25 @@ msgstr "Schussbilder"
 msgid "events.shots"
 msgstr "Schüsse"
 
+# en: "Shots"
+msgid "disciplineRecord.column.shots"
+msgstr "Schüsse"
+
+# en: "Shots per event"
+msgid "matchRounds.shots"
+msgstr "Schüsse je Durchgang"
+
+# en: "Shots per event: {count}"
+msgid "matchRounds.shotsStated"
+msgstr "Schüsse je Durchgang: {count}"
+
 # en: "Shotshell"
 msgid "values.shotshell"
 msgstr "Schrotpatrone"
+
+# en: "Sighters per event"
+msgid "matchRounds.sighters"
+msgstr "Probeschüsse je Durchgang"
 
 # en: "Size"
 msgid "primers.column.size"
@@ -1579,6 +1716,10 @@ msgstr "Quelle"
 msgid "listSources.button"
 msgstr "Quelle: {text}"
 
+# en: "Stage"
+msgid "disciplineRecord.column.stage"
+msgstr "Programmteil"
+
 # en: "Stage {n}"
 msgid "events.stageNumber"
 msgstr "Stage {n}"
@@ -1597,6 +1738,10 @@ msgstr "Stages"
 
 # en: "Target"
 msgid "disciplines.facet.face"
+msgstr "Scheibe"
+
+# en: "Target"
+msgid "disciplineRecord.column.target"
 msgstr "Scheibe"
 
 # en: "Target data is unavailable right now."
@@ -1618,6 +1763,14 @@ msgstr "Scheiben"
 # en: "Targets"
 msgid "page.targets"
 msgstr "Scheiben"
+
+# en: "Targets ({count})"
+msgid "disciplineRecord.targets"
+msgstr "Scheiben ({count})"
+
+# en: "Targets table"
+msgid "disciplineRecord.targetsTable"
+msgstr "Tabelle der Scheiben"
 
 # en: "Targets, {filters}"
 msgid "targets.filtered"
@@ -1667,6 +1820,18 @@ msgstr "Die Schusszahl von {name} enthält diesen Wettkampf schon."
 msgid "events.roundCountUnchanged"
 msgstr "Die Schusszahl von {name} bleibt unverändert."
 
+# en: "The targets and stages of this discipline"
+msgid "disciplineRecord.targetsCaption"
+msgstr "Die Scheiben und Programmteile dieser Disziplin"
+
+# en: "The targets of this discipline state no shot count."
+msgid "matchRounds.shotsUnstated"
+msgstr "Die Zielscheiben dieser Disziplin nennen keine Schusszahl."
+
+# en: "This page needs JavaScript."
+msgid "recordView.needsJavaScript"
+msgstr "Diese Seite braucht JavaScript."
+
 # en: "Time (s)"
 msgid "events.time"
 msgstr "Zeit (s)"
@@ -1714,6 +1879,14 @@ msgstr "Einheiten: {preset}"
 # en: "Units: {preset}, custom"
 msgid "units.nameCustom"
 msgstr "Einheiten: {preset}, benutzerdefiniert"
+
+# en: "Untick"
+msgid "comparePicks.untick"
+msgstr "Abwählen"
+
+# en: "Untick {name}"
+msgid "comparePicks.untickName"
+msgstr "{name} abwählen"
 
 # en: "US customary"
 msgid "units.preset.us"

@@ -100,6 +100,15 @@ msgstr "{count, plural, one {# training row} other {# training rows}}"
 msgid "events.addRounds"
 msgstr "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
 
+msgid "comparePicks.hidden"
+msgstr "{count} hidden"
+
+msgid "comparePicks.selected"
+msgstr "{count} selected"
+
+msgid "comparePicks.selectedMax"
+msgstr "{count} selected (max {max})"
+
 msgid "directoryTable.aToZ"
 msgstr "{label}, A to Z"
 
@@ -195,6 +204,9 @@ msgstr "Altitude"
 
 msgid "values.aluminum"
 msgstr "Aluminum"
+
+msgid "matchRounds.anyNumber"
+msgstr "Any number"
 
 msgid "units.quantity.area"
 msgstr "Areas"
@@ -319,6 +331,9 @@ msgstr "Category"
 msgid "events.outOfRange"
 msgstr "Check the event: a value is out of its range."
 
+msgid "comparePicks.clear"
+msgstr "Clear"
+
 msgid "facetFilters.clear"
 msgstr "Clear all"
 
@@ -328,8 +343,17 @@ msgstr "Clear filters"
 msgid "directoryTable.clearSearch"
 msgstr "Clear search"
 
+msgid "comparePicks.clearSelection"
+msgstr "Clear selection"
+
 msgid "cartridges.column.cartridgeLengthHelp"
 msgstr "COAL, the cartridge maximum of the CIP sheet, shortest variant."
+
+msgid "comparePicks.compare"
+msgstr "Compare"
+
+msgid "comparePicks.compareCount"
+msgstr "Compare {count}"
 
 msgid "page.bulletsCompare"
 msgstr "Compare bullets"
@@ -363,6 +387,9 @@ msgstr "Country"
 
 msgid "disciplines.column.country"
 msgstr "Country"
+
+msgid "disciplineRecord.column.course"
+msgstr "Course of fire"
 
 msgid "units.custom"
 msgstr "Custom"
@@ -404,6 +431,9 @@ msgid "targets.facet.discipline"
 msgstr "Discipline"
 
 msgid "events.discipline"
+msgstr "Discipline"
+
+msgid "disciplineRecord.data"
 msgstr "Discipline"
 
 msgid "log.column.discipline"
@@ -463,6 +493,9 @@ msgstr "Energy"
 msgid "states.error"
 msgstr "Error"
 
+msgid "disciplineRecord.column.event"
+msgstr "Event"
+
 msgid "events.total"
 msgstr "Event total: {total}"
 
@@ -481,6 +514,10 @@ msgstr "Event type"
 msgid "states.unavailable.eventType"
 msgstr "Event type data is unavailable right now."
 
+msgctxt "match"
+msgid "matchRounds.events"
+msgstr "Events"
+
 msgid "events.exportCsv"
 msgstr "Export CSV"
 
@@ -494,6 +531,9 @@ msgid "targets.facet.org"
 msgstr "Federation"
 
 msgid "disciplines.column.federation"
+msgstr "Federation"
+
+msgid "disciplineRecord.federation"
 msgstr "Federation"
 
 msgid "targets.column.organization"
@@ -538,6 +578,12 @@ msgstr "G1"
 msgid "bullets.column.g7"
 msgstr "G7"
 
+msgid "disciplineRecord.column.gauge"
+msgstr "Gauge"
+
+msgid "comparePicks.hiddenTitle"
+msgstr "Hidden by the search or a filter"
+
 msgid "events.hitFactor"
 msgstr "Hit factor"
 
@@ -549,6 +595,9 @@ msgstr "Import JSON"
 
 msgid "disciplines.international"
 msgstr "International"
+
+msgid "disciplineRecord.international"
+msgstr "International discipline"
 
 msgid "values.lacqueredSteel"
 msgstr "Lacquered steel"
@@ -892,6 +941,9 @@ msgstr "No primers match these filters."
 msgid "events.nothingToExport"
 msgstr "No saved event to export."
 
+msgid "disciplineRecord.noTargets"
+msgstr "No target mapping names this discipline."
+
 msgid "events.noTargetSheet"
 msgstr "No target sheet saved yet"
 
@@ -913,6 +965,9 @@ msgstr "Not in this browser"
 msgid "events.notSaved"
 msgstr "Not saved: {reason}"
 
+msgid "matchRounds.notStated"
+msgstr "Not stated"
+
 msgid "states.note"
 msgstr "Note"
 
@@ -930,6 +985,12 @@ msgstr "Offline"
 
 msgid "listSources.ok"
 msgstr "OK"
+
+msgid "disciplineRecord.open"
+msgstr "Open"
+
+msgid "disciplineRecord.openStage"
+msgstr "Open {name} in shot groups"
 
 msgid "firearms.column.optic"
 msgstr "Optic, zero"
@@ -1072,6 +1133,9 @@ msgstr "Replace"
 msgid "events.replaceEvents"
 msgstr "Replace events?"
 
+msgid "matchRounds.reserve"
+msgstr "Reserve, %"
+
 msgid "units.reset"
 msgstr "Reset to preset"
 
@@ -1111,6 +1175,27 @@ msgstr "Rounds"
 msgid "events.roundsFired"
 msgstr "Rounds fired"
 
+msgid "matchRounds.title"
+msgstr "Rounds for a match"
+
+msgid "matchRounds.leftOver"
+msgstr "Rounds left over"
+
+msgid "matchRounds.needed"
+msgstr "Rounds needed"
+
+msgid "matchRounds.onHand"
+msgstr "Rounds on hand"
+
+msgid "matchRounds.short"
+msgstr "Rounds short"
+
+msgid "disciplineRecord.ruleBook"
+msgstr "Rule book"
+
+msgid "matchRounds.ruleBook"
+msgstr "Rule book: {value}"
+
 msgid "events.saveEvent"
 msgstr "Save event"
 
@@ -1122,6 +1207,9 @@ msgstr "SD"
 
 msgid "directoryTable.search"
 msgstr "Search"
+
+msgid "disciplineRecord.section"
+msgstr "section {section}, {page}"
 
 msgid "bullets.column.sdHelp"
 msgstr "Sectional density, computed: mass over diameter squared."
@@ -1156,14 +1244,29 @@ msgstr "Shooting log"
 msgid "page.firearmsLog"
 msgstr "Shooting log"
 
+msgid "disciplineRecord.column.groups"
+msgstr "Shot groups"
+
 msgid "page.groups"
 msgstr "Shot groups"
 
 msgid "events.shots"
 msgstr "Shots"
 
+msgid "disciplineRecord.column.shots"
+msgstr "Shots"
+
+msgid "matchRounds.shots"
+msgstr "Shots per event"
+
+msgid "matchRounds.shotsStated"
+msgstr "Shots per event: {count}"
+
 msgid "values.shotshell"
 msgstr "Shotshell"
+
+msgid "matchRounds.sighters"
+msgstr "Sighters per event"
 
 msgid "primers.column.size"
 msgstr "Size"
@@ -1186,6 +1289,9 @@ msgstr "Source"
 msgid "listSources.button"
 msgstr "Source: {text}"
 
+msgid "disciplineRecord.column.stage"
+msgstr "Stage"
+
 msgid "events.stageNumber"
 msgstr "Stage {n}"
 
@@ -1199,6 +1305,9 @@ msgid "events.stages"
 msgstr "Stages"
 
 msgid "disciplines.facet.face"
+msgstr "Target"
+
+msgid "disciplineRecord.column.target"
 msgstr "Target"
 
 msgid "states.unavailable.targetFace"
@@ -1215,6 +1324,12 @@ msgstr "Targets"
 
 msgid "page.targets"
 msgstr "Targets"
+
+msgid "disciplineRecord.targets"
+msgstr "Targets ({count})"
+
+msgid "disciplineRecord.targetsTable"
+msgstr "Targets table"
 
 msgid "targets.filtered"
 msgstr "Targets, {filters}"
@@ -1252,6 +1367,15 @@ msgstr "The round count of {name} holds this event already."
 msgid "events.roundCountUnchanged"
 msgstr "The round count of {name} is unchanged."
 
+msgid "disciplineRecord.targetsCaption"
+msgstr "The targets and stages of this discipline"
+
+msgid "matchRounds.shotsUnstated"
+msgstr "The targets of this discipline state no shot count."
+
+msgid "recordView.needsJavaScript"
+msgstr "This page needs JavaScript."
+
 msgid "events.time"
 msgstr "Time (s)"
 
@@ -1287,6 +1411,12 @@ msgstr "Units: {preset}"
 
 msgid "units.nameCustom"
 msgstr "Units: {preset}, custom"
+
+msgid "comparePicks.untick"
+msgstr "Untick"
+
+msgid "comparePicks.untickName"
+msgstr "Untick {name}"
 
 msgid "units.preset.us"
 msgstr "US customary"

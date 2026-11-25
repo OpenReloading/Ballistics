@@ -1,10 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Popover, Tooltip } from '@mantine/core'
 import { ArrowLeftRight, EyeOff, X } from 'lucide-react'
 import { useEffect, useId, useRef } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
@@ -56,7 +56,7 @@ export function SelectionSummary({
   onUntick: (id: string) => void
   onClear: () => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // Clear leaves with the picks: the focus goes to the search box
   const clear = () => {
     onClear()
@@ -69,10 +69,18 @@ export function SelectionSummary({
         {count > 0 && (
           <>
             <span className="selection-count-short" aria-hidden="true">
-              {t('{count} selected', { count })}
+              {i18n._({
+                id: 'comparePicks.selected',
+                message: '{count} selected',
+                values: { count },
+              })}
             </span>
             <span className="selection-count-text">
-              {t('{count} selected (max {max})', { count, max })}
+              {i18n._({
+                id: 'comparePicks.selectedMax',
+                message: '{count} selected (max {max})',
+                values: { count, max },
+              })}
             </span>
           </>
         )}
@@ -84,11 +92,13 @@ export function SelectionSummary({
           variant="subtle"
           size={controlSize.row.button}
           px={6}
-          aria-label={t('Clear selection')}
+          aria-label={i18n._({ id: 'comparePicks.clearSelection', message: 'Clear selection' })}
           leftSection={<X size={12} aria-hidden="true" />}
           onClick={clear}
         >
-          <span className="clear-picks-text">{t('Clear')}</span>
+          <span className="clear-picks-text">
+            {i18n._({ id: 'comparePicks.clear', message: 'Clear' })}
+          </span>
         </Button>
       )}
     </span>
@@ -102,7 +112,7 @@ function HiddenPicks({
   hidden: readonly HiddenPick[]
   onUntick: (id: string) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const title = useId()
   const list = useRef<HTMLUListElement>(null)
   // the row of the untick just clicked: its button goes, the focus moves to the one now in its place
@@ -134,12 +144,18 @@ function HiddenPicks({
           <span className="hidden-picks-count" aria-hidden="true">
             {hidden.length}
           </span>
-          <span className="hidden-picks-text">{t('{count} hidden', { count: hidden.length })}</span>
+          <span className="hidden-picks-text">
+            {i18n._({
+              id: 'comparePicks.hidden',
+              message: '{count} hidden',
+              values: { count: hidden.length },
+            })}
+          </span>
         </Button>
       </Popover.Target>
       <Popover.Dropdown aria-labelledby={title}>
         <p id={title} className="hidden-picks-title">
-          {t('Hidden by the search or a filter')}
+          {i18n._({ id: 'comparePicks.hiddenTitle', message: 'Hidden by the search or a filter' })}
         </p>
         <ul ref={list} className="hidden-picks-list">
           {hidden.map((p, at) => (
@@ -149,11 +165,15 @@ function HiddenPicks({
                 variant="subtle"
                 size={controlSize.row.button}
                 px={6}
-                aria-label={t('Untick {name}', { name: p.label })}
+                aria-label={i18n._({
+                  id: 'comparePicks.untickName',
+                  message: 'Untick {name}',
+                  values: { name: p.label },
+                })}
                 leftSection={<X size={12} aria-hidden="true" />}
                 onClick={() => untick(p.id, at)}
               >
-                {t('Untick')}
+                {i18n._({ id: 'comparePicks.untick', message: 'Untick' })}
               </Button>
             </li>
           ))}
@@ -179,8 +199,13 @@ export function CompareButton({
   need?: string
   idle?: string
 }) {
-  const { t } = useTranslation()
-  const text = count > 0 ? t('Compare {count}', { count }) : (idle ?? t('Compare'))
+  const { i18n } = useLingui()
+  const compareCount = (n: number) =>
+    i18n._({ id: 'comparePicks.compareCount', message: 'Compare {count}', values: { count: n } })
+  const text =
+    count > 0
+      ? compareCount(count)
+      : (idle ?? i18n._({ id: 'comparePicks.compare', message: 'Compare' }))
   // the widest label under the shown one, unseen: the slot's width
   const label =
     max === undefined ? (
@@ -188,7 +213,7 @@ export function CompareButton({
     ) : (
       <span className="compare-label">
         <span>{text}</span>
-        <span aria-hidden="true">{t('Compare {count}', { count: max })}</span>
+        <span aria-hidden="true">{compareCount(max)}</span>
       </span>
     )
   const hint = useId()

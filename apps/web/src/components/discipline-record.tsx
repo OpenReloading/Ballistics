@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -31,30 +32,49 @@ interface DisciplineStageRow {
 
 /** The faces and stages of a discipline; with several stages each row opens its own in the shot groups. */
 export function DisciplineStages({ rows }: { rows: readonly DisciplineStageRow[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const perStage = rows.length > 1
   const hasCourse = rows.some((m) => m.course)
   return (
-    <Panel id="discipline-stages" title={t('Targets ({count})', { count: rows.length })}>
+    <Panel
+      id="discipline-stages"
+      title={i18n._({
+        id: 'disciplineRecord.targets',
+        message: 'Targets ({count})',
+        values: { count: rows.length },
+      })}
+    >
       {rows.length === 0 ? (
-        <p className="record-note">{t('No target mapping names this discipline.')}</p>
+        <p className="record-note">
+          {i18n._({
+            id: 'disciplineRecord.noTargets',
+            message: 'No target mapping names this discipline.',
+          })}
+        </p>
       ) : (
         <PanelTable
-          label={t('Targets table')}
+          label={i18n._({ id: 'disciplineRecord.targetsTable', message: 'Targets table' })}
           className="face-table"
           caption={
             <span className="visually-hidden">
-              {t('The targets and stages of this discipline')}
+              {i18n._({
+                id: 'disciplineRecord.targetsCaption',
+                message: 'The targets and stages of this discipline',
+              })}
             </span>
           }
           columns={[
-            t('Target'),
-            t('Event'),
-            t('Stage'),
-            t('Gauge'),
-            t('Shots'),
-            ...(hasCourse ? [t('Course of fire')] : []),
-            ...(perStage ? [t('Shot groups')] : []),
+            i18n._({ id: 'disciplineRecord.column.target', message: 'Target' }),
+            i18n._({ id: 'disciplineRecord.column.event', message: 'Event' }),
+            i18n._({ id: 'disciplineRecord.column.stage', message: 'Stage' }),
+            i18n._({ id: 'disciplineRecord.column.gauge', message: 'Gauge' }),
+            i18n._({ id: 'disciplineRecord.column.shots', message: 'Shots' }),
+            ...(hasCourse
+              ? [i18n._({ id: 'disciplineRecord.column.course', message: 'Course of fire' })]
+              : []),
+            ...(perStage
+              ? [i18n._({ id: 'disciplineRecord.column.groups', message: 'Shot groups' })]
+              : []),
           ]}
         >
           {rows.map((m) => (
@@ -74,9 +94,13 @@ export function DisciplineStages({ rows }: { rows: readonly DisciplineStageRow[]
                 <td>
                   <Link
                     href={m.groupsHref}
-                    aria-label={t('Open {name} in shot groups', { name: m.stage ?? m.event })}
+                    aria-label={i18n._({
+                      id: 'disciplineRecord.openStage',
+                      message: 'Open {name} in shot groups',
+                      values: { name: m.stage ?? m.event },
+                    })}
                   >
-                    {t('Open')}
+                    {i18n._({ id: 'disciplineRecord.open', message: 'Open' })}
                   </Link>
                 </td>
               )}
@@ -125,31 +149,37 @@ export function DisciplineData({
   international?: { id: string; name: string } | undefined
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <Panel id="record-data" title={t('Discipline')}>
+    <Panel id="record-data" title={i18n._({ id: 'disciplineRecord.data', message: 'Discipline' })}>
       <FieldTable
         caption={msg('Discipline')}
         labelledBy="record-data"
         groups={disciplineGroups(record, classes, t)}
       />
       <dl className="record-links">
-        <dt>{t('Federation')}</dt>
+        <dt>{i18n._({ id: 'disciplineRecord.federation', message: 'Federation' })}</dt>
         <dd>
           <Link href={`/federations/${federation.id}`}>{federation.name}</Link>
         </dd>
         {book && (
           <>
-            <dt>{t('Rule book')}</dt>
+            <dt>{i18n._({ id: 'disciplineRecord.ruleBook', message: 'Rule book' })}</dt>
             <dd>
               {book.url ? <a href={book.url}>{book.title}</a> : book.title}
               {book.edition && !book.title.includes(book.edition) && `, ${book.edition}`}
-              {`, ${t('section {section}, {page}', { section: book.section, page: book.page })}`}
+              {`, ${i18n._({ id: 'disciplineRecord.section', message: 'section {section}, {page}', values: { section: book.section, page: book.page } })}`}
             </dd>
           </>
         )}
         {international && (
           <>
-            <dt>{t('International discipline')}</dt>
+            <dt>
+              {i18n._({
+                id: 'disciplineRecord.international',
+                message: 'International discipline',
+              })}
+            </dt>
             <dd>
               <Link href={`/disciplines/${international.id}`}>{international.name}</Link>
             </dd>
