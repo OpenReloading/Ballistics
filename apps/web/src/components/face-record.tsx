@@ -18,7 +18,7 @@ import { shownLength } from './shown-length.tsx'
 /** How an event scores a hole, by the stored value. */
 const scoredBy = {
   touch: /*i18n*/ { id: 'faceRecord.scoredBy.touch', message: 'Hole edge' },
-  centre: /*i18n*/ { id: 'faceRecord.scoredBy.centre', message: 'Hole center' },
+  centre: /*i18n*/ { id: 'faceRecord.scoredBy.center', message: 'Hole center' },
   outward: /*i18n*/ { id: 'faceRecord.scoredBy.outward', message: 'Hole edge, outward' },
 }
 

@@ -1037,7 +1037,7 @@ msgid "events.hitFactor"
 msgstr "Trefferfaktor"
 
 # en: "Hole center"
-msgid "faceRecord.scoredBy.centre"
+msgid "faceRecord.scoredBy.center"
 msgstr "Lochmitte"
 
 # en: "Hole edge"

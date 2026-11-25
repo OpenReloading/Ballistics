@@ -779,7 +779,7 @@ msgstr "Hidden by the search or a filter"
 msgid "events.hitFactor"
 msgstr "Hit factor"
 
-msgid "faceRecord.scoredBy.centre"
+msgid "faceRecord.scoredBy.center"
 msgstr "Hole center"
 
 msgid "faceRecord.scoredBy.touch"
