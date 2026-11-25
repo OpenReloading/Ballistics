@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   Badge,
   Button,
@@ -50,7 +52,12 @@ export interface ChooserSelect<R> {
   label: Message
   nothingFound: Message
   /** The options of the loaded catalogue (`catalogue`) or of every row (`rows`). */
-  options: (catalogue: readonly R[], rows: readonly R[], t: Translator['t']) => ComboboxData
+  options: (
+    catalogue: readonly R[],
+    rows: readonly R[],
+    t: Translator['t'],
+    i18n: I18n,
+  ) => ComboboxData
   keep: (row: R, value: string) => boolean
 }
 
@@ -95,7 +102,7 @@ export function manufacturerSelect<
 interface ChooserColumn<R> {
   label: Message
   width: string
-  cell: (row: R, system: UnitSystem, t: Translator['t']) => string
+  cell: (row: R, system: UnitSystem, t: Translator['t'], i18n: I18n) => string
 }
 
 /** What a chooser's dialog says, each a message of one record kind. */
@@ -142,7 +149,12 @@ export interface ChooserKind<R extends ChooserRow> {
   /** The rows that match `query`, in the order of `sort`. */
   search: (rows: readonly R[], query: string, sort: string) => R[]
   columns: readonly ChooserColumn<R>[]
-  facts: (row: R, system: UnitSystem, t: Translator['t']) => [Message, string | undefined][]
+  facts: (
+    row: R,
+    system: UnitSystem,
+    t: Translator['t'],
+    i18n: I18n,
+  ) => [Message, string | undefined][]
   /** The page of a catalogue record, if it has one. */
   href?: (row: R) => string | undefined
   /** Values missing (`complete-records.ts`): "Complete records only" hides it, else it follows the complete ones with a mark. */
@@ -233,6 +245,7 @@ function ResultRow<R extends ChooserRow>({
   onChoose,
 }: RowsProps<R> & { row: R; index: number }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const unavailable = kind.unavailable?.(row)
   return (
     // keyboard: the search box owns the focus and moves the highlight
@@ -264,7 +277,7 @@ function ResultRow<R extends ChooserRow>({
         {unavailable && <span className="bd-reason">{t(unavailable)}</span>}
       </span>
       {kind.columns.map((c) => (
-        <span key={c.label}>{c.cell(row, system, t)}</span>
+        <span key={c.label}>{c.cell(row, system, t, i18n)}</span>
       ))}
     </div>
   )
@@ -395,6 +408,7 @@ function ChooserBody<R extends ChooserRow>({
   phone,
 }: ChooserProps<R> & { state: Catalogue<R>; retry: () => void; phone: boolean | undefined }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { texts } = kind
   const [query, setQuery] = useState(text)
   const [picked, setPicked] = useState<readonly string[]>([])
@@ -440,8 +454,8 @@ function ChooserBody<R extends ChooserRow>({
   }, [active, current, id])
 
   const options = useMemo(
-    () => kind.selects.map((s) => s.options(catalogue, rows, t)),
-    [kind, catalogue, rows, t],
+    () => kind.selects.map((s) => s.options(catalogue, rows, t, i18n)),
+    [kind, catalogue, rows, t, i18n],
   )
   const filterCount = picked.filter(Boolean).length + count + (origin === 'all' ? 0 : 1)
   const message = statusMessage(state, texts, results.length, rows.length, t)
@@ -582,12 +596,13 @@ function Preview<R extends ChooserRow>({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const href = row.origin ? undefined : kind.href?.(row)
   return (
     <aside className="bd-preview" aria-label={t(kind.texts.preview)}>
       <p className="bd-preview-title">{row.name}</p>
       <dl>
-        {kind.facts(row, system, t).map(([k, v]) => (
+        {kind.facts(row, system, t, i18n).map(([k, v]) => (
           <div key={k}>
             <dt>{t(k)}</dt>
             <dd>{v ?? t('n/a')}</dd>

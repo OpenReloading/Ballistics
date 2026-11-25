@@ -1,10 +1,10 @@
+import type { MessageDescriptor } from '@lingui/core'
 import type { PresetId, Quantity, UnitSystem } from '@rangefoundry/locale-format'
 import * as locale from '@rangefoundry/locale-format'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { conversions, waterDensityGramsPerCm3 } from '@rangefoundry/units'
 import { parseNumber } from '../i18n/number.ts'
 import { shownLanguage } from '../i18n/shown.ts'
-import { type Message, msg } from '../i18n/translate.ts'
 
 /** The display unit tables and unit formatting of `@rangefoundry/locale-format` in the language shown, with the app's factors and unit-field text. */
 export {
@@ -43,10 +43,10 @@ export { waterDensityGramsPerCm3 }
 export const psi = conversions.psi.factor
 export const footPound = conversions['ft-lbf'].factor
 
-export const presetNames: Record<PresetId, Message> = {
-  'metric-grains': msg('Metric, common use'),
-  us: msg('US customary'),
-  'metric-grams': msg('Metric (SI)'),
+export const presetNames: Record<PresetId, MessageDescriptor> = {
+  'metric-grains': /*i18n*/ { id: 'units.preset.metricGrains', message: 'Metric, common use' },
+  us: /*i18n*/ { id: 'units.preset.us', message: 'US customary' },
+  'metric-grams': /*i18n*/ { id: 'units.preset.metricGrams', message: 'Metric (SI)' },
 }
 
 /** The length unit of the technical drawings' labels: inches when lengths are shown in inches. */

@@ -1,5 +1,7 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { Button, NativeSelect, SegmentedControl, SimpleGrid, Stack, Tooltip } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { Ruler } from 'lucide-react'
@@ -13,8 +15,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
-import { onLanguageChange, useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
+import { onLanguageChange } from '../i18n/language.ts'
 import { storageName } from '../lib/edition.ts'
 import { type FieldSpec, type Fields, switchFields } from '../lib/field-spec.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -210,31 +211,34 @@ export function useFieldUnits(
 }
 
 /** Quantities with a unit choice, in the order of the presets table. */
-const choices: [Quantity, Message][] = [
-  ['charge', msg('Powder charge')],
-  ['mass', msg('Bullet mass')],
-  ['length', msg('Lengths')],
-  ['twist', msg('Barrel twist')],
-  ['barrelLength', msg('Barrel length')],
-  ['area', msg('Areas')],
-  ['capacity', msg('Case capacity')],
-  ['velocity', msg('Velocity')],
-  ['pressure', msg('Pressure')],
-  ['energy', msg('Energy')],
-  ['temperature', msg('Temperature')],
-  ['range', msg('Range, distance')],
-  ['lineOfSightOffset', msg('Drop, windage')],
-  ['windSpeed', msg('Wind speed')],
-  ['altitude', msg('Altitude')],
-  ['airPressure', msg('Air pressure')],
-  ['correction', msg('Corrections')],
-  ['firearmMass', msg('Firearm mass')],
+const choices: [Quantity, MessageDescriptor][] = [
+  ['charge', /*i18n*/ { id: 'units.quantity.charge', message: 'Powder charge' }],
+  ['mass', /*i18n*/ { id: 'units.quantity.mass', message: 'Bullet mass' }],
+  ['length', /*i18n*/ { id: 'units.quantity.length', message: 'Lengths' }],
+  ['twist', /*i18n*/ { id: 'units.quantity.twist', message: 'Barrel twist' }],
+  ['barrelLength', /*i18n*/ { id: 'units.quantity.barrelLength', message: 'Barrel length' }],
+  ['area', /*i18n*/ { id: 'units.quantity.area', message: 'Areas' }],
+  ['capacity', /*i18n*/ { id: 'units.quantity.capacity', message: 'Case capacity' }],
+  ['velocity', /*i18n*/ { id: 'units.quantity.velocity', message: 'Velocity' }],
+  ['pressure', /*i18n*/ { id: 'units.quantity.pressure', message: 'Pressure' }],
+  ['energy', /*i18n*/ { id: 'units.quantity.energy', message: 'Energy' }],
+  ['temperature', /*i18n*/ { id: 'units.quantity.temperature', message: 'Temperature' }],
+  ['range', /*i18n*/ { id: 'units.quantity.range', message: 'Range, distance' }],
+  [
+    'lineOfSightOffset',
+    /*i18n*/ { id: 'units.quantity.lineOfSightOffset', message: 'Drop, windage' },
+  ],
+  ['windSpeed', /*i18n*/ { id: 'units.quantity.windSpeed', message: 'Wind speed' }],
+  ['altitude', /*i18n*/ { id: 'units.quantity.altitude', message: 'Altitude' }],
+  ['airPressure', /*i18n*/ { id: 'units.quantity.airPressure', message: 'Air pressure' }],
+  ['correction', /*i18n*/ { id: 'units.quantity.correction', message: 'Corrections' }],
+  ['firearmMass', /*i18n*/ { id: 'units.quantity.firearmMass', message: 'Firearm mass' }],
 ]
 
 /** The unit settings of the settings dialog: the preset, one unit per quantity and "Reset to preset"; every change is stored. */
 export function UnitsForm() {
   const { choice, choose, custom, ready } = useUnits()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // four segments do not fit a phone in a row
   const narrow = useMediaQuery('(width < 36em)')
   const isCustom = hasOverrides(choice)
@@ -251,7 +255,7 @@ export function UnitsForm() {
     <Stack gap="sm" maw="40rem">
       <div>
         <p className="segment-label" id="units-preset">
-          {t('Preset')}
+          {i18n._({ id: 'units.preset', message: 'Preset' })}
         </p>
         <SegmentedControl
           aria-labelledby="units-preset"
@@ -263,11 +267,11 @@ export function UnitsForm() {
           // alphabetical, the custom variant last
           data={[
             ...(Object.keys(presetNames) as PresetId[])
-              .sort((a, b) => t(presetNames[a]).localeCompare(t(presetNames[b])))
-              .map((p) => ({ value: p, label: t(presetNames[p]) })),
+              .sort((a, b) => i18n._(presetNames[a]).localeCompare(i18n._(presetNames[b])))
+              .map((p) => ({ value: p, label: i18n._(presetNames[p]) })),
             {
               value: 'custom',
-              label: t('Custom'),
+              label: i18n._({ id: 'units.custom', message: 'Custom' }),
               disabled: !custom && !isCustom,
             },
           ]}
@@ -277,7 +281,7 @@ export function UnitsForm() {
         {choices.map(([q, label]) => (
           <NativeSelect
             key={q}
-            label={t(label)}
+            label={i18n._(label)}
             size={controlSize.row.input}
             value={choice.overrides[q] ?? presetUnitIds[choice.preset][q]}
             data={Object.entries(unitsOf[q]).map(([id, u]) => ({
@@ -297,7 +301,7 @@ export function UnitsForm() {
         disabled={!hasOverrides(choice)}
         onClick={() => set(choice.preset, {})}
       >
-        {t('Reset to preset')}
+        {i18n._({ id: 'units.reset', message: 'Reset to preset' })}
       </Button>
     </Stack>
   )
@@ -306,11 +310,11 @@ export function UnitsForm() {
 /** "Units: <preset>", ", custom" with an override: the name of the Units buttons, and the preset's own. */
 function useUnitsName() {
   const { choice } = useUnits()
-  const { t } = useTranslation()
-  const preset = t(presetNames[choice.preset])
+  const { i18n } = useLingui()
+  const preset = i18n._(presetNames[choice.preset])
   const name = hasOverrides(choice)
-    ? t('Units: {preset}, custom', { preset })
-    : t('Units: {preset}', { preset })
+    ? i18n._({ id: 'units.nameCustom', message: 'Units: {preset}, custom', values: { preset } })
+    : i18n._({ id: 'units.name', message: 'Units: {preset}', values: { preset } })
   return { name, preset }
 }
 

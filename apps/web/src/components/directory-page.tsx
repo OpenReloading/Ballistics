@@ -1,7 +1,7 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 import type { DirectoryState } from '../lib/directory.ts'
 import { countText, type ListNoun, widestCount } from '../lib/lists.ts'
@@ -47,7 +47,7 @@ export function DirectoryPage({
   filters?: ReactNode
   table: ReactNode
 }) {
-  const tr = useTranslation()
+  const { i18n } = useLingui()
   return (
     <>
       <PageBar
@@ -55,8 +55,8 @@ export function DirectoryPage({
         translated
         status={
           <>
-            <BarCount widest={widestCount(tr, total, noun)}>
-              {countText(tr, shown, total, noun)}
+            <BarCount widest={widestCount(i18n, total, noun)}>
+              {countText(i18n, shown, total, noun)}
             </BarCount>
             {status}
           </>

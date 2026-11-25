@@ -1,6 +1,5 @@
 import { expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { translator } from '../src/i18n/translate.ts'
 import {
   countText,
   filterText,
@@ -10,7 +9,7 @@ import {
   widestCount,
 } from '../src/lib/lists.ts'
 
-const english = translator()
+const english = linguiOf('en')
 
 it('matches every word of the query in any text, ignoring case', () => {
   expect(matchesQuery(['308 Win.', '7,62 x 51'], '308 win')).toBe(true)

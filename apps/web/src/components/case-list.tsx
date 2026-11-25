@@ -6,7 +6,6 @@ import { toSi } from '@rangefoundry/schema'
 import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { type CaseRow, caseMatches, userCaseRows } from '../lib/case-rows.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
@@ -36,7 +35,6 @@ export function CaseList({
   rows: CaseRow[]
   cartridgeNames: Record<string, string>
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   const [records, removeRow, read] = useUserRecords()
@@ -83,7 +81,7 @@ export function CaseList({
       label: /*i18n*/ { id: 'cases.column.material', message: 'Material' },
       width: '10rem',
       value: (r) => r.material,
-      cell: (r) => kebabValue(t, r.material),
+      cell: (r) => kebabValue(i18n, r.material),
     },
     {
       key: 'mass',
@@ -119,7 +117,7 @@ export function CaseList({
       r.origin === 'user' && i18n._(originNames.user),
       r.manufacturerName,
       r.cartridgeName,
-      kebabValue(t, r.material),
+      kebabValue(i18n, r.material),
     ]
       .filter(Boolean)
       .join(' · ')

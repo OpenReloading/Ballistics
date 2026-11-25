@@ -1,3 +1,4 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -5,6 +6,7 @@ import { expect, it, vi } from 'vitest'
 import RootError from '../src/app/error.tsx'
 import GlobalError from '../src/app/global-error.tsx'
 import { ErrorNote } from '../src/components/states.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 
 // the pages are called as functions below, outside a render, where a hook cannot subscribe
@@ -28,9 +30,11 @@ function find(node: ReactNode, text: string): ReactElement<{ onClick?: () => voi
 it('the error page keeps the shell: one h1, one message with the error, Retry calls retry', () => {
   const retry = vi.fn()
   const html = renderToStaticMarkup(
-    <MantineProvider>
-      <RootError error={error} retry={retry} />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <RootError error={error} retry={retry} />
+      </MantineProvider>
+    </I18nProvider>,
   )
   expect(html.match(/<h1/g)).toHaveLength(1)
   expect(html).toContain('role="alert"')

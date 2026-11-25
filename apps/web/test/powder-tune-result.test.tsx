@@ -1,3 +1,4 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import {
   type ChronographString,
@@ -15,6 +16,7 @@ import {
   TuneStrings,
 } from '../src/components/powder-tune.tsx'
 import { TuneChart } from '../src/components/powder-tune-chart.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { formatNumber } from '../src/i18n/number.ts'
 import { nth } from '../src/lib/nth.ts'
 import type { PowderFitReply, PowderFitState } from '../src/lib/powder-fit.ts'
@@ -35,9 +37,11 @@ if (fitted?.kind !== 'fit' || ranged?.kind !== 'range') throw new Error('no fit'
 
 const text = (state: PowderFitState, interior = load(0.38), table?: string) =>
   renderToStaticMarkup(
-    <MantineProvider>
-      <TuneNotes loaded={undefined} interior={interior} fit={state} table={table} />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <TuneNotes loaded={undefined} interior={interior} fit={state} table={table} />
+      </MantineProvider>
+    </I18nProvider>,
   ).replaceAll('&#x27;', "'")
 
 describe('the result view of the tuning route', () => {
@@ -134,15 +138,17 @@ describe('hand tuning', () => {
     const [a, b] = band.map((p) => p.charge)
     if (a === undefined || b === undefined) throw new Error('two band points expected')
     const html = renderToStaticMarkup(
-      <MantineProvider>
-        <TuneChart
-          band={band}
-          curve={[{ charge: a, velocity: 812.34 }]}
-          ladder={fitted.fit.chargeRange}
-          rows={[]}
-          system={presetUnits('metric-grains')}
-        />
-      </MantineProvider>,
+      <I18nProvider i18n={linguiOf('en')}>
+        <MantineProvider>
+          <TuneChart
+            band={band}
+            curve={[{ charge: a, velocity: 812.34 }]}
+            ladder={fitted.fit.chargeRange}
+            rows={[]}
+            system={presetUnits('metric-grains')}
+          />
+        </MantineProvider>
+      </I18nProvider>,
     )
     expect(html).toMatch(/<td[^>]*>812\.3<\/td>/)
     expect(html.match(/<td[^>]*><\/td>/g)).toHaveLength(1)
@@ -223,9 +229,11 @@ describe('refusals and rules on the screen', () => {
 /** The strings table as the server renders it, in metric units with grains. */
 const table = (props: Parameters<typeof TuneStrings>[0]) =>
   renderToStaticMarkup(
-    <MantineProvider>
-      <TuneStrings {...props} />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <TuneStrings {...props} />
+      </MantineProvider>
+    </I18nProvider>,
   )
 
 describe('the strings table', () => {

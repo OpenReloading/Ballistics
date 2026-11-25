@@ -121,7 +121,7 @@ function useContextNow(opened: boolean, route: string): ReportContext | undefine
       userAgent: navigator.userAgent,
       window: `${window.innerWidth} x ${window.innerHeight}`,
       colourScheme: scheme,
-      units: `${presetNames[choice.preset]}${overrides.length ? `, ${overrides.join(', ')}` : ''}`,
+      units: `${presetNames[choice.preset].message}${overrides.length ? `, ${overrides.join(', ')}` : ''}`,
     })
   }, [opened, route, scheme, choice])
   return context

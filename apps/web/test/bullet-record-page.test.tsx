@@ -1,8 +1,10 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { Bullet } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { BulletRecordPage } from '../src/components/bullet-record-page.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 
 const basic: Bullet = {
   id: 'test-bullet-basic',
@@ -26,9 +28,11 @@ vi.mock('../src/components/use-record.ts', () => ({
 
 it('shows a bullet record without provenance with no sources section', () => {
   const html = renderToStaticMarkup(
-    <MantineProvider>
-      <BulletRecordPage id={basic.id} name={basic.name} fits={[]} />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <BulletRecordPage id={basic.id} name={basic.name} fits={[]} />
+      </MantineProvider>
+    </I18nProvider>,
   )
   expect(html).toContain('Test Maker Test 175 gr HPBT')
   expect(html).toContain('id="record-data"')

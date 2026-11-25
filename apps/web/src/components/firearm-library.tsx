@@ -666,8 +666,8 @@ export function FirearmLibrary() {
         translated
         status={
           list && (
-            <BarCount widest={widestCount(tr, total, 'firearms')}>
-              {countText(tr, rows.length, total, 'firearms')}
+            <BarCount widest={widestCount(i18n, total, 'firearms')}>
+              {countText(i18n, rows.length, total, 'firearms')}
             </BarCount>
           )
         }

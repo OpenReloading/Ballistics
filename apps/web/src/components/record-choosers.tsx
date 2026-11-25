@@ -319,13 +319,13 @@ export const caseKind: ChooserKind<CaseRow> = {
     {
       label: msg('Material'),
       width: '6rem',
-      cell: (r, _, t) => (r.material ? kebabValue(t, r.material) : ''),
+      cell: (r, _, _t, i18n) => (r.material ? kebabValue(i18n, r.material) : ''),
     },
     { label: msg('Water'), width: '7rem', cell: (r, _, t) => water(r.waterCapacity, t) },
   ],
-  facts: (row, _, t) => [
+  facts: (row, _, t, i18n) => [
     [msg('Manufacturer'), row.manufacturerName || undefined],
-    [msg('Material'), row.material && kebabValue(t, row.material)],
+    [msg('Material'), row.material && kebabValue(i18n, row.material)],
     [msg('Water'), water(row.waterCapacity, t) || undefined],
   ],
   href: (row) => (row.id.startsWith('user:') ? undefined : `/cases/${row.id}`),
@@ -360,11 +360,11 @@ export const primerKind: ChooserKind<PrimerRow> = {
     {
       label: msg('Size'),
       nothingFound: msg('No size found'),
-      options: (catalogue, _, t) =>
+      options: (catalogue, _, _t, i18n) =>
         countedOptions(
           catalogue,
           (r) => r.size,
-          (v) => kebabValue(t, v),
+          (v) => kebabValue(i18n, v),
         ),
       keep: (r, v) => r.size === v,
     },
@@ -375,15 +375,15 @@ export const primerKind: ChooserKind<PrimerRow> = {
   ],
   search: (rows, query, sort) => rankRecords(rows, query, primerKeys, sort),
   columns: [
-    { label: msg('Size'), width: '8rem', cell: (r, _, t) => kebabValue(t, r.size) },
+    { label: msg('Size'), width: '8rem', cell: (r, _, _t, i18n) => kebabValue(i18n, r.size) },
     { label: msg('Magnum'), width: '5rem', cell: (r, _, t) => yesNo(r.magnum, t) ?? '' },
   ],
-  facts: (row, _, t) => [
+  facts: (row, _, t, i18n) => [
     [msg('Manufacturer'), row.manufacturerName || undefined],
     [msg('Product number'), row.productNumber],
-    [msg('Size'), kebabValue(t, row.size)],
+    [msg('Size'), kebabValue(i18n, row.size)],
     [msg('Magnum'), yesNo(row.magnum, t)],
-    [msg('Compound'), row.compound && kebabValue(t, row.compound)],
+    [msg('Compound'), row.compound && kebabValue(i18n, row.compound)],
   ],
   href: (row) => `/primers/${row.id}`,
 }
