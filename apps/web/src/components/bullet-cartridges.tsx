@@ -1,11 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { TextInput } from '@mantine/core'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
@@ -13,14 +12,14 @@ import { ScrollRegion } from './scroll-region.tsx'
 /** The cartridges the bullet fits by their CIP values (`fitsOf` in `bullet-fit.ts`); nothing when none. */
 export function BulletCartridges({ fits }: { fits: { id: string; name: string }[] }) {
   const [q, setQ] = useState('')
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (fits.length === 0) return null
   const needle = q.trim().toLowerCase()
   const shown = needle ? fits.filter((c) => c.name.toLowerCase().includes(needle)) : fits
   return (
     <Panel
       id="record-cartridges"
-      title={msg('Cartridges')}
+      title={/*i18n*/ { id: 'bulletRecord.cartridges', message: 'Cartridges' }}
       translated
       className="bullet-cartridges"
     >
@@ -28,13 +27,13 @@ export function BulletCartridges({ fits }: { fits: { id: string; name: string }[
         className="field-search"
         type="search"
         size={controlSize.row.input}
-        aria-label={t('Filter the cartridges')}
-        placeholder={t('Filter cartridges')}
+        aria-label={i18n._({ id: 'bulletRecord.filterLabel', message: 'Filter the cartridges' })}
+        placeholder={i18n._({ id: 'bulletRecord.filter', message: 'Filter cartridges' })}
         leftSection={<Search aria-hidden="true" />}
         value={q}
         onChange={(e) => setQ(e.currentTarget.value)}
       />
-      <ScrollRegion label={t('Cartridge list')}>
+      <ScrollRegion label={i18n._({ id: 'bulletRecord.cartridgeList', message: 'Cartridge list' })}>
         <ul aria-labelledby="record-cartridges">
           {fits.map((c) => (
             // left out by the filter on screen, printed
@@ -45,7 +44,13 @@ export function BulletCartridges({ fits }: { fits: { id: string; name: string }[
         </ul>
       </ScrollRegion>
       {shown.length === 0 && (
-        <p className="record-note">{t('No cartridge matches {query}.', { query: q.trim() })}</p>
+        <p className="record-note">
+          {i18n._({
+            id: 'bulletRecord.noCartridge',
+            message: 'No cartridge matches {query}.',
+            values: { query: q.trim() },
+          })}
+        </p>
       )}
     </Panel>
   )

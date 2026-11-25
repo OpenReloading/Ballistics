@@ -1,7 +1,6 @@
 'use client'
 
 import type { Primer } from '@rangefoundry/schema'
-import { msg } from '../i18n/translate.ts'
 import {
   fetchManufacturerNames,
   type ManufacturerNames,
@@ -36,7 +35,7 @@ export function PrimerRecordPage({ id, name }: { id: string; name: string }) {
             values={
               <FieldPanel
                 id="record-data"
-                title={msg('Properties')}
+                title={/*i18n*/ { id: 'primerRecord.data', message: 'Properties' }}
                 groups={groups}
                 symbols={false}
               >

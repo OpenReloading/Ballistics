@@ -1,7 +1,6 @@
 'use client'
 
 import type { CatalogueCase } from '@rangefoundry/schema'
-import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
@@ -38,7 +37,12 @@ function CaseRecord({ c, names, cartridge }: { c: CatalogueCase } & Extras) {
       }
       className="plain-record"
       values={
-        <FieldPanel id="record-data" title={msg('Properties')} groups={groups} symbols={false}>
+        <FieldPanel
+          id="record-data"
+          title={/*i18n*/ { id: 'caseRecord.data', message: 'Properties' }}
+          groups={groups}
+          symbols={false}
+        >
           {c.note && <p className="record-note">{c.note}</p>}
         </FieldPanel>
       }

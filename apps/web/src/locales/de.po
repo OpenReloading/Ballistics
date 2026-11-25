@@ -343,6 +343,10 @@ msgstr "Mindestens eine Quelle bleibt eingeschaltet"
 msgid "directoryTable.full"
 msgstr "Höchstens {max} gleichzeitig"
 
+# en: "Ballistic coefficients"
+msgid "bulletRecord.coefficients"
+msgstr "Ballistische Koeffizienten"
+
 # en: "Barrel"
 msgid "firearms.column.barrel"
 msgstr "Lauflänge"
@@ -390,6 +394,10 @@ msgstr "Hülsengruppe"
 # en: "Brass, {filters}"
 msgid "cases.filtered"
 msgstr "Hülsen, {filters}"
+
+# en: "Bullet data"
+msgid "bulletRecord.data"
+msgstr "Geschossdaten"
 
 # en: "Bullet data is unavailable right now."
 msgid "states.unavailable.bullet"
@@ -443,6 +451,10 @@ msgstr "Kaliber"
 msgid "cartridges.column.cal"
 msgstr "Kaliber"
 
+# en: "Caliber {caliber}"
+msgid "bulletRecord.caliber"
+msgstr "Kaliber {caliber}"
+
 # en: "Caliber class"
 msgid "disciplines.facet.class"
 msgstr "Kaliberklasse"
@@ -468,6 +480,10 @@ msgid "values.carbine"
 msgstr "Karabiner"
 
 # en: "Cartridge"
+msgid "caseRecord.cartridge"
+msgstr "Patrone"
+
+# en: "Cartridge"
 msgid "cases.column.cartridge"
 msgstr "Patrone"
 
@@ -483,6 +499,10 @@ msgstr "Die Patronendaten sind gerade nicht verfügbar."
 msgid "page.cartridgesDesigner"
 msgstr "Patronen-Editor"
 
+# en: "Cartridge list"
+msgid "bulletRecord.cartridgeList"
+msgstr "Patronenliste"
+
 # en: "Cartridge maximum of the CIP sheet, shortest variant."
 msgid "cartridges.column.caseLengthHelp"
 msgstr "Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
@@ -490,6 +510,10 @@ msgstr "Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
 # en: "Cartridge value of the CIP sheet, smallest variant."
 msgid "cartridges.column.maxBulletDiameterHelp"
 msgstr "Wert der Patrone im CIP-Datenblatt, kleinste Variante."
+
+# en: "Cartridges"
+msgid "bulletRecord.cartridges"
+msgstr "Patronen"
 
 # en: "Cartridges"
 msgid "page.cartridges"
@@ -521,6 +545,10 @@ msgstr "Waffenart"
 
 # en: "Category"
 msgid "disciplines.column.category"
+msgstr "Waffenart"
+
+# en: "Category"
+msgid "federationRecord.column.category"
 msgstr "Waffenart"
 
 # en: "Check the event: a value is out of its range."
@@ -612,6 +640,10 @@ msgid "disciplines.column.country"
 msgstr "Land"
 
 # en: "Country"
+msgid "federationRecord.country"
+msgstr "Land"
+
+# en: "Country"
 msgid "fieldStrip.country"
 msgstr "Land"
 
@@ -696,6 +728,14 @@ msgid "disciplineRecord.data"
 msgstr "Disziplin"
 
 # en: "Discipline"
+msgid "faceRecord.column.discipline"
+msgstr "Disziplin"
+
+# en: "Discipline"
+msgid "federationRecord.column.discipline"
+msgstr "Disziplin"
+
+# en: "Discipline"
 msgid "log.column.discipline"
 msgstr "Disziplin"
 
@@ -708,12 +748,24 @@ msgid "disciplines.column.disciplines"
 msgstr "Disziplinen"
 
 # en: "Disciplines"
+msgid "federationRecord.column.disciplines"
+msgstr "Disziplinen"
+
+# en: "Disciplines"
 msgid "targets.column.disciplines"
 msgstr "Disziplinen"
 
 # en: "Disciplines"
 msgid "page.disciplines"
 msgstr "Disziplinen"
+
+# en: "Disciplines ({count})"
+msgid "federationRecord.disciplines"
+msgstr "Disziplinen ({count})"
+
+# en: "Disciplines table"
+msgid "federationRecord.disciplinesTable"
+msgstr "Tabelle der Disziplinen"
 
 # en: "Disciplines, {filters}"
 msgid "disciplines.filtered"
@@ -740,6 +792,14 @@ msgid "disciplines.column.distance"
 msgstr "Entfernung"
 
 # en: "Distance"
+msgid "faceRecord.column.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
+msgid "federationRecord.column.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
 msgid "targets.column.distance"
 msgstr "Entfernung"
 
@@ -750,6 +810,10 @@ msgstr "Division"
 # en: "Drag model"
 msgid "fieldTable.column.dragModel"
 msgstr "Luftwiderstandsmodell"
+
+# en: "Drawing"
+msgid "bulletRecord.drawing"
+msgstr "Zeichnung"
 
 # en: "Drop, windage"
 msgid "units.quantity.lineOfSightOffset"
@@ -762,6 +826,10 @@ msgstr "Dynamische Vivacity, gemittelt über den Abbrandanteil 0,1 bis 0,9, plus
 # en: "Edit event"
 msgid "events.edit"
 msgstr "Wettkampf bearbeiten"
+
+# en: "Edition"
+msgid "federationRecord.column.edition"
+msgstr "Ausgabe"
 
 # en: "Empty: the event type and the day."
 msgid "events.nameHint"
@@ -820,6 +888,14 @@ msgctxt "match"
 msgid "matchRounds.events"
 msgstr "Durchgänge"
 
+# en: "Events ({count})"
+msgid "faceRecord.events"
+msgstr "Wettbewerbe ({count})"
+
+# en: "Events table"
+msgid "faceRecord.eventsTable"
+msgstr "Tabelle der Wettbewerbe"
+
 # en: "Export CSV"
 msgid "events.exportCsv"
 msgstr "CSV exportieren"
@@ -849,6 +925,14 @@ msgid "disciplineRecord.federation"
 msgstr "Verband"
 
 # en: "Federation"
+msgid "faceRecord.column.federation"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "federationRecord.data"
+msgstr "Verband"
+
+# en: "Federation"
 msgid "targets.column.organization"
 msgstr "Verband"
 
@@ -863,6 +947,14 @@ msgstr "Verbände"
 # en: "Federations, {filters}"
 msgid "disciplines.federationsFiltered"
 msgstr "Verbände, {filters}"
+
+# en: "Filter cartridges"
+msgid "bulletRecord.filter"
+msgstr "Patronen filtern"
+
+# en: "Filter the cartridges"
+msgid "bulletRecord.filterLabel"
+msgstr "Die Patronen filtern"
 
 # en: "Firearm"
 msgid "disciplines.row.firearm"
@@ -928,6 +1020,10 @@ msgstr "G7"
 msgid "disciplineRecord.column.gauge"
 msgstr "Messring"
 
+# en: "Gauge"
+msgid "faceRecord.column.gauge"
+msgstr "Messring"
+
 # en: "Handloads"
 msgid "disciplines.row.handloads"
 msgstr "Wiedergeladene Munition"
@@ -940,12 +1036,28 @@ msgstr "Von der Suche oder einem Filter ausgeblendet"
 msgid "events.hitFactor"
 msgstr "Trefferfaktor"
 
+# en: "Hole center"
+msgid "faceRecord.scoredBy.center"
+msgstr "Lochmitte"
+
+# en: "Hole edge"
+msgid "faceRecord.scoredBy.touch"
+msgstr "Lochrand"
+
+# en: "Hole edge, outward"
+msgid "faceRecord.scoredBy.outward"
+msgstr "Lochrand, nach außen gemessen"
+
 # en: "hollow point"
 msgid "disciplines.rule.hollowPoint"
 msgstr "Hohlspitze"
 
 # en: "Homepage"
 msgid "disciplines.column.website"
+msgstr "Webseite"
+
+# en: "Homepage"
+msgid "federationRecord.homepage"
 msgstr "Webseite"
 
 # en: "Import JSON"
@@ -956,8 +1068,20 @@ msgstr "JSON importieren"
 msgid "recordSources.newTab"
 msgstr "in einem neuen Tab"
 
+# en: "In the discipline list"
+msgid "faceRecord.inDisciplineList"
+msgstr "Zur Disziplinliste"
+
+# en: "In the discipline list"
+msgid "federationRecord.inDisciplineList"
+msgstr "Zur Disziplinliste"
+
 # en: "International"
 msgid "disciplines.international"
+msgstr "International"
+
+# en: "International"
+msgid "federationRecord.international"
 msgstr "International"
 
 # en: "International discipline"
@@ -967,6 +1091,10 @@ msgstr "Internationale Disziplin"
 # en: "jacketed"
 msgid "disciplines.rule.jacketed"
 msgstr "Mantelgeschoss"
+
+# en: "Kind"
+msgid "faceRecord.column.kind"
+msgstr "Art"
 
 # en: "kneeling"
 msgid "disciplines.rule.kneeling"
@@ -1035,6 +1163,10 @@ msgstr "Unterhebelrepetierer"
 # en: "License"
 msgid "recordSources.column.license"
 msgstr "Lizenz"
+
+# en: "Line {line}"
+msgid "bulletRecord.line"
+msgstr "Produktlinie {line}"
 
 # en: "Load"
 msgid "events.load"
@@ -1272,6 +1404,10 @@ msgstr "Mittlere Vivacity"
 msgid "recordSources.kind.measured"
 msgstr "gemessen"
 
+# en: "Member of"
+msgid "federationRecord.memberOf"
+msgstr "Mitglied von"
+
 # en: "Metal"
 msgid "events.metal"
 msgstr "Metall"
@@ -1420,6 +1556,10 @@ msgstr "Keine Hülsen entsprechen diesen Filtern."
 msgid "states.noMatch.bullets"
 msgstr "Keine Geschosse entsprechen diesen Filtern."
 
+# en: "No cartridge matches {query}."
+msgid "bulletRecord.noCartridge"
+msgstr "Keine Patrone entspricht „{query}“."
+
 # en: "No cartridges match these filters."
 msgid "states.noMatch.cartridges"
 msgstr "Keine Patronen entsprechen diesen Filtern."
@@ -1427,6 +1567,10 @@ msgstr "Keine Patronen entsprechen diesen Filtern."
 # en: "No discipline found"
 msgid "events.noDisciplineFound"
 msgstr "Keine Disziplin gefunden"
+
+# en: "No discipline record names this federation."
+msgid "federationRecord.noDisciplines"
+msgstr "Kein Disziplindatensatz enthält den Namen dieses Verbands."
 
 # en: "No disciplines match these filters."
 msgid "states.noMatch.disciplines"
@@ -1479,6 +1623,10 @@ msgstr "Kein gespeicherter Wettkampf zum Exportieren."
 # en: "No target mapping names this discipline."
 msgid "disciplineRecord.noTargets"
 msgstr "Keine Zuordnung enthält den Namen dieser Disziplin."
+
+# en: "No target mapping of its disciplines names a target."
+msgid "federationRecord.noTargets"
+msgstr "Keine Zuordnung seiner Disziplinen enthält den Namen einer Scheibe."
 
 # en: "No target sheet saved yet"
 msgid "events.noTargetSheet"
@@ -1542,6 +1690,14 @@ msgstr "Nummer"
 
 # en: "Number"
 msgid "disciplines.column.number"
+msgstr "Nummer"
+
+# en: "Number"
+msgid "faceRecord.column.number"
+msgstr "Nummer"
+
+# en: "Number"
+msgid "federationRecord.column.number"
 msgstr "Nummer"
 
 # en: "Offline"
@@ -1736,6 +1892,10 @@ msgstr "Gedruckt: die ersten {limit} von {total} Scheiben."
 msgid "events.procedurals"
 msgstr "Verfahrensfehler"
 
+# en: "Product {number}"
+msgid "bulletRecord.product"
+msgstr "Artikelnummer {number}"
+
 # en: "Product number"
 msgid "primers.column.number"
 msgstr "Produktnummer"
@@ -1743,6 +1903,14 @@ msgstr "Produktnummer"
 # en: "prone"
 msgid "disciplines.rule.prone"
 msgstr "liegend"
+
+# en: "Properties"
+msgid "caseRecord.data"
+msgstr "Eigenschaften"
+
+# en: "Properties"
+msgid "primerRecord.data"
+msgstr "Eigenschaften"
 
 # en: "public"
 msgid "recordSources.origin.public"
@@ -1853,6 +2021,10 @@ msgid "targets.facet.rings"
 msgstr "Ringe"
 
 # en: "Rings"
+msgid "faceRecord.rings"
+msgstr "Ringe"
+
+# en: "Rings"
 msgid "targets.column.rings"
 msgstr "Ringe"
 
@@ -1896,6 +2068,14 @@ msgstr "Sportordnung"
 msgid "matchRounds.ruleBook"
 msgstr "Sportordnung: {value}"
 
+# en: "Rule books ({count})"
+msgid "federationRecord.ruleBooks"
+msgstr "Sportordnungen ({count})"
+
+# en: "Rule books table"
+msgid "federationRecord.ruleBooksTable"
+msgstr "Tabelle der Sportordnungen"
+
 # en: "Rules"
 msgid "disciplines.rules"
 msgstr "Regeln"
@@ -1907,6 +2087,10 @@ msgstr "Wettkampf speichern"
 # en: "Saved loads of another cartridge, or no saved load."
 msgid "firearms.column.notesHelp"
 msgstr "Gespeicherte Laborierungen einer anderen Patrone oder keine gespeicherte Laborierung."
+
+# en: "Scoring"
+msgid "faceRecord.column.scoring"
+msgstr "Wertung"
 
 # en: "SD"
 msgid "bullets.column.sd"
@@ -1922,6 +2106,10 @@ msgstr "{title} durchsuchen"
 
 # en: "Section"
 msgid "disciplines.row.section"
+msgstr "Abschnitt"
+
+# en: "Section"
+msgid "faceRecord.column.section"
 msgstr "Abschnitt"
 
 # en: "section {section}, {page}"
@@ -1994,6 +2182,10 @@ msgstr "Schüsse"
 
 # en: "Shots"
 msgid "disciplineRecord.column.shots"
+msgstr "Schüsse"
+
+# en: "Shots"
+msgid "faceRecord.column.shots"
 msgstr "Schüsse"
 
 # en: "Shots per event"
@@ -2092,6 +2284,10 @@ msgstr "Tabelle der Quellen"
 msgid "disciplineRecord.column.stage"
 msgstr "Programmteil"
 
+# en: "Stage"
+msgid "faceRecord.column.stage"
+msgstr "Programmteil"
+
 # en: "Stage {n}"
 msgid "events.stageNumber"
 msgstr "Stage {n}"
@@ -2132,6 +2328,14 @@ msgstr "Scheibe"
 msgid "disciplineRecord.column.target"
 msgstr "Scheibe"
 
+# en: "Target"
+msgid "federationRecord.column.target"
+msgstr "Scheibe"
+
+# en: "Target"
+msgid "faceRecord.drawing"
+msgstr "Scheibe"
+
 # en: "Target data is unavailable right now."
 msgid "states.unavailable.targetFace"
 msgstr "Die Scheibendaten sind gerade nicht verfügbar."
@@ -2149,6 +2353,10 @@ msgid "disciplines.column.faces"
 msgstr "Scheiben"
 
 # en: "Targets"
+msgid "federationRecord.column.targets"
+msgstr "Scheiben"
+
+# en: "Targets"
 msgid "page.targets"
 msgstr "Scheiben"
 
@@ -2156,8 +2364,16 @@ msgstr "Scheiben"
 msgid "disciplineRecord.targets"
 msgstr "Scheiben ({count})"
 
+# en: "Targets ({count})"
+msgid "federationRecord.targets"
+msgstr "Scheiben ({count})"
+
 # en: "Targets table"
 msgid "disciplineRecord.targetsTable"
+msgstr "Tabelle der Scheiben"
+
+# en: "Targets table"
+msgid "federationRecord.targetsTable"
 msgstr "Tabelle der Scheiben"
 
 # en: "Targets, {filters}"
@@ -2192,6 +2408,14 @@ msgstr "Die Konfiguration, die das Flugbahnformular zuerst anbietet."
 msgid "states.dataError"
 msgstr "Die Datendatei konnte nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut."
 
+# en: "The disciplines of this federation"
+msgid "federationRecord.disciplinesCaption"
+msgstr "Die Disziplinen dieses Verbands"
+
+# en: "The events and disciplines shot on this target"
+msgid "faceRecord.eventsCaption"
+msgstr "Die Wettbewerbe und Disziplinen, in denen auf diese Scheibe Schüsse abgegeben werden"
+
 # en: "The first optic of the active configuration and its zero range."
 msgid "firearms.column.opticHelp"
 msgstr "Die erste Optik der aktiven Konfiguration und ihre Einschießentfernung."
@@ -2216,9 +2440,17 @@ msgstr "Die Schusszahl von {name} enthält diesen Wettkampf schon."
 msgid "events.roundCountUnchanged"
 msgstr "Die Schusszahl von {name} bleibt unverändert."
 
+# en: "The rule books the records cite"
+msgid "federationRecord.ruleBooksCaption"
+msgstr "Die Sportordnungen, auf die sich die Datensätze beziehen"
+
 # en: "The targets and stages of this discipline"
 msgid "disciplineRecord.targetsCaption"
 msgstr "Die Scheiben und Programmteile dieser Disziplin"
+
+# en: "The targets its disciplines are shot on"
+msgid "federationRecord.targetsCaption"
+msgstr "Die Scheiben, auf die in seinen Disziplinen Schüsse abgegeben werden"
 
 # en: "The targets of this discipline state no shot count."
 msgid "matchRounds.shotsUnstated"
@@ -2239,6 +2471,10 @@ msgstr "Schießzeit"
 # en: "Tip"
 msgid "bullets.facet.tip"
 msgstr "Spitze"
+
+# en: "Title"
+msgid "federationRecord.column.title"
+msgstr "Titel"
 
 # en: "Total"
 msgid "events.totalHeading"
@@ -2300,9 +2536,17 @@ msgstr "{name} abwählen"
 msgid "units.preset.us"
 msgstr "US-amerikanisch"
 
+# en: "Use in workbench"
+msgid "bulletRecord.useInWorkbench"
+msgstr "In der Werkbank verwenden"
+
 # en: "Value"
 msgid "fieldTable.column.value"
 msgstr "Wert"
+
+# en: "Values missing: the record only names the bullet"
+msgid "bulletRecord.valuesMissing"
+msgstr "Werte fehlen: Der Datensatz enthält vom Geschoss nur den Namen"
 
 # en: "Velocity"
 msgid "units.quantity.velocity"

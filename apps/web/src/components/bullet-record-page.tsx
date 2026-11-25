@@ -1,9 +1,9 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import type { Bullet } from '@rangefoundry/schema'
 import { FlaskConical } from 'lucide-react'
-import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { compareFrom } from '../lib/compare-ids.ts'
 import { bulletIncomplete } from '../lib/complete-records.ts'
 import { countryOf } from '../lib/countries.ts'
@@ -14,7 +14,7 @@ import {
 } from '../lib/manufacturers.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { ballisticCoefficientRows, bulletDataGroups, bulletStrip } from '../lib/record-fields.ts'
-import { type OwnWording, type Wording, worded } from '../lib/wording.ts'
+import type { Wording } from '../lib/wording.ts'
 import { BulletCartridges } from './bullet-cartridges.tsx'
 import { BulletDrawing } from './bullet-drawing.tsx'
 import { ByLengthUnit } from './by-length-unit.tsx'
@@ -30,14 +30,34 @@ import { RecordViewWith } from './record-view.tsx'
 type Fits = { id: string; name: string }[]
 
 function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // each named, as a badge holds no heading
-  const badges: Wording[] = [
-    b.productLine && worded(msg('Line {line}'), { line: b.productLine }),
-    b.caliber && worded(msg('Caliber {caliber}'), { caliber: b.caliber }),
-    b.productNumber && worded(msg('Product {number}'), { number: b.productNumber }),
-    bulletIncomplete(b) && msg('Values missing: the record only names the bullet'),
-  ].filter((x): x is OwnWording => !!x)
+  const named: (MessageDescriptor | '' | false | undefined)[] = [
+    b.productLine && /*i18n*/ {
+      id: 'bulletRecord.line',
+      message: 'Line {line}',
+      values: { line: b.productLine },
+    },
+    b.caliber && /*i18n*/ {
+      id: 'bulletRecord.caliber',
+      message: 'Caliber {caliber}',
+      values: { caliber: b.caliber },
+    },
+    b.productNumber && /*i18n*/ {
+      id: 'bulletRecord.product',
+      message: 'Product {number}',
+      values: { number: b.productNumber },
+    },
+    bulletIncomplete(b) && /*i18n*/ {
+      id: 'bulletRecord.valuesMissing',
+      message: 'Values missing: the record only names the bullet',
+    },
+  ]
+  const badges: Wording[] = named.filter((x): x is MessageDescriptor => !!x)
+  const coefficientsTitle = /*i18n*/ {
+    id: 'bulletRecord.coefficients',
+    message: 'Ballistic coefficients',
+  }
   const coefficients = ballisticCoefficientRows(b)
   return (
     <RecordScope>
@@ -64,7 +84,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
               primary
               className="phone-action"
             >
-              {t('Use in workbench')}
+              {i18n._({ id: 'bulletRecord.useInWorkbench', message: 'Use in workbench' })}
             </LinkButton>
           </>
         }
@@ -72,7 +92,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
           <>
             <Panel
               id="record-drawing"
-              title={msg('Drawing')}
+              title={/*i18n*/ { id: 'bulletRecord.drawing', message: 'Drawing' }}
               translated
               // the drawing needs the length; without it the panel holds the reason
               controls={b.length && <UnitSwitch />}
@@ -83,15 +103,19 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
               />
             </Panel>
             {coefficients.length > 0 && (
-              <Panel id="record-coefficients" title={msg('Ballistic coefficients')} translated>
-                <CoefficientTable label={msg('Ballistic coefficients')} rows={coefficients} />
+              <Panel id="record-coefficients" title={coefficientsTitle} translated>
+                <CoefficientTable label={coefficientsTitle} rows={coefficients} />
               </Panel>
             )}
           </>
         }
         values={
           <>
-            <FieldPanel id="record-data" title={msg('Bullet data')} groups={bulletDataGroups(b)}>
+            <FieldPanel
+              id="record-data"
+              title={/*i18n*/ { id: 'bulletRecord.data', message: 'Bullet data' }}
+              groups={bulletDataGroups(b)}
+            >
               {b.note && <p className="record-note">{b.note}</p>}
             </FieldPanel>
             <BulletCartridges fits={fits} />

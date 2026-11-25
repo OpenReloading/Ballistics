@@ -259,6 +259,9 @@ msgstr "At least one source stays on"
 msgid "directoryTable.full"
 msgstr "At most {max} at once"
 
+msgid "bulletRecord.coefficients"
+msgstr "Ballistic coefficients"
+
 msgid "firearms.column.barrel"
 msgstr "Barrel"
 
@@ -294,6 +297,9 @@ msgstr "Brass group"
 
 msgid "cases.filtered"
 msgstr "Brass, {filters}"
+
+msgid "bulletRecord.data"
+msgstr "Bullet data"
 
 msgid "states.unavailable.bullet"
 msgstr "Bullet data is unavailable right now."
@@ -334,6 +340,9 @@ msgstr "Caliber"
 msgid "cartridges.column.cal"
 msgstr "Caliber"
 
+msgid "bulletRecord.caliber"
+msgstr "Caliber {caliber}"
+
 msgid "disciplines.facet.class"
 msgstr "Caliber class"
 
@@ -352,6 +361,9 @@ msgstr "Cancel"
 msgid "values.carbine"
 msgstr "Carbine"
 
+msgid "caseRecord.cartridge"
+msgstr "Cartridge"
+
 msgid "cases.column.cartridge"
 msgstr "Cartridge"
 
@@ -364,11 +376,17 @@ msgstr "Cartridge data is unavailable right now."
 msgid "page.cartridgesDesigner"
 msgstr "Cartridge designer"
 
+msgid "bulletRecord.cartridgeList"
+msgstr "Cartridge list"
+
 msgid "cartridges.column.caseLengthHelp"
 msgstr "Cartridge maximum of the CIP sheet, shortest variant."
 
 msgid "cartridges.column.maxBulletDiameterHelp"
 msgstr "Cartridge value of the CIP sheet, smallest variant."
+
+msgid "bulletRecord.cartridges"
+msgstr "Cartridges"
 
 msgid "page.cartridges"
 msgstr "Cartridges"
@@ -392,6 +410,9 @@ msgid "disciplines.strip.category"
 msgstr "Category"
 
 msgid "disciplines.column.category"
+msgstr "Category"
+
+msgid "federationRecord.column.category"
 msgstr "Category"
 
 msgid "events.outOfRange"
@@ -460,6 +481,9 @@ msgstr "Country"
 msgid "disciplines.column.country"
 msgstr "Country"
 
+msgid "federationRecord.country"
+msgstr "Country"
+
 msgid "fieldStrip.country"
 msgstr "Country"
 
@@ -523,6 +547,12 @@ msgstr "Discipline"
 msgid "disciplineRecord.data"
 msgstr "Discipline"
 
+msgid "faceRecord.column.discipline"
+msgstr "Discipline"
+
+msgid "federationRecord.column.discipline"
+msgstr "Discipline"
+
 msgid "log.column.discipline"
 msgstr "Discipline"
 
@@ -532,11 +562,20 @@ msgstr "Discipline data is unavailable right now."
 msgid "disciplines.column.disciplines"
 msgstr "Disciplines"
 
+msgid "federationRecord.column.disciplines"
+msgstr "Disciplines"
+
 msgid "targets.column.disciplines"
 msgstr "Disciplines"
 
 msgid "page.disciplines"
 msgstr "Disciplines"
+
+msgid "federationRecord.disciplines"
+msgstr "Disciplines ({count})"
+
+msgid "federationRecord.disciplinesTable"
+msgstr "Disciplines table"
 
 msgid "disciplines.filtered"
 msgstr "Disciplines, {filters}"
@@ -556,6 +595,12 @@ msgstr "Distance"
 msgid "disciplines.column.distance"
 msgstr "Distance"
 
+msgid "faceRecord.column.distance"
+msgstr "Distance"
+
+msgid "federationRecord.column.distance"
+msgstr "Distance"
+
 msgid "targets.column.distance"
 msgstr "Distance"
 
@@ -565,6 +610,9 @@ msgstr "Division"
 msgid "fieldTable.column.dragModel"
 msgstr "Drag model"
 
+msgid "bulletRecord.drawing"
+msgstr "Drawing"
+
 msgid "units.quantity.lineOfSightOffset"
 msgstr "Drop, windage"
 
@@ -573,6 +621,9 @@ msgstr "Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus
 
 msgid "events.edit"
 msgstr "Edit event"
+
+msgid "federationRecord.column.edition"
+msgstr "Edition"
 
 msgid "events.nameHint"
 msgstr "Empty: the event type and the day."
@@ -617,6 +668,12 @@ msgctxt "match"
 msgid "matchRounds.events"
 msgstr "Events"
 
+msgid "faceRecord.events"
+msgstr "Events ({count})"
+
+msgid "faceRecord.eventsTable"
+msgstr "Events table"
+
 msgid "events.exportCsv"
 msgstr "Export CSV"
 
@@ -638,6 +695,12 @@ msgstr "Federation"
 msgid "disciplineRecord.federation"
 msgstr "Federation"
 
+msgid "faceRecord.column.federation"
+msgstr "Federation"
+
+msgid "federationRecord.data"
+msgstr "Federation"
+
 msgid "targets.column.organization"
 msgstr "Federation"
 
@@ -649,6 +712,12 @@ msgstr "Federations"
 
 msgid "disciplines.federationsFiltered"
 msgstr "Federations, {filters}"
+
+msgid "bulletRecord.filter"
+msgstr "Filter cartridges"
+
+msgid "bulletRecord.filterLabel"
+msgstr "Filter the cartridges"
 
 msgid "disciplines.row.firearm"
 msgstr "Firearm"
@@ -698,6 +767,9 @@ msgstr "G7"
 msgid "disciplineRecord.column.gauge"
 msgstr "Gauge"
 
+msgid "faceRecord.column.gauge"
+msgstr "Gauge"
+
 msgid "disciplines.row.handloads"
 msgstr "Handloads"
 
@@ -707,10 +779,22 @@ msgstr "Hidden by the search or a filter"
 msgid "events.hitFactor"
 msgstr "Hit factor"
 
+msgid "faceRecord.scoredBy.center"
+msgstr "Hole center"
+
+msgid "faceRecord.scoredBy.touch"
+msgstr "Hole edge"
+
+msgid "faceRecord.scoredBy.outward"
+msgstr "Hole edge, outward"
+
 msgid "disciplines.rule.hollowPoint"
 msgstr "hollow point"
 
 msgid "disciplines.column.website"
+msgstr "Homepage"
+
+msgid "federationRecord.homepage"
 msgstr "Homepage"
 
 msgid "events.importJson"
@@ -719,7 +803,16 @@ msgstr "Import JSON"
 msgid "recordSources.newTab"
 msgstr "in a new tab"
 
+msgid "faceRecord.inDisciplineList"
+msgstr "In the discipline list"
+
+msgid "federationRecord.inDisciplineList"
+msgstr "In the discipline list"
+
 msgid "disciplines.international"
+msgstr "International"
+
+msgid "federationRecord.international"
 msgstr "International"
 
 msgid "disciplineRecord.international"
@@ -727,6 +820,9 @@ msgstr "International discipline"
 
 msgid "disciplines.rule.jacketed"
 msgstr "jacketed"
+
+msgid "faceRecord.column.kind"
+msgstr "Kind"
 
 msgid "disciplines.rule.kneeling"
 msgstr "kneeling"
@@ -778,6 +874,9 @@ msgstr "Lever action"
 
 msgid "recordSources.column.license"
 msgstr "License"
+
+msgid "bulletRecord.line"
+msgstr "Line {line}"
 
 msgid "events.load"
 msgstr "Load"
@@ -956,6 +1055,9 @@ msgstr "Mean vivacity"
 msgid "recordSources.kind.measured"
 msgstr "measured"
 
+msgid "federationRecord.memberOf"
+msgstr "Member of"
+
 msgid "events.metal"
 msgstr "Metal"
 
@@ -1067,11 +1169,17 @@ msgstr "No brass matches these filters."
 msgid "states.noMatch.bullets"
 msgstr "No bullets match these filters."
 
+msgid "bulletRecord.noCartridge"
+msgstr "No cartridge matches {query}."
+
 msgid "states.noMatch.cartridges"
 msgstr "No cartridges match these filters."
 
 msgid "events.noDisciplineFound"
 msgstr "No discipline found"
+
+msgid "federationRecord.noDisciplines"
+msgstr "No discipline record names this federation."
 
 msgid "states.noMatch.disciplines"
 msgstr "No disciplines match these filters."
@@ -1111,6 +1219,9 @@ msgstr "No saved event to export."
 
 msgid "disciplineRecord.noTargets"
 msgstr "No target mapping names this discipline."
+
+msgid "federationRecord.noTargets"
+msgstr "No target mapping of its disciplines names a target."
 
 msgid "events.noTargetSheet"
 msgstr "No target sheet saved yet"
@@ -1158,6 +1269,12 @@ msgid "disciplines.row.number"
 msgstr "Number"
 
 msgid "disciplines.column.number"
+msgstr "Number"
+
+msgid "faceRecord.column.number"
+msgstr "Number"
+
+msgid "federationRecord.column.number"
 msgstr "Number"
 
 msgid "page.offline"
@@ -1304,11 +1421,20 @@ msgstr "Printed: the first {limit} of {total} targets."
 msgid "events.procedurals"
 msgstr "Procedurals"
 
+msgid "bulletRecord.product"
+msgstr "Product {number}"
+
 msgid "primers.column.number"
 msgstr "Product number"
 
 msgid "disciplines.rule.prone"
 msgstr "prone"
+
+msgid "caseRecord.data"
+msgstr "Properties"
+
+msgid "primerRecord.data"
+msgstr "Properties"
 
 msgid "recordSources.origin.public"
 msgstr "public"
@@ -1391,6 +1517,9 @@ msgstr "Ring values separated by spaces, such as 10 9 10."
 msgid "targets.facet.rings"
 msgstr "Rings"
 
+msgid "faceRecord.rings"
+msgstr "Rings"
+
 msgid "targets.column.rings"
 msgstr "Rings"
 
@@ -1424,6 +1553,12 @@ msgstr "Rule book"
 msgid "matchRounds.ruleBook"
 msgstr "Rule book: {value}"
 
+msgid "federationRecord.ruleBooks"
+msgstr "Rule books ({count})"
+
+msgid "federationRecord.ruleBooksTable"
+msgstr "Rule books table"
+
 msgid "disciplines.rules"
 msgstr "Rules"
 
@@ -1432,6 +1567,9 @@ msgstr "Save event"
 
 msgid "firearms.column.notesHelp"
 msgstr "Saved loads of another cartridge, or no saved load."
+
+msgid "faceRecord.column.scoring"
+msgstr "Scoring"
 
 msgid "bullets.column.sd"
 msgstr "SD"
@@ -1443,6 +1581,9 @@ msgid "fieldTable.search"
 msgstr "Search {title}"
 
 msgid "disciplines.row.section"
+msgstr "Section"
+
+msgid "faceRecord.column.section"
 msgstr "Section"
 
 msgid "disciplineRecord.section"
@@ -1497,6 +1638,9 @@ msgid "events.shots"
 msgstr "Shots"
 
 msgid "disciplineRecord.column.shots"
+msgstr "Shots"
+
+msgid "faceRecord.column.shots"
 msgstr "Shots"
 
 msgid "matchRounds.shots"
@@ -1571,6 +1715,9 @@ msgstr "Sources table"
 msgid "disciplineRecord.column.stage"
 msgstr "Stage"
 
+msgid "faceRecord.column.stage"
+msgstr "Stage"
+
 msgid "events.stageNumber"
 msgstr "Stage {n}"
 
@@ -1601,6 +1748,12 @@ msgstr "Target"
 msgid "disciplineRecord.column.target"
 msgstr "Target"
 
+msgid "federationRecord.column.target"
+msgstr "Target"
+
+msgid "faceRecord.drawing"
+msgstr "Target"
+
 msgid "states.unavailable.targetFace"
 msgstr "Target data is unavailable right now."
 
@@ -1613,13 +1766,22 @@ msgstr "Target sheet"
 msgid "disciplines.column.faces"
 msgstr "Targets"
 
+msgid "federationRecord.column.targets"
+msgstr "Targets"
+
 msgid "page.targets"
 msgstr "Targets"
 
 msgid "disciplineRecord.targets"
 msgstr "Targets ({count})"
 
+msgid "federationRecord.targets"
+msgstr "Targets ({count})"
+
 msgid "disciplineRecord.targetsTable"
+msgstr "Targets table"
+
+msgid "federationRecord.targetsTable"
 msgstr "Targets table"
 
 msgid "targets.filtered"
@@ -1646,6 +1808,12 @@ msgstr "The configuration the trajectory form offers first."
 msgid "states.dataError"
 msgstr "The data file could not be loaded. Check the connection and retry."
 
+msgid "federationRecord.disciplinesCaption"
+msgstr "The disciplines of this federation"
+
+msgid "faceRecord.eventsCaption"
+msgstr "The events and disciplines shot on this target"
+
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
 
@@ -1664,8 +1832,14 @@ msgstr "The round count of {name} holds this event already."
 msgid "events.roundCountUnchanged"
 msgstr "The round count of {name} is unchanged."
 
+msgid "federationRecord.ruleBooksCaption"
+msgstr "The rule books the records cite"
+
 msgid "disciplineRecord.targetsCaption"
 msgstr "The targets and stages of this discipline"
+
+msgid "federationRecord.targetsCaption"
+msgstr "The targets its disciplines are shot on"
 
 msgid "matchRounds.shotsUnstated"
 msgstr "The targets of this discipline state no shot count."
@@ -1681,6 +1855,9 @@ msgstr "Time limit"
 
 msgid "bullets.facet.tip"
 msgstr "Tip"
+
+msgid "federationRecord.column.title"
+msgstr "Title"
 
 msgid "events.totalHeading"
 msgstr "Total"
@@ -1727,8 +1904,14 @@ msgstr "Untick {name}"
 msgid "units.preset.us"
 msgstr "US customary"
 
+msgid "bulletRecord.useInWorkbench"
+msgstr "Use in workbench"
+
 msgid "fieldTable.column.value"
 msgstr "Value"
+
+msgid "bulletRecord.valuesMissing"
+msgstr "Values missing: the record only names the bullet"
 
 msgid "units.quantity.velocity"
 msgstr "Velocity"
