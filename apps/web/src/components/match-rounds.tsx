@@ -1,8 +1,8 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { NumberInput, SimpleGrid } from '@mantine/core'
 import { useState } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import { type MatchCourse, matchRounds } from '../lib/match-rounds.ts'
 import { Panel } from './panel.tsx'
 
@@ -16,9 +16,12 @@ const below: ('label' | 'input' | 'description' | 'error')[] = [
   'error',
 ]
 
+// the match sense of Events, not the competition events: a context the runtime type lacks
+const eventsLabel = /*i18n*/ { id: 'matchRounds.events', context: 'match', message: 'Events' }
+
 /** Nothing is stored: the fields live while the page is open. */
 export function MatchRounds({ course }: { course: MatchCourse }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [shots, setShots] = useState<number | string>('')
   const [events, setEvents] = useState<number | string>(1)
   const [sighters, setSighters] = useState<number | string>(course.sighters)
@@ -34,9 +37,18 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
   const whole = { min: 0, allowDecimal: false, allowNegative: false, hideControls: true }
   // a field's description under it: the fields of the row stay level
   return (
-    <Panel id="match-rounds" title={t('Rounds for a match')}>
+    <Panel
+      id="match-rounds"
+      title={i18n._({ id: 'matchRounds.title', message: 'Rounds for a match' })}
+    >
       {course.shots !== undefined && (
-        <p className="record-note">{t('Shots per event: {count}', { count: course.shots })}</p>
+        <p className="record-note">
+          {i18n._({
+            id: 'matchRounds.shotsStated',
+            message: 'Shots per event: {count}',
+            values: { count: course.shots },
+          })}
+        </p>
       )}
       {/* one row from 48em, in the order a match is planned: shots where no target states them */}
       <SimpleGrid
@@ -47,26 +59,31 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
       >
         {course.shots === undefined && (
           <NumberInput
-            label={t('Shots per event')}
-            description={t('The targets of this discipline state no shot count.')}
+            label={i18n._({ id: 'matchRounds.shots', message: 'Shots per event' })}
+            description={i18n._({
+              id: 'matchRounds.shotsUnstated',
+              message: 'The targets of this discipline state no shot count.',
+            })}
             inputWrapperOrder={below}
             {...whole}
             value={shots}
             onChange={setShots}
           />
         )}
+        <NumberInput label={i18n._(eventsLabel)} {...whole} value={events} onChange={setEvents} />
         <NumberInput
-          label={t('match\u0004Events')}
-          {...whole}
-          value={events}
-          onChange={setEvents}
-        />
-        <NumberInput
-          label={t('Sighters per event')}
+          label={i18n._({ id: 'matchRounds.sighters', message: 'Sighters per event' })}
           inputWrapperOrder={below}
           {...(course.openSighters && {
-            description: t('Rule book: {value}', {
-              value: course.openSighters === 'unlimited' ? t('Any number') : t('Not stated'),
+            description: i18n._({
+              id: 'matchRounds.ruleBook',
+              message: 'Rule book: {value}',
+              values: {
+                value:
+                  course.openSighters === 'unlimited'
+                    ? i18n._({ id: 'matchRounds.anyNumber', message: 'Any number' })
+                    : i18n._({ id: 'matchRounds.notStated', message: 'Not stated' }),
+              },
             }),
           })}
           {...whole}
@@ -74,14 +91,19 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
           onChange={setSighters}
         />
         <NumberInput
-          label={t('Reserve, %')}
+          label={i18n._({ id: 'matchRounds.reserve', message: 'Reserve, %' })}
           min={0}
           allowNegative={false}
           hideControls
           value={reserve}
           onChange={setReserve}
         />
-        <NumberInput label={t('Rounds on hand')} {...whole} value={onHand} onChange={setOnHand} />
+        <NumberInput
+          label={i18n._({ id: 'matchRounds.onHand', message: 'Rounds on hand' })}
+          {...whole}
+          value={onHand}
+          onChange={setOnHand}
+        />
       </SimpleGrid>
       <MatchReadout result={result} />
     </Panel>
@@ -90,19 +112,23 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
 
 /** Empty while a field it needs is empty; a live region either way. */
 export function MatchReadout({ result }: { result: ReturnType<typeof matchRounds> }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const difference = result?.difference
   return (
     <div role="status">
       {result && (
         <dl className="readouts match-readouts">
           <div>
-            <dt>{t('Rounds needed')}</dt>
+            <dt>{i18n._({ id: 'matchRounds.needed', message: 'Rounds needed' })}</dt>
             <dd>{result.needed}</dd>
           </div>
           {difference !== undefined && (
             <div>
-              <dt>{difference < 0 ? t('Rounds short') : t('Rounds left over')}</dt>
+              <dt>
+                {difference < 0
+                  ? i18n._({ id: 'matchRounds.short', message: 'Rounds short' })
+                  : i18n._({ id: 'matchRounds.leftOver', message: 'Rounds left over' })}
+              </dt>
               <dd className={difference < 0 ? 'exceeded' : undefined}>{Math.abs(difference)}</dd>
             </div>
           )}

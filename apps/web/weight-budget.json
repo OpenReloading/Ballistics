@@ -2,13 +2,13 @@
   "groups": {
     "error page": {
       "budget": {
-        "initial": 189000,
-        "total": 189000
+        "initial": 181000,
+        "total": 181000
       },
       "routes": {
         "/_global-error": {
-          "initial": 184637,
-          "total": 184637
+          "initial": 176752,
+          "total": 176752
         }
       }
     },

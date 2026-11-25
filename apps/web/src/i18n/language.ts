@@ -1,7 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { setRefusalWords } from '../lib/core-messages.ts'
 import { storageName } from '../lib/edition.ts'
-import { loadLingui } from './lingui.ts'
 import { setShownLanguage } from './shown.ts'
 import { type Catalogue, english as englishText, type Translator, translator } from './translate.ts'
 
@@ -21,6 +20,10 @@ const loaders: Record<Exclude<Language, 'en'>, () => Promise<{ default: Catalogu
 /** The table of package and API messages: loaded with any language but English, read by `translateMessage`. */
 const loadMessages = () =>
   import('../lib/core-message-table.ts').then((m) => m.installCoreMessages())
+
+// a dynamic import keeps the English catalog out of the global error page, which reads this module only
+const loadLingui = (code: Exclude<Language, 'en'>) =>
+  import('./lingui.ts').then((m) => m.loadLingui(code))
 
 /** Loaded in every language once a page has started, so that no page carries them in its own JavaScript; the page renders again with them. */
 const loadRefusalWords = () =>

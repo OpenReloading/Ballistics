@@ -1,7 +1,7 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import { PageBar } from './page-bar.tsx'
 import { PageNotFound } from './page-not-found.tsx'
 import { DataError, type DataKind, type Loadable, Loading } from './states.tsx'
@@ -19,7 +19,7 @@ function Pending({
   state: Exclude<RecordState<unknown>, { status: 'ok' }>
   retry: () => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (state.status === 'notFound')
     return (
       <>
@@ -37,7 +37,9 @@ function Pending({
         <Loading what={what.toLowerCase() as Loadable} rows={6} />
       )}
       <noscript>
-        <p>{t('This page needs JavaScript.')}</p>
+        <p>
+          {i18n._({ id: 'recordView.needsJavaScript', message: 'This page needs JavaScript.' })}
+        </p>
       </noscript>
     </>
   )
