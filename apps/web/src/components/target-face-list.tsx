@@ -6,10 +6,8 @@ import { toSi } from '@rangefoundry/schema'
 import { Plus } from 'lucide-react'
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { ungrouped } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { filterText, matchingText } from '../lib/lists.ts'
@@ -45,7 +43,6 @@ export function TargetFaceList({
   /** The names of the disciplines by id, for the Discipline filter. */
   disciplines: readonly { id: string; name: string }[]
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   const [records, removeRow] = useUserRecords()
@@ -73,25 +70,30 @@ export function TargetFaceList({
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
   const named = [
-    onlyText(t, readOrigins(state.sources)),
-    ...facetNames(facets, state.facets ?? {}, t),
-    matchingText(t, state.query),
+    onlyText(i18n, readOrigins(state.sources)),
+    ...facetNames(facets, state.facets ?? {}, i18n),
+    matchingText(i18n, state.query),
   ]
   const outer = (r: TargetFaceRow) =>
     r.outer === undefined ? '' : formatQuantity('length', system, toSi('length', r.outer))
   const distances = (r: TargetFaceRow) => r.distances.map((m) => distance(m)).join(', ')
   const columns: DirectoryColumn<TargetFaceRow>[] = [
-    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'name',
+      label: /*i18n*/ { id: 'targets.column.name', message: 'Name' },
+      value: (r) => r.name,
+      cell: (r) => r.name,
+    },
     {
       key: 'organization',
-      label: msg('Federation'),
+      label: /*i18n*/ { id: 'targets.column.organization', message: 'Federation' },
       width: '7rem',
       value: (r) => r.organization,
       cell: (r) => r.organization,
     },
     {
       key: 'distance',
-      label: msg('Distance'),
+      label: /*i18n*/ { id: 'targets.column.distance', message: 'Distance' },
       unit: system.range.symbol,
       width: '8rem',
       value: (r) => r.distances[0],
@@ -99,7 +101,7 @@ export function TargetFaceList({
     },
     {
       key: 'outer',
-      label: msg('Outer diameter'),
+      label: /*i18n*/ { id: 'targets.column.outer', message: 'Outer diameter' },
       unit: system.length.symbol,
       num: true,
       width: '8rem',
@@ -108,7 +110,7 @@ export function TargetFaceList({
     },
     {
       key: 'rings',
-      label: msg('Rings'),
+      label: /*i18n*/ { id: 'targets.column.rings', message: 'Rings' },
       num: true,
       width: '5rem',
       value: (r) => r.rings,
@@ -116,7 +118,7 @@ export function TargetFaceList({
     },
     {
       key: 'disciplines',
-      label: msg('Disciplines'),
+      label: /*i18n*/ { id: 'targets.column.disciplines', message: 'Disciplines' },
       num: true,
       width: '7rem',
       value: (r) => r.disciplines,
@@ -126,7 +128,7 @@ export function TargetFaceList({
   ]
   const facts = (r: TargetFaceRow) =>
     [
-      r.origin === 'user' && t(originNames.user),
+      r.origin === 'user' && i18n._(originNames.user),
       r.organization,
       r.distances.length > 0 ? `${distances(r)} ${system.range.symbol}` : '',
       r.outer !== undefined && `${outer(r)} ${system.length.symbol}`,

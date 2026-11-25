@@ -1,9 +1,10 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DirectoryTable } from '../src/components/directory-table.tsx'
 import { PanelTable, ScrollRegion } from '../src/components/scroll-region.tsx'
-import { msg } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 
 // the server HTML is a region and a tab stop, so a box that overflows before hydration is reachable by keyboard (axe scrollable-region-focusable); the observer drops both once the content fits
 it('a scroll region starts as a named region and a tab stop', () => {
@@ -18,30 +19,32 @@ it('a scroll region starts as a named region and a tab stop', () => {
 it('a directory table box is a named region and its first row link the one tab stop', () => {
   const html = renderToStaticMarkup(
     <MantineProvider>
-      <DirectoryTable<{ id: string }>
-        rows={[{ id: 'a' }, { id: 'b' }]}
-        columns={[
-          { key: 'name', label: msg('Name'), cell: (r) => r.id },
-          {
-            key: 'note',
-            label: msg('Note'),
-            cell: (r, tabIndex) => (
-              <button type="button" tabIndex={tabIndex}>
-                {r.id}
-              </button>
-            ),
-          },
-        ]}
-        link="name"
-        href={(r) => `/x/${r.id}`}
-        facts={() => ''}
-        label={(r) => r.id}
-        caption="All rows"
-        noun="bullets"
-        sort={undefined}
-        onSort={() => {}}
-        empty={null}
-      />
+      <I18nProvider i18n={linguiOf('en')}>
+        <DirectoryTable<{ id: string }>
+          rows={[{ id: 'a' }, { id: 'b' }]}
+          columns={[
+            { key: 'name', label: { id: 'test.name', message: 'Name' }, cell: (r) => r.id },
+            {
+              key: 'note',
+              label: { id: 'test.note', message: 'Note' },
+              cell: (r, tabIndex) => (
+                <button type="button" tabIndex={tabIndex}>
+                  {r.id}
+                </button>
+              ),
+            },
+          ]}
+          link="name"
+          href={(r) => `/x/${r.id}`}
+          facts={() => ''}
+          label={(r) => r.id}
+          caption="All rows"
+          noun="bullets"
+          sort={undefined}
+          onSort={() => {}}
+          empty={null}
+        />
+      </I18nProvider>
     </MantineProvider>,
   )
   expect(html).toContain(

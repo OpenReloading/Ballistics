@@ -1,5 +1,5 @@
 /** List sources: RangeFoundry records and the user records of the browser. */
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 import type { UserBulletView, UserCartridgeView } from './variants.ts'
@@ -7,10 +7,10 @@ import type { UserBulletView, UserCartridgeView } from './variants.ts'
 export const origins = ['rangefoundry', 'user'] as const
 export type Origin = (typeof origins)[number]
 
-/** Full names, the chips' labels and the badges' hover text; shown through `t`. */
-export const originNames: Record<Origin, Message> = {
-  rangefoundry: msg('RangeFoundry'),
-  user: msg('Mine'),
+/** Full names, the chips' labels and the badges' hover text; shown through `i18n._`. */
+export const originNames: Record<Origin, MessageDescriptor> = {
+  rangefoundry: /*i18n*/ { id: 'sources.rangefoundry', message: 'RangeFoundry' },
+  user: /*i18n*/ { id: 'sources.user', message: 'Mine' },
 }
 
 /** A row without `origin` is a catalogue row. */
@@ -53,10 +53,14 @@ export const inOrigins = (
 ) => readOrigins(src, available).includes(originOf(row))
 
 /** The source filter as a named filter ("Mine only"); false while every source is on. */
-export const onlyText = (t: Translator['t'], on: readonly Origin[]) =>
+export const onlyText = (i18n: I18n, on: readonly Origin[]) =>
   on.length < origins.length &&
   on[0] !== undefined &&
-  t('{source} only', { source: t(originNames[on[0]]) })
+  i18n._({
+    id: 'sources.only',
+    message: '{source} only',
+    values: { source: i18n._(originNames[on[0]]) },
+  })
 
 export function countOrigins(
   rows: readonly { origin?: 'user' | undefined }[],

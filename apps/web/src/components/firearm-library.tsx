@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Button,
@@ -88,7 +90,7 @@ const tableCaption = (t: Translator['t'], named: unknown[]) =>
   named.length > 0 ? t('Firearms, {filters}', { filters: named.join(', ') }) : t('Firearms')
 
 /** The filters set, named for the empty list and the caption. */
-const namedFilters = (t: Translator['t'], query: string) => [matchingText(t, query)].filter(Boolean)
+const namedFilters = (i18n: I18n, query: string) => [matchingText(i18n, query)].filter(Boolean)
 
 /** The twist with its hand as one cell ("1:12 R"); a hand the record does not know shows as stored. */
 const twists: Record<string, Message> = { right: msg('1:{twist} R'), left: msg('1:{twist} L') }
@@ -114,7 +116,7 @@ function firearmColumns(
   return [
     {
       key: 'name',
-      label: msg('Name'),
+      label: /*i18n*/ { id: 'firearms.column.name', message: 'Name' },
       // every column has a width, so the table scrolls sideways before the name is squeezed; they add up to 72rem, which a 1280 px window holds
       width: '12.5rem',
       value: (r) => r.name,
@@ -122,14 +124,14 @@ function firearmColumns(
     },
     {
       key: 'cartridge',
-      label: msg('Cartridge'),
+      label: /*i18n*/ { id: 'firearms.column.cartridge', message: 'Cartridge' },
       width: '8.5rem',
       value: (r) => cartridgeName(r.data.cartridge),
       cell: (r) => cartridgeName(r.data.cartridge) ?? '',
     },
     {
       key: 'barrel',
-      label: msg('Barrel'),
+      label: /*i18n*/ { id: 'firearms.column.barrel', message: 'Barrel' },
       unit: system.barrelLength.symbol,
       num: true,
       width: '4.5rem',
@@ -138,9 +140,9 @@ function firearmColumns(
     },
     {
       key: 'twist',
-      label: msg('Twist'),
+      label: /*i18n*/ { id: 'firearms.column.twist', message: 'Twist' },
       unit: t('{unit} per turn', { unit: system.twist.symbol }),
-      help: msg('R right hand, L left hand.'),
+      help: /*i18n*/ { id: 'firearms.column.twistHelp', message: 'R right hand, L left hand.' },
       num: true,
       width: '6rem',
       value: (r) => r.data.twist?.value,
@@ -148,24 +150,30 @@ function firearmColumns(
     },
     {
       key: 'optic',
-      label: msg('Optic, zero'),
+      label: /*i18n*/ { id: 'firearms.column.optic', message: 'Optic, zero' },
       unit: system.range.symbol,
-      help: msg('The first optic of the active configuration and its zero range.'),
+      help: /*i18n*/ {
+        id: 'firearms.column.opticHelp',
+        message: 'The first optic of the active configuration and its zero range.',
+      },
       width: '11.5rem',
       value: (r) => cells(r).opticZero,
       cell: (r) => [cells(r).optic, cells(r).zero].filter(Boolean).join(' · '),
     },
     {
       key: 'configuration',
-      label: msg('Configuration'),
-      help: msg('The configuration the trajectory form offers first.'),
+      label: /*i18n*/ { id: 'firearms.column.configuration', message: 'Configuration' },
+      help: /*i18n*/ {
+        id: 'firearms.column.configurationHelp',
+        message: 'The configuration the trajectory form offers first.',
+      },
       width: '8rem',
       value: (r) => cells(r).configuration || undefined,
       cell: (r) => cells(r).configuration,
     },
     {
       key: 'loads',
-      label: msg('Loads'),
+      label: /*i18n*/ { id: 'firearms.column.loads', message: 'Loads' },
       num: true,
       width: '4rem',
       value: (r) => usageOf(r).loads,
@@ -173,8 +181,11 @@ function firearmColumns(
     },
     {
       key: 'lastSession',
-      label: msg('Last session'),
-      help: msg('Latest chronograph session of these loads.'),
+      label: /*i18n*/ { id: 'firearms.column.lastSession', message: 'Last session' },
+      help: /*i18n*/ {
+        id: 'firearms.column.lastSessionHelp',
+        message: 'Latest chronograph session of these loads.',
+      },
       width: '6.5rem',
       value: (r) => usageOf(r).last,
       cell: (r) => {
@@ -184,15 +195,18 @@ function firearmColumns(
     },
     {
       key: 'notes',
-      label: msg('Notes'),
-      help: msg('Saved loads of another cartridge, or no saved load.'),
+      label: /*i18n*/ { id: 'firearms.column.notes', message: 'Notes' },
+      help: /*i18n*/ {
+        id: 'firearms.column.notesHelp',
+        message: 'Saved loads of another cartridge, or no saved load.',
+      },
       width: '7.5rem',
       value: (r) => notesOf(r).join(' ') || undefined,
       cell: (r) => notesOf(r).join(' '),
     },
     {
       key: 'actions',
-      label: msg('Actions'),
+      label: /*i18n*/ { id: 'firearms.column.actions', message: 'Actions' },
       width: '3rem',
       screenOnly: true,
       // the row menu stays in view while the table scrolls sideways
@@ -581,6 +595,7 @@ export function FirearmLibrary() {
   /** An open firearm narrows the list to cards beside it. */
   const compact = editing
   const [filters, setFilters, clearFilters] = useListState()
+  const { i18n } = useLingui()
   const lines = (r: FirearmRecord) => {
     const facts = cardFacts(r.data, system, t)
     return [cartridgeName(r.data.cartridge), facts.barrel, facts.sight]
@@ -588,7 +603,7 @@ export function FirearmLibrary() {
   const matches = (r: FirearmRecord) => matchesQuery([r.name, ...lines(r)], filters.query)
   const shown = list?.filter(matches)
   const rows = shown ?? []
-  const named = namedFilters(t, filters.query)
+  const named = namedFilters(i18n, filters.query)
   const empty = list?.length ? (
     <EmptyList noun="firearms" filters={filterText(named)} onClear={clearFilters} />
   ) : (

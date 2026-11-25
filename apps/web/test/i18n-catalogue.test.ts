@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
   baseList,
   extract,
+  linguiGerman,
   messages,
   problems,
   requiredMessages,
@@ -161,6 +162,40 @@ describe('the catalogue lint', () => {
       'says safe without approval: Handle it safely',
       'says "sicher" other than "safe" 1 times: Safety notice',
     ])
+  })
+
+  it('checks the German of the Lingui catalog by its English text, and names other German for one English text', () => {
+    const { german, conflicts } = linguiGerman(
+      {
+        'bullets.all': { translation: 'All bullets' },
+        'bullets.none': { translation: 'No bullets' },
+        'cases.none': { translation: 'No bullets' },
+        'bullets.gone': { translation: 'Gone' },
+      },
+      {
+        'bullets.all': { translation: 'Alle Kugeln' },
+        'bullets.none': { translation: 'Keine Geschosse' },
+        'cases.none': { translation: 'Keine Kugeln' },
+        'bullets.gone': { translation: 'Weg', obsolete: true },
+      },
+    )
+    expect(german).toEqual({ 'All bullets': 'Alle Kugeln', 'No bullets': 'Keine Geschosse' })
+    expect(conflicts).toEqual(['cases.none: other German than bullets.none for No bullets'])
+    const table = {
+      sources: { a: { document: 'A', edition: '1', pages: 'p.' } },
+      terms: [
+        {
+          key: 'bullet',
+          english: 'Bullet',
+          german: 'Geschoss',
+          status: 'verified',
+          group: 'components',
+          sources: [{ doc: 'a', at: '1' }],
+          candidates: [],
+        },
+      ],
+    }
+    expect(termUseProblems(german, table, {}, [])).toEqual(['All bullets: Geschoss'])
   })
 
   it('counts the warning sentences and refusal words the two files mark as texts of the table', () => {

@@ -43,6 +43,22 @@ msgstr "{count, plural, one {# Trainingszeile} other {# Trainingszeilen}}"
 msgid "events.addRounds"
 msgstr "{count, plural, one {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?} other {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?}}"
 
+# en: "{label}, A to Z"
+msgid "directoryTable.aToZ"
+msgstr "{label}, A bis Z"
+
+# en: "{label}, high to low"
+msgid "directoryTable.highToLow"
+msgstr "{label}, absteigend"
+
+# en: "{label}, low to high"
+msgid "directoryTable.lowToHigh"
+msgstr "{label}, aufsteigend"
+
+# en: "{label}, Z to A"
+msgid "directoryTable.zToA"
+msgstr "{label}, Z bis A"
+
 # en: "{low} to {high}"
 msgid "powders.range"
 msgstr "{low} bis {high}"
@@ -51,13 +67,37 @@ msgstr "{low} bis {high}"
 msgid "events.noRoundCount"
 msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um den Wettkampf hinzuzurechnen."
 
+# en: "{name} was not deleted: the browser refused."
+msgid "listSources.notDeleted"
+msgstr "{name} wurde nicht gelöscht: Der Browser hat es abgelehnt."
+
 # en: "{points} points, hit factor {hf}"
 msgid "events.stageScore"
 msgstr "{points} Punkte, Trefferfaktor {hf}"
 
+# en: "{source} only"
+msgid "sources.only"
+msgstr "nur {source}"
+
 # en: "A brass group keeps the cases you measured, with their water capacity, in this browser."
 msgid "cases.noneOwnHint"
 msgstr "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer Wasserkapazität in diesem Browser."
+
+# en: "Abbreviation"
+msgid "disciplines.column.abbreviation"
+msgstr "Abkürzung"
+
+# en: "Actions"
+msgid "events.column.actions"
+msgstr "Aktionen"
+
+# en: "Actions"
+msgid "firearms.column.actions"
+msgstr "Aktionen"
+
+# en: "Actions"
+msgid "log.column.actions"
+msgstr "Aktionen"
 
 # en: "Add"
 msgid "events.add"
@@ -103,9 +143,33 @@ msgstr "Alle Treibladungspulver"
 msgid "primers.all"
 msgstr "Alle Zündhütchen"
 
+# en: "All sources"
+msgid "listSources.all"
+msgstr "Alle Quellen"
+
 # en: "All targets"
 msgid "targets.all"
 msgstr "Alle Scheiben"
+
+# en: "At least one source stays on"
+msgid "listSources.lastOn"
+msgstr "Mindestens eine Quelle bleibt eingeschaltet"
+
+# en: "At most {max} at once"
+msgid "directoryTable.full"
+msgstr "Höchstens {max} gleichzeitig"
+
+# en: "Barrel"
+msgid "firearms.column.barrel"
+msgstr "Lauflänge"
+
+# en: "Base"
+msgid "powders.column.base"
+msgstr "Basis"
+
+# en: "Base type"
+msgid "bullets.facet.base"
+msgstr "Bodenform"
 
 # en: "Brass"
 msgid "page.cases"
@@ -123,6 +187,10 @@ msgstr "Hülsen, {filters}"
 msgid "page.bulletsDesigner"
 msgstr "Geschoss-Editor"
 
+# en: "Bullet diameter G1"
+msgid "cartridges.column.maxBulletDiameter"
+msgstr "Geschoss­durchmesser G1"
+
 # en: "Bullets"
 msgid "page.bullets"
 msgstr "Geschosse"
@@ -139,13 +207,45 @@ msgstr "Abbrandgeschwindigkeiten"
 msgid "powders.burnRateOrder"
 msgstr "Rang {order} der Abbrandgeschwindigkeit"
 
+# en: "Caliber"
+msgid "bullets.column.cal"
+msgstr "Kaliber"
+
+# en: "Caliber"
+msgid "cartridges.column.cal"
+msgstr "Kaliber"
+
+# en: "Caliber class"
+msgid "disciplines.facet.class"
+msgstr "Kaliberklasse"
+
+# en: "Caliber classes"
+msgid "disciplines.column.classes"
+msgstr "Kaliberklassen"
+
 # en: "Cancel"
 msgid "events.cancel"
 msgstr "Abbrechen"
 
+# en: "Cartridge"
+msgid "cases.column.cartridge"
+msgstr "Patrone"
+
+# en: "Cartridge"
+msgid "firearms.column.cartridge"
+msgstr "Patrone"
+
 # en: "Cartridge designer"
 msgid "page.cartridgesDesigner"
 msgstr "Patronen-Editor"
+
+# en: "Cartridge maximum of the CIP sheet, shortest variant."
+msgid "cartridges.column.caseLengthHelp"
+msgstr "Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
+
+# en: "Cartridge value of the CIP sheet, smallest variant."
+msgid "cartridges.column.maxBulletDiameterHelp"
+msgstr "Wert der Patrone im CIP-Datenblatt, kleinste Variante."
 
 # en: "Cartridges"
 msgid "page.cartridges"
@@ -155,13 +255,45 @@ msgstr "Patronen"
 msgid "cartridges.filtered"
 msgstr "Patronen, {filters}"
 
+# en: "Case length L3"
+msgid "cartridges.column.caseLength"
+msgstr "Hülsenlänge L3"
+
+# en: "Case type"
+msgid "cartridges.column.type"
+msgstr "Hülsenform"
+
+# en: "Category"
+msgid "disciplines.facet.category"
+msgstr "Waffenart"
+
+# en: "Category"
+msgid "disciplines.column.category"
+msgstr "Waffenart"
+
 # en: "Check the event: a value is out of its range."
 msgid "events.outOfRange"
 msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
 
+# en: "Clear all"
+msgid "facetFilters.clear"
+msgstr "Alle zurücksetzen"
+
+# en: "Clear search"
+msgid "directoryTable.clearSearch"
+msgstr "Suche leeren"
+
+# en: "COAL, the cartridge maximum of the CIP sheet, shortest variant."
+msgid "cartridges.column.cartridgeLengthHelp"
+msgstr "COAL, Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
+
 # en: "Compare bullets"
 msgid "page.bulletsCompare"
 msgstr "Geschosse vergleichen"
+
+# en: "Competition event"
+msgid "log.column.event"
+msgstr "Wettkampf"
 
 # en: "Competition events"
 msgid "events.title"
@@ -171,13 +303,61 @@ msgstr "Wettkämpfe"
 msgid "page.events"
 msgstr "Wettkämpfe"
 
+# en: "Compound"
+msgid "primers.column.compound"
+msgstr "Zündsatz"
+
+# en: "Configuration"
+msgid "firearms.column.configuration"
+msgstr "Konfiguration"
+
+# en: "Confirmed by"
+msgid "log.column.confirmed"
+msgstr "Bestätigt von"
+
+# en: "Construction"
+msgid "bullets.facet.construction"
+msgstr "Konstruktion"
+
+# en: "Country"
+msgid "federations.facet.country"
+msgstr "Land"
+
+# en: "Country"
+msgid "disciplines.column.country"
+msgstr "Land"
+
 # en: "Date"
 msgid "events.date"
 msgstr "Datum"
 
+# en: "Date"
+msgid "events.column.date"
+msgstr "Datum"
+
+# en: "Date"
+msgid "log.column.date"
+msgstr "Datum"
+
+# en: "Delete"
+msgid "listSources.delete"
+msgstr "Löschen"
+
 # en: "Delete {name}"
 msgid "events.delete"
 msgstr "{name} löschen"
+
+# en: "Delete {name}"
+msgid "listSources.deleteName"
+msgstr "{name} löschen"
+
+# en: "Delete {name} from this browser? This cannot be undone."
+msgid "listSources.deleteAsk"
+msgstr "{name} aus diesem Browser löschen? Das kann nicht rückgängig gemacht werden."
+
+# en: "Delete from this browser"
+msgid "listSources.deleteRow"
+msgstr "Aus diesem Browser löschen"
 
 # en: "Delete of {name} failed: {reason}"
 msgid "events.deleteOfFailed"
@@ -187,9 +367,29 @@ msgstr "Löschen von {name} fehlgeschlagen: {reason}"
 msgid "events.deletedFromThisBrowser"
 msgstr "{name} wurde aus diesem Browser gelöscht."
 
+# en: "Diameter"
+msgid "bullets.column.diameter"
+msgstr "Durchmesser"
+
+# en: "Discipline"
+msgid "targets.facet.discipline"
+msgstr "Disziplin"
+
 # en: "Discipline"
 msgid "events.discipline"
 msgstr "Disziplin"
+
+# en: "Discipline"
+msgid "log.column.discipline"
+msgstr "Disziplin"
+
+# en: "Disciplines"
+msgid "disciplines.column.disciplines"
+msgstr "Disziplinen"
+
+# en: "Disciplines"
+msgid "targets.column.disciplines"
+msgstr "Disziplinen"
 
 # en: "Disciplines"
 msgid "page.disciplines"
@@ -203,9 +403,29 @@ msgstr "Disziplinen, {filters}"
 msgid "events.disqualifiedNoTotal"
 msgstr "Disqualifiziert: kein Gesamtergebnis."
 
+# en: "Distance"
+msgid "disciplines.facet.dist"
+msgstr "Entfernung"
+
+# en: "Distance"
+msgid "targets.facet.dist"
+msgstr "Entfernung"
+
+# en: "Distance"
+msgid "disciplines.column.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
+msgid "targets.column.distance"
+msgstr "Entfernung"
+
 # en: "Division"
 msgid "events.division"
 msgstr "Division"
+
+# en: "Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus 2 standard uncertainties, log scale. Model output from fitted M3 parameters, not manufacturer data."
+msgid "powders.column.rateHelp"
+msgstr "Dynamische Vivacity, gemittelt über den Abbrandanteil 0,1 bis 0,9, plus und minus 2 Standardunsicherheiten, logarithmische Skala. Modellergebnis aus angepassten M3-Parametern, keine Herstellerdaten."
 
 # en: "Edit event"
 msgid "events.edit"
@@ -235,6 +455,10 @@ msgstr "Gesamtergebnis: tragen Sie die Stage-Punkte aus dem offiziellen Ergebnis
 msgid "events.eventType"
 msgstr "Wettkampfart"
 
+# en: "Event type"
+msgid "events.column.type"
+msgstr "Wettkampfart"
+
 # en: "Export CSV"
 msgid "events.exportCsv"
 msgstr "CSV exportieren"
@@ -242,6 +466,22 @@ msgstr "CSV exportieren"
 # en: "Export JSON"
 msgid "events.exportJson"
 msgstr "JSON exportieren"
+
+# en: "Federation"
+msgid "disciplines.facet.org"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "targets.facet.org"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "disciplines.column.federation"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "targets.column.organization"
+msgstr "Verband"
 
 # en: "Federations"
 msgid "page.federations"
@@ -253,6 +493,10 @@ msgstr "Verbände, {filters}"
 
 # en: "Firearm"
 msgid "events.firearm"
+msgstr "Schusswaffe"
+
+# en: "Firearm"
+msgid "log.column.firearm"
 msgstr "Schusswaffe"
 
 # en: "Firearms"
@@ -267,13 +511,29 @@ msgstr "Passt zu {name}"
 msgid "bullets.fitting"
 msgstr "passend zu {name}"
 
+# en: "Form"
+msgid "powders.column.form"
+msgstr "Form"
+
 # en: "From the official result, where published."
 msgid "events.stagePointsHint"
 msgstr "Aus dem offiziellen Ergebnis, wo veröffentlicht."
 
+# en: "G1"
+msgid "bullets.column.g1"
+msgstr "G1"
+
+# en: "G7"
+msgid "bullets.column.g7"
+msgstr "G7"
+
 # en: "Hit factor"
 msgid "events.hitFactor"
 msgstr "Trefferfaktor"
+
+# en: "Homepage"
+msgid "disciplines.column.website"
+msgstr "Webseite"
 
 # en: "Import JSON"
 msgid "events.importJson"
@@ -283,21 +543,73 @@ msgstr "JSON importieren"
 msgid "disciplines.international"
 msgstr "International"
 
+# en: "Last session"
+msgid "firearms.column.lastSession"
+msgstr "Letzte Sitzung"
+
+# en: "Latest chronograph session of these loads."
+msgid "firearms.column.lastSessionHelp"
+msgstr "Jüngste Chronograph-Sitzung dieser Laborierungen."
+
+# en: "Lead-free"
+msgid "bullets.facet.leadfree"
+msgstr "Bleifrei"
+
+# en: "Length"
+msgid "bullets.column.length"
+msgstr "Länge"
+
 # en: "Level"
 msgid "events.level"
+msgstr "Ebene"
+
+# en: "Level"
+msgid "events.column.level"
 msgstr "Ebene"
 
 # en: "Load"
 msgid "events.load"
 msgstr "Laborierung"
 
+# en: "Load or ammunition"
+msgid "log.column.ammunition"
+msgstr "Laborierung oder Munition"
+
 # en: "Load workbench"
 msgid "page.workbench"
 msgstr "Werkbank für Laborierungen"
 
+# en: "Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating."
+msgid "powders.column.rowsHelp"
+msgstr "Zeilen der Ladetabellen, an die das Modell angepasst wurde, ihre Patronen und der Tag, an dem die Ladetabellen gelesen wurden; die Datensatzseite listet sie je Ladetabelle. Eine Anzahl, keine Bewertung."
+
+# en: "Loads"
+msgid "firearms.column.loads"
+msgstr "Laborierungen"
+
+# en: "Magnum"
+msgid "primers.column.magnum"
+msgstr "Magnum"
+
 # en: "Major"
 msgid "events.major"
 msgstr "Major"
+
+# en: "Manufacturer"
+msgid "bullets.column.manufacturer"
+msgstr "Hersteller"
+
+# en: "Manufacturer"
+msgid "cases.column.manufacturer"
+msgstr "Hersteller"
+
+# en: "Manufacturer"
+msgid "powders.column.manufacturer"
+msgstr "Hersteller"
+
+# en: "Manufacturer"
+msgid "primers.column.manufacturer"
+msgstr "Hersteller"
 
 # en: "Manufacturer or name, DP40…"
 msgid "powders.search"
@@ -315,9 +627,45 @@ msgstr "Hersteller, Name oder Größe…"
 msgid "bullets.search"
 msgstr "Hersteller, Name, 168, .308 oder 7,82…"
 
+# en: "Mass"
+msgid "bullets.column.mass"
+msgstr "Masse"
+
+# en: "Mass"
+msgid "cases.column.mass"
+msgstr "Masse"
+
+# en: "matching \"{query}\""
+msgid "lists.matching"
+msgstr "Suche nach „{query}“"
+
+# en: "Material"
+msgid "cases.column.material"
+msgstr "Material"
+
+# en: "Max length L6"
+msgid "cartridges.column.cartridgeLength"
+msgstr "Max. Länge L6"
+
+# en: "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
+msgid "cartridges.column.pmaxHelp"
+msgstr "Größter mittlerer Druck laut CIP-Datenblatt, höchste Variante, nach dem Verfahren des Datenblatts."
+
+# en: "Mean vivacity"
+msgid "powders.column.rate"
+msgstr "Mittlere Vivacity"
+
 # en: "Metal"
 msgid "events.metal"
 msgstr "Metall"
+
+# en: "Mine"
+msgid "sources.user"
+msgstr "Meine"
+
+# en: "Mine: designs saved in this browser. Rows without a mark are the RangeFoundry catalog."
+msgid "listSources.column.sourceHelp"
+msgstr "Meine: In diesem Browser gespeicherte Entwürfe. Zeilen ohne Markierung gehören zum RangeFoundry-Katalog."
 
 # en: "Minor"
 msgid "events.minor"
@@ -327,8 +675,48 @@ msgstr "Minor"
 msgid "events.misses"
 msgstr "Fehlschüsse"
 
+# en: "n/a"
+msgid "directoryTable.missing"
+msgstr "k. A."
+
+# en: "Name"
+msgid "bullets.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "cartridges.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "cases.column.name"
+msgstr "Name"
+
 # en: "Name"
 msgid "events.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "events.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "disciplines.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "firearms.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "powders.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "primers.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "targets.column.name"
 msgstr "Name"
 
 # en: "Name or alias, 308, 7,62 or .308…"
@@ -427,9 +815,29 @@ msgstr "Nicht gespeichert: {reason}"
 msgid "events.notes"
 msgstr "Notizen"
 
+# en: "Notes"
+msgid "firearms.column.notes"
+msgstr "Notizen"
+
+# en: "Number"
+msgid "disciplines.column.number"
+msgstr "Nummer"
+
 # en: "Offline"
 msgid "page.offline"
 msgstr "Offline"
+
+# en: "OK"
+msgid "listSources.ok"
+msgstr "OK"
+
+# en: "Optic, zero"
+msgid "firearms.column.optic"
+msgstr "Optik, Einschießentfernung"
+
+# en: "Outer diameter"
+msgid "targets.column.outer"
+msgstr "Außendurchmesser"
 
 # en: "Penalties"
 msgid "events.penalties"
@@ -442,6 +850,14 @@ msgstr "2 bis {max} auswählen"
 # en: "Place"
 msgid "events.place"
 msgstr "Ort"
+
+# en: "Place"
+msgid "log.column.place"
+msgstr "Ort"
+
+# en: "Pmax"
+msgid "cartridges.column.pmax"
+msgstr "Pmax"
 
 # en: "Points"
 msgid "events.points"
@@ -483,16 +899,76 @@ msgstr "Liste der Wettkämpfe drucken"
 msgid "events.printOpen"
 msgstr "Den geöffneten Wettkampf drucken"
 
+# en: "Printed: the first {limit} of {total} brass."
+msgid "directoryTable.printed.brass"
+msgstr "Gedruckt: die ersten {limit} von {total} Hülsen."
+
+# en: "Printed: the first {limit} of {total} bullets."
+msgid "directoryTable.printed.bullets"
+msgstr "Gedruckt: die ersten {limit} von {total} Geschossen."
+
+# en: "Printed: the first {limit} of {total} cartridges."
+msgid "directoryTable.printed.cartridges"
+msgstr "Gedruckt: die ersten {limit} von {total} Patronen."
+
+# en: "Printed: the first {limit} of {total} disciplines."
+msgid "directoryTable.printed.disciplines"
+msgstr "Gedruckt: die ersten {limit} von {total} Disziplinen."
+
+# en: "Printed: the first {limit} of {total} entries."
+msgid "directoryTable.printed.logEntries"
+msgstr "Gedruckt: die ersten {limit} von {total} Einträgen."
+
+# en: "Printed: the first {limit} of {total} events."
+msgid "directoryTable.printed.events"
+msgstr "Gedruckt: die ersten {limit} von {total} Wettbewerben."
+
+# en: "Printed: the first {limit} of {total} federations."
+msgid "directoryTable.printed.federations"
+msgstr "Gedruckt: die ersten {limit} von {total} Verbänden."
+
+# en: "Printed: the first {limit} of {total} firearms."
+msgid "directoryTable.printed.firearms"
+msgstr "Gedruckt: die ersten {limit} von {total} Schusswaffen."
+
+# en: "Printed: the first {limit} of {total} powders."
+msgid "directoryTable.printed.powders"
+msgstr "Gedruckt: die ersten {limit} von {total} Treibladungspulvern."
+
+# en: "Printed: the first {limit} of {total} primers."
+msgid "directoryTable.printed.primers"
+msgstr "Gedruckt: die ersten {limit} von {total} Zündhütchen."
+
+# en: "Printed: the first {limit} of {total} targets."
+msgid "directoryTable.printed.faces"
+msgstr "Gedruckt: die ersten {limit} von {total} Scheiben."
+
 # en: "Procedurals"
 msgid "events.procedurals"
 msgstr "Verfahrensfehler"
+
+# en: "Product number"
+msgid "primers.column.number"
+msgstr "Produktnummer"
+
+# en: "R right hand, L left hand."
+msgid "firearms.column.twistHelp"
+msgstr "R Rechtsdrall, L Linksdrall."
 
 # en: "Range mode"
 msgid "page.range"
 msgstr "Schießstand-Modus"
 
+# en: "RangeFoundry"
+msgid "sources.rangefoundry"
+msgstr "RangeFoundry"
+
 # en: "Remove {name}"
 msgid "events.removeStage"
+msgstr "{name} entfernen"
+
+# en: "Remove {name}"
+msgid "directoryTable.removeScope"
 msgstr "{name} entfernen"
 
 # en: "Remove series {n}"
@@ -511,13 +987,33 @@ msgstr "Wettkämpfe ersetzen?"
 msgid "events.result"
 msgstr "Ergebnis"
 
+# en: "Result"
+msgid "events.column.state"
+msgstr "Ergebnis"
+
+# en: "Result"
+msgid "log.column.result"
+msgstr "Ergebnis"
+
 # en: "Ring values separated by spaces, such as 10 9 10."
 msgid "events.shotsHint"
 msgstr "Wertungen durch Leerzeichen getrennt, etwa 10 9 10."
 
+# en: "Rings"
+msgid "targets.facet.rings"
+msgstr "Ringe"
+
+# en: "Rings"
+msgid "targets.column.rings"
+msgstr "Ringe"
+
 # en: "Round count of {name}: {count}."
 msgid "events.roundCountOf"
 msgstr "Schusszahl von {name}: {count}."
+
+# en: "Rounds"
+msgid "log.column.rounds"
+msgstr "Patronen"
 
 # en: "Rounds fired"
 msgid "events.roundsFired"
@@ -526,6 +1022,30 @@ msgstr "Abgegebene Schüsse"
 # en: "Save event"
 msgid "events.saveEvent"
 msgstr "Wettkampf speichern"
+
+# en: "Saved loads of another cartridge, or no saved load."
+msgid "firearms.column.notesHelp"
+msgstr "Gespeicherte Laborierungen einer anderen Patrone oder keine gespeicherte Laborierung."
+
+# en: "SD"
+msgid "bullets.column.sd"
+msgstr "QB"
+
+# en: "Search"
+msgid "directoryTable.search"
+msgstr "Suchen"
+
+# en: "Sectional density, computed: mass over diameter squared."
+msgid "bullets.column.sdHelp"
+msgstr "Querschnittsbelastung, berechnet: Masse durch Durchmesser im Quadrat."
+
+# en: "Select"
+msgid "directoryTable.select"
+msgstr "Auswählen"
+
+# en: "Select {name}"
+msgid "directoryTable.selectRow"
+msgstr "{name} auswählen"
 
 # en: "Series"
 msgid "events.seriesHeading"
@@ -559,6 +1079,26 @@ msgstr "Schussbilder"
 msgid "events.shots"
 msgstr "Schüsse"
 
+# en: "Size"
+msgid "primers.column.size"
+msgstr "Maße"
+
+# en: "Sort"
+msgid "directoryTable.sort"
+msgstr "Sortieren"
+
+# en: "Sort: {text}"
+msgid "directoryTable.sortBy"
+msgstr "Sortierung: {text}"
+
+# en: "Source"
+msgid "listSources.column.source"
+msgstr "Quelle"
+
+# en: "Source: {text}"
+msgid "listSources.button"
+msgstr "Quelle: {text}"
+
 # en: "Stage {n}"
 msgid "events.stageNumber"
 msgstr "Stage {n}"
@@ -575,6 +1115,10 @@ msgstr "Stage-Punkte"
 msgid "events.stages"
 msgstr "Stages"
 
+# en: "Target"
+msgid "disciplines.facet.face"
+msgstr "Scheibe"
+
 # en: "Target designer"
 msgid "page.targetsDesigner"
 msgstr "Scheiben-Editor"
@@ -582,6 +1126,10 @@ msgstr "Scheiben-Editor"
 # en: "Target sheet"
 msgid "events.targetSheet"
 msgstr "Blatt mit Zielscheibe"
+
+# en: "Targets"
+msgid "disciplines.column.faces"
+msgstr "Scheiben"
 
 # en: "Targets"
 msgid "page.targets"
@@ -594,6 +1142,26 @@ msgstr "Scheiben, {filters}"
 # en: "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
 msgid "powders.noneHint"
 msgstr "Der Katalog enthält kein Treibladungspulver. Legen Sie eines mit „Neues Treibladungspulver“ an oder importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import."
+
+# en: "The common caliber of the bullet diameter G1."
+msgid "cartridges.column.calHelp"
+msgstr "Das übliche Kaliber zum Geschossdurchmesser G1."
+
+# en: "The configuration the trajectory form offers first."
+msgid "firearms.column.configurationHelp"
+msgstr "Die Konfiguration, die das Flugbahnformular zuerst anbietet."
+
+# en: "The first optic of the active configuration and its zero range."
+msgid "firearms.column.opticHelp"
+msgstr "Die erste Optik der aktiven Konfiguration und ihre Einschießentfernung."
+
+# en: "The manufacturer's first published BC of this drag model."
+msgid "bullets.column.g1Help"
+msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
+
+# en: "The manufacturer's first published BC of this drag model."
+msgid "bullets.column.g7Help"
+msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
 
 # en: "The records of this browser could not be read."
 msgid "events.readFailed"
@@ -611,21 +1179,49 @@ msgstr "Die Schusszahl von {name} bleibt unverändert."
 msgid "events.time"
 msgstr "Zeit (s)"
 
+# en: "Tip"
+msgid "bullets.facet.tip"
+msgstr "Spitze"
+
 # en: "Total"
 msgid "events.totalHeading"
+msgstr "Summe"
+
+# en: "Total"
+msgid "events.column.total"
 msgstr "Summe"
 
 # en: "Total {total}"
 msgid "events.partTotal"
 msgstr "Summe {total}"
 
+# en: "Training rows"
+msgid "powders.column.rows"
+msgstr "Trainingszeilen"
+
 # en: "Tune a powder"
 msgid "page.powdersTune"
 msgstr "Treibladungspulver abstimmen"
 
+# en: "Twist"
+msgid "firearms.column.twist"
+msgstr "Drall"
+
+# en: "Type"
+msgid "bullets.column.type"
+msgstr "Art"
+
 # en: "Undo of {name} failed: {reason}"
 msgid "events.undoOfFailed"
 msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
+
+# en: "Water capacity"
+msgid "cases.column.capacity"
+msgstr "Wasserkapazität"
+
+# en: "Water to the case mouth, as the manufacturer states."
+msgid "cases.column.capacityHelp"
+msgstr "Wasser bis zum Hülsenmund, laut Hersteller."
 
 # en: "Yes"
 msgid "primers.yes"

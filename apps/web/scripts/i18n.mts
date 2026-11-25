@@ -2,6 +2,7 @@
 import { globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { git } from './ci-plan.mts'
+import { type PoCatalog, readCatalog } from './po-catalog.mts'
 
 const webRoot = path.join(import.meta.dirname, '..')
 
@@ -363,6 +364,25 @@ export function safeWordingProblems(
   return found
 }
 
+/** The German of the Lingui catalog `de` keyed by its English in `en`, as `de.json` keys it, for the term and safe-wording checks; `conflicts` names each id whose English has other German under an earlier id (one German per English text, as in `de.json`). */
+export function linguiGerman(en: PoCatalog, de: PoCatalog) {
+  const german: Record<string, string> = {}
+  const idOf: Record<string, string> = {}
+  const conflicts: string[] = []
+  for (const [id, entry] of Object.entries(de)) {
+    const english = en[id]?.translation
+    if (entry.obsolete || !entry.translation || !english) continue
+    const earlier = idOf[english]
+    if (earlier !== undefined && german[english] !== entry.translation)
+      conflicts.push(`${id}: other German than ${earlier} for ${english}`)
+    else {
+      german[english] = entry.translation
+      idOf[english] = id
+    }
+  }
+  return { german, conflicts }
+}
+
 /** The untranslated list of `code` in `lintAtBase`, the lint file as the commit `baseRef` has it; a base without one throws, since nothing would show that the list only shrank. */
 export function baseList(lintAtBase: string, code: string, baseRef: string): string[] {
   const list = JSON.parse(lintAtBase).untranslated?.[code]
@@ -399,20 +419,26 @@ if (import.meta.main) {
         : undefined
     const same: string[] = lint.sameAsEnglish?.[code] ?? []
     const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed, base, same)
+    const wording: string[] = []
     if (code === 'de') {
       const table: TermTable = read('src/i18n/german-terms.json')
       const senses = {
         ...Object.fromEntries(lint.targetRecords.map((k: string) => [k, lint.targetSense])),
         ...lint.otherSense,
       }
-      found.push(
-        ...termTableProblems(table),
-        ...termUseProblems(catalogue, table, senses, source),
-        ...safeWordingProblems(source, catalogue, lint.safeTexts),
-      )
+      // the texts on Lingui ids keep the checks they had in de.json; each catalog on its own, the messages of both
+      const lingui = linguiGerman(await readCatalog('en'), await readCatalog('de'))
+      const english = [...source, ...Object.keys(lingui.german)]
+      const checked = [catalogue, lingui.german].flatMap((german) => [
+        ...termUseProblems(german, table, senses, english),
+        ...safeWordingProblems(english, german, lint.safeTexts),
+      ])
+      found.push(...termTableProblems(table))
+      wording.push(...new Set(checked), ...lingui.conflicts)
     }
     for (const p of found) console.error(`src/i18n/${code}.json: ${p}`)
-    if (found.length > 0) process.exit(1)
+    for (const p of wording) console.error(`src/i18n/${code}.json or src/locales/${code}.po: ${p}`)
+    if (found.length + wording.length > 0) process.exit(1)
   } else {
     console.error(
       'usage: i18n.mts messages | missing <language code> | check <language code> [<base commit>]',

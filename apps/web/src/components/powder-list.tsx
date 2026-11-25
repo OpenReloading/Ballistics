@@ -8,7 +8,6 @@ import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { ungrouped } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
 import {
   maxOverlay,
   overlayHref,
@@ -45,15 +44,6 @@ import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { MissingMark } from './missing-mark.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
-
-/** The Training rows column's help: the column, then the burn-rate page's sentences for a powder without fitted parameters and a shotgun-only one. */
-const trainingRowsHelp = [
-  msg(
-    'Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
-  ),
-  unfitTitles.none,
-  unfitTitles.shotgun,
-] as const
 
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
 
@@ -104,11 +94,13 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
   )
 
   const query = state.query.trim()
-  const named = [onlyText(t, readOrigins(state.sources)), matchingText(t, query)].filter(Boolean)
+  const named = [onlyText(i18n, readOrigins(state.sources)), matchingText(i18n, query)].filter(
+    Boolean,
+  )
   const columns: DirectoryColumn<PowderRow>[] = [
     {
       key: 'manufacturer',
-      label: msg('Manufacturer'),
+      label: /*i18n*/ { id: 'powders.column.manufacturer', message: 'Manufacturer' },
       width: '10.5rem',
       dim: true,
       value: (r) => r.manufacturerName,
@@ -116,7 +108,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     },
     {
       key: 'name',
-      label: msg('Name'),
+      label: /*i18n*/ { id: 'powders.column.name', message: 'Name' },
       value: (r) => r.name,
       cell: (r) => (
         <>
@@ -133,25 +125,27 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     },
     {
       key: 'form',
-      label: msg('Form'),
+      label: /*i18n*/ { id: 'powders.column.form', message: 'Form' },
       width: '8rem',
       value: (r) => r.grainForm,
       cell: (r) => (r.grainForm ? grainFormText(t, r.grainForm) : ''),
     },
     {
       key: 'base',
-      label: msg('Base'),
+      label: /*i18n*/ { id: 'powders.column.base', message: 'Base' },
       width: '5.5rem',
       value: (r) => r.propellantBase,
       cell: (r) => (r.propellantBase ? baseText(t, r.propellantBase) : ''),
     },
     {
       key: 'rate',
-      label: msg('Mean vivacity'),
+      label: /*i18n*/ { id: 'powders.column.rate', message: 'Mean vivacity' },
       unit: vivacityUnit,
-      help: msg(
-        'Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus 2 standard uncertainties, log scale. Model output from fitted M3 parameters, not manufacturer data.',
-      ),
+      help: /*i18n*/ {
+        id: 'powders.column.rateHelp',
+        message:
+          'Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus 2 standard uncertainties, log scale. Model output from fitted M3 parameters, not manufacturer data.',
+      },
       width: `calc(var(--rate-scale, ${scaleWidth}px) + 11rem)`,
       head: <RateTicks domain={domain} />,
       value: (r) => r.meanVivacity,
@@ -176,8 +170,17 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     },
     {
       key: 'rows',
-      label: msg('Training rows'),
-      help: trainingRowsHelp,
+      label: /*i18n*/ { id: 'powders.column.rows', message: 'Training rows' },
+      // the column's sentence, then the burn-rate page's for a powder without fitted parameters and a shotgun-only one
+      help: [
+        i18n._({
+          id: 'powders.column.rowsHelp',
+          message:
+            'Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
+        }),
+        t(unfitTitles.none),
+        t(unfitTitles.shotgun),
+      ].join(' '),
       width: '13rem',
       num: true,
       value: (r) => r.trainingRows,
@@ -206,7 +209,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
   const facts = (r: PowderRow) =>
     // the burn-rate order before form and base: a phone's line ends where it is cut
     [
-      r.origin === 'user' && t(originNames.user),
+      r.origin === 'user' && i18n._(originNames.user),
       r.manufacturerName,
       r.burnRateOrder !== undefined &&
         i18n._({

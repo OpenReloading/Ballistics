@@ -121,27 +121,36 @@ export function disciplineFacets(
 ): Facet<DisciplineRow>[] {
   const classNames = new Map(rows.flatMap((r) => r.classes.map((c) => [c.id, c.name] as const)))
   return [
-    { key: 'org', label: msg('Federation'), values: (r) => [r.federation] },
+    {
+      key: 'org',
+      label: /*i18n*/ { id: 'disciplines.facet.org', message: 'Federation' },
+      values: (r) => [r.federation],
+    },
     {
       key: 'category',
-      label: msg('Category'),
+      label: /*i18n*/ { id: 'disciplines.facet.category', message: 'Category' },
       values: (r) => (r.category ? [r.category] : []),
       text: titleFromKebab,
     },
     {
       key: 'dist',
-      label: msg('Distance'),
+      label: /*i18n*/ { id: 'disciplines.facet.dist', message: 'Distance' },
       values: (r) => distanceReadings(r.distance, r.unit).map((d) => `${d.number}${d.unit}`),
       text: (v) => v.replace(/(\d)(m|yd)$/, '$1 $2'),
       order: (a, b) => Number.parseFloat(a) - Number.parseFloat(b) || a.localeCompare(b),
     },
     {
       key: 'class',
-      label: msg('Caliber class'),
+      label: /*i18n*/ { id: 'disciplines.facet.class', message: 'Caliber class' },
       values: (r) => r.classes.map((c) => c.id),
       text: (v) => classNames.get(v) ?? v,
     },
-    { key: 'face', label: msg('Target'), values: (r) => r.faceIds, text: (v) => faces.get(v) ?? v },
+    {
+      key: 'face',
+      label: /*i18n*/ { id: 'disciplines.facet.face', message: 'Target' },
+      values: (r) => r.faceIds,
+      text: (v) => faces.get(v) ?? v,
+    },
   ]
 }
 
@@ -445,7 +454,11 @@ export const federationFacetKeys = ['country']
 
 /** The federation list's choice filter: the country, where "International" is a world body. */
 export const federationFacets: Facet<FederationRow>[] = [
-  { key: 'country', label: msg('Country'), values: (r) => [r.country] },
+  {
+    key: 'country',
+    label: /*i18n*/ { id: 'federations.facet.country', message: 'Country' },
+    values: (r) => [r.country],
+  },
 ]
 
 /** Whether a federation row passes the search. */

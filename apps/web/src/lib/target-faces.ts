@@ -95,18 +95,18 @@ export function faceFacets(
   return [
     {
       key: 'org',
-      label: msg('Federation'),
+      label: /*i18n*/ { id: 'targets.facet.org', message: 'Federation' },
       values: (r) => (r.organization ? [r.organization] : []),
     },
     {
       key: 'discipline',
-      label: msg('Discipline'),
+      label: /*i18n*/ { id: 'targets.facet.discipline', message: 'Discipline' },
       values: (r) => r.disciplineIds,
       text: (v) => disciplines.get(v) ?? v,
     },
     {
       key: 'dist',
-      label: msg('Distance'),
+      label: /*i18n*/ { id: 'targets.facet.dist', message: 'Distance' },
       // keyed by the meters to 0.01 m, so a selection in the URL holds in either range unit
       values: (r) => [...new Set(r.distances.map((m) => String(Number(m.toFixed(2)))))],
       text: (v) => distance(Number(v)),
@@ -114,7 +114,7 @@ export function faceFacets(
     },
     {
       key: 'rings',
-      label: msg('Rings'),
+      label: /*i18n*/ { id: 'targets.facet.rings', message: 'Rings' },
       values: (r) => [String(r.rings)],
       order: (a, b) => Number(a) - Number(b),
     },
