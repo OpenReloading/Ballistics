@@ -1,17 +1,17 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Tooltip } from '@mantine/core'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { fitRule } from '../lib/bullet-fit.ts'
 import { controlSize } from '../lib/theme.ts'
 import { NavIcon } from './nav-icons.tsx'
 
 /** The link to the bullet list of the bullets that fit a cartridge (`bulletFits`, counted by the page), the rule on hover. */
 export function CartridgeBullets({ id, count }: { id: string; count: number }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <Tooltip label={t(fitRule)} multiline maw={320}>
+    <Tooltip label={i18n._(fitRule)} multiline maw={320}>
       <Button
         component={Link}
         href={`/bullets?fits=${encodeURIComponent(id)}`}
@@ -20,7 +20,7 @@ export function CartridgeBullets({ id, count }: { id: string; count: number }) {
         leftSection={<NavIcon name="/bullets" size={16} />}
         className="cartridge-bullets"
       >
-        {t('Bullets ({count})', { count })}
+        {i18n._({ id: 'cartridgeRecord.bullets', message: 'Bullets ({count})', values: { count } })}
       </Button>
     </Tooltip>
   )

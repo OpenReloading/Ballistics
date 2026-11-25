@@ -163,6 +163,10 @@ msgstr "Tabelle: {label}"
 msgid "directoryTable.aToZ"
 msgstr "{label}, A bis Z"
 
+# en: "{label}, burn-rate order {order}"
+msgid "powderRecord.neighbor"
+msgstr "{label}, Rang in der Abbrandreihenfolge: {order}"
+
 # en: "{label}, high to low"
 msgid "directoryTable.highToLow"
 msgstr "{label}, absteigend"
@@ -215,9 +219,21 @@ msgstr "nur {source}"
 msgid "fieldTable.groupFilter"
 msgstr "{title}: Gruppe"
 
+# en: "{value} ({low} to {high})"
+msgid "powderRecord.meanInterval"
+msgstr "{value} ({low} bis {high})"
+
 # en: "A brass group keeps the cases you measured, with their water capacity, in this browser."
 msgid "cases.noneOwnHint"
 msgstr "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer Wasserkapazität in diesem Browser."
+
+# en: "A bullet fits a cartridge when its diameter is above the mean of the land and groove diameters F and Z and at most the projectile diameter G1, all from the CIP sheet (G1 to its printed 0.01 mm)."
+msgid "cartridgeRecord.fitRule"
+msgstr "Ein Geschoss passt zu einer Patrone, wenn sein Durchmesser über dem Mittel aus Felddurchmesser F und Zugdurchmesser Z liegt und höchstens dem Geschossdurchmesser G1 entspricht, jeweils nach dem C.I.P.-Blatt (G1 mit der gedruckten Genauigkeit von 0,01 mm)."
+
+# en: "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
+msgid "powderRecord.neighborNote"
+msgstr "Ein Nachbar ist ein Kandidat, kein Ersatz: Er braucht eine neue Ladungsentwicklung, bevor er dieses Treibladungspulver ersetzt."
 
 # en: "Abbreviation"
 msgid "disciplines.column.abbreviation"
@@ -310,6 +326,10 @@ msgstr "Alle Scheiben"
 # en: "Allowed"
 msgid "disciplines.allowed"
 msgstr "Erlaubt"
+
+# en: "Also printed as: {aliases}"
+msgid "cartridgeRecord.alsoPrintedAs"
+msgstr "Auch gedruckt als: {aliases}"
 
 # en: "Altitude"
 msgid "units.quantity.altitude"
@@ -431,9 +451,21 @@ msgstr "Geschosse"
 msgid "page.bullets"
 msgstr "Geschosse"
 
+# en: "Bullets ({count})"
+msgid "cartridgeRecord.bullets"
+msgstr "Geschosse ({count})"
+
 # en: "Bullets, {filters}"
 msgid "bullets.filtered"
 msgstr "Geschosse, {filters}"
+
+# en: "Burn rate"
+msgid "powderRecord.burnRateTable"
+msgstr "Abbrandgeschwindigkeit"
+
+# en: "Burn rate (model output)"
+msgid "powderRecord.burnRate"
+msgstr "Abbrandgeschwindigkeit (Modellergebnis)"
 
 # en: "Burn rates"
 msgid "powders.burnRates"
@@ -480,6 +512,10 @@ msgid "values.carbine"
 msgstr "Karabiner"
 
 # en: "Cartridge"
+msgid "cartridgeRecord.side.cartridge"
+msgstr "Patrone"
+
+# en: "Cartridge"
 msgid "caseRecord.cartridge"
 msgstr "Patrone"
 
@@ -499,6 +535,14 @@ msgstr "Die Patronendaten sind gerade nicht verfügbar."
 msgid "page.cartridgesDesigner"
 msgstr "Patronen-Editor"
 
+# en: "Cartridge dimensions"
+msgid "cartridgeRecord.dimensions.cartridge"
+msgstr "Maße der Patrone"
+
+# en: "Cartridge length unit"
+msgid "cartridgeRecord.unit.cartridge"
+msgstr "Längeneinheit der Patrone"
+
 # en: "Cartridge list"
 msgid "bulletRecord.cartridgeList"
 msgstr "Patronenliste"
@@ -516,12 +560,20 @@ msgid "bulletRecord.cartridges"
 msgstr "Patronen"
 
 # en: "Cartridges"
+msgid "powderRecord.cartridges"
+msgstr "Patronen"
+
+# en: "Cartridges"
 msgid "page.cartridges"
 msgstr "Patronen"
 
 # en: "Cartridges, {filters}"
 msgid "cartridges.filtered"
 msgstr "Patronen, {filters}"
+
+# en: "Case"
+msgid "cartridgeRecord.case"
+msgstr "Hülse"
 
 # en: "Case capacity"
 msgid "units.quantity.capacity"
@@ -534,6 +586,10 @@ msgstr "Hülsenlänge L3"
 # en: "Case type"
 msgid "cartridges.column.type"
 msgstr "Hülsenform"
+
+# en: "Case: the case type, derived from the record"
+msgid "cartridgeRecord.meaning.case"
+msgstr "Hülse: die Hülsenart, aus dem Datensatz abgeleitet"
 
 # en: "Category"
 msgid "disciplines.facet.category"
@@ -550,6 +606,18 @@ msgstr "Waffenart"
 # en: "Category"
 msgid "federationRecord.column.category"
 msgstr "Waffenart"
+
+# en: "Chamber"
+msgid "cartridgeRecord.side.chamber"
+msgstr "Patronenlager"
+
+# en: "Chamber dimensions"
+msgid "cartridgeRecord.dimensions.chamber"
+msgstr "Maße des Patronenlagers"
+
+# en: "Chamber length unit"
+msgid "cartridgeRecord.unit.chamber"
+msgstr "Längeneinheit des Patronenlagers"
 
 # en: "Check the event: a value is out of its range."
 msgid "events.outOfRange"
@@ -575,6 +643,10 @@ msgstr "Suche leeren"
 msgid "comparePicks.clearSelection"
 msgstr "Auswahl aufheben"
 
+# en: "Clearance {value}"
+msgid "cartridgeRecord.clearance"
+msgstr "Spiel {value}"
+
 # en: "COAL, the cartridge maximum of the CIP sheet, shortest variant."
 msgid "cartridges.column.cartridgeLengthHelp"
 msgstr "COAL, Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
@@ -585,6 +657,10 @@ msgstr "Community"
 
 # en: "Compare"
 msgid "comparePicks.compare"
+msgstr "Vergleichen"
+
+# en: "Compare"
+msgid "recordActions.compare"
 msgstr "Vergleichen"
 
 # en: "Compare {count}"
@@ -627,12 +703,32 @@ msgstr "Bestätigt von"
 msgid "bullets.facet.construction"
 msgstr "Konstruktion"
 
+# en: "Copied"
+msgid "recordActions.copied"
+msgstr "Kopiert"
+
+# en: "Copy failed"
+msgid "recordActions.copyFailed"
+msgstr "Kopieren fehlgeschlagen"
+
+# en: "Copy hash {hash}"
+msgid "recordActions.copyHash"
+msgstr "Hash {hash} kopieren"
+
+# en: "Copy link"
+msgid "recordActions.copyLink"
+msgstr "Link kopieren"
+
 # en: "Corrections"
 msgid "units.quantity.correction"
 msgstr "Korrekturen"
 
 # en: "Country"
 msgid "federations.facet.country"
+msgstr "Land"
+
+# en: "Country"
+msgid "cartridgeRecord.country"
 msgstr "Land"
 
 # en: "Country"
@@ -658,6 +754,10 @@ msgstr "Schießprogramm"
 # en: "Covers"
 msgid "recordSources.column.covers"
 msgstr "Gilt für"
+
+# en: "Curve values"
+msgid "powderRecord.curveValues"
+msgstr "Kurvenwerte"
 
 # en: "Custom"
 msgid "units.custom"
@@ -815,13 +915,29 @@ msgstr "Luftwiderstandsmodell"
 msgid "bulletRecord.drawing"
 msgstr "Zeichnung"
 
+# en: "Drawing notes"
+msgid "recordActions.drawingNotes"
+msgstr "Hinweise zur Zeichnung"
+
 # en: "Drop, windage"
 msgid "units.quantity.lineOfSightOffset"
 msgstr "Flugbahnabfall, Seitenabweichung"
 
+# en: "Dynamic vivacity"
+msgid "powderRecord.vivacity"
+msgstr "Dynamische Vivacity"
+
 # en: "Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus 2 standard uncertainties, log scale. Model output from fitted M3 parameters, not manufacturer data."
 msgid "powders.column.rateHelp"
 msgstr "Dynamische Vivacity, gemittelt über den Abbrandanteil 0,1 bis 0,9, plus und minus 2 Standardunsicherheiten, logarithmische Skala. Modellergebnis aus angepassten M3-Parametern, keine Herstellerdaten."
+
+# en: "Dynamic vivacity of {label}"
+msgid "powderRecord.vivacityTable"
+msgstr "Dynamische Vivacity von {label}"
+
+# en: "Dynamic vivacity of {label}, model output"
+msgid "powderRecord.vivacityOf"
+msgstr "Dynamische Vivacity von {label}, Modellausgabe"
 
 # en: "Edit event"
 msgid "events.edit"
@@ -903,6 +1019,10 @@ msgstr "CSV exportieren"
 # en: "Export JSON"
 msgid "events.exportJson"
 msgstr "JSON exportieren"
+
+# en: "Faster ({unit})"
+msgid "powderRecord.faster"
+msgstr "Schneller ({unit})"
 
 # en: "Federation"
 msgid "disciplines.facet.org"
@@ -988,6 +1108,10 @@ msgstr "Passt zu {name}"
 msgid "recordSources.kind.fitted"
 msgstr "angepasst"
 
+# en: "Fitted M3 curve"
+msgid "powderRecord.fittedCurve"
+msgstr "Angepasste M3-Kurve"
+
 # en: "fitting {name}"
 msgid "bullets.fitting"
 msgstr "passend zu {name}"
@@ -1016,6 +1140,10 @@ msgstr "G1"
 msgid "bullets.column.g7"
 msgstr "G7"
 
+# en: "Gap"
+msgid "standardBadge.gap"
+msgstr "Lücke"
+
 # en: "Gauge"
 msgid "disciplineRecord.column.gauge"
 msgstr "Messring"
@@ -1027,6 +1155,10 @@ msgstr "Messring"
 # en: "Handloads"
 msgid "disciplines.row.handloads"
 msgstr "Wiedergeladene Munition"
+
+# en: "Hash copied"
+msgid "recordActions.hashCopied"
+msgstr "Hash kopiert"
 
 # en: "Hidden by the search or a filter"
 msgid "comparePicks.hiddenTitle"
@@ -1140,6 +1272,10 @@ msgstr "Bleifrei"
 msgid "bullets.column.length"
 msgstr "Länge"
 
+# en: "Length unit"
+msgid "cartridgeRecord.lengthUnit"
+msgstr "Längeneinheit"
+
 # en: "Lengths"
 msgid "units.quantity.length"
 msgstr "Längen"
@@ -1168,6 +1304,10 @@ msgstr "Lizenz"
 msgid "bulletRecord.line"
 msgstr "Produktlinie {line}"
 
+# en: "Link copied"
+msgid "recordActions.linkCopied"
+msgstr "Link kopiert"
+
 # en: "Load"
 msgid "events.load"
 msgstr "Laborierung"
@@ -1175,6 +1315,10 @@ msgstr "Laborierung"
 # en: "Load or ammunition"
 msgid "log.column.ammunition"
 msgstr "Laborierung oder Munition"
+
+# en: "Load table"
+msgid "powderRecord.loadTable"
+msgstr "Ladetabelle"
 
 # en: "Load workbench"
 msgid "page.workbench"
@@ -1388,6 +1532,10 @@ msgstr "Suche nach „{query}“"
 msgid "cases.column.material"
 msgstr "Material"
 
+# en: "Max ({unit})"
+msgid "cartridgeRecord.max"
+msgstr "Max ({unit})"
+
 # en: "Max length L6"
 msgid "cartridges.column.cartridgeLength"
 msgstr "Max. Länge L6"
@@ -1395,6 +1543,14 @@ msgstr "Max. Länge L6"
 # en: "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
 msgid "cartridges.column.pmaxHelp"
 msgstr "Größter mittlerer Druck laut CIP-Datenblatt, höchste Variante, nach dem Verfahren des Datenblatts."
+
+# en: "Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval."
+msgid "powderRecord.meanMethod"
+msgstr "Mittlere dynamische Vivacity über dem abgebrannten Anteil 0,1 bis 0,9, mit ihrem Intervall."
+
+# en: "Mean vivacity"
+msgid "powderRecord.meanVivacity"
+msgstr "Mittlere Vivacity"
 
 # en: "Mean vivacity"
 msgid "powders.column.rate"
@@ -1412,6 +1568,14 @@ msgstr "Mitglied von"
 msgid "events.metal"
 msgstr "Metall"
 
+# en: "Method"
+msgid "cartridgeRecord.method"
+msgstr "Verfahren"
+
+# en: "Method: the pressure measuring method"
+msgid "cartridgeRecord.meaning.method"
+msgstr "Verfahren: das Verfahren der Druckmessung"
+
 # en: "Metric (SI)"
 msgid "units.preset.metricGrams"
 msgstr "Metrisch (SI)"
@@ -1419,6 +1583,10 @@ msgstr "Metrisch (SI)"
 # en: "Metric, common use"
 msgid "units.preset.metricGrains"
 msgstr "Metrisch, gebräuchlich"
+
+# en: "Min ({unit})"
+msgid "cartridgeRecord.min"
+msgstr "Min ({unit})"
 
 # en: "Mine"
 msgid "sources.user"
@@ -1436,6 +1604,18 @@ msgstr "Minor"
 msgid "events.misses"
 msgstr "Fehlschüsse"
 
+# en: "Model fit"
+msgid "powderRecord.modelFit"
+msgstr "Modellanpassung"
+
+# en: "Model fit table"
+msgid "powderRecord.modelFitTable"
+msgstr "Tabelle der Modellanpassung"
+
+# en: "Model parameters"
+msgid "powderRecord.modelParameters"
+msgstr "Modellparameter"
+
 # en: "Muzzle energy from"
 msgid "disciplines.row.minMuzzleEnergy"
 msgstr "Mündungsenergie ab"
@@ -1446,6 +1626,10 @@ msgstr "Vorderlader"
 
 # en: "n/a"
 msgid "directoryTable.missing"
+msgstr "k. A."
+
+# en: "n/a"
+msgid "powderRecord.notAvailable"
 msgstr "k. A."
 
 # en: "Name"
@@ -1564,6 +1748,10 @@ msgstr "Keine Patrone entspricht „{query}“."
 msgid "states.noMatch.cartridges"
 msgstr "Keine Patronen entsprechen diesen Filtern."
 
+# en: "No dimensions or pressures in this record"
+msgid "cartridgeRecord.noValues"
+msgstr "Keine Maße oder Drücke in diesem Datensatz"
+
 # en: "No discipline found"
 msgid "events.noDisciplineFound"
 msgstr "Keine Disziplin gefunden"
@@ -1639,6 +1827,10 @@ msgstr "Keine Scheiben entsprechen diesen Filtern."
 # en: "No-shoots"
 msgid "events.noShoots"
 msgstr "No-Shoots"
+
+# en: "None"
+msgid "powderRecord.none"
+msgstr "Keine"
 
 # en: "None"
 msgid "events.none"
@@ -1719,6 +1911,14 @@ msgstr "Öffnen"
 # en: "Open {name} in shot groups"
 msgid "disciplineRecord.openStage"
 msgstr "{name} in den Schussbildern öffnen"
+
+# en: "Open in designer"
+msgid "recordActions.openInDesigner"
+msgstr "Im Editor öffnen"
+
+# en: "Open in shot groups"
+msgid "recordActions.openInShotGroups"
+msgstr "In Schussbildern öffnen"
 
 # en: "Optic, zero"
 msgid "firearms.column.optic"
@@ -1836,6 +2036,10 @@ msgstr "Zündhütchen"
 msgid "primers.filtered"
 msgstr "Zündhütchen, {filters}"
 
+# en: "Print"
+msgid "recordActions.print"
+msgstr "Drucken"
+
 # en: "Print the list of events"
 msgid "events.printList"
 msgstr "Liste der Wettkämpfe drucken"
@@ -1909,6 +2113,10 @@ msgid "caseRecord.data"
 msgstr "Eigenschaften"
 
 # en: "Properties"
+msgid "powderRecord.data"
+msgstr "Eigenschaften"
+
+# en: "Properties"
 msgid "primerRecord.data"
 msgstr "Eigenschaften"
 
@@ -1919,6 +2127,10 @@ msgstr "öffentlich"
 # en: "published"
 msgid "recordSources.kind.published"
 msgstr "veröffentlicht"
+
+# en: "Published"
+msgid "cartridgeRecord.published"
+msgstr "Veröffentlicht"
 
 # en: "Quantity"
 msgid "fieldTable.column.quantity"
@@ -2000,6 +2212,10 @@ msgstr "Abgerufen"
 msgid "states.retry"
 msgstr "Erneut versuchen"
 
+# en: "Revised"
+msgid "cartridgeRecord.revised"
+msgstr "Überarbeitet"
+
 # en: "revolver"
 msgid "disciplines.rule.revolver"
 msgstr "Revolver"
@@ -2059,6 +2275,10 @@ msgstr "Vorhandene Patronen"
 # en: "Rounds short"
 msgid "matchRounds.short"
 msgstr "Fehlende Patronen"
+
+# en: "Rows"
+msgid "powderRecord.rows"
+msgstr "Zeilen"
 
 # en: "Rule book"
 msgid "disciplineRecord.ruleBook"
@@ -2240,6 +2460,10 @@ msgstr "Maße"
 msgid "disciplines.rule.sling"
 msgstr "mit Riemen"
 
+# en: "Slower ({unit})"
+msgid "powderRecord.slower"
+msgstr "Langsamer ({unit})"
+
 # en: "Small pistol"
 msgid "values.smallPistol"
 msgstr "Pistole, klein"
@@ -2313,12 +2537,24 @@ msgid "disciplines.row.support"
 msgstr "Auflage"
 
 # en: "Symbol"
+msgid "cartridgeRecord.symbol"
+msgstr "Symbol"
+
+# en: "Symbol"
 msgid "fieldTable.column.symbol"
 msgstr "Symbol"
 
 # en: "Symbol or name"
 msgid "fieldTable.searchSymbolOrName"
 msgstr "Symbol oder Name"
+
+# en: "Table"
+msgid "cartridgeRecord.table"
+msgstr "Tabelle"
+
+# en: "Table: the CIP table of the record, I to XI, by cartridge class"
+msgid "cartridgeRecord.meaning.table"
+msgstr "Tabelle: die CIP-Tabelle des Datensatzes, I bis XI, nach Patronenklasse"
 
 # en: "Target"
 msgid "disciplines.facet.face"
@@ -2476,6 +2712,14 @@ msgstr "Spitze"
 msgid "federationRecord.column.title"
 msgstr "Titel"
 
+# en: "Tolerance"
+msgid "cartridgeRecord.tolerance"
+msgstr "Toleranzen"
+
+# en: "Tolerance, clearance"
+msgid "cartridgeRecord.toleranceClearance"
+msgstr "Toleranzen, Spiel"
+
 # en: "Total"
 msgid "events.totalHeading"
 msgstr "Summe"
@@ -2499,6 +2743,10 @@ msgstr "Abzugsgewicht ab"
 # en: "Tune a powder"
 msgid "page.powdersTune"
 msgstr "Treibladungspulver abstimmen"
+
+# en: "Tune from strings"
+msgid "powderRecord.tuneFromStrings"
+msgstr "Aus Schussreihen abstimmen"
 
 # en: "Twist"
 msgid "firearms.column.twist"
@@ -2540,13 +2788,37 @@ msgstr "US-amerikanisch"
 msgid "bulletRecord.useInWorkbench"
 msgstr "In der Werkbank verwenden"
 
+# en: "Use in workbench"
+msgid "recordActions.useInWorkbench"
+msgstr "In der Werkbank verwenden"
+
+# en: "Value"
+msgid "cartridgeRecord.value"
+msgstr "Wert"
+
 # en: "Value"
 msgid "fieldTable.column.value"
 msgstr "Wert"
 
+# en: "Values missing: no burn values"
+msgid "powderRecord.valuesMissing"
+msgstr "Werte fehlen: keine Abbrandwerte"
+
 # en: "Values missing: the record only names the bullet"
 msgid "bulletRecord.valuesMissing"
 msgstr "Werte fehlen: Der Datensatz enthält vom Geschoss nur den Namen"
+
+# en: "Variant"
+msgid "cartridgeRecord.variant"
+msgstr "Variante"
+
+# en: "Variants"
+msgid "cartridgeRecord.variants"
+msgstr "Varianten"
+
+# en: "Variants table"
+msgid "cartridgeRecord.variantsTable"
+msgstr "Tabelle der Varianten"
 
 # en: "Velocity"
 msgid "units.quantity.velocity"
@@ -2579,3 +2851,7 @@ msgstr "Windgeschwindigkeit"
 # en: "Yes"
 msgid "primers.yes"
 msgstr "Ja"
+
+# en: "z1 {z}"
+msgid "powderRecord.z1"
+msgstr "z1 {z}"

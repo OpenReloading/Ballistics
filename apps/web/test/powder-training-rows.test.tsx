@@ -112,5 +112,11 @@ it('lists the load tables of a fit with their rows on the record page, and nothi
     ['Table A', '12'],
     ['Table B', 'n/a'],
   ])
-  expect(renderToStaticMarkup(<PowderFit powder={powder([fitted()])} />)).toBe('')
+  expect(
+    renderToStaticMarkup(
+      <I18nProvider i18n={linguiOf('en')}>
+        <PowderFit powder={powder([fitted()])} />
+      </I18nProvider>,
+    ),
+  ).toBe('')
 })

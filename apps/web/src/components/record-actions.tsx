@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Button,
@@ -23,7 +24,6 @@ import {
 } from 'lucide-react'
 import { type ReactNode, useId } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { TourButton } from './tour-button.tsx'
@@ -77,28 +77,28 @@ export function RecordActions({
   /** The Tour button of the record pages. */
   tour?: boolean
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const clipboard = useClipboard({ timeout: 2000 })
   return (
     <>
       {workbench && (
         <LinkButton href={workbench} icon={<FlaskConical aria-hidden="true" />} primary>
-          {t('Use in workbench')}
+          {i18n._({ id: 'recordActions.useInWorkbench', message: 'Use in workbench' })}
         </LinkButton>
       )}
       {groups && (
         <LinkButton href={groups} icon={<Target aria-hidden="true" />} primary>
-          {t('Open in shot groups')}
+          {i18n._({ id: 'recordActions.openInShotGroups', message: 'Open in shot groups' })}
         </LinkButton>
       )}
       {design && (
         <LinkButton href={design} icon={<Pencil aria-hidden="true" />}>
-          {t('Open in designer')}
+          {i18n._({ id: 'recordActions.openInDesigner', message: 'Open in designer' })}
         </LinkButton>
       )}
       {compare && (
         <LinkButton href={compare} icon={<ArrowLeftRight aria-hidden="true" />}>
-          {t('Compare')}
+          {i18n._({ id: 'recordActions.compare', message: 'Compare' })}
         </LinkButton>
       )}
       {more}
@@ -106,12 +106,16 @@ export function RecordActions({
       <UnitsIconButton />
       {/* the name stays, so a copy moves nothing */}
       <Tooltip
-        label={clipboard.copied ? t('Link copied') : t('Copy link')}
+        label={
+          clipboard.copied
+            ? i18n._({ id: 'recordActions.linkCopied', message: 'Link copied' })
+            : i18n._({ id: 'recordActions.copyLink', message: 'Copy link' })
+        }
         {...(clipboard.copied && { opened: true })}
       >
         <ActionIcon
           variant="default"
-          aria-label={t('Copy link')}
+          aria-label={i18n._({ id: 'recordActions.copyLink', message: 'Copy link' })}
           onClick={() => clipboard.copy(window.location.href)}
         >
           <LinkIcon aria-hidden="true" />
@@ -125,10 +129,14 @@ export function RecordActions({
 
 /** Hidden live region beside a Copy link button: says the result of a copy, empty otherwise. */
 export function CopyStatus({ copied, error }: { copied: boolean; error: Error | null }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <span role="status" className="visually-hidden">
-      {copied ? t('Link copied') : error ? t('Copy failed') : ''}
+      {copied
+        ? i18n._({ id: 'recordActions.linkCopied', message: 'Link copied' })
+        : error
+          ? i18n._({ id: 'recordActions.copyFailed', message: 'Copy failed' })
+          : ''}
     </span>
   )
 }
@@ -144,15 +152,19 @@ export function PrintButton({
   disabled?: string | false | undefined
   hint?: string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const why = useId()
   const label = disabled || hint
   return (
     <>
-      <Tooltip label={label ?? t('Print')} multiline={!!label} maw={label ? 320 : undefined}>
+      <Tooltip
+        label={label ?? i18n._({ id: 'recordActions.print', message: 'Print' })}
+        multiline={!!label}
+        maw={label ? 320 : undefined}
+      >
         <ActionIcon
           variant="default"
-          aria-label={t('Print')}
+          aria-label={i18n._({ id: 'recordActions.print', message: 'Print' })}
           // aria-disabled, not disabled: a disabled button shows no tooltip and takes no focus
           {...(disabled && {
             'data-disabled': true,
@@ -178,14 +190,14 @@ const shortDigits = 12
 
 /** A source file's hash, short, as a button that copies it; the full value on hover or focus. */
 export function CopyHash({ hash }: { hash: string }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <span className="hash">
       SHA-256{' '}
       <CopyButton value={hash} timeout={2000}>
         {({ copied, copy }) => (
           <Tooltip
-            label={copied ? t('Copied') : hash}
+            label={copied ? i18n._({ id: 'recordActions.copied', message: 'Copied' }) : hash}
             events={tipEvents}
             multiline
             classNames={{ tooltip: 'hash-tooltip' }}
@@ -194,8 +206,12 @@ export function CopyHash({ hash }: { hash: string }) {
               className="hash-copy"
               aria-label={
                 copied
-                  ? t('Hash copied')
-                  : t('Copy hash {hash}', { hash: hash.slice(0, shortDigits) })
+                  ? i18n._({ id: 'recordActions.hashCopied', message: 'Hash copied' })
+                  : i18n._({
+                      id: 'recordActions.copyHash',
+                      message: 'Copy hash {hash}',
+                      values: { hash: hash.slice(0, shortDigits) },
+                    })
               }
               onClick={copy}
             >
@@ -219,7 +235,7 @@ export function CopyHash({ hash }: { hash: string }) {
 
 /** A drawing's legend and assumptions behind a button, so the figure keeps its height. */
 export function DrawingNotes({ notes }: { notes: string[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <AppPopover width={popoverWidth.notes} position="bottom-start" withArrow trapFocus>
       <Popover.Target>
@@ -229,7 +245,7 @@ export function DrawingNotes({ notes }: { notes: string[] }) {
           leftSection={<Info aria-hidden="true" />}
           className="screen-only"
         >
-          {t('Drawing notes')}
+          {i18n._({ id: 'recordActions.drawingNotes', message: 'Drawing notes' })}
         </Button>
       </Popover.Target>
       <Popover.Dropdown className="drawing-notes">

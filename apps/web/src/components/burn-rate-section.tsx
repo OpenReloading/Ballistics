@@ -1,10 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { Powder } from '@rangefoundry/schema'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
 import {
   classifyPowder,
   isFitted,
@@ -14,7 +14,7 @@ import {
 } from '../lib/burn-rate.ts'
 import type { ManufacturerNames } from '../lib/manufacturers.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
-import { sayOwn, verbatim, worded } from '../lib/wording.ts'
+import { sayOwn, verbatim } from '../lib/wording.ts'
 import { Decimal } from './decimal.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
@@ -35,7 +35,7 @@ export interface BurnRatePlace {
 
 /** A neighbor list: the unit of the mean vivacities once, in the heading. */
 function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <div>
       <h3 className="record-heading">{title}</h3>
@@ -45,7 +45,11 @@ function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
             <li key={r.id} value={r.order}>
               <Link
                 href={`/powders/${encodeURIComponent(r.id)}`}
-                title={t('{label}, burn-rate order {order}', { label: r.label, order: r.order })}
+                title={i18n._({
+                  id: 'powderRecord.neighbor',
+                  message: '{label}, burn-rate order {order}',
+                  values: { label: r.label, order: r.order },
+                })}
               >
                 {r.label}
               </Link>
@@ -58,7 +62,7 @@ function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
           ))}
         </ol>
       ) : (
-        <p>{t('None')}</p>
+        <p>{i18n._({ id: 'powderRecord.none', message: 'None' })}</p>
       )}
     </div>
   )
@@ -75,6 +79,7 @@ export function BurnRateSummary({
   names: ManufacturerNames
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const p = classifyPowder(powder, names)
   const n2 = (x: number) => formatNumber(x, 2)
   const m = isFitted(p) ? meanRate(p) : undefined
@@ -82,30 +87,41 @@ export function BurnRateSummary({
   const rows: FieldRow[] = isFitted(p)
     ? [
         {
-          label: msg('Mean vivacity'),
+          label: /*i18n*/ { id: 'powderRecord.meanVivacity', message: 'Mean vivacity' },
           text: `${n2(m?.value ?? 0)}${m?.low === undefined || m.high === undefined ? '' : ` (${n2(m.low)} to ${n2(m.high)})`}`,
           words:
             m?.low === undefined || m.high === undefined
               ? [verbatim(n2(m?.value ?? 0))]
               : [
-                  worded(msg('{value} ({low} to {high})'), {
-                    value: n2(m.value),
-                    low: n2(m.low),
-                    high: n2(m.high),
-                  }),
+                  /*i18n*/ {
+                    id: 'powderRecord.meanInterval',
+                    message: '{value} ({low} to {high})',
+                    values: { value: n2(m.value), low: n2(m.low), high: n2(m.high) },
+                  },
                 ],
           unit: vivacityUnit,
           numeric: true as const,
-          method: msg('Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval.'),
+          method: /*i18n*/ {
+            id: 'powderRecord.meanMethod',
+            message: 'Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval.',
+          },
         },
       ]
     : []
   return (
-    <Panel id="burn-rate" title={msg('Burn rate (model output)')} translated>
+    <Panel
+      id="burn-rate"
+      title={/*i18n*/ { id: 'powderRecord.burnRate', message: 'Burn rate (model output)' }}
+      translated
+    >
       {isFitted(p) ? (
         <>
           <div className="burn-rate-body">
-            <FieldTable caption={msg('Burn rate')} labelledBy="burn-rate" groups={[{ rows }]} />
+            <FieldTable
+              caption={/*i18n*/ { id: 'powderRecord.burnRateTable', message: 'Burn rate' }}
+              labelledBy="burn-rate"
+              groups={[{ rows }]}
+            />
             {place && m && (
               <div className="burn-scale">
                 <RateTicks domain={place.domain} />
@@ -117,17 +133,27 @@ export function BurnRateSummary({
           {place && place.faster.length + place.slower.length > 0 && (
             <div className="burn-neighbours">
               <Neighbours
-                title={t('Faster ({unit})', { unit: vivacityUnit })}
+                title={i18n._({
+                  id: 'powderRecord.faster',
+                  message: 'Faster ({unit})',
+                  values: { unit: vivacityUnit },
+                })}
                 rows={place.faster}
               />
               <Neighbours
-                title={t('Slower ({unit})', { unit: vivacityUnit })}
+                title={i18n._({
+                  id: 'powderRecord.slower',
+                  message: 'Slower ({unit})',
+                  values: { unit: vivacityUnit },
+                })}
                 rows={place.slower}
               />
               <p className="record-note">
-                {t(
-                  'A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder.',
-                )}
+                {i18n._({
+                  id: 'powderRecord.neighborNote',
+                  message:
+                    'A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder.',
+                })}
               </p>
             </div>
           )}
