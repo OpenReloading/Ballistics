@@ -77,37 +77,7 @@ test('the chart readout slider follows the keys and a value change, and is clear
   await expect(readout).toHaveValue('0')
 })
 
-test('TEMPORARY proof: the band arriving after the run keeps the vivacity chart tooltip', async ({
-  page,
-}) => {
-  await page.addInitScript(() => {
-    const w = window as unknown as { removedFromVivacity: string[] }
-    w.removedFromVivacity = []
-    new MutationObserver((records) => {
-      for (const r of records)
-        for (const n of r.removedNodes)
-          if (r.target instanceof Element && r.target.matches('.vivacity-chart [role="img"]'))
-            w.removedFromVivacity.push(n.nodeName)
-    }).observe(document, { childList: true, subtree: true })
-  })
-  await runSavedLoad(page)
-  const before = await page.evaluate(() => {
-    const w = window as unknown as { removedFromVivacity: string[] }
-    const was = w.removedFromVivacity.length
-    w.removedFromVivacity = []
-    return was
-  })
-  console.log(`removed before the run settled: ${before}`)
-  await expect(page.getByText(/5th to 95th percentile/).first()).toBeAttached({ timeout: 15_000 })
-  await page.waitForTimeout(1000)
-  const removed = await page.evaluate(
-    () => (window as unknown as { removedFromVivacity: string[] }).removedFromVivacity,
-  )
-  expect(removed).toEqual([])
-})
-
-for (const n of Array.from({ length: 30 }, (_, i) => i))
-test(`Escape hides the chart tooltip with the pointer or the focus where it is ${n}`, async ({
+test('Escape hides the chart tooltip with the pointer or the focus where it is', async ({
   page,
 }) => {
   await runSavedLoad(page)
