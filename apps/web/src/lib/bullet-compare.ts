@@ -9,7 +9,8 @@ import {
   bulletFigureModel,
   bulletScreenEm,
 } from '@rangefoundry/svg-drawings/bullet'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/bullet-compare.json' with { type: 'json' }
 import {
   ballisticCoefficientRows,
   bulletDataGroups,
@@ -21,6 +22,8 @@ import {
 } from './record-fields.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 import type { LinguiWording } from './wording.ts'
+
+loadEnglish(englishMessages)
 
 /** A row of the comparison: one value per bullet as shown in the preset, undefined where absent. */
 interface CompareRow {

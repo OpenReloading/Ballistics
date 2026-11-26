@@ -5,10 +5,14 @@ import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantin
 import { FunnelX, Info, OctagonExclamationPoint, TriangleExclamationPoint } from 'lucide-react'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
 import { useRouter } from '@/platform/navigation.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import type { Message as Marked } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/states.json' with { type: 'json' }
 import { LibraryTabs } from './library-tabs.tsx'
 import { PageBar } from './page-bar.tsx'
+
+loadEnglish(englishMessages)
 
 /** The one empty state of the app: nothing to show yet, and the action that adds it. */
 export function EmptyNote({

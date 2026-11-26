@@ -1,7 +1,11 @@
 import { millerStability, type Projectile } from '@rangefoundry/ballistics'
 import { type Bullet, baseTypes, fromSi, toSi } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/bullet.json' with { type: 'json' }
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
+
+loadEnglish(englishMessages)
 
 /** The bullet values a load may type over its record, by the keys of `analysis.overrides`. */
 const bulletValueKeys = [

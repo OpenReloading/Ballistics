@@ -1,0 +1,1508 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-11-26 10:55+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: de\n"
+
+# en: "{field} must be at least 0."
+msgid "refusal.valueNegative"
+msgstr "{field} muss mindestens 0 betragen."
+
+# en: "{file}.json answered {status}"
+msgid "coreMessage.request.fileStatus"
+msgstr "{file}.json antwortete mit {status}"
+
+# en: "{input}: standardUncertainty must be 0 or above"
+msgid "refusal.inputUncertaintyNegative"
+msgstr "{input}: standardUncertainty muss 0 oder größer sein"
+
+# en: "{kind} {id} not found"
+msgid "refusal.recordNotFound"
+msgstr "{kind} {id} nicht gefunden"
+
+# en: "{kind} range"
+msgid "refusal.entryRangeInvalid"
+msgstr "Entfernung ({kind}) ungültig"
+
+# en: "{kind} rounding must not be negative"
+msgid "refusal.entryRoundingNegative"
+msgstr "{kind} rounding darf nicht negativ sein"
+
+# en: "{kind} shotCount must be a whole number of at least 1"
+msgid "refusal.entryShotCountInvalid"
+msgstr "{kind} shotCount muss eine ganze Zahl von mindestens 1 sein"
+
+# en: "{kind} standardDeviation must be positive"
+msgid "refusal.entryStandardDeviationNotPositive"
+msgstr "{kind} standardDeviation muss positiv sein"
+
+# en: "{n} of {m} range cases could not be computed ({list}); the range covers only the computed cases, and the true range can be wider."
+msgid "coreMessage.warning.rangeIncomplete"
+msgstr "{n} von {m} Fällen des Druckbereichs konnten nicht berechnet werden ({list}); der Bereich deckt nur die berechneten Fälle ab, der wahre Bereich kann breiter sein."
+
+# en: "{name} has no CIP Pmax measured by transducer or piezo. Crusher values are not compared with a simulated pressure."
+msgid "coreMessage.warning.noComparableLimit"
+msgstr "{name} hat kein CIP-Pmax, das mit mechanisch-elektrischem Wandler oder Piezo-Messquarz gemessen wurde. Werte des Kupferstauchzylinders werden nicht mit einem simulierten Druck verglichen."
+
+# en: "{name} must be finite"
+msgid "refusal.coefficientNotFinite"
+msgstr "{name} muss endlich sein"
+
+# en: "{name} table Mach must rise"
+msgid "refusal.coefficientTableMachNotRising"
+msgstr "Die Machzahlen der Tabelle {name} müssen steigen"
+
+# en: "{name} table needs at least two nodes"
+msgid "refusal.coefficientTableTooShort"
+msgstr "Die Tabelle {name} braucht mindestens zwei Stützstellen"
+
+# en: "{name} table node"
+msgid "refusal.coefficientTableNodeInvalid"
+msgstr "Stützstelle der Tabelle {name} ungültig"
+
+# en: "{path} not found"
+msgid "coreMessage.request.notFound"
+msgstr "{path} nicht gefunden"
+
+# en: "a curve fit needs a vivacity burn law with a two-stage form"
+msgid "refusal.curveFitNeedsTwoStageVivacity"
+msgstr "Eine Kurvenanpassung braucht ein Abbrandgesetz mit vivacity und zweistufiger Form"
+
+# en: "A data file did not load or the computation failed. Check the connection and retry."
+msgid "coreMessage.request.failed"
+msgstr "Eine Datendatei wurde nicht geladen oder die Berechnung ist fehlgeschlagen. Prüfen Sie die Verbindung und versuchen Sie es erneut."
+
+# en: "a drag curve needs at least two nodes"
+msgid "refusal.dragCurveTooShort"
+msgstr "Eine Kurve des Luftwiderstands braucht mindestens zwei Stützstellen"
+
+# en: "a ladder around the charge needs an odd count"
+msgid "refusal.ladderAroundNeedsOddCount"
+msgstr "Ein Ladeleiter um die Treibladung braucht eine ungerade Anzahl"
+
+# en: "a ladder around the charge needs an odd number of steps"
+msgid "coreMessage.answer.oddSteps"
+msgstr "Ein Ladeleiter um die Treibladung braucht eine ungerade Zahl von Schritten"
+
+# en: "a ladder needs at least three charges"
+msgid "refusal.ladderTooFewCharges"
+msgstr "Eine Ladeleiter braucht mindestens drei Treibladungen"
+
+# en: "a ladder needs at least two strings"
+msgid "refusal.ladderTooFewStrings"
+msgstr "Ein Ladeleiter braucht mindestens zwei Schussreihen"
+
+# en: "a missing moment of inertia needs the length"
+msgid "refusal.inertiaNeedsLength"
+msgstr "Ein fehlendes Trägheitsmoment braucht die Länge"
+
+# en: "a missing momentSlope needs the length"
+msgid "refusal.momentSlopeNeedsLength"
+msgstr "Ein fehlendes momentSlope braucht die Länge"
+
+# en: "a prior needs its parameter in parameters"
+msgid "refusal.priorParameterNotFitted"
+msgstr "Ein prior braucht seinen Parameter in parameters"
+
+# en: "a prior needs its powder in the sessions"
+msgid "refusal.priorPowderNotInSessions"
+msgstr "Ein prior braucht sein Treibladungspulver in den Sitzungen"
+
+# en: "A user record is not on the server, name a catalogue record"
+msgid "coreMessage.answer.userRecord"
+msgstr "Ein eigener Datensatz liegt nicht auf dem Server, geben Sie den Namen eines Katalogdatensatzes an"
+
+# en: "a zeroOffset prior needs the fitZeroOffset option"
+msgid "refusal.zeroOffsetPriorWithoutFit"
+msgstr "Ein prior für zeroOffset braucht die Option fitZeroOffset"
+
+# en: "aboveRange"
+msgid "coreMessage.code.aboveRange"
+msgstr "über dem Bereich"
+
+# en: "aim must be finite"
+msgid "refusal.aim"
+msgstr "Der Haltepunkt muss endlich sein"
+
+# en: "all compute workers are busy"
+msgid "coreMessage.request.workersBusy"
+msgstr "Alle Rechenprozesse sind ausgelastet"
+
+# en: "altitude {altitude} m outside {low} to {high} m"
+msgid "refusal.altitudeOutsideRange"
+msgstr "Höhenlage {altitude} m außerhalb von {low} bis {high} m"
+
+# en: "apex"
+msgid "coreMessage.code.apex"
+msgstr "Scheitelpunkt"
+
+# en: "at least one BC band"
+msgid "refusal.noBcBand"
+msgstr "Mindestens ein BC-Band"
+
+# en: "at least one candidate"
+msgid "refusal.noCandidate"
+msgstr "Mindestens ein Kandidat"
+
+# en: "at least one entry or a chronograph"
+msgid "refusal.noEntryOrChronograph"
+msgstr "Mindestens ein Eintrag oder ein Chronograph"
+
+# en: "at least one held-out string"
+msgid "refusal.noHeldOutString"
+msgstr "Mindestens eine zurückgehaltene Schussreihe"
+
+# en: "at least one ladder point"
+msgid "refusal.noLadderPoint"
+msgstr "Mindestens ein Punkt des Ladeleiters"
+
+# en: "at least one ladder point per session"
+msgid "refusal.sessionWithoutLadderPoint"
+msgstr "Mindestens ein Punkt des Ladeleiters je Sitzung"
+
+# en: "at least one observation"
+msgid "refusal.noObservation"
+msgstr "Mindestens eine Beobachtung"
+
+# en: "at least one observation per session"
+msgid "refusal.sessionWithoutObservation"
+msgstr "Mindestens eine Beobachtung je Sitzung"
+
+# en: "at least one point"
+msgid "refusal.noPoint"
+msgstr "Mindestens ein Punkt"
+
+# en: "at least one session"
+msgid "refusal.noSession"
+msgstr "Mindestens eine Sitzung"
+
+# en: "at least one tolerance must be above 0"
+msgid "coreMessage.answer.tolerance"
+msgstr "Mindestens eine der Toleranzen muss größer als 0 sein"
+
+# en: "at least one trace"
+msgid "refusal.noTrace"
+msgstr "mindestens eine Messkurve"
+
+# en: "at least two knots"
+msgid "refusal.knotsTooFew"
+msgstr "Mindestens zwei Knoten"
+
+# en: "atmosphere"
+msgid "coreMessage.code.atmosphere"
+msgstr "Atmosphärengrenze"
+
+# en: "azimuth"
+msgid "refusal.azimuthInvalid"
+msgstr "Azimut ungültig"
+
+# en: "bandDiameter must be at least the diameter"
+msgid "refusal.bandDiameterBelowDiameter"
+msgstr "bandDiameter muss mindestens dem Durchmesser entsprechen"
+
+# en: "barrel {barrel} m must be a positive number"
+msgid "refusal.barrelNotPositive"
+msgstr "Die Lauflänge {barrel} m muss eine positive Zahl sein"
+
+# en: "barrel length and temperature per session"
+msgid "refusal.barrelOrTemperatureOnPoint"
+msgstr "Lauflänge und Temperatur je Sitzung"
+
+# en: "barrelLength must be positive"
+msgid "refusal.barrelLengthNotPositive"
+msgstr "barrelLength muss positiv sein"
+
+# en: "baseDiameter must be positive"
+msgid "refusal.baseDiameterNotPositive"
+msgstr "baseDiameter muss positiv sein"
+
+# en: "BC band"
+msgid "refusal.bcBandInvalid"
+msgstr "BC-Band ungültig"
+
+# en: "BC bands need distinct speeds"
+msgid "refusal.bcBandsSameSpeed"
+msgstr "BC-Bänder brauchen verschiedene Geschwindigkeiten"
+
+# en: "BC reference {reference}"
+msgid "refusal.bcReferenceUnknown"
+msgstr "BC-Bezug {reference} unbekannt"
+
+# en: "belowRange"
+msgid "coreMessage.code.belowRange"
+msgstr "unter dem Bereich"
+
+# en: "boatTailLength must be zero or more"
+msgid "refusal.boatTailLengthNegative"
+msgstr "boatTailLength muss 0 oder größer sein"
+
+# en: "Body is not valid JSON"
+msgid "coreMessage.request.notJson"
+msgstr "Der Inhalt ist kein gültiges JSON"
+
+# en: "bore angles"
+msgid "refusal.boreAnglesInvalid"
+msgstr "Höhen- und Seitenwinkel der Laufachse ungültig"
+
+# en: "boreDiameter must be positive"
+msgid "refusal.boreDiameterNotPositive"
+msgstr "boreDiameter muss positiv sein"
+
+# en: "bracketFailed"
+msgid "coreMessage.code.bracketFailed"
+msgstr "kein Paar benachbarter Ladungen schließt das Ziel ein"
+
+# en: "Bulk density"
+msgid "coreMessage.label.bulkDensity"
+msgstr "Schüttgewicht"
+
+# en: "bulk density must be above 0"
+msgid "refusal.bulkDensityNotPositive"
+msgstr "Das Schüttgewicht muss größer als 0 sein"
+
+# en: "bullet {bullet} {key} {value} {unit} must be within {low} and {high} {unit}"
+msgid "refusal.bulletValueOutOfBounds"
+msgstr "Geschoss {bullet}: {key} {value} {unit} muss zwischen {low} und {high} {unit} liegen"
+
+# en: "bullet {bullet} has {count} {model} values without distinct velocity bands; send drag explicitly"
+msgid "refusal.bulletCoefficientsWithoutBands"
+msgstr "Geschoss {bullet} hat {count} Werte für {model} ohne verschiedene Geschwindigkeitsbänder; den Luftwiderstand ausdrücklich übergeben"
+
+# en: "bullet {bullet} has no {model} ballistic coefficient"
+msgid "refusal.bulletWithoutCoefficient"
+msgstr "Geschoss {bullet} hat keinen Ballistischen Koeffizienten für {model}"
+
+# en: "bullet {bullet} has no diameter"
+msgid "refusal.bulletWithoutDiameter"
+msgstr "Geschoss {bullet} hat keinen Durchmesser"
+
+# en: "bullet {bullet} has no length"
+msgid "refusal.bulletWithoutLength"
+msgstr "Geschoss {bullet} hat keine Länge"
+
+# en: "Bullet diameter"
+msgid "coreMessage.label.bulletDiameter"
+msgstr "Geschossdurchmesser"
+
+# en: "burn coefficient and energy must be positive"
+msgid "refusal.burnCoefficientOrEnergyNotPositive"
+msgstr "Abbrandkoeffizient und Energie müssen positiv sein"
+
+# en: "Burn form: {missing} needed with the others, or leave all four empty."
+msgid "refusal.burnFormPartial"
+msgstr "Abbrandform: {missing} zusammen mit den anderen angeben oder alle vier leer lassen."
+
+# en: "busy"
+msgid "coreMessage.code.busy"
+msgstr "ausgelastet"
+
+# en: "Caliber"
+msgid "coreMessage.label.caliber"
+msgstr "Kaliber"
+
+# en: "Case length"
+msgid "coreMessage.label.caseLength"
+msgstr "Hülsenlänge"
+
+# en: "case-contact"
+msgid "coreMessage.method.caseContact"
+msgstr "Wandler am Hülsenkörper"
+
+# en: "chamberVolume"
+msgid "coreMessage.code.chamberVolume"
+msgstr "Ladung passt nicht in das Patronenlager"
+
+# en: "Charge mass must not be negative."
+msgid "refusal.chargeMassNegative"
+msgstr "Die Masse der Treibladung darf nicht negativ sein."
+
+# en: "charge must be positive"
+msgid "refusal.chargeNotPositive"
+msgstr "Die Treibladung muss positiv sein"
+
+# en: "charge solver: {reason}"
+msgid "coreMessage.answer.chargeSolver"
+msgstr "Ladungssuche: {reason}"
+
+# en: "charge too small for the model"
+msgid "coreMessage.advisory.chargeTooSmall"
+msgstr "Treibladung zu klein für das Modell"
+
+# en: "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the ignition pressure ({hold}); results are outside the range the model was built for."
+msgid "coreMessage.warning.chargeTooSmallIgnition"
+msgstr "Treibladung zu klein für das Modell: Der simulierte höchste mittlere Druck, {p}, liegt unter dem {ratio}-Fachen des Zünddrucks ({hold}); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde."
+
+# en: "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the start pressure ({hold}); results are outside the range the model was built for."
+msgid "coreMessage.warning.chargeTooSmall"
+msgstr "Treibladung zu klein für das Modell: Der simulierte höchste mittlere Druck, {p}, liegt unter dem {ratio}-Fachen des Startdrucks ({hold}); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde."
+
+# en: "charges must differ"
+msgid "refusal.chargesEqual"
+msgstr "Die Treibladungen müssen sich unterscheiden"
+
+# en: "chronograph mean"
+msgid "refusal.chronographMeanInvalid"
+msgstr "Mittelwert des Chronographen ungültig"
+
+# en: "click value must be positive"
+msgid "refusal.clickValueNotPositive"
+msgstr "Der Klickwert muss positiv sein"
+
+# en: "collinear"
+msgid "coreMessage.code.collinear"
+msgstr "kollinear"
+
+# en: "computation did not finish within {ms} ms"
+msgid "coreMessage.request.tooSlow"
+msgstr "Die Berechnung wurde nicht innerhalb von {ms} ms fertig"
+
+# en: "compute pool closed"
+msgid "coreMessage.request.poolClosed"
+msgstr "Der Rechenpool ist geschlossen"
+
+# en: "compute worker exited"
+msgid "coreMessage.request.workerExited"
+msgstr "Der Rechenprozess wurde beendet"
+
+# en: "compute worker failed"
+msgid "coreMessage.request.workerFailed"
+msgstr "Der Rechenprozess ist fehlgeschlagen"
+
+# en: "confidence level must lie in (0, 1)"
+msgid "refusal.confidenceLevelOutsideUnit"
+msgstr "Das Konfidenzniveau muss in (0, 1) liegen"
+
+# en: "confidence level must lie in (0, 1)"
+msgid "refusal.confidenceLevel"
+msgstr "Das Konfidenzniveau muss in (0, 1) liegen"
+
+# en: "confidenceLevel must lie in (0, 1)"
+msgid "refusal.confidenceLevelOptionOutsideUnit"
+msgstr "confidenceLevel muss in (0, 1) liegen"
+
+# en: "count must be a positive integer"
+msgid "refusal.countNotPositiveInteger"
+msgstr "count muss eine positive ganze Zahl sein"
+
+# en: "coverage must lie in (0, 1)"
+msgid "refusal.coverage"
+msgstr "Die Abdeckung muss in (0, 1) liegen"
+
+# en: "crusher"
+msgid "coreMessage.method.crusher"
+msgstr "Kupferstauchzylinder"
+
+# en: "degrees of freedom must be a positive whole number"
+msgid "refusal.degreesOfFreedomNotPositiveWhole"
+msgstr "Die Freiheitsgrade müssen eine positive ganze Zahl sein"
+
+# en: "degrees of freedom must be positive"
+msgid "refusal.degreesOfFreedomNotPositive"
+msgstr "Die Freiheitsgrade müssen positiv sein"
+
+# en: "Diameter"
+msgid "coreMessage.label.diameter"
+msgstr "Durchmesser"
+
+# en: "diameter must be positive"
+msgid "refusal.diameterNotPositive"
+msgstr "Der Durchmesser muss positiv sein"
+
+# en: "dispersion must be positive"
+msgid "refusal.dispersionNotPositive"
+msgstr "Die Streuung muss positiv sein"
+
+# en: "distance {distance} m not reached ({stop})"
+msgid "refusal.distanceNotReached"
+msgstr "Entfernung {distance} m nicht erreicht ({stop})"
+
+# en: "distance must be positive"
+msgid "refusal.distance"
+msgstr "Die Entfernung muss positiv sein"
+
+# en: "distance must not be negative"
+msgid "refusal.distanceNegative"
+msgstr "Die Entfernung darf nicht negativ sein"
+
+# en: "domainMargin must lie in [0, 1)"
+msgid "refusal.domainMarginOutsideRange"
+msgstr "domainMargin muss in [0, 1) liegen"
+
+# en: "done"
+msgid "coreMessage.code.done"
+msgstr "abgeschlossen"
+
+# en: "drag curve Mach must rise"
+msgid "refusal.dragCurveMachNotRising"
+msgstr "Die Machzahlen der Kurve des Luftwiderstands müssen steigen"
+
+# en: "drag curve node"
+msgid "refusal.dragCurveNodeInvalid"
+msgstr "Stützstelle der Kurve des Luftwiderstands ungültig"
+
+# en: "drag interpolation {interpolation}"
+msgid "refusal.dragInterpolationUnknown"
+msgstr "Interpolation des Luftwiderstands {interpolation} unbekannt"
+
+# en: "drag model {model}"
+msgid "refusal.dragModelUnknown"
+msgstr "Modell des Luftwiderstands {model} unbekannt"
+
+# en: "dynamic vivacity: exponent must be 1"
+msgid "refusal.dynamicVivacityExponentNotOne"
+msgstr "dynamic vivacity: Der Exponent muss 1 sein"
+
+# en: "dynamic vivacity: need 0 <= from < to <= 1"
+msgid "refusal.dynamicVivacityRangeInvalid"
+msgstr "dynamic vivacity: Es muss 0 <= from < to <= 1 gelten"
+
+# en: "each charge needs at least two shots"
+msgid "refusal.chargeTooFewShots"
+msgstr "Jede Treibladung braucht mindestens zwei Schüsse"
+
+# en: "each shot needs a height and a velocity"
+msgid "refusal.shotWithoutHeightOrVelocity"
+msgstr "Jeder Schuss braucht eine Höhe und eine Geschwindigkeit"
+
+# en: "each string needs at least two shots"
+msgid "refusal.stringTooFewShots"
+msgstr "Jede Schussreihe braucht mindestens zwei Schüsse"
+
+# en: "energy"
+msgid "coreMessage.method.energy"
+msgstr "Energie"
+
+# en: "Enter a number for {field}."
+msgid "refusal.valueMissing"
+msgstr "Geben Sie eine Zahl für {field} ein."
+
+# en: "Enter a number."
+msgid "refusal.valueNotNumber"
+msgstr "Geben Sie eine Zahl ein."
+
+# en: "entry kind {kind}"
+msgid "refusal.entryKindUnknown"
+msgstr "Unbekannte Art des Eintrags: {kind}"
+
+# en: "entry value"
+msgid "refusal.entryValueInvalid"
+msgstr "Wert des Eintrags ungültig"
+
+# en: "Error {status}."
+msgid "coreMessage.request.error"
+msgstr "Fehler {status}."
+
+# en: "every string needs at least one velocity"
+msgid "refusal.stringWithoutVelocity"
+msgstr "Jede Schussreihe braucht mindestens eine Geschwindigkeit"
+
+# en: "exponent needs a start value above 0"
+msgid "refusal.exponentStartNotPositive"
+msgstr "exponent braucht einen Startwert über 0"
+
+# en: "fallFraction must lie in (0, 1)"
+msgid "refusal.fallFractionOutsideUnit"
+msgstr "fallFraction muss in (0, 1) liegen"
+
+# en: "Firearm mass must be positive."
+msgid "refusal.firearmMassNotPositive"
+msgstr "Die Masse der Schusswaffe muss positiv sein."
+
+# en: "fit-failed"
+msgid "coreMessage.code.fitFailed"
+msgstr "Anpassung fehlgeschlagen"
+
+# en: "formSlope needs a start value above 0"
+msgid "refusal.formSlopeStartNotPositive"
+msgstr "formSlope braucht einen Startwert über 0"
+
+# en: "Gas velocity factor must not be negative."
+msgid "refusal.gasVelocityFactorNegative"
+msgstr "Der Gasgeschwindigkeitsfaktor darf nicht negativ sein."
+
+# en: "Give a load or factory ammunition, not both."
+msgid "coreMessage.schema.loadOrFactory"
+msgstr "Geben Sie eine Laborierung oder Fabrikmunition an, nicht beides."
+
+# en: "Grain form"
+msgid "coreMessage.label.grainForm"
+msgstr "Kornform"
+
+# en: "gravity"
+msgid "refusal.gravityInvalid"
+msgstr "Erdbeschleunigung ungültig"
+
+# en: "group {group}: an impact and a dial entry share their shots, keep one or name two groups"
+msgid "refusal.groupSharesShots"
+msgstr "Gruppe {group}: Ein Eintrag der Art impact und einer der Art dial teilen sich ihre Schüsse, einen davon behalten oder zwei Gruppen mit Namen anlegen"
+
+# en: "group {range} m: an impact and a dial entry share their shots, keep one or name two groups"
+msgid "refusal.rangeGroupSharesShots"
+msgstr "Gruppe {range} m: Ein Eintrag der Art impact und einer der Art dial teilen sich ihre Schüsse, einen davon behalten oder zwei Gruppen mit Namen anlegen"
+
+# en: "gyration radius ignored"
+msgid "coreMessage.advisory.gyrationRadiusIgnored"
+msgstr "Trägheitsradius ignoriert"
+
+# en: "headShape must be from 0 to 1"
+msgid "refusal.headShapeOutsideUnit"
+msgstr "headShape muss zwischen 0 und 1 liegen"
+
+# en: "heights and velocities must be finite"
+msgid "refusal.heightsOrVelocitiesNotFinite"
+msgstr "Höhen und Geschwindigkeiten müssen endlich sein"
+
+# en: "huberThreshold must be positive"
+msgid "refusal.huberThresholdNotPositive"
+msgstr "huberThreshold muss positiv sein"
+
+# en: "humidity {humidity} outside 0..1"
+msgid "refusal.humidityOutsideUnit"
+msgstr "Luftfeuchte {humidity} außerhalb von 0..1"
+
+# en: "ill-conditioned"
+msgid "coreMessage.code.illConditioned"
+msgstr "schlecht konditioniert"
+
+# en: "imprecise"
+msgid "coreMessage.code.imprecise"
+msgstr "ungenau"
+
+# en: "inconsistent"
+msgid "coreMessage.code.inconsistent"
+msgstr "widersprüchlich"
+
+# en: "input"
+msgid "coreMessage.code.input"
+msgstr "Eingabewert außerhalb des Modells"
+
+# en: "integration"
+msgid "coreMessage.code.integration"
+msgstr "Berechnung nicht konvergiert"
+
+# en: "interior: {reason}"
+msgid "coreMessage.answer.interior"
+msgstr "Innenballistik: {reason}"
+
+# en: "internal server error"
+msgid "coreMessage.request.internal"
+msgstr "Interner Serverfehler"
+
+# en: "invalid"
+msgid "coreMessage.code.invalid"
+msgstr "ungültig"
+
+# en: "knot Mach must be positive"
+msgid "refusal.knotMachNotPositive"
+msgstr "Die Machzahl eines Knotens muss positiv sein"
+
+# en: "knots must rise"
+msgid "refusal.knotsNotRising"
+msgstr "Die Knoten müssen steigen"
+
+# en: "knots need a single-band BC or a curve"
+msgid "refusal.knotsNeedSingleBandOrCurve"
+msgstr "Die Knoten brauchen einen BC mit einem Band oder eine Kurve"
+
+# en: "ladder charge {charge} g must be above 0"
+msgid "refusal.ladderChargeNotAboveZero"
+msgstr "Die Treibladung {charge} g des Ladeleiters muss größer als 0 sein"
+
+# en: "ladder charge {charge} kg must be above 0"
+msgid "refusal.ladderLowestChargeNotPositive"
+msgstr "Die Treibladung {charge} kg des Ladeleiters muss größer als 0 sein"
+
+# en: "ladder charge and velocity positive"
+msgid "refusal.ladderChargeOrVelocityNotPositive"
+msgstr "Treibladung und Geschwindigkeit des Ladeleiters positiv"
+
+# en: "ladder charge must be positive"
+msgid "refusal.ladderChargeNotPositive"
+msgstr "Die Treibladung des Ladeleiters muss positiv sein"
+
+# en: "ladder output of {n} points is above {max}: fewer steps or a larger options.outputStep"
+msgid "coreMessage.answer.ladderOutput"
+msgstr "Die Ausgabe des Ladeleiters hat {n} Punkte, mehr als {max}: weniger Schritte oder ein größeres options.outputStep"
+
+# en: "ladder pressure must be positive"
+msgid "refusal.ladderPressureNotPositive"
+msgstr "Der Druck des Ladeleiters muss positiv sein"
+
+# en: "ladder start charge must be above 0"
+msgid "refusal.ladderStartNotPositive"
+msgstr "Die Startladung des Ladeleiters muss größer als 0 sein"
+
+# en: "ladder step must be above 0"
+msgid "refusal.ladderStepNotPositive"
+msgstr "Die Schrittweite des Ladeleiters muss größer als 0 sein"
+
+# en: "ladder steps must be an integer of at least 1"
+msgid "refusal.ladderStepCountInvalid"
+msgstr "Die Schrittzahl des Ladeleiters muss eine ganze Zahl von mindestens 1 sein"
+
+# en: "ladder velocity must be positive"
+msgid "refusal.ladderVelocityNotPositive"
+msgstr "Die Geschwindigkeit des Ladeleiters muss positiv sein"
+
+# en: "ladder would pass {ms} ms"
+msgid "coreMessage.request.ladderTooSlow"
+msgstr "Der Ladeleiter würde {ms} ms überschreiten"
+
+# en: "ladder.kind: a {kind} ladder runs in the workbench, not in this route"
+msgid "coreMessage.answer.ladderKind"
+msgstr "ladder.kind: Ein Ladeleiter vom Typ {kind} läuft in der Werkbank, nicht über diese Route"
+
+# en: "latitude"
+msgid "refusal.latitudeInvalid"
+msgstr "Breitengrad ungültig"
+
+# en: "Length"
+msgid "coreMessage.label.length"
+msgstr "Länge"
+
+# en: "length and noseLength must be positive"
+msgid "refusal.outlineLengthsNotPositive"
+msgstr "length und noseLength müssen positiv sein"
+
+# en: "length must be positive"
+msgid "refusal.lengthNotPositive"
+msgstr "Die Länge muss positiv sein"
+
+# en: "level must lie in (0, 1)"
+msgid "refusal.levelOutsideUnit"
+msgstr "Das Niveau muss in (0, 1) liegen"
+
+# en: "limit exceeded"
+msgid "coreMessage.advisory.limitExceeded"
+msgstr "Grenzwert überschritten"
+
+# en: "look angle outside -pi/2..pi/2"
+msgid "refusal.lookAngleOutsideRange"
+msgstr "Visierwinkel außerhalb von -pi/2..pi/2"
+
+# en: "mach must be positive"
+msgid "refusal.machNotPositive"
+msgstr "Die Machzahl muss positiv sein"
+
+# en: "Maker"
+msgid "coreMessage.label.maker"
+msgstr "Hersteller"
+
+# en: "Mass"
+msgid "coreMessage.label.mass"
+msgstr "Masse"
+
+# en: "mass must be positive"
+msgid "refusal.massNotPositive"
+msgstr "Die Masse muss positiv sein"
+
+# en: "mass, diameter and length are required without bullet"
+msgid "coreMessage.answer.bulletValues"
+msgstr "Ohne bullet (Geschoss) sind mass, diameter und length erforderlich"
+
+# en: "mass, diameter, length, twist and velocity must be positive"
+msgid "refusal.stabilityInputsNotPositive"
+msgstr "Masse, Durchmesser, Länge, Drall und Geschwindigkeit müssen positiv sein"
+
+# en: "Max pressure"
+msgid "coreMessage.label.maxPressure"
+msgstr "Höchstdruck"
+
+# en: "maxCondition must be finite and at least 1"
+msgid "refusal.maxConditionOutOfRange"
+msgstr "maxCondition muss endlich und mindestens 1 sein"
+
+# en: "maxInflation must exceed 1"
+msgid "refusal.maxInflationNotAboveOne"
+msgstr "maxInflation muss größer als 1 sein"
+
+# en: "maxIterations must be a positive integer"
+msgid "refusal.maxIterationsNotPositiveInteger"
+msgstr "maxIterations muss eine positive ganze Zahl sein"
+
+# en: "maxRelativeStandardUncertainty must be positive"
+msgid "refusal.maxRelativeStandardUncertaintyNotPositive"
+msgstr "maxRelativeStandardUncertainty muss positiv sein"
+
+# en: "maxTime"
+msgid "coreMessage.code.maxTime"
+msgstr "Zeitgrenze erreicht"
+
+# en: "maxTime / outputStep must be at most {max}"
+msgid "coreMessage.answer.outputSteps"
+msgstr "maxTime / outputStep darf höchstens {max} betragen"
+
+# en: "maxTotalSteps must be positive"
+msgid "refusal.maxTotalStepsNotPositive"
+msgstr "maxTotalSteps muss positiv sein"
+
+# en: "maxZeroSigma must be positive"
+msgid "refusal.maxZeroSigmaNotPositive"
+msgstr "maxZeroSigma muss positiv sein"
+
+# en: "mean must be finite"
+msgid "refusal.meanNotFinite"
+msgstr "Der Mittelwert muss endlich sein"
+
+# en: "measuring method not stated"
+msgid "coreMessage.method.notStated"
+msgstr "Messmethode nicht angegeben"
+
+# en: "measuring method not stated in the record"
+msgid "coreMessage.method.notStatedInRecord"
+msgstr "Messmethode im Datensatz nicht angegeben"
+
+# en: "meplatDiameter must be zero up to the diameter"
+msgid "refusal.meplatDiameterOutsideRange"
+msgstr "meplatDiameter muss von 0 bis zum Durchmesser reichen"
+
+# en: "missingValues"
+msgid "coreMessage.code.missingValues"
+msgstr "fehlende Werte"
+
+# en: "model {model}"
+msgid "refusal.modelUnknown"
+msgstr "Unbekanntes Modell {model}"
+
+# en: "moments of inertia must be positive"
+msgid "refusal.inertiaNotPositive"
+msgstr "Die Trägheitsmomente müssen positiv sein"
+
+# en: "momentSlope must be positive (spin-stabilized bullet)"
+msgid "refusal.momentSlopeNotPositive"
+msgstr "momentSlope muss positiv sein (drallstabilisiertes Geschoss)"
+
+# en: "more than {max} integration steps"
+msgid "refusal.integrationStepsExceeded"
+msgstr "Mehr als {max} Integrationsschritte"
+
+# en: "more than {max} integration steps in total"
+msgid "refusal.integrationBudgetExceeded"
+msgstr "Mehr als {max} Integrationsschritte insgesamt"
+
+# en: "Must be above 0."
+msgid "refusal.valueNotPositive"
+msgstr "Muss größer als 0 sein."
+
+# en: "Must be at least 0."
+msgid "refusal.valueBelowZero"
+msgstr "Muss mindestens 0 betragen."
+
+# en: "muzzle velocity did not converge"
+msgid "refusal.muzzleVelocityNotConverged"
+msgstr "Die Mündungsgeschwindigkeit ist nicht konvergiert"
+
+# en: "muzzle velocity must be positive"
+msgid "refusal.muzzleVelocityNotPositive"
+msgstr "Die Mündungsgeschwindigkeit muss positiv sein"
+
+# en: "Muzzle velocity must not be negative."
+msgid "refusal.muzzleVelocityNegative"
+msgstr "Die Mündungsgeschwindigkeit darf nicht negativ sein."
+
+# en: "Needed with the other engraving value, or from a powder record."
+msgid "refusal.engravingValueNeeded"
+msgstr "Wird zusammen mit dem anderen Einpresswert oder aus einem Datensatz des Treibladungspulvers benötigt."
+
+# en: "no cartridge"
+msgid "coreMessage.advisory.noCartridge"
+msgstr "keine Patrone"
+
+# en: "No cartridge id was given, so no CIP Pmax was checked."
+msgid "coreMessage.warning.noCartridge"
+msgstr "Es wurde keine Patronen-ID angegeben, daher wurde kein CIP-Pmax geprüft."
+
+# en: "no comparable limit"
+msgid "coreMessage.advisory.noComparableLimit"
+msgstr "kein vergleichbarer Grenzwert"
+
+# en: "no compute worker could be started"
+msgid "coreMessage.request.noWorker"
+msgstr "Es konnte kein Rechenprozess gestartet werden"
+
+# en: "no scanned charge gives a valid run: interior {reason}"
+msgid "coreMessage.answer.noValidCharge"
+msgstr "Keine untersuchte Treibladung ergibt eine gültige Berechnung: Innenballistik {reason}"
+
+# en: "no scanned charge gives a valid run: interior {reason} ({field})"
+msgid "coreMessage.answer.noValidChargeField"
+msgstr "Keine untersuchte Treibladung ergibt eine gültige Berechnung: Innenballistik {reason} ({field})"
+
+# en: "no-information"
+msgid "coreMessage.code.noInformation"
+msgstr "keine Information"
+
+# en: "noComparableLimit"
+msgid "coreMessage.code.noComparableLimit"
+msgstr "kein vergleichbarer Grenzwert"
+
+# en: "nonFinite"
+msgid "coreMessage.code.nonFinite"
+msgstr "Wert nicht endlich"
+
+# en: "noseLength plus boatTailLength must not exceed length"
+msgid "refusal.noseAndBoatTailExceedLength"
+msgstr "noseLength plus boatTailLength darf length nicht überschreiten"
+
+# en: "noShotStart"
+msgid "coreMessage.code.noShotStart"
+msgstr "Geschoss setzt sich nicht in Bewegung"
+
+# en: "not-converged"
+msgid "coreMessage.code.notConverged"
+msgstr "nicht konvergiert"
+
+# en: "notMonotone"
+msgid "coreMessage.code.notMonotone"
+msgstr "nicht monoton"
+
+# en: "noValidRun"
+msgid "coreMessage.code.noValidRun"
+msgstr "keine gültige Berechnung"
+
+# en: "noValue"
+msgid "coreMessage.code.noValue"
+msgstr "kein Wert"
+
+# en: "observation kind {kind}"
+msgid "refusal.observationKindUnknown"
+msgstr "Unbekannte Art der Beobachtung: {kind}"
+
+# en: "observation range {range}"
+msgid "refusal.observationRangeInvalid"
+msgstr "Entfernung der Beobachtung {range} ungültig"
+
+# en: "observation value"
+msgid "refusal.observationValueInvalid"
+msgstr "Wert der Beobachtung ungültig"
+
+# en: "observations of different kinds need standard uncertainties"
+msgid "refusal.mixedObservationsNeedUncertainty"
+msgstr "Beobachtungen verschiedener Arten brauchen Standardunsicherheiten"
+
+# en: "options.maxSteps must be at most {max} for the charge solver"
+msgid "coreMessage.answer.maxSteps"
+msgstr "options.maxSteps darf für die Ladungssuche höchstens {max} betragen"
+
+# en: "outputTooLarge"
+msgid "coreMessage.code.outputTooLarge"
+msgstr "Ausgabe zu groß"
+
+# en: "outsideModel"
+msgid "coreMessage.code.outsideModel"
+msgstr "außerhalb des Modells"
+
+# en: "Overall length"
+msgid "coreMessage.label.overallLength"
+msgstr "Gesamtlänge"
+
+# en: "parameters: {parameters}, each at most once"
+msgid "refusal.fitParametersInvalid"
+msgstr "parameters: {parameters}, jeweils höchstens einmal"
+
+# en: "parameters: burnRate, formSlope, transition and exponent, each at most once"
+msgid "refusal.curveFitParametersInvalid"
+msgstr "parameters: burnRate, formSlope, transition und exponent, jeweils höchstens einmal"
+
+# en: "parameters: burnRate, temperatureFactor, energy, each at most once, burnRate always"
+msgid "refusal.pooledFitParametersInvalid"
+msgstr "parameters: burnRate, temperatureFactor, energy, jeweils höchstens einmal, burnRate immer"
+
+# en: "params/id must match the record id"
+msgid "coreMessage.request.idMismatch"
+msgstr "params/id muss der ID eines Datensatzes entsprechen"
+
+# en: "peakPressure and pressureBasis together"
+msgid "refusal.pressureWithoutBasis"
+msgstr "peakPressure und pressureBasis gemeinsam"
+
+# en: "peakPressure and pressureSigma together"
+msgid "refusal.pressureWithoutSigma"
+msgstr "peakPressure und pressureSigma gemeinsam"
+
+# en: "piezo"
+msgid "coreMessage.method.piezo"
+msgstr "Piezo-Messquarz"
+
+# en: "powder {powder} bulk density {density} kg/m3 must be above 0 and at most {max} kg/m3"
+msgid "refusal.powderBulkDensityOutOfRange"
+msgstr "Das Schüttgewicht {density} kg/m3 des Treibladungspulvers {powder} muss größer als 0 und höchstens {max} kg/m3 sein"
+
+# en: "powder {powder} has no bulk density"
+msgid "refusal.powderWithoutBulkDensity"
+msgstr "Das Treibladungspulver {powder} hat kein Schüttgewicht"
+
+# en: "powder fit: {reason}"
+msgid "coreMessage.answer.powderFit"
+msgstr "Anpassung des Treibladungspulvers: {reason}"
+
+# en: "pressure {pressure} Pa"
+msgid "refusal.pressureInvalid"
+msgstr "Druck {pressure} Pa nicht zulässig"
+
+# en: "pressure {pressure} Pa at temperature {temperature} K gives an air density of {density} kg/m3, outside 0 to {max} kg/m3"
+msgid "refusal.airDensityOutsideRange"
+msgstr "Druck {pressure} Pa bei Temperatur {temperature} K ergibt eine Luftdichte von {density} kg/m3 außerhalb von 0 bis {max} kg/m3"
+
+# en: "pressure rows use more than one basis: {rows}"
+msgid "refusal.pressureBasesMixed"
+msgstr "Druckzeilen auf mehr als einer Messgrundlage: {rows}"
+
+# en: "pressureBasis must be one of {bases}"
+msgid "refusal.pressureBasisUnknown"
+msgstr "pressureBasis muss eines von {bases} sein"
+
+# en: "pressures need velocity sigmas"
+msgid "refusal.pressuresNeedVelocitySigmas"
+msgstr "Drücke brauchen Geschwindigkeits-Sigmas"
+
+# en: "pressureSigma must be positive"
+msgid "refusal.pressureSigmaNotPositive"
+msgstr "pressureSigma muss positiv sein"
+
+# en: "prior {kind} of {group}: value and sigma above 0"
+msgid "refusal.groupPriorNotPositive"
+msgstr "prior {kind} von {group}: Wert und sigma über 0"
+
+# en: "prior {name}"
+msgid "refusal.priorUnknown"
+msgstr "Unbekannter prior {name}"
+
+# en: "prior {name} must be positive"
+msgid "refusal.priorNotPositive"
+msgstr "prior {name} muss positiv sein"
+
+# en: "prior {name}: value above 0, sigma above 0"
+msgid "refusal.priorValueOrSigmaNotPositive"
+msgstr "prior {name}: Wert über 0, sigma über 0"
+
+# en: "prior {name}: value above the floor, sigma above 0"
+msgid "refusal.priorValueBelowFloorOrSigmaNotPositive"
+msgstr "prior {name}: Wert über der Untergrenze, sigma über 0"
+
+# en: "priors and huberThreshold need velocity sigmas"
+msgid "refusal.priorsNeedVelocitySigmas"
+msgstr "priors und huberThreshold brauchen Geschwindigkeits-Sigmas"
+
+# en: "probability must lie in (0, 1)"
+msgid "refusal.probabilityOutsideUnit"
+msgstr "Die Wahrscheinlichkeit muss in (0, 1) liegen"
+
+# en: "Projectile mass must be positive."
+msgid "refusal.projectileMassNotPositive"
+msgstr "Die Masse des Geschosses muss positiv sein."
+
+# en: "Propellant base"
+msgid "coreMessage.label.propellantBase"
+msgstr "Basis des Treibladungspulvers"
+
+# en: "propellant.bulkDensity or powder is required for the loadRatio target"
+msgid "coreMessage.answer.bulkDensity"
+msgstr "Für das Ziel loadRatio ist propellant.bulkDensity oder powder (Treibladungspulver) erforderlich"
+
+# en: "propellantTemperature must be positive"
+msgid "refusal.propellantTemperatureNotPositive"
+msgstr "propellantTemperature muss positiv sein"
+
+# en: "querystring does not match the schema"
+msgid "coreMessage.request.querySchema"
+msgstr "Die Abfrage entspricht nicht dem Schema"
+
+# en: "range {range}"
+msgid "refusal.rangeInvalid"
+msgstr "Entfernung {range} ungültig"
+
+# en: "range {range} m not reached"
+msgid "refusal.rangeNotReached"
+msgstr "Entfernung {range} m nicht erreicht"
+
+# en: "range incomplete"
+msgid "coreMessage.advisory.rangeIncomplete"
+msgstr "Bereich unvollständig"
+
+# en: "range must be positive"
+msgid "refusal.rangeNotPositive"
+msgstr "Die Entfernung muss positiv sein"
+
+# en: "relative half-width must be at least 0.01"
+msgid "refusal.relativeHalfWidthBelowMinimum"
+msgstr "Die relative Halbbreite muss mindestens 0,01 betragen"
+
+# en: "relative half-width needs more shots than the search covers"
+msgid "refusal.relativeHalfWidthOutOfReach"
+msgstr "Die relative Halbbreite braucht mehr Schüsse, als die Suche abdeckt"
+
+# en: "request body above 64 KiB"
+msgid "coreMessage.request.bodyTooLarge"
+msgstr "Die Anfrage ist größer als 64 KiB"
+
+# en: "request does not match the schema"
+msgid "coreMessage.request.schema"
+msgstr "Die Anfrage entspricht nicht dem Schema"
+
+# en: "residualConfidenceLevel must lie in (0, 1)"
+msgid "refusal.residualConfidenceLevelOutsideUnit"
+msgstr "residualConfidenceLevel muss in (0, 1) liegen"
+
+# en: "resistance not applied"
+msgid "coreMessage.advisory.resistanceNotApplied"
+msgstr "Widerstand nicht angewendet"
+
+# en: "result holds a non-finite number at {path}"
+msgid "refusal.resultNotFinite"
+msgstr "Das Ergebnis enthält an {path} eine nicht endliche Zahl"
+
+# en: "rifleSigma and lotSigma must be positive"
+msgid "refusal.rifleOrLotSigmaNotPositive"
+msgstr "rifleSigma und lotSigma müssen positiv sein"
+
+# en: "sampling applies to a single run, not to a ladder"
+msgid "coreMessage.answer.samplingSingle"
+msgstr "Die Stichprobe gilt für eine einzelne Berechnung, nicht für einen Ladeleiter"
+
+# en: "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet."
+msgid "coreMessage.import.noTable"
+msgstr "Blatt „{name}“ enthält keine Tabelle mit zwei oder mehr Spalten. Verschieben Sie die Tabelle auf das erste Blatt."
+
+# en: "shot coordinates must be finite"
+msgid "refusal.shotCoordinates"
+msgstr "Die Koordinaten der Schüsse müssen endlich sein"
+
+# en: "shot velocity must be finite"
+msgid "refusal.shotVelocity"
+msgstr "Die Geschwindigkeit eines Schusses muss endlich sein"
+
+# en: "sight height and offset"
+msgid "refusal.sightInvalid"
+msgstr "Visierhöhe und Versatz ungültig"
+
+# en: "sigma must be positive"
+msgid "refusal.sigmaNotPositive"
+msgstr "sigma muss positiv sein"
+
+# en: "sigma: on every trace or on none"
+msgid "refusal.sigmaPartial"
+msgstr "sigma: bei jeder Messkurve oder bei keiner"
+
+# en: "Simulated peak pressure {nominal} (range {low} to {high}) is above {name} {limit} ({spec}; {method})."
+msgid "coreMessage.warning.limitExceeded"
+msgstr "Simulierter Gasdruck {nominal} (Bereich {low} bis {high}) liegt über {name} {limit} ({spec}; {method})."
+
+# en: "Simulated peak pressure {nominal} (range {low} to {high}) is above the typed {name} {limit}."
+msgid "coreMessage.warning.typedLimitExceeded"
+msgstr "Simulierter Gasdruck {nominal} (Bereich {low} bis {high}) liegt über dem eingegebenen {name} {limit}."
+
+# en: "simulation, not load data"
+msgid "coreMessage.advisory.simulation"
+msgstr "Simulation, keine Ladedaten"
+
+# en: "Simulation: load ratio {ratio} is above {max}, solid fill {limit} for this powder; the model is outside the range it was built for."
+msgid "coreMessage.warning.loadRatioHigh"
+msgstr "Simulation: Die Ladedichte {ratio} liegt über {max}, Feststoff-Füllgrad {limit} für dieses Treibladungspulver; das Modell liegt außerhalb des Bereichs, für den es gebaut wurde."
+
+# en: "Simulation: solid fill {fill} is above {limit}; the model is outside the range it was built for."
+msgid "coreMessage.warning.solidFillHigh"
+msgstr "Simulation: Der Feststoff-Füllgrad {fill} liegt über {limit}; das Modell liegt außerhalb des Bereichs, für den es gebaut wurde."
+
+# en: "Simulation: the parameters of {label} were fitted with a bore-resistance law this run cannot apply (missing: {list}); the results are biased."
+msgid "coreMessage.warning.resistanceNotApplied"
+msgstr "Simulation: Die Parameter von {label} wurden mit einem Gesetz des Laufwiderstands angepasst, das diese Berechnung nicht anwenden kann (fehlend: {list}); die Ergebnisse sind verzerrt."
+
+# en: "slope must be finite"
+msgid "refusal.slopeNotFinite"
+msgstr "Die Steigung muss endlich sein"
+
+# en: "solid fill high"
+msgid "coreMessage.advisory.solidFillHigh"
+msgstr "Feststoff-Füllgrad hoch"
+
+# en: "Some cases of the pressure range could not be computed."
+msgid "coreMessage.advisory.rangeIncompleteRule"
+msgstr "Einige Fälle des Druckbereichs konnten nicht berechnet werden."
+
+# en: "standard deviation must be 0 or more"
+msgid "refusal.standardDeviationNegative"
+msgstr "Die Standardabweichung muss 0 oder größer sein"
+
+# en: "standardUncertainty must be positive"
+msgid "refusal.standardUncertaintyNotPositive"
+msgstr "standardUncertainty muss positiv sein"
+
+# en: "standardUncertainty on all observations or none"
+msgid "refusal.standardUncertaintyPartial"
+msgstr "standardUncertainty bei allen Beobachtungen oder bei keiner"
+
+# en: "start pressure has no effect"
+msgid "coreMessage.advisory.startPressureNoEffect"
+msgstr "Startdruck ohne Wirkung"
+
+# en: "start pressure held once"
+msgid "coreMessage.advisory.startPressureHeldOnce"
+msgstr "Startdruck einmal gehalten"
+
+# en: "startPressure must be above the ignition pressure and the resistance at travel 0"
+msgid "refusal.startPressureTooLow"
+msgstr "startPressure muss über dem Zünddruck und dem Widerstand bei Weg 0 liegen"
+
+# en: "step budget"
+msgid "refusal.stepBudgetInvalid"
+msgstr "Schrittbudget ungültig"
+
+# en: "step size {step} s below {min} s"
+msgid "refusal.stepSizeBelowMinimum"
+msgstr "Schrittweite {step} s unter {min} s"
+
+# en: "step-budget"
+msgid "coreMessage.code.stepBudget"
+msgstr "Schrittbudget erreicht"
+
+# en: "stuck"
+msgid "coreMessage.code.stuck"
+msgstr "Geschoss bleibt im Lauf stecken"
+
+# en: "target heading must be a number"
+msgid "refusal.targetHeadingNotNumber"
+msgstr "Die Richtung des Ziels muss eine Zahl sein"
+
+# en: "target speed must be 0 or more"
+msgid "refusal.targetSpeedNegative"
+msgstr "Die Geschwindigkeit des Ziels muss 0 oder größer sein"
+
+# en: "target value must be above 0"
+msgid "refusal.targetValueNotPositive"
+msgstr "Der Zielwert muss größer als 0 sein"
+
+# en: "temperature {temperature} K"
+msgid "refusal.temperatureInvalid"
+msgstr "Temperatur {temperature} K nicht zulässig"
+
+# en: "temperatureFactor needs the load to carry a temperature sensitivity other than 0"
+msgid "refusal.temperatureFactorNeedsSensitivity"
+msgstr "temperatureFactor braucht eine Laborierung mit einer Temperaturempfindlichkeit ungleich 0"
+
+# en: "the bore resistance of the powder needs {missing}"
+msgid "refusal.boreResistanceNeedsValues"
+msgstr "der Laufwiderstand des Treibladungspulvers benötigt {missing}"
+
+# en: "The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given."
+msgid "coreMessage.seating.behindHead"
+msgstr "Der Geschossboden liegt hinter dem Hülsenboden: Die Setztiefe ist größer als die Hülsenlänge. Es wird kein Volumen hinter dem Geschoss angegeben."
+
+# en: "The bullet below the mouth takes the whole case volume: no volume behind the bullet is given."
+msgid "coreMessage.seating.noVolume"
+msgstr "Das Geschoss unter dem Hülsenmund nimmt das ganze Hülsenvolumen ein: Es wird kein Volumen hinter dem Geschoss angegeben."
+
+# en: "the burn coefficient is always fitted"
+msgid "refusal.burnCoefficientNotFitted"
+msgstr "Der Abbrandkoeffizient wird immer angepasst"
+
+# en: "The cartridge has no CIP Pmax measured by transducer or piezo."
+msgid "coreMessage.advisory.noComparableLimitRule"
+msgstr "Die Patrone hat kein CIP-Pmax, das mit Messwandler oder Piezo gemessen wurde."
+
+# en: "The file could not be read."
+msgid "coreMessage.import.notRead"
+msgstr "Die Datei konnte nicht gelesen werden."
+
+# en: "The file has format version {v}; this app reads version {w}."
+msgid "coreMessage.answer.formatVersion"
+msgstr "Die Datei hat die Formatversion {v}; diese App liest die Version {w}."
+
+# en: "The file is larger than 40 MB. Split it and import the parts."
+msgid "coreMessage.import.tooLarge"
+msgstr "Die Datei ist größer als 40 MB. Teilen Sie sie auf und importieren Sie die Teile."
+
+# en: "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again"
+msgid "coreMessage.import.notUnicode"
+msgstr "Die Datei ist kein UTF-8- oder UTF-16-Text; speichern Sie sie als UTF-8 (CSV UTF-8) und importieren Sie sie erneut"
+
+# en: "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again."
+msgid "coreMessage.import.notUnicodeSentence"
+msgstr "Die Datei ist kein UTF-8- oder UTF-16-Text; speichern Sie sie als UTF-8 (CSV UTF-8) und importieren Sie sie erneut."
+
+# en: "The file must hold exactly one load record, it has {n}"
+msgid "coreMessage.answer.oneLoad"
+msgstr "Die Datei muss genau einen Datensatz einer Laborierung enthalten, sie hat {n}"
+
+# en: "the fit has no covariance: add rows or velocity sigmas"
+msgid "refusal.fitNoCovariance"
+msgstr "Die Anpassung hat keine Kovarianz: Zeilen oder Geschwindigkeits-Sigmas ergänzen"
+
+# en: "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
+msgid "coreMessage.curveFit.peakRatio"
+msgstr "Der höchste Spitzendruck (Messkurve {high}) ist das {ratio}-Fache des niedrigsten (Messkurve {low}), unter {limit}"
+
+# en: "The import could not run in this browser."
+msgid "coreMessage.import.notRun"
+msgstr "Der Import konnte in diesem Browser nicht laufen."
+
+# en: "The load file lacks {n} values: {list}. Type them under analysis.overrides, or name catalogue records that give them."
+msgid "coreMessage.answer.lacksValues"
+msgstr "In der Datei der Laborierung fehlen {n} Werte: {list}. Geben Sie sie unter analysis.overrides ein oder geben Sie die Namen von Katalogdatensätzen an, die sie liefern."
+
+# en: "The load file lacks 1 value: {list}. Type them under analysis.overrides, or name catalogue records that give them."
+msgid "coreMessage.answer.lacksValue"
+msgstr "In der Datei der Laborierung fehlt 1 Wert: {list}. Geben Sie ihn unter analysis.overrides ein oder geben Sie die Namen von Katalogdatensätzen an, die ihn liefern."
+
+# en: "the load is no longer in this browser"
+msgid "coreMessage.request.loadGone"
+msgstr "Die Laborierung ist nicht mehr in diesem Browser"
+
+# en: "the load ratio target needs the bulk density"
+msgid "refusal.loadRatioTargetNeedsBulkDensity"
+msgstr "Das Ziel Ladedichte braucht das Schüttgewicht"
+
+# en: "The longer run did not answer in {seconds} s."
+msgid "coreMessage.request.longerRunSilent"
+msgstr "Die längere Berechnung hat nicht innerhalb von {seconds} s geantwortet."
+
+# en: "The lot rows did not answer in {seconds} s."
+msgid "coreMessage.request.lotRowsSilent"
+msgstr "Die Zeilen des Loses haben nicht innerhalb von {seconds} s geantwortet."
+
+# en: "the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction"
+msgid "refusal.modelLeavesBarrelBeforeWindowEnd"
+msgstr "Das Modell verlässt mit den Startwerten den Lauf vor dem Ende des Kurvenfensters; näher beginnen oder fallFraction erhöhen"
+
+# en: "The model refused the load. The error panel gives the reason."
+msgid "coreMessage.request.refused"
+msgstr "Das Modell hat die Laborierung abgelehnt. Der Fehlerbereich nennt den Grund."
+
+# en: "the modified point mass needs liftSlope"
+msgid "refusal.modifiedPointMassNeedsLiftSlope"
+msgstr "Der modifizierte Massenpunkt braucht liftSlope"
+
+# en: "the modified point mass needs projectile.aerodynamics"
+msgid "refusal.modifiedPointMassNeedsAerodynamics"
+msgstr "Der modifizierte Massenpunkt braucht projectile.aerodynamics"
+
+# en: "the modified point mass needs twist and twist hand"
+msgid "refusal.modifiedPointMassNeedsTwist"
+msgstr "Der modifizierte Massenpunkt braucht Drall und Drallrichtung"
+
+# en: "the outline gives no positive finite drag: outside the method"
+msgid "refusal.outlineOutsideMethod"
+msgstr "Der Umriss ergibt keinen positiven endlichen Luftwiderstand: außerhalb des Verfahrens"
+
+# en: "the Pages catalogue holds the index only"
+msgid "coreMessage.request.indexOnly"
+msgstr "Der Katalog der Pages-Ausgabe enthält nur das Verzeichnis"
+
+# en: "the pooled fit has no covariance"
+msgid "refusal.pooledFitNoCovariance"
+msgstr "Die gemeinsame Anpassung hat keine Kovarianz"
+
+# en: "the powder has no interior model"
+msgid "refusal.powderWithoutInteriorModel"
+msgstr "Das Treibladungspulver hat kein Innenballistikmodell"
+
+# en: "the powder of the target must be one of the fit"
+msgid "refusal.targetPowderNotInFit"
+msgstr "Das Treibladungspulver der Zielsitzung muss eines der Anpassung sein"
+
+# en: "the range has no width"
+msgid "refusal.rangeWithoutWidth"
+msgstr "Der Bereich hat keine Breite"
+
+# en: "The run passed the time limit."
+msgid "coreMessage.request.timeLimit"
+msgstr "Die Berechnung hat das Zeitlimit überschritten."
+
+# en: "the sessions of a powder share one burn kind"
+msgid "refusal.sessionsBurnKindDiffers"
+msgstr "Die Sitzungen eines Treibladungspulvers teilen eine Abbrandart"
+
+# en: "The simulated peak mean pressure is below {ratio} times the hold pressure; the results are outside the range the model was built for."
+msgid "coreMessage.advisory.chargeTooSmallRule"
+msgstr "Der simulierte höchste mittlere Druck liegt unter dem {ratio}-Fachen des Haltedrucks; die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde."
+
+# en: "The simulated peak pressure is above a CIP maximum pressure of the cartridge."
+msgid "coreMessage.advisory.limitExceededRule"
+msgstr "Der simulierte höchste Druck liegt über einem CIP-Höchstdruck der Patrone."
+
+# en: "the speed measured is lower than the bullet can keep over the distance"
+msgid "refusal.measuredSpeedTooLow"
+msgstr "Die gemessene Geschwindigkeit ist niedriger, als das Geschoss über die Entfernung halten kann"
+
+# en: "The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then starts against the lower bore resistance at travel 0, after which the engraving profile applies."
+msgid "coreMessage.warning.startPressureHeldOnce"
+msgstr "Der Startdruck liegt über dem Laufwiderstand bei Weg 0 und über dem Zünddruck, und der Einpressdruck bei Weg 0 ist nicht 0; das Geschoss wird daher bis zum Startdruck gehalten und beginnt danach gegen den niedrigeren Laufwiderstand bei Weg 0 zu laufen, anschließend gilt das Einpressprofil."
+
+# en: "The start pressure is at or below the bore resistance at travel 0, so the shot starts when the pressure force exceeds that resistance and the start pressure has no effect."
+msgid "coreMessage.warning.startPressureBelowResistance"
+msgstr "Der Startdruck liegt auf oder unter dem Laufwiderstand bei Weg 0; der Schuss beginnt daher, wenn die Druckkraft diesen Widerstand übersteigt, und der Startdruck hat keine Wirkung."
+
+# en: "the trace has no positive pressure"
+msgid "refusal.traceNoPositivePressure"
+msgstr "Die Messkurve enthält keinen positiven Druck"
+
+# en: "the trace never falls to the fall fraction of its peak after the peak"
+msgid "refusal.traceNeverFalls"
+msgstr "Die Messkurve fällt nach ihrem Höchstwert nie auf den Abfallanteil des Höchstwerts"
+
+# en: "The twist is 0, so the bullet has no rotational energy and the radius of gyration is ignored."
+msgid "coreMessage.warning.gyrationRadiusWithoutTwist"
+msgstr "Der Drall ist 0, das Geschoss hat daher keine Rotationsenergie und der Trägheitsradius wird ignoriert."
+
+# en: "The upper end of the simulated peak pressure range, {high}, is above {name} {limit} ({spec}; {method}); the nominal value is {nominal}."
+msgid "coreMessage.warning.limitExceededUpper"
+msgstr "Das obere Ende des simulierten Gasdruckbereichs, {high}, liegt über {name} {limit} ({spec}; {method}); der Nennwert beträgt {nominal}."
+
+# en: "The upper end of the simulated peak pressure range, {high}, is above the typed {name} {limit}; the nominal value is {nominal}."
+msgid "coreMessage.warning.typedLimitExceededUpper"
+msgstr "Das obere Ende des simulierten Gasdruckbereichs, {high}, liegt über dem eingegebenen {name} {limit}; der Nennwert beträgt {nominal}."
+
+# en: "The workbook cannot be read. Save it again as XLSX or CSV."
+msgid "coreMessage.import.unreadable"
+msgstr "Die Arbeitsmappe kann nicht gelesen werden. Speichern Sie sie erneut als XLSX oder CSV."
+
+# en: "The workbook has no cells with text. Open the right file or paste the table into a sheet."
+msgid "coreMessage.import.noText"
+msgstr "Die Arbeitsmappe hat keine Zellen mit Text. Öffnen Sie die richtige Datei oder fügen Sie die Tabelle in ein Blatt ein."
+
+# en: "time of flight must be 0 or more"
+msgid "refusal.timeOfFlightNegative"
+msgstr "Die Flugzeit muss 0 oder größer sein"
+
+# en: "timeout"
+msgid "coreMessage.code.timeout"
+msgstr "Zeitüberschreitung"
+
+# en: "toleranceNotReached"
+msgid "coreMessage.code.toleranceNotReached"
+msgstr "Genauigkeit nicht erreicht"
+
+# en: "tolerances and limits"
+msgid "refusal.tolerancesInvalid"
+msgstr "Toleranzen und Grenzen ungültig"
+
+# en: "Too big: expected number to be <={n}"
+msgid "coreMessage.ladder.tooBig"
+msgstr "Zu groß: Der Wert darf höchstens {n} sein"
+
+# en: "too few trace samples in the window"
+msgid "refusal.traceWindowTooShort"
+msgstr "Zu wenige Messwerte der Kurve im Fenster"
+
+# en: "trace: equal numbers of finite, strictly increasing times and finite pressures, at least 2"
+msgid "refusal.traceInvalid"
+msgstr "trace: gleich viele endliche, streng steigende Zeiten und endliche Drücke, mindestens 2"
+
+# en: "trace.sensor: breech, mean or base"
+msgid "refusal.traceSensorUnknown"
+msgstr "trace.sensor: breech, mean oder base"
+
+# en: "traces {list} have the same charge"
+msgid "coreMessage.curveFit.sameCharge"
+msgstr "Die Messkurven {list} haben dieselbe Treibladung"
+
+# en: "transducer"
+msgid "coreMessage.method.transducer"
+msgstr "mechanisch-elektrischer Wandler"
+
+# en: "transition needs a start value below 1"
+msgid "refusal.transitionStartNotBelowOne"
+msgstr "transition braucht einen Startwert unter 1"
+
+# en: "truing: {reason}"
+msgid "coreMessage.answer.truing"
+msgstr "Truing: {reason}"
+
+# en: "truing: {reason} ({detail})"
+msgid "coreMessage.answer.truingDetail"
+msgstr "Truing: {reason} ({detail})"
+
+# en: "twist must be positive"
+msgid "refusal.twistNotPositive"
+msgstr "Der Drall muss positiv sein"
+
+# en: "underdetermined"
+msgid "coreMessage.code.underdetermined"
+msgstr "unterbestimmt"
+
+# en: "unit percentOfLimit applies to the peakPressure target only"
+msgid "coreMessage.answer.percentOfLimit"
+msgstr "Die Einheit percentOfLimit gilt nur für das Ziel peakPressure"
+
+# en: "unknown bullet construction {construction}"
+msgid "refusal.bulletConstructionUnknown"
+msgstr "Unbekannte Geschossbauart {construction}"
+
+# en: "Unknown field"
+msgid "coreMessage.answer.unknownField"
+msgstr "Unbekanntes Feld"
+
+# en: "unreachable"
+msgid "coreMessage.code.unreachable"
+msgstr "nicht erreichbar"
+
+# en: "unresolved"
+msgid "coreMessage.code.unresolved"
+msgstr "nicht aufgelöst"
+
+# en: "UTF-16 text with an odd number of bytes"
+msgid "coreMessage.import.oddBytes"
+msgstr "UTF-16-Text mit einer ungeraden Anzahl von Bytes"
+
+# en: "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again."
+msgid "coreMessage.import.oddBytesSave"
+msgstr "UTF-16-Text mit einer ungeraden Anzahl von Bytes; speichern Sie ihn als UTF-8 (CSV UTF-8) und importieren Sie ihn erneut."
+
+# en: "velocities must be finite"
+msgid "refusal.velocitiesNotFinite"
+msgstr "Die Geschwindigkeiten müssen endlich sein"
+
+# en: "velocity must be positive"
+msgid "refusal.velocityNotPositive"
+msgstr "Die Geschwindigkeit muss größer als 0 sein"
+
+# en: "velocitySigma must be 0 or above"
+msgid "refusal.velocitySigmaNegative"
+msgstr "velocitySigma muss 0 oder größer sein"
+
+# en: "velocitySigma must be positive"
+msgid "refusal.velocitySigmaNotPositive"
+msgstr "velocitySigma muss positiv sein"
+
+# en: "velocitySigma on all points or none"
+msgid "refusal.velocitySigmaPartial"
+msgstr "velocitySigma bei allen Punkten oder bei keinem"
+
+# en: "velocitySigma on every point"
+msgid "refusal.velocitySigmaMissing"
+msgstr "velocitySigma bei jedem Punkt"
+
+# en: "wind segment"
+msgid "refusal.windSegmentInvalid"
+msgstr "Windsegment ungültig"
+
+# en: "wind segments must end in rising order"
+msgid "refusal.windSegmentsNotRising"
+msgstr "Windsegmente müssen mit steigender Entfernung enden"
+
+# en: "yaw"
+msgid "coreMessage.code.yaw"
+msgstr "Gierwinkelgrenze"
+
+# en: "zero did not converge (miss {vertical} m, {horizontal} m)"
+msgid "refusal.zeroNotConverged"
+msgstr "Das Einschießen ist nicht konvergiert (Fehlschuss {vertical} m, {horizontal} m)"
+
+# en: "zero look angle outside -pi/2..pi/2"
+msgid "refusal.zeroLookAngleOutsideRange"
+msgstr "Visierwinkel beim Einschießen außerhalb von -pi/2..pi/2"
+
+# en: "zero range {range} m not reached ({stop})"
+msgid "refusal.zeroRangeNotReached"
+msgstr "Einschießentfernung {range} m nicht erreicht ({stop})"
+
+# en: "zero range must be positive"
+msgid "refusal.zeroRangeNotPositive"
+msgstr "Die Einschießentfernung muss positiv sein"
+
+# en: "zero tolerance and maximum yaw must be positive"
+msgid "refusal.zeroToleranceOrMaxYawNotPositive"
+msgstr "Die Toleranzen beim Einschießen und der größte Gierwinkel müssen positiv sein"

@@ -488,7 +488,7 @@ function statusText(
 /** The line after a batch that stopped early or failed. */
 function messageText(message: CompareMessage, t: Translator['t'], i18n: I18n) {
   if (message.kind === 'stopped')
-    return t('Stopped. {reason}', { reason: t(noComparableLimitText) })
+    return t('Stopped. {reason}', { reason: i18n._(noComparableLimitText) })
   if (message.kind === 'cancelled')
     return t('Cancelled after {done} of {total} powders.', {
       done: message.done,

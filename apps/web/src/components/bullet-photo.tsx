@@ -1,6 +1,6 @@
 'use client'
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
   Button,
@@ -16,24 +16,31 @@ import { useMediaQuery } from '@mantine/hooks'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fixedNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { Design } from '../lib/bullet-designer.ts'
 import { paintPhoto } from '../lib/bullet-photo-canvas.ts'
 import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design.ts'
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { say } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/bullet-photo.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { type MessageEntry, MessageSlot } from './states.tsx'
 import { distanceSpec, useBulletPhoto } from './use-bullet-photo.ts'
 import { type Tool, usePhotoPointer } from './use-photo-pointer.ts'
 
-const tools: { value: Tool; label: Message }[] = [
-  { value: 'scale', label: msg('Place scale points') },
-  { value: 'add', label: msg('Brush: add') },
-  { value: 'erase', label: msg('Brush: erase') },
+loadEnglish(englishMessages)
+
+const tools: { value: Tool; label: MessageDescriptor }[] = [
+  {
+    value: 'scale',
+    label: /*i18n*/ { id: 'bulletPhoto.placeScalePoints', message: 'Place scale points' },
+  },
+  { value: 'add', label: /*i18n*/ { id: 'bulletPhoto.brushAdd', message: 'Brush: add' } },
+  { value: 'erase', label: /*i18n*/ { id: 'bulletPhoto.brushErase', message: 'Brush: erase' } },
 ]
 
 type PhotoState = ReturnType<typeof useBulletPhoto>
@@ -54,9 +61,11 @@ function stateMessages(p: PhotoState, t: Translator['t'], i18n: I18n): MessageEn
       ? [
           {
             severity: 'warning',
-            text: t(
-              'No bullet is outlined: brush the bullet in, or place the scale points on the ruler.',
-            ),
+            text: i18n._({
+              id: 'bulletPhoto.noOutline',
+              message:
+                'No bullet is outlined: brush the bullet in, or place the scale points on the ruler.',
+            }),
           } as const,
         ]
       : []),
@@ -64,9 +73,11 @@ function stateMessages(p: PhotoState, t: Translator['t'], i18n: I18n): MessageEn
       ? [
           {
             severity: 'info',
-            text: t(
-              'The nose end was chosen by its longer taper, which is close here: flip the nose if it is wrong.',
-            ),
+            text: i18n._({
+              id: 'bulletPhoto.noseByTaper',
+              message:
+                'The nose end was chosen by its longer taper, which is close here: flip the nose if it is wrong.',
+            }),
           } as const,
         ]
       : []),
@@ -74,9 +85,11 @@ function stateMessages(p: PhotoState, t: Translator['t'], i18n: I18n): MessageEn
       ? [
           {
             severity: 'info',
-            text: t(
-              'For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length.',
-            ),
+            text: i18n._({
+              id: 'bulletPhoto.needScale',
+              message:
+                'For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length.',
+            }),
           } as const,
         ]
       : []),
@@ -101,14 +114,18 @@ function valueMessages(
           {
             severity: 'warning',
             text: record
-              ? t(
-                  'The photograph differs from {record} in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed.',
-                  { record: record.title, values },
-                )
-              : t(
-                  'The photograph differs from the chosen record in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed.',
-                  { values },
-                ),
+              ? i18n._({
+                  id: 'bulletPhoto.differsFromRecord',
+                  message:
+                    'The photograph differs from {record} in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed.',
+                  values: { record: record.title, values },
+                })
+              : i18n._({
+                  id: 'bulletPhoto.differsFromChosen',
+                  message:
+                    'The photograph differs from the chosen record in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed.',
+                  values: { values },
+                }),
           } as const,
         ]
       : []),
@@ -122,13 +139,14 @@ export function DistanceField({
   value,
   onChange,
 }: {
-  label: Message
+  label: MessageDescriptor
   system: UnitSystem
   value: FieldValue
   onChange: (v: FieldValue) => void
 }) {
   const { t } = useTranslation()
-  const spec = distanceSpec(label)
+  const { i18n } = useLingui()
+  const spec = { ...distanceSpec, label: i18n._(label) }
   return (
     <NumberField
       spec={spec}
@@ -146,22 +164,24 @@ function ScaleControls({ system, p }: { system: UnitSystem; p: PhotoState }) {
     p.setDistances(([a, b]) => (i === 0 ? [v, b] : [a, v]))
   const setKnown = (i: 0 | 1) => (v: FieldValue) =>
     p.setKnown(([a, b]) => (i === 0 ? [v, b] : [a, v]))
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <>
       <Text fz="sm">
-        {t(
-          'Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first.',
-        )}
+        {i18n._({
+          id: 'bulletPhoto.scaleHelp',
+          message:
+            'Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first.',
+        })}
       </Text>
       <DistanceField
-        label={msg('Distance A to B')}
+        label={/*i18n*/ { id: 'bulletPhoto.distanceAB', message: 'Distance A to B' }}
         system={system}
         value={p.distances[0]}
         onChange={set(0)}
       />
       <DistanceField
-        label={msg('Distance C to D (optional)')}
+        label={/*i18n*/ { id: 'bulletPhoto.distanceCD', message: 'Distance C to D (optional)' }}
         system={system}
         value={p.distances[1]}
         onChange={set(1)}
@@ -177,21 +197,33 @@ function ScaleControls({ system, p }: { system: UnitSystem; p: PhotoState }) {
           ])
         }}
       >
-        {t('Clear the scale')}
+        {i18n._({ id: 'bulletPhoto.clearScale', message: 'Clear the scale' })}
       </Button>
       <Text fz="sm">
-        {t(
-          'Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out.',
-        )}
+        {i18n._({
+          id: 'bulletPhoto.caliperHelp',
+          message:
+            'Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out.',
+        })}
       </Text>
       <DistanceField
-        label={msg('Diameter, caliper (optional)')}
+        label={
+          /*i18n*/ {
+            id: 'bulletPhoto.caliperDiameter',
+            message: 'Diameter, caliper (optional)',
+          }
+        }
         system={system}
         value={p.known[0]}
         onChange={setKnown(0)}
       />
       <DistanceField
-        label={msg('Overall length, caliper (optional)')}
+        label={
+          /*i18n*/ {
+            id: 'bulletPhoto.caliperLength',
+            message: 'Overall length, caliper (optional)',
+          }
+        }
         system={system}
         value={p.known[1]}
         onChange={setKnown(1)}
@@ -211,12 +243,24 @@ function ValuesTable({
   record: Design['origin']
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <Table className="field-table" aria-label={t('Values measured from the photograph')}>
+    <Table
+      className="field-table"
+      aria-label={i18n._({
+        id: 'bulletPhoto.valuesTable',
+        message: 'Values measured from the photograph',
+      })}
+    >
       <Table.Thead>
         <Table.Tr>
-          <Table.Th>{t('Value')}</Table.Th>
-          <Table.Th>{t('Measured, with standard uncertainty')}</Table.Th>
+          <Table.Th>{i18n._({ id: 'bulletPhoto.value', message: 'Value' })}</Table.Th>
+          <Table.Th>
+            {i18n._({
+              id: 'bulletPhoto.measured',
+              message: 'Measured, with standard uncertainty',
+            })}
+          </Table.Th>
           {record && <Table.Th>{record.title}</Table.Th>}
         </Table.Tr>
       </Table.Thead>
@@ -227,8 +271,10 @@ function ValuesTable({
             <Table.Td>{valueText(r.spec, system, r.value)}</Table.Td>
             {record && (
               <Table.Td>
-                {r.record === undefined ? t('not given') : storedText(r.spec, system, r.record)}
-                {r.differs && ` ${t('(differs)')}`}
+                {r.record === undefined
+                  ? i18n._({ id: 'bulletPhoto.notGiven', message: 'not given' })
+                  : storedText(r.spec, system, r.record)}
+                {r.differs && ` ${i18n._({ id: 'bulletPhoto.differs', message: '(differs)' })}`}
               </Table.Td>
             )}
           </Table.Tr>
@@ -302,7 +348,10 @@ function PhotoTool({
           tabIndex={size ? 0 : -1}
           // oxlint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- a canvas with its own keys is announced as an application, as the target sheet is
           role="application"
-          aria-label={t('Photograph of the bullet')}
+          aria-label={i18n._({
+            id: 'bulletPhoto.photograph',
+            message: 'Photograph of the bullet',
+          })}
           aria-describedby={`${id}-keys`}
           onPointerDown={pointer.down}
           onPointerMove={pointer.move}
@@ -320,19 +369,23 @@ function PhotoTool({
           }}
         />
         <p id={`${id}-keys`} className="visually-hidden">
-          {t(
-            'Arrow keys move the cursor, Shift for single pixels, Control for large steps. Enter places a scale point or paints with the brush.',
-          )}
+          {i18n._({
+            id: 'bulletPhoto.keysHelp',
+            message:
+              'Arrow keys move the cursor, Shift for single pixels, Control for large steps. Enter places a scale point or paints with the brush.',
+          })}
         </p>
         {!size && (
           <Text c="dimmed" fz="sm">
-            {t(
-              'Choose a photograph of the bullet beside a ruler, or try the sample. It is never uploaded.',
-            )}
+            {i18n._({
+              id: 'bulletPhoto.chooseHelp',
+              message:
+                'Choose a photograph of the bullet beside a ruler, or try the sample. It is never uploaded.',
+            })}
           </Text>
         )}
         <p role="status" className="visually-hidden">
-          {p.busy ? t(p.busy) : pointer.heard}
+          {p.busy ? i18n._(p.busy) : pointer.heard}
         </p>
       </div>
       <Flex direction="column" gap="sm" style={{ flex: '1 1 18rem', minWidth: 0 }}>
@@ -340,40 +393,46 @@ function PhotoTool({
           <FileButton onChange={p.read} accept="image/*">
             {(props) => (
               <Button variant="default" {...props}>
-                {t('Choose photograph')}
+                {i18n._({ id: 'bulletPhoto.choosePhotograph', message: 'Choose photograph' })}
               </Button>
             )}
           </FileButton>
           <Button variant="default" onClick={p.sample}>
-            {t('Try a sample')}
+            {i18n._({ id: 'bulletPhoto.trySample', message: 'Try a sample' })}
           </Button>
         </Flex>
         {size && (
           <>
             <SegmentedControl
-              aria-label={t('Tool')}
+              aria-label={i18n._({ id: 'bulletPhoto.tool', message: 'Tool' })}
               size="xs"
               value={tool}
               onChange={(v) => setTool(v as Tool)}
-              data={tools.map((o) => ({ value: o.value, label: t(o.label) }))}
+              data={tools.map((o) => ({ value: o.value, label: i18n._(o.label) }))}
             />
             {tool === 'scale' ? (
               <ScaleControls system={system} p={p} />
             ) : (
               <>
                 <Text fz="sm">
-                  {t(
-                    'Paint over the picture to add to the bullet or erase from it. Keys: arrows move the cursor, Enter paints.',
-                  )}
+                  {i18n._({
+                    id: 'bulletPhoto.brushHelp',
+                    message:
+                      'Paint over the picture to add to the bullet or erase from it. Keys: arrows move the cursor, Enter paints.',
+                  })}
                 </Text>
                 <Text component="label" fz="sm" htmlFor="photo-brush">
-                  {t('Brush radius, {size} px', { size: brush })}
+                  {i18n._({
+                    id: 'bulletPhoto.brushRadiusValue',
+                    message: 'Brush radius, {size, decimal} px',
+                    values: { size: brush },
+                  })}
                 </Text>
                 <Slider
                   id="photo-brush"
                   min={2}
                   max={80}
-                  thumbLabel={t('Brush radius')}
+                  thumbLabel={i18n._({ id: 'bulletPhoto.brushRadius', message: 'Brush radius' })}
                   value={brush}
                   onChange={setBrush}
                 />
@@ -381,34 +440,44 @@ function PhotoTool({
             )}
             <Text fz="sm" aria-live="polite">
               {scale
-                ? t('Scale {scale} px/mm, uncertainty {uncertainty} %.', {
-                    scale: fixedNumber(scale.pxPerMm, 2),
-                    uncertainty: fixedNumber(100 * scale.relUncertainty, 2),
+                ? i18n._({
+                    id: 'bulletPhoto.scaleValue',
+                    message: 'Scale {scale} px/mm, uncertainty {uncertainty} %.',
+                    values: {
+                      scale: fixedNumber(scale.pxPerMm, 2),
+                      uncertainty: fixedNumber(100 * scale.relUncertainty, 2),
+                    },
                   })
-                : t('No scale yet.')}
+                : i18n._({ id: 'bulletPhoto.noScale', message: 'No scale yet.' })}
             </Text>
             <Flex gap="xs" wrap="wrap">
               <Button variant="default" disabled={!p.cut} onClick={p.cutAgain}>
-                {t('Cut out again')}
+                {i18n._({ id: 'bulletPhoto.cutOutAgain', message: 'Cut out again' })}
               </Button>
               <Button
                 variant="default"
                 disabled={!outline}
                 onClick={() => outline && p.setAxis(outline.angle + Math.PI)}
               >
-                {t('Flip nose')}
+                {i18n._({ id: 'bulletPhoto.flipNose', message: 'Flip nose' })}
               </Button>
               <Button
                 variant="default"
                 disabled={p.axis === undefined}
                 onClick={() => p.setAxis(undefined)}
               >
-                {t('Find the axis again')}
+                {i18n._({ id: 'bulletPhoto.findAxisAgain', message: 'Find the axis again' })}
               </Button>
             </Flex>
             <NumberInput
-              label={t("Axis direction, degrees from the photograph's x axis")}
-              description={t('Base to tip, y down. Typing a direction fixes the axis.')}
+              label={i18n._({
+                id: 'bulletPhoto.axisDirection',
+                message: "Axis direction, degrees from the photograph's x axis",
+              })}
+              description={i18n._({
+                id: 'bulletPhoto.axisHelp',
+                message: 'Base to tip, y down. Typing a direction fixes the axis.',
+              })}
               hideControls
               step={0.1}
               decimalScale={2}
@@ -417,13 +486,17 @@ function PhotoTool({
               disabled={!outline}
             />
             <Text component="label" fz="sm" htmlFor="photo-opacity">
-              {t('Drawing over the photograph, {percent} %', {
-                percent: Math.round(100 * opacity),
+              {i18n._({
+                id: 'bulletPhoto.drawingOpacityValue',
+                message: 'Drawing over the photograph, {percent, decimal} %',
+                values: {
+                  percent: Math.round(100 * opacity),
+                },
               })}
             </Text>
             <Slider
               id="photo-opacity"
-              thumbLabel={t('Drawing opacity')}
+              thumbLabel={i18n._({ id: 'bulletPhoto.drawingOpacity', message: 'Drawing opacity' })}
               min={0}
               max={1}
               step={0.05}
@@ -436,19 +509,24 @@ function PhotoTool({
       </Flex>
       {/* data-idle: no reserved message room before a photograph (globals.css) */}
       <div style={{ flex: '1 1 100%' }} data-idle={!loaded}>
-        <MessageSlot label={t('Photograph messages')} messages={messages} />
+        <MessageSlot
+          label={i18n._({ id: 'bulletPhoto.messages', message: 'Photograph messages' })}
+          messages={messages}
+        />
         {p.rows.length > 0 && <ValuesTable rows={p.rows} system={system} record={record} />}
         <Flex gap="xs" mt="sm" align="center" wrap="wrap">
           <Button
             disabled={!(p.ready && p.design && drawing)}
             onClick={() => p.design && void onOpen(p.design)}
           >
-            {t('Open in designer')}
+            {i18n._({ id: 'bulletPhoto.openDesigner', message: 'Open in designer' })}
           </Button>
           <Text fz="sm" c="dimmed">
-            {t(
-              'Opens the designer with these values; the design keeps them as measured from a photograph, with their uncertainties. The photograph is not stored.',
-            )}
+            {i18n._({
+              id: 'bulletPhoto.openHelp',
+              message:
+                'Opens the designer with these values; the design keeps them as measured from a photograph, with their uncertainties. The photograph is not stored.',
+            })}
           </Text>
         </Flex>
       </div>
@@ -472,17 +550,22 @@ export function BulletPhoto({
   onOpen: (d: Design) => Promise<boolean>
 }) {
   const phone = useMediaQuery('(width < 48em)')
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // narrow while it only offers a photograph; the canvas and its controls side by side with one
   const [photo, setPhoto] = useState(false)
   return (
     <AppModal
       opened={opened}
       onClose={onClose}
-      title={t('Bullet from a photograph')}
+      title={i18n._({ id: 'bulletPhoto.title', message: 'Bullet from a photograph' })}
       size={photo ? 'min(72rem, 96vw)' : 'min(34rem, 96vw)'}
       fullScreen={phone}
-      closeButton={{ 'aria-label': t('Close the photograph tool') }}
+      closeButton={{
+        'aria-label': i18n._({
+          id: 'bulletPhoto.close',
+          message: 'Close the photograph tool',
+        }),
+      }}
     >
       <PhotoTool
         onPhoto={setPhoto}

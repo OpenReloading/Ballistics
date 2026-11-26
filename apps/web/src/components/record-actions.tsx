@@ -24,10 +24,14 @@ import {
 } from 'lucide-react'
 import { type ReactNode, useId } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/record-actions.json' with { type: 'json' }
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { TourButton } from './tour-button.tsx'
 import { UnitsIconButton } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** Drawn as a default Mantine button, or filled as the page's one primary action. */
 export function LinkButton({

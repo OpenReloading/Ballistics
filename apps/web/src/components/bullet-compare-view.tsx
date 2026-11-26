@@ -9,6 +9,7 @@ import { type BulletProfile, recordProfile } from '@rangefoundry/svg-drawings/bu
 import { ArrowLeftRight, CircleExclamationPoint } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import { useSearchParams } from '@/platform/navigation.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { sharedScale } from '../lib/bullet-compare.ts'
 import { compareHref, maxComparedBullets, parseCompareIds } from '../lib/compare-ids.ts'
@@ -20,6 +21,9 @@ import {
 } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/bullet-compare-view.json' with {
+  type: 'json',
+}
 import { BulletCompare } from './bullet-compare.tsx'
 import { description } from './bullet-drawing.tsx'
 import { ByLengthUnit } from './by-length-unit.tsx'
@@ -28,6 +32,8 @@ import { PageBar } from './page-bar.tsx'
 import { LinkButton, RecordActions } from './record-actions.tsx'
 import { DataError, EmptyNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
+
+loadEnglish(englishMessages)
 
 /** `empty` (no bullets chosen yet) is no error, so it has a neutral icon. */
 function Problem({

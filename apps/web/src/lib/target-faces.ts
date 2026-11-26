@@ -9,6 +9,8 @@ import {
   toSi,
   type UserRecord,
 } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/target-faces.json' with { type: 'json' }
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'
 import { colourWord } from './face-words.ts'
@@ -18,6 +20,8 @@ import { nth } from './nth.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
 import { userRowId } from './sources.ts'
 import type { LinguiWording } from './wording.ts'
+
+loadEnglish(englishMessages)
 
 /** One row of the target face list, `origin` `user` a face design of the browser. Lengths in mm, distances in m. */
 export type TargetFaceRow = {

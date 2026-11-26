@@ -6,7 +6,7 @@ import { toSi } from '@rangefoundry/schema'
 import { Plus } from 'lucide-react'
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
@@ -27,12 +27,15 @@ import {
   userFaceRows,
 } from '../lib/target-faces.ts'
 import { formatQuantity } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/target-face-list.json' with { type: 'json' }
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
 import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** The face designs of this browser are Mine rows, opened in the face designer. */
 export function TargetFaceList({

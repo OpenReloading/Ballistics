@@ -258,7 +258,7 @@ export type ModelManifest = {
         sure: number;
     };
     license: {
-        model: 'CC0-1.0' | 'CC-BY-4.0' | 'ISC' | 'MIT' | 'Apache-2.0';
+        model: 'CC0-1.0' | 'CC-BY-4.0' | 'CC-BY-SA-4.0' | 'ISC' | 'MIT' | 'Apache-2.0';
         training: {
             classes: {
                 own: number;

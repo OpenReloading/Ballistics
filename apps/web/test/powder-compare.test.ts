@@ -4,7 +4,7 @@ import { answerRow, computeRows } from '../src/components/use-powder-compare.ts'
 import { english } from '../src/i18n/translate.ts'
 import { fetchPowder, postInteriorRun, postJson } from '../src/lib/api-client.ts'
 import { runBatch } from '../src/lib/batch.ts'
-import { noComparableLimitText, targetError, targetUnit } from '../src/lib/charge-target.ts'
+import { targetError, targetUnit } from '../src/lib/charge-target.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import {
   compareCharge,
@@ -600,7 +600,6 @@ describe('computeRows in the target mode', () => {
       expect(r.values).toBeUndefined()
       expect(r.refusal?.reason).toBe('noComparableLimit')
     }
-    expect(noComparableLimitText).toMatch(/no CIP limit/)
   })
 
   it('gives no row and asks nothing more after a cancel', async () => {

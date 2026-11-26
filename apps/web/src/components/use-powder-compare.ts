@@ -3,6 +3,7 @@
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { Powder } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { english, type Translator } from '../i18n/translate.ts'
 import { anySignal } from '../lib/any-signal.ts'
 import { fetchPowder, fetchPowderList, postInteriorRun, postJson } from '../lib/api-client.ts'
@@ -29,8 +30,11 @@ import {
 } from '../lib/powder-compare.ts'
 import type { Gap } from '../lib/resistance-gaps.ts'
 import { percentOfPressureLimit } from '../lib/workbench.ts'
+import englishMessages from '../locales/en/components/use-powder-compare.json' with { type: 'json' }
 import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 import { derived, stepFlag } from './workbench-outcome.ts'
+
+loadEnglish(englishMessages)
 
 const noModel = /*i18n*/ { id: 'powderCompare.noModel', message: 'No fitted model parameters' }
 const apiSilent = /*i18n*/ {

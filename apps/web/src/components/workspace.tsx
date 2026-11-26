@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Tabs } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 import { Check, Link as LinkIcon } from 'lucide-react'
@@ -13,9 +14,12 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
-import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/workspace.json' with { type: 'json' }
 import { CopyStatus } from './record-actions.tsx'
 import { useScrollFocus } from './scroll-region.tsx'
+
+loadEnglish(englishMessages)
 
 export type WorkspaceHandle = {
   /** Opens the Inputs tab; call it inside `flushSync` to focus a field right after. */
@@ -45,7 +49,8 @@ export function Workspace({
   inputsLabel?: string
   className?: string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
+  const resultsLabel = i18n._({ id: 'workspace.results', message: 'Results' })
   const [tab, setTab] = useState('inputs')
   useImperativeHandle(
     ref,
@@ -61,7 +66,7 @@ export function Workspace({
     return () => wide.removeEventListener('change', leave)
   }, [range])
   const region = useRef<HTMLElement>(null)
-  const scrollFocus = useScrollFocus(t('Results'), region)
+  const scrollFocus = useScrollFocus(resultsLabel, region)
   const show = useCallback(() => {
     flushSync(() => setTab('results'))
     region.current?.focus()
@@ -84,9 +89,13 @@ export function Workspace({
     <div className={className ? `workspace ${className}` : 'workspace'}>
       <Tabs value={tab} onChange={(v) => setTab(v ?? 'inputs')} className="workspace-tabs">
         <Tabs.List grow className="workspace-tablist">
-          <Tabs.Tab value="inputs">{inputsLabel ?? t('Inputs')}</Tabs.Tab>
-          <Tabs.Tab value="results">{t('Results')}</Tabs.Tab>
-          {range && <Tabs.Tab value="range">{t('Range')}</Tabs.Tab>}
+          <Tabs.Tab value="inputs">
+            {inputsLabel ?? i18n._({ id: 'workspace.inputs', message: 'Inputs' })}
+          </Tabs.Tab>
+          <Tabs.Tab value="results">{resultsLabel}</Tabs.Tab>
+          {range && (
+            <Tabs.Tab value="range">{i18n._({ id: 'workspace.range', message: 'Range' })}</Tabs.Tab>
+          )}
         </Tabs.List>
         <Tabs.Panel value="inputs" className="workspace-inputs">
           {inputs}
@@ -95,7 +104,7 @@ export function Workspace({
           {/* scrolls on its own from 62em, so it takes focus for keyboard scrolling */}
           <section
             id="results"
-            aria-label={t('Results')}
+            aria-label={resultsLabel}
             // the skip link focuses it; a tab stop only while it scrolls
             tabIndex={-1}
             {...scrollFocus}
@@ -145,8 +154,11 @@ export function Toolbar({
   /** The page's `useCopyLink`, shared with the other controls that copy the link. */
   link: ReturnType<typeof useCopyLink>
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { copied, error, copy } = link
+  const label = copied
+    ? i18n._({ id: 'workspace.linkCopied', message: 'Link copied' })
+    : i18n._({ id: 'workspace.copyLink', message: 'Copy link' })
   return (
     <>
       {file}
@@ -154,7 +166,7 @@ export function Toolbar({
       <Button
         variant="default"
         className="bar-icon"
-        title={copied ? t('Link copied') : t('Copy link')}
+        title={label}
         leftSection={
           copied ? (
             <Check size={18} aria-hidden="true" />
@@ -164,7 +176,7 @@ export function Toolbar({
         }
         onClick={copy}
       >
-        {copied ? t('Link copied') : t('Copy link')}
+        {label}
       </Button>
       <CopyStatus copied={copied} error={error} />
       {after}
