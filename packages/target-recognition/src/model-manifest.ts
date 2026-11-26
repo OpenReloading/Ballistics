@@ -18,7 +18,7 @@ export type ModelManifest = {
   output: { stride: number; channels: number; threshold: number; sure: number }
   /** The model license and the training photos as counts only, per data class and per target kind; no photo or source is listed. */
   license: {
-    model: 'CC0-1.0' | 'CC-BY-4.0' | 'ISC' | 'MIT' | 'Apache-2.0'
+    model: 'CC-BY-SA-4.0' | 'CC0-1.0' | 'CC-BY-4.0' | 'ISC' | 'MIT' | 'Apache-2.0'
     training: {
       classes: { own: number; 'third-party': number; synthetic: number }
       kinds: Record<string, number>
@@ -86,7 +86,7 @@ const shape = z.strictObject({
     }),
   license: z.strictObject({
     // a fixed list of SPDX license identifiers, so no file name, domain, credit line or LicenseRef fits
-    model: z.enum(['CC0-1.0', 'CC-BY-4.0', 'ISC', 'MIT', 'Apache-2.0']),
+    model: z.enum(['CC-BY-SA-4.0', 'CC0-1.0', 'CC-BY-4.0', 'ISC', 'MIT', 'Apache-2.0']),
     training: z.strictObject({
       classes: z.strictObject({ own: count, 'third-party': count, synthetic: count }),
       // refuses a URL, file name or credit line as a kind; a site name written as a slug still fits

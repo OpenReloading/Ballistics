@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { RepositoryLink } from '../src/components/repository-link.tsx'
-import { repositoryUrl } from '../src/lib/repository-url.ts'
+import { repositoryUrl, sourceUrl } from '../src/lib/repository-url.ts'
 
 const render = (url?: string | undefined, drawer?: boolean) =>
   renderToStaticMarkup(
@@ -39,5 +39,18 @@ it('repositoryUrl drops an unset or empty value', () => {
   expect(repositoryUrl('  ')).toBeUndefined()
   expect(repositoryUrl('https://github.com/OpenReloading/openreloading')).toBe(
     'https://github.com/OpenReloading/openreloading',
+  )
+})
+
+it('sourceUrl names the commit of the build, else its release tag, in the given repository or this one', () => {
+  const sha = 'abcdef0123456789abcdef0123456789abcdef01'
+  expect(sourceUrl('https://example.org/fork', sha, '0.0.7')).toBe(
+    `https://example.org/fork/tree/${sha}`,
+  )
+  expect(sourceUrl(undefined, sha, '0.0.7')).toBe(
+    `https://github.com/OpenReloading/Ballistics/tree/${sha}`,
+  )
+  expect(sourceUrl(' ', '', '0.0.7')).toBe(
+    'https://github.com/OpenReloading/Ballistics/tree/web-v0.0.7',
   )
 })

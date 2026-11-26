@@ -68,7 +68,7 @@ jobs:
           matrix=$(jq -nc \
             --arg av "$API_VERSION" --arg at "$API_TAG" \
             '[{name: "api", dockerfile: "packages/api/Dockerfile", version: $av, tag: $at,
-               licenses: "ISC AND MIT AND CC-BY-4.0 AND Apache-2.0"}]
+               licenses: "AGPL-3.0-only AND MIT AND CC-BY-SA-4.0 AND Apache-2.0"}]
              | map(select(.version != ""))')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
       - id: libraries

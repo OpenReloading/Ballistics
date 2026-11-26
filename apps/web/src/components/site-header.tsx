@@ -21,7 +21,7 @@ import { useDisclosure, useHotkeys, useMediaQuery } from '@mantine/hooks'
 import dynamic from 'next/dynamic'
 import { useContext, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { docsAddress, noDocs, repositoryAddress } from '@/platform/edition.ts'
+import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '@/platform/edition.ts'
 import Image from '@/platform/image.tsx'
 import Link from '@/platform/link.tsx'
 import dark from '../assets/ballistics-dark.svg'
@@ -254,7 +254,7 @@ export function SiteHeader() {
         <SafetyBarButton iconOnly />
       </Box>
       <ReportIssueButton url={repository} onOpen={() => setReporting(true)} />
-      <RepositoryLink url={repository} />
+      <RepositoryLink url={sourceAddress} />
       <ThemeSwitch />
     </div>
   )
@@ -363,7 +363,7 @@ export function SiteHeader() {
                 onOpen={fromDrawer(() => setReporting(true))}
               />
               <DocsLink url={docs} drawer />
-              <RepositoryLink url={repository} drawer />
+              <RepositoryLink url={sourceAddress} drawer />
             </Stack>
           </Drawer.Body>
         </Drawer.Content>

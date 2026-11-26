@@ -28,15 +28,15 @@ SPDX-License-Identifier = "MIT"
 [[annotations]]
 path = "packages/catalog/records/**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
-SPDX-License-Identifier = "CC-BY-4.0"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
 
-# Records derived from Wikipedia state CC-BY-SA-4.0 in their source (packages/catalog/LICENSE).
+# Records derived from Wikipedia: the Wikipedia contributors hold rights in them too.
 [[annotations]]
 path = "packages/catalog/records/capacities/*-wikipedia.json"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors, Wikipedia contributors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
-# Logo files copied from the RangeFoundry Artwork repository (NOTICE).
+# Names and logos: no open license (LICENSES/LicenseRef-Brand.txt, NOTICE).
 [[annotations]]
 path = [
   "apps/web/src/assets/ballistics-light.svg",
@@ -46,8 +46,8 @@ path = [
   "apps/web/src/app/apple-icon.png",
   "apps/web/public/icon-192.png",
 ]
-SPDX-FileCopyrightText = "2026 RangeFoundry contributors"
-SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "LicenseRef-Brand"
 
 # Inter fonts and their license text (apps/web/src/platform/fonts/OFL.txt).
 [[annotations]]

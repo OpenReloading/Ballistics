@@ -51,6 +51,9 @@ describe('buildOpenApi', () => {
     )
     expect(d.paths['/v1/interior']?.post?.requestBody).toBeDefined()
     expect(d.info.version).toBe(API_VERSION)
+    expect(d.info.description).toContain(
+      `[Source code of this version](https://github.com/OpenReloading/Ballistics/tree/api-v${API_VERSION})`,
+    )
   })
 
   it('documents the statuses each route answers, errors with the shared body', () => {

@@ -98,7 +98,7 @@ Publishing is off until the settings below exist, `pnpm run pack:check` passes a
 2. On npmjs.com, package Settings, Trusted Publisher, GitHub Actions: organization `OpenReloading`, repository `Ballistics`, workflow `release.yml`.
 3. Publishing access: "Require two-factor authentication and disallow tokens".
 
-`pnpm --filter @rangefoundry/<name> pack --dry-run` lists the package contents: `dist` without source maps and the license files (`catalog`: `LICENSE` for CC BY 4.0 and `LICENSE-AGPL`), no sources, tests or records folder.
+`pnpm --filter @rangefoundry/<name> pack --dry-run` lists the package contents: `dist` without source maps and the license files (`catalog`: `LICENSE` for CC BY-SA 4.0 and `LICENSE-AGPL`), no sources, tests or records folder.
 
 ## Contract baselines
 

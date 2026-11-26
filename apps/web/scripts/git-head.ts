@@ -4,7 +4,7 @@ import path from 'node:path'
 const read = (file: string) => readFileSync(file, 'utf8').trim()
 
 /** Read from its git files so a build needs no `git` program on the path; follows a worktree's `.git` file and a ref in `packed-refs`, `''` when there is no checkout or it cannot be read. */
-export function shortCommit(root: string): string {
+export function headCommit(root: string): string {
   try {
     let dir = path.join(root, '.git')
     try {
@@ -27,8 +27,11 @@ export function shortCommit(root: string): string {
         head = line?.split(' ')[0] ?? ''
       }
     }
-    return /^[0-9a-f]{40}$/.test(head) ? head.slice(0, 7) : ''
+    return /^[0-9a-f]{40}$/.test(head) ? head : ''
   } catch {
     return ''
   }
 }
+
+/** The first 7 characters of `headCommit`, `''` without a checkout. */
+export const shortCommit = (root: string): string => headCommit(root).slice(0, 7)
