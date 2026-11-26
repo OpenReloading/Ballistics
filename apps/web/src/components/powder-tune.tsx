@@ -1,4 +1,5 @@
 'use client'
+import { useLingui } from '@lingui/react'
 
 import { Anchor, Badge, Button, Group, NativeSelect, Slider, Text, TextInput } from '@mantine/core'
 import type {
@@ -341,6 +342,7 @@ function FitResult({
   revolver?: boolean
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const { fit, range, failure } = state
   const speed = (ms: number) => withUnit('velocity', system, ms)
@@ -371,7 +373,7 @@ function FitResult({
           <Message severity="warning">
             {failure.kind === 'refused'
               ? t(refusalTexts[failure.reason])
-              : translateMessage(failure.message, t)}
+              : translateMessage(failure.message, i18n)}
           </Message>
         )}
       </div>

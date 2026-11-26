@@ -4,147 +4,408 @@ import type { GroupStatisticsIssue } from '@rangefoundry/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@rangefoundry/statistics'
 import type { RecordNotFoundIssue, UseCaseIssue } from '@rangefoundry/use-cases'
 import { english, type Message, msg } from '../i18n/translate.ts'
+import type { Described } from './core-messages.ts'
 import { gapWords } from './resistance-gaps.ts'
 
 const statisticsWords = {
-  probabilityOutsideUnit: msg('probability must lie in (0, 1)'),
-  levelOutsideUnit: msg('level must lie in (0, 1)'),
-  confidenceLevelOutsideUnit: msg('confidence level must lie in (0, 1)'),
-  degreesOfFreedomNotPositive: msg('degrees of freedom must be positive'),
-  degreesOfFreedomNotPositiveWhole: msg('degrees of freedom must be a positive whole number'),
-  maxIterationsNotPositiveInteger: msg('maxIterations must be a positive integer'),
-  maxConditionOutOfRange: msg('maxCondition must be finite and at least 1'),
-  velocitiesNotFinite: msg('velocities must be finite'),
-  relativeHalfWidthBelowMinimum: msg('relative half-width must be at least 0.01'),
-  relativeHalfWidthOutOfReach: msg('relative half-width needs more shots than the search covers'),
-} satisfies Record<StatisticsIssue['code'], Message>
+  probabilityOutsideUnit: /*i18n*/ {
+    id: 'refusal.probabilityOutsideUnit',
+    message: 'probability must lie in (0, 1)',
+  },
+  levelOutsideUnit: /*i18n*/ {
+    id: 'refusal.levelOutsideUnit',
+    message: 'level must lie in (0, 1)',
+  },
+  confidenceLevelOutsideUnit: /*i18n*/ {
+    id: 'refusal.confidenceLevelOutsideUnit',
+    message: 'confidence level must lie in (0, 1)',
+  },
+  degreesOfFreedomNotPositive: /*i18n*/ {
+    id: 'refusal.degreesOfFreedomNotPositive',
+    message: 'degrees of freedom must be positive',
+  },
+  degreesOfFreedomNotPositiveWhole: /*i18n*/ {
+    id: 'refusal.degreesOfFreedomNotPositiveWhole',
+    message: 'degrees of freedom must be a positive whole number',
+  },
+  maxIterationsNotPositiveInteger: /*i18n*/ {
+    id: 'refusal.maxIterationsNotPositiveInteger',
+    message: 'maxIterations must be a positive integer',
+  },
+  maxConditionOutOfRange: /*i18n*/ {
+    id: 'refusal.maxConditionOutOfRange',
+    message: 'maxCondition must be finite and at least 1',
+  },
+  velocitiesNotFinite: /*i18n*/ {
+    id: 'refusal.velocitiesNotFinite',
+    message: 'velocities must be finite',
+  },
+  relativeHalfWidthBelowMinimum: /*i18n*/ {
+    id: 'refusal.relativeHalfWidthBelowMinimum',
+    message: 'relative half-width must be at least 0.01',
+  },
+  relativeHalfWidthOutOfReach: /*i18n*/ {
+    id: 'refusal.relativeHalfWidthOutOfReach',
+    message: 'relative half-width needs more shots than the search covers',
+  },
+} satisfies Record<StatisticsIssue['code'], Described>
 
 const groupStatisticsWords = {
-  'confidence-level': msg('confidence level must lie in (0, 1)'),
-  distance: msg('distance must be positive'),
-  'shot-coordinates': msg('shot coordinates must be finite'),
-  'shot-velocity': msg('shot velocity must be finite'),
-  aim: msg('aim must be finite'),
-  coverage: msg('coverage must lie in (0, 1)'),
-} satisfies Record<GroupStatisticsIssue['code'], Message>
+  'confidence-level': /*i18n*/ {
+    id: 'refusal.confidenceLevel',
+    message: 'confidence level must lie in (0, 1)',
+  },
+  distance: /*i18n*/ { id: 'refusal.distance', message: 'distance must be positive' },
+  'shot-coordinates': /*i18n*/ {
+    id: 'refusal.shotCoordinates',
+    message: 'shot coordinates must be finite',
+  },
+  'shot-velocity': /*i18n*/ { id: 'refusal.shotVelocity', message: 'shot velocity must be finite' },
+  aim: /*i18n*/ { id: 'refusal.aim', message: 'aim must be finite' },
+  coverage: /*i18n*/ { id: 'refusal.coverage', message: 'coverage must lie in (0, 1)' },
+} satisfies Record<GroupStatisticsIssue['code'], Described>
 
 const exteriorWords = {
-  pressureInvalid: msg('pressure {pressure} Pa'),
-  humidityOutsideUnit: msg('humidity {humidity} outside 0..1'),
-  temperatureInvalid: msg('temperature {temperature} K'),
-  altitudeOutsideRange: msg('altitude {altitude} m outside {low} to {high} m'),
-  timeOfFlightNegative: msg('time of flight must be 0 or more'),
-  rangeNotPositive: msg('range must be positive'),
-  targetHeadingNotNumber: msg('target heading must be a number'),
-  targetSpeedNegative: msg('target speed must be 0 or more'),
-  muzzleVelocityNotConverged: msg('muzzle velocity did not converge'),
-  measuredSpeedTooLow: msg(
-    'the speed measured is lower than the bullet can keep over the distance',
-  ),
-  distanceNotReached: msg('distance {distance} m not reached ({stop})'),
-  velocityNotPositive: msg('velocity must be positive'),
-  distanceNegative: msg('distance must not be negative'),
-  outlineOutsideMethod: msg('the outline gives no positive finite drag: outside the method'),
-  machNotPositive: msg('mach must be positive'),
-  diameterNotPositive: msg('diameter must be positive'),
-  noseAndBoatTailExceedLength: msg('noseLength plus boatTailLength must not exceed length'),
-  bandDiameterBelowDiameter: msg('bandDiameter must be at least the diameter'),
-  meplatDiameterOutsideRange: msg('meplatDiameter must be zero up to the diameter'),
-  baseDiameterNotPositive: msg('baseDiameter must be positive'),
-  boatTailLengthNegative: msg('boatTailLength must be zero or more'),
-  headShapeOutsideUnit: msg('headShape must be from 0 to 1'),
-  outlineLengthsNotPositive: msg('length and noseLength must be positive'),
-  noCandidate: msg('at least one candidate'),
-  dispersionNotPositive: msg('dispersion must be positive'),
-  entryValueInvalid: msg('entry value'),
-  entryKindUnknown: msg('entry kind {kind}'),
-  noEntryOrChronograph: msg('at least one entry or a chronograph'),
-  chronographMeanInvalid: msg('chronograph mean'),
-  entryRoundingNegative: msg('{kind} rounding must not be negative'),
-  entryStandardDeviationNotPositive: msg('{kind} standardDeviation must be positive'),
-  entryShotCountInvalid: msg('{kind} shotCount must be a whole number of at least 1'),
-  entryRangeInvalid: msg('{kind} range'),
-  maxRelativeStandardUncertaintyNotPositive: msg('maxRelativeStandardUncertainty must be positive'),
-  maxInflationNotAboveOne: msg('maxInflation must exceed 1'),
-  residualConfidenceLevelOutsideUnit: msg('residualConfidenceLevel must lie in (0, 1)'),
-  confidenceLevelOptionOutsideUnit: msg('confidenceLevel must lie in (0, 1)'),
-  zeroOffsetPriorWithoutFit: msg('a zeroOffset prior needs the fitZeroOffset option'),
-  priorNotPositive: msg('prior {name} must be positive'),
-  priorUnknown: msg('prior {name}'),
-  clickValueNotPositive: msg('click value must be positive'),
-  maxZeroSigmaNotPositive: msg('maxZeroSigma must be positive'),
-  muzzleVelocityNotPositive: msg('muzzle velocity must be positive'),
-  stepSizeBelowMinimum: msg('step size {step} s below {min} s'),
-  integrationBudgetExceeded: msg('more than {max} integration steps in total'),
-  integrationStepsExceeded: msg('more than {max} integration steps'),
-  stabilityInputsNotPositive: msg('mass, diameter, length, twist and velocity must be positive'),
-  rangeInvalid: msg('range {range}'),
-  zeroNotConverged: msg('zero did not converge (miss {vertical} m, {horizontal} m)'),
-  zeroRangeNotReached: msg('zero range {range} m not reached ({stop})'),
-  momentSlopeNotPositive: msg('momentSlope must be positive (spin-stabilized bullet)'),
-  momentSlopeNeedsLength: msg('a missing momentSlope needs the length'),
-  inertiaNotPositive: msg('moments of inertia must be positive'),
-  inertiaNeedsLength: msg('a missing moment of inertia needs the length'),
-  modifiedPointMassNeedsLiftSlope: msg('the modified point mass needs liftSlope'),
-  modifiedPointMassNeedsTwist: msg('the modified point mass needs twist and twist hand'),
-  modifiedPointMassNeedsAerodynamics: msg('the modified point mass needs projectile.aerodynamics'),
-  coefficientTableMachNotRising: msg('{name} table Mach must rise'),
-  coefficientTableNodeInvalid: msg('{name} table node'),
-  coefficientTableTooShort: msg('{name} table needs at least two nodes'),
-  coefficientNotFinite: msg('{name} must be finite'),
-  modelUnknown: msg('model {model}'),
-  zeroToleranceOrMaxYawNotPositive: msg('zero tolerance and maximum yaw must be positive'),
-  gravityInvalid: msg('gravity'),
-  stepBudgetInvalid: msg('step budget'),
-  tolerancesInvalid: msg('tolerances and limits'),
-  azimuthInvalid: msg('azimuth'),
-  latitudeInvalid: msg('latitude'),
-  lookAngleOutsideRange: msg('look angle outside -pi/2..pi/2'),
-  boreAnglesInvalid: msg('bore angles'),
-  zeroLookAngleOutsideRange: msg('zero look angle outside -pi/2..pi/2'),
-  zeroRangeNotPositive: msg('zero range must be positive'),
-  twistNotPositive: msg('twist must be positive'),
-  sightInvalid: msg('sight height and offset'),
-  lengthNotPositive: msg('length must be positive'),
-  massNotPositive: msg('mass must be positive'),
-  dragInterpolationUnknown: msg('drag interpolation {interpolation}'),
-  dragCurveMachNotRising: msg('drag curve Mach must rise'),
-  dragCurveNodeInvalid: msg('drag curve node'),
-  dragCurveTooShort: msg('a drag curve needs at least two nodes'),
-  bcReferenceUnknown: msg('BC reference {reference}'),
-  bcBandsSameSpeed: msg('BC bands need distinct speeds'),
-  bcBandInvalid: msg('BC band'),
-  noBcBand: msg('at least one BC band'),
-  dragModelUnknown: msg('drag model {model}'),
-  windSegmentsNotRising: msg('wind segments must end in rising order'),
-  windSegmentInvalid: msg('wind segment'),
-  sessionWithoutObservation: msg('at least one observation per session'),
-  noSession: msg('at least one session'),
-  knotsNeedSingleBandOrCurve: msg('knots need a single-band BC or a curve'),
-  knotsNotRising: msg('knots must rise'),
-  knotMachNotPositive: msg('knot Mach must be positive'),
-  knotsTooFew: msg('at least two knots'),
-  mixedObservationsNeedUncertainty: msg(
-    'observations of different kinds need standard uncertainties',
-  ),
-  standardUncertaintyPartial: msg('standardUncertainty on all observations or none'),
-  standardUncertaintyNotPositive: msg('standardUncertainty must be positive'),
-  observationRangeInvalid: msg('observation range {range}'),
-  observationValueInvalid: msg('observation value'),
-  observationKindUnknown: msg('observation kind {kind}'),
-  noObservation: msg('at least one observation'),
-  maxTotalStepsNotPositive: msg('maxTotalSteps must be positive'),
-  airDensityOutsideRange: msg(
-    'pressure {pressure} Pa at temperature {temperature} K gives an air density of {density} kg/m3, outside 0 to {max} kg/m3',
-  ),
-  groupSharesShots: msg(
-    'group {group}: an impact and a dial entry share their shots, keep one or name two groups',
-  ),
-  rangeNotReached: msg('range {range} m not reached'),
-  rangeGroupSharesShots: msg(
-    'group {range} m: an impact and a dial entry share their shots, keep one or name two groups',
-  ),
-} satisfies Record<ExteriorIssue['code'], Message>
+  pressureInvalid: /*i18n*/ { id: 'refusal.pressureInvalid', message: 'pressure {pressure} Pa' },
+  humidityOutsideUnit: /*i18n*/ {
+    id: 'refusal.humidityOutsideUnit',
+    message: 'humidity {humidity} outside 0..1',
+  },
+  temperatureInvalid: /*i18n*/ {
+    id: 'refusal.temperatureInvalid',
+    message: 'temperature {temperature} K',
+  },
+  altitudeOutsideRange: /*i18n*/ {
+    id: 'refusal.altitudeOutsideRange',
+    message: 'altitude {altitude} m outside {low} to {high} m',
+  },
+  timeOfFlightNegative: /*i18n*/ {
+    id: 'refusal.timeOfFlightNegative',
+    message: 'time of flight must be 0 or more',
+  },
+  rangeNotPositive: /*i18n*/ { id: 'refusal.rangeNotPositive', message: 'range must be positive' },
+  targetHeadingNotNumber: /*i18n*/ {
+    id: 'refusal.targetHeadingNotNumber',
+    message: 'target heading must be a number',
+  },
+  targetSpeedNegative: /*i18n*/ {
+    id: 'refusal.targetSpeedNegative',
+    message: 'target speed must be 0 or more',
+  },
+  muzzleVelocityNotConverged: /*i18n*/ {
+    id: 'refusal.muzzleVelocityNotConverged',
+    message: 'muzzle velocity did not converge',
+  },
+  measuredSpeedTooLow: /*i18n*/ {
+    id: 'refusal.measuredSpeedTooLow',
+    message: 'the speed measured is lower than the bullet can keep over the distance',
+  },
+  distanceNotReached: /*i18n*/ {
+    id: 'refusal.distanceNotReached',
+    message: 'distance {distance} m not reached ({stop})',
+  },
+  velocityNotPositive: /*i18n*/ {
+    id: 'refusal.velocityNotPositive',
+    message: 'velocity must be positive',
+  },
+  distanceNegative: /*i18n*/ {
+    id: 'refusal.distanceNegative',
+    message: 'distance must not be negative',
+  },
+  outlineOutsideMethod: /*i18n*/ {
+    id: 'refusal.outlineOutsideMethod',
+    message: 'the outline gives no positive finite drag: outside the method',
+  },
+  machNotPositive: /*i18n*/ { id: 'refusal.machNotPositive', message: 'mach must be positive' },
+  diameterNotPositive: /*i18n*/ {
+    id: 'refusal.diameterNotPositive',
+    message: 'diameter must be positive',
+  },
+  noseAndBoatTailExceedLength: /*i18n*/ {
+    id: 'refusal.noseAndBoatTailExceedLength',
+    message: 'noseLength plus boatTailLength must not exceed length',
+  },
+  bandDiameterBelowDiameter: /*i18n*/ {
+    id: 'refusal.bandDiameterBelowDiameter',
+    message: 'bandDiameter must be at least the diameter',
+  },
+  meplatDiameterOutsideRange: /*i18n*/ {
+    id: 'refusal.meplatDiameterOutsideRange',
+    message: 'meplatDiameter must be zero up to the diameter',
+  },
+  baseDiameterNotPositive: /*i18n*/ {
+    id: 'refusal.baseDiameterNotPositive',
+    message: 'baseDiameter must be positive',
+  },
+  boatTailLengthNegative: /*i18n*/ {
+    id: 'refusal.boatTailLengthNegative',
+    message: 'boatTailLength must be zero or more',
+  },
+  headShapeOutsideUnit: /*i18n*/ {
+    id: 'refusal.headShapeOutsideUnit',
+    message: 'headShape must be from 0 to 1',
+  },
+  outlineLengthsNotPositive: /*i18n*/ {
+    id: 'refusal.outlineLengthsNotPositive',
+    message: 'length and noseLength must be positive',
+  },
+  noCandidate: /*i18n*/ { id: 'refusal.noCandidate', message: 'at least one candidate' },
+  dispersionNotPositive: /*i18n*/ {
+    id: 'refusal.dispersionNotPositive',
+    message: 'dispersion must be positive',
+  },
+  entryValueInvalid: /*i18n*/ { id: 'refusal.entryValueInvalid', message: 'entry value' },
+  entryKindUnknown: /*i18n*/ { id: 'refusal.entryKindUnknown', message: 'entry kind {kind}' },
+  noEntryOrChronograph: /*i18n*/ {
+    id: 'refusal.noEntryOrChronograph',
+    message: 'at least one entry or a chronograph',
+  },
+  chronographMeanInvalid: /*i18n*/ {
+    id: 'refusal.chronographMeanInvalid',
+    message: 'chronograph mean',
+  },
+  entryRoundingNegative: /*i18n*/ {
+    id: 'refusal.entryRoundingNegative',
+    message: '{kind} rounding must not be negative',
+  },
+  entryStandardDeviationNotPositive: /*i18n*/ {
+    id: 'refusal.entryStandardDeviationNotPositive',
+    message: '{kind} standardDeviation must be positive',
+  },
+  entryShotCountInvalid: /*i18n*/ {
+    id: 'refusal.entryShotCountInvalid',
+    message: '{kind} shotCount must be a whole number of at least 1',
+  },
+  entryRangeInvalid: /*i18n*/ { id: 'refusal.entryRangeInvalid', message: '{kind} range' },
+  maxRelativeStandardUncertaintyNotPositive: /*i18n*/ {
+    id: 'refusal.maxRelativeStandardUncertaintyNotPositive',
+    message: 'maxRelativeStandardUncertainty must be positive',
+  },
+  maxInflationNotAboveOne: /*i18n*/ {
+    id: 'refusal.maxInflationNotAboveOne',
+    message: 'maxInflation must exceed 1',
+  },
+  residualConfidenceLevelOutsideUnit: /*i18n*/ {
+    id: 'refusal.residualConfidenceLevelOutsideUnit',
+    message: 'residualConfidenceLevel must lie in (0, 1)',
+  },
+  confidenceLevelOptionOutsideUnit: /*i18n*/ {
+    id: 'refusal.confidenceLevelOptionOutsideUnit',
+    message: 'confidenceLevel must lie in (0, 1)',
+  },
+  zeroOffsetPriorWithoutFit: /*i18n*/ {
+    id: 'refusal.zeroOffsetPriorWithoutFit',
+    message: 'a zeroOffset prior needs the fitZeroOffset option',
+  },
+  priorNotPositive: /*i18n*/ {
+    id: 'refusal.priorNotPositive',
+    message: 'prior {name} must be positive',
+  },
+  priorUnknown: /*i18n*/ { id: 'refusal.priorUnknown', message: 'prior {name}' },
+  clickValueNotPositive: /*i18n*/ {
+    id: 'refusal.clickValueNotPositive',
+    message: 'click value must be positive',
+  },
+  maxZeroSigmaNotPositive: /*i18n*/ {
+    id: 'refusal.maxZeroSigmaNotPositive',
+    message: 'maxZeroSigma must be positive',
+  },
+  muzzleVelocityNotPositive: /*i18n*/ {
+    id: 'refusal.muzzleVelocityNotPositive',
+    message: 'muzzle velocity must be positive',
+  },
+  stepSizeBelowMinimum: /*i18n*/ {
+    id: 'refusal.stepSizeBelowMinimum',
+    message: 'step size {step} s below {min} s',
+  },
+  integrationBudgetExceeded: /*i18n*/ {
+    id: 'refusal.integrationBudgetExceeded',
+    message: 'more than {max} integration steps in total',
+  },
+  integrationStepsExceeded: /*i18n*/ {
+    id: 'refusal.integrationStepsExceeded',
+    message: 'more than {max} integration steps',
+  },
+  stabilityInputsNotPositive: /*i18n*/ {
+    id: 'refusal.stabilityInputsNotPositive',
+    message: 'mass, diameter, length, twist and velocity must be positive',
+  },
+  rangeInvalid: /*i18n*/ { id: 'refusal.rangeInvalid', message: 'range {range}' },
+  zeroNotConverged: /*i18n*/ {
+    id: 'refusal.zeroNotConverged',
+    message: 'zero did not converge (miss {vertical} m, {horizontal} m)',
+  },
+  zeroRangeNotReached: /*i18n*/ {
+    id: 'refusal.zeroRangeNotReached',
+    message: 'zero range {range} m not reached ({stop})',
+  },
+  momentSlopeNotPositive: /*i18n*/ {
+    id: 'refusal.momentSlopeNotPositive',
+    message: 'momentSlope must be positive (spin-stabilized bullet)',
+  },
+  momentSlopeNeedsLength: /*i18n*/ {
+    id: 'refusal.momentSlopeNeedsLength',
+    message: 'a missing momentSlope needs the length',
+  },
+  inertiaNotPositive: /*i18n*/ {
+    id: 'refusal.inertiaNotPositive',
+    message: 'moments of inertia must be positive',
+  },
+  inertiaNeedsLength: /*i18n*/ {
+    id: 'refusal.inertiaNeedsLength',
+    message: 'a missing moment of inertia needs the length',
+  },
+  modifiedPointMassNeedsLiftSlope: /*i18n*/ {
+    id: 'refusal.modifiedPointMassNeedsLiftSlope',
+    message: 'the modified point mass needs liftSlope',
+  },
+  modifiedPointMassNeedsTwist: /*i18n*/ {
+    id: 'refusal.modifiedPointMassNeedsTwist',
+    message: 'the modified point mass needs twist and twist hand',
+  },
+  modifiedPointMassNeedsAerodynamics: /*i18n*/ {
+    id: 'refusal.modifiedPointMassNeedsAerodynamics',
+    message: 'the modified point mass needs projectile.aerodynamics',
+  },
+  coefficientTableMachNotRising: /*i18n*/ {
+    id: 'refusal.coefficientTableMachNotRising',
+    message: '{name} table Mach must rise',
+  },
+  coefficientTableNodeInvalid: /*i18n*/ {
+    id: 'refusal.coefficientTableNodeInvalid',
+    message: '{name} table node',
+  },
+  coefficientTableTooShort: /*i18n*/ {
+    id: 'refusal.coefficientTableTooShort',
+    message: '{name} table needs at least two nodes',
+  },
+  coefficientNotFinite: /*i18n*/ {
+    id: 'refusal.coefficientNotFinite',
+    message: '{name} must be finite',
+  },
+  modelUnknown: /*i18n*/ { id: 'refusal.modelUnknown', message: 'model {model}' },
+  zeroToleranceOrMaxYawNotPositive: /*i18n*/ {
+    id: 'refusal.zeroToleranceOrMaxYawNotPositive',
+    message: 'zero tolerance and maximum yaw must be positive',
+  },
+  gravityInvalid: /*i18n*/ { id: 'refusal.gravityInvalid', message: 'gravity' },
+  stepBudgetInvalid: /*i18n*/ { id: 'refusal.stepBudgetInvalid', message: 'step budget' },
+  tolerancesInvalid: /*i18n*/ { id: 'refusal.tolerancesInvalid', message: 'tolerances and limits' },
+  azimuthInvalid: /*i18n*/ { id: 'refusal.azimuthInvalid', message: 'azimuth' },
+  latitudeInvalid: /*i18n*/ { id: 'refusal.latitudeInvalid', message: 'latitude' },
+  lookAngleOutsideRange: /*i18n*/ {
+    id: 'refusal.lookAngleOutsideRange',
+    message: 'look angle outside -pi/2..pi/2',
+  },
+  boreAnglesInvalid: /*i18n*/ { id: 'refusal.boreAnglesInvalid', message: 'bore angles' },
+  zeroLookAngleOutsideRange: /*i18n*/ {
+    id: 'refusal.zeroLookAngleOutsideRange',
+    message: 'zero look angle outside -pi/2..pi/2',
+  },
+  zeroRangeNotPositive: /*i18n*/ {
+    id: 'refusal.zeroRangeNotPositive',
+    message: 'zero range must be positive',
+  },
+  twistNotPositive: /*i18n*/ { id: 'refusal.twistNotPositive', message: 'twist must be positive' },
+  sightInvalid: /*i18n*/ { id: 'refusal.sightInvalid', message: 'sight height and offset' },
+  lengthNotPositive: /*i18n*/ {
+    id: 'refusal.lengthNotPositive',
+    message: 'length must be positive',
+  },
+  massNotPositive: /*i18n*/ { id: 'refusal.massNotPositive', message: 'mass must be positive' },
+  dragInterpolationUnknown: /*i18n*/ {
+    id: 'refusal.dragInterpolationUnknown',
+    message: 'drag interpolation {interpolation}',
+  },
+  dragCurveMachNotRising: /*i18n*/ {
+    id: 'refusal.dragCurveMachNotRising',
+    message: 'drag curve Mach must rise',
+  },
+  dragCurveNodeInvalid: /*i18n*/ { id: 'refusal.dragCurveNodeInvalid', message: 'drag curve node' },
+  dragCurveTooShort: /*i18n*/ {
+    id: 'refusal.dragCurveTooShort',
+    message: 'a drag curve needs at least two nodes',
+  },
+  bcReferenceUnknown: /*i18n*/ {
+    id: 'refusal.bcReferenceUnknown',
+    message: 'BC reference {reference}',
+  },
+  bcBandsSameSpeed: /*i18n*/ {
+    id: 'refusal.bcBandsSameSpeed',
+    message: 'BC bands need distinct speeds',
+  },
+  bcBandInvalid: /*i18n*/ { id: 'refusal.bcBandInvalid', message: 'BC band' },
+  noBcBand: /*i18n*/ { id: 'refusal.noBcBand', message: 'at least one BC band' },
+  dragModelUnknown: /*i18n*/ { id: 'refusal.dragModelUnknown', message: 'drag model {model}' },
+  windSegmentsNotRising: /*i18n*/ {
+    id: 'refusal.windSegmentsNotRising',
+    message: 'wind segments must end in rising order',
+  },
+  windSegmentInvalid: /*i18n*/ { id: 'refusal.windSegmentInvalid', message: 'wind segment' },
+  sessionWithoutObservation: /*i18n*/ {
+    id: 'refusal.sessionWithoutObservation',
+    message: 'at least one observation per session',
+  },
+  noSession: /*i18n*/ { id: 'refusal.noSession', message: 'at least one session' },
+  knotsNeedSingleBandOrCurve: /*i18n*/ {
+    id: 'refusal.knotsNeedSingleBandOrCurve',
+    message: 'knots need a single-band BC or a curve',
+  },
+  knotsNotRising: /*i18n*/ { id: 'refusal.knotsNotRising', message: 'knots must rise' },
+  knotMachNotPositive: /*i18n*/ {
+    id: 'refusal.knotMachNotPositive',
+    message: 'knot Mach must be positive',
+  },
+  knotsTooFew: /*i18n*/ { id: 'refusal.knotsTooFew', message: 'at least two knots' },
+  mixedObservationsNeedUncertainty: /*i18n*/ {
+    id: 'refusal.mixedObservationsNeedUncertainty',
+    message: 'observations of different kinds need standard uncertainties',
+  },
+  standardUncertaintyPartial: /*i18n*/ {
+    id: 'refusal.standardUncertaintyPartial',
+    message: 'standardUncertainty on all observations or none',
+  },
+  standardUncertaintyNotPositive: /*i18n*/ {
+    id: 'refusal.standardUncertaintyNotPositive',
+    message: 'standardUncertainty must be positive',
+  },
+  observationRangeInvalid: /*i18n*/ {
+    id: 'refusal.observationRangeInvalid',
+    message: 'observation range {range}',
+  },
+  observationValueInvalid: /*i18n*/ {
+    id: 'refusal.observationValueInvalid',
+    message: 'observation value',
+  },
+  observationKindUnknown: /*i18n*/ {
+    id: 'refusal.observationKindUnknown',
+    message: 'observation kind {kind}',
+  },
+  noObservation: /*i18n*/ { id: 'refusal.noObservation', message: 'at least one observation' },
+  maxTotalStepsNotPositive: /*i18n*/ {
+    id: 'refusal.maxTotalStepsNotPositive',
+    message: 'maxTotalSteps must be positive',
+  },
+  airDensityOutsideRange: /*i18n*/ {
+    id: 'refusal.airDensityOutsideRange',
+    message:
+      'pressure {pressure} Pa at temperature {temperature} K gives an air density of {density} kg/m3, outside 0 to {max} kg/m3',
+  },
+  groupSharesShots: /*i18n*/ {
+    id: 'refusal.groupSharesShots',
+    message:
+      'group {group}: an impact and a dial entry share their shots, keep one or name two groups',
+  },
+  rangeNotReached: /*i18n*/ {
+    id: 'refusal.rangeNotReached',
+    message: 'range {range} m not reached',
+  },
+  rangeGroupSharesShots: /*i18n*/ {
+    id: 'refusal.rangeGroupSharesShots',
+    message:
+      'group {range} m: an impact and a dial entry share their shots, keep one or name two groups',
+  },
+} satisfies Record<ExteriorIssue['code'], Described>
 
 /** The codes interior shares with exterior and statistics take their words there. */
 const interiorWords = {
@@ -256,33 +517,61 @@ const interiorWords = {
 >
 
 const loadFileWords = {
-  valueMissing: msg('Enter a number for {field}.'),
-  valueNegative: msg('{field} must be at least 0.'),
-  burnFormPartial: msg('Burn form: {missing} needed with the others, or leave all four empty.'),
-  valueNotNumber: msg('Enter a number.'),
-  valueNotPositive: msg('Must be above 0.'),
-  valueBelowZero: msg('Must be at least 0.'),
-  engravingValueNeeded: msg('Needed with the other engraving value, or from a powder record.'),
-} satisfies Record<LoadFileIssue['code'], Message>
+  valueMissing: /*i18n*/ { id: 'refusal.valueMissing', message: 'Enter a number for {field}.' },
+  valueNegative: /*i18n*/ { id: 'refusal.valueNegative', message: '{field} must be at least 0.' },
+  burnFormPartial: /*i18n*/ {
+    id: 'refusal.burnFormPartial',
+    message: 'Burn form: {missing} needed with the others, or leave all four empty.',
+  },
+  valueNotNumber: /*i18n*/ { id: 'refusal.valueNotNumber', message: 'Enter a number.' },
+  valueNotPositive: /*i18n*/ { id: 'refusal.valueNotPositive', message: 'Must be above 0.' },
+  valueBelowZero: /*i18n*/ { id: 'refusal.valueBelowZero', message: 'Must be at least 0.' },
+  engravingValueNeeded: /*i18n*/ {
+    id: 'refusal.engravingValueNeeded',
+    message: 'Needed with the other engraving value, or from a powder record.',
+  },
+} satisfies Record<LoadFileIssue['code'], Described>
 
 const useCaseWords = {
-  resultNotFinite: msg('result holds a non-finite number at {path}'),
-  powderBulkDensityOutOfRange: msg(
-    'powder {powder} bulk density {density} kg/m3 must be above 0 and at most {max} kg/m3',
-  ),
-  powderWithoutBulkDensity: msg('powder {powder} has no bulk density'),
-  bulletWithoutDiameter: msg('bullet {bullet} has no diameter'),
-  bulletWithoutLength: msg('bullet {bullet} has no length'),
-  bulletValueOutOfBounds: msg(
-    'bullet {bullet} {key} {value} {unit} must be within {low} and {high} {unit}',
-  ),
-  bulletWithoutCoefficient: msg('bullet {bullet} has no {model} ballistic coefficient'),
-  bulletCoefficientsWithoutBands: msg(
-    'bullet {bullet} has {count} {model} values without distinct velocity bands; send drag explicitly',
-  ),
-  ladderChargeNotAboveZero: msg('ladder charge {charge} g must be above 0'),
-  recordNotFound: msg('{kind} {id} not found'),
-} satisfies Record<(UseCaseIssue | RecordNotFoundIssue)['code'], Message>
+  resultNotFinite: /*i18n*/ {
+    id: 'refusal.resultNotFinite',
+    message: 'result holds a non-finite number at {path}',
+  },
+  powderBulkDensityOutOfRange: /*i18n*/ {
+    id: 'refusal.powderBulkDensityOutOfRange',
+    message: 'powder {powder} bulk density {density} kg/m3 must be above 0 and at most {max} kg/m3',
+  },
+  powderWithoutBulkDensity: /*i18n*/ {
+    id: 'refusal.powderWithoutBulkDensity',
+    message: 'powder {powder} has no bulk density',
+  },
+  bulletWithoutDiameter: /*i18n*/ {
+    id: 'refusal.bulletWithoutDiameter',
+    message: 'bullet {bullet} has no diameter',
+  },
+  bulletWithoutLength: /*i18n*/ {
+    id: 'refusal.bulletWithoutLength',
+    message: 'bullet {bullet} has no length',
+  },
+  bulletValueOutOfBounds: /*i18n*/ {
+    id: 'refusal.bulletValueOutOfBounds',
+    message: 'bullet {bullet} {key} {value} {unit} must be within {low} and {high} {unit}',
+  },
+  bulletWithoutCoefficient: /*i18n*/ {
+    id: 'refusal.bulletWithoutCoefficient',
+    message: 'bullet {bullet} has no {model} ballistic coefficient',
+  },
+  bulletCoefficientsWithoutBands: /*i18n*/ {
+    id: 'refusal.bulletCoefficientsWithoutBands',
+    message:
+      'bullet {bullet} has {count} {model} values without distinct velocity bands; send drag explicitly',
+  },
+  ladderChargeNotAboveZero: /*i18n*/ {
+    id: 'refusal.ladderChargeNotAboveZero',
+    message: 'ladder charge {charge} g must be above 0',
+  },
+  recordNotFound: /*i18n*/ { id: 'refusal.recordNotFound', message: '{kind} {id} not found' },
+} satisfies Record<(UseCaseIssue | RecordNotFoundIssue)['code'], Described>
 
 /** Joins two packages' words; a code both use fails `tsc`, since a refusal carries no package. */
 const disjoint = <L extends object, R extends object>(
@@ -291,7 +580,7 @@ const disjoint = <L extends object, R extends object>(
 ) => ({ ...l, ...r })
 
 /** The words of every code. */
-export const refusalWords: Readonly<Record<string, Message>> = disjoint(
+export const refusalWords: Readonly<Record<string, Described | Message>> = disjoint(
   disjoint(
     disjoint(
       disjoint(disjoint(statisticsWords, groupStatisticsWords), exteriorWords),
@@ -322,5 +611,5 @@ function shown(name: string, v: unknown): string {
 export function refusalSentence({ code, params }: Diagnostic<string, object>): string | undefined {
   const words = Object.hasOwn(refusalWords, code) ? refusalWords[code] : undefined
   const values = Object.fromEntries(Object.entries(params).map(([k, v]) => [k, shown(k, v)]))
-  return words && english.t(words, values)
+  return words && english.t(typeof words === 'string' ? words : (words.message as Message), values)
 }

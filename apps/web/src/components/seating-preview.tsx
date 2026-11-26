@@ -1,4 +1,5 @@
 'use client'
+import { useLingui } from '@lingui/react'
 
 import { Anchor, NativeSelect } from '@mantine/core'
 import { cartridgeDiameters } from '@rangefoundry/ballistics'
@@ -1500,6 +1501,7 @@ function BulletPicker({ m }: { m: Model }) {
 /** What the bullet choice stands at: loading, failed, the record or design in use, and why it does not seat. */
 function BulletStatus({ m }: { m: Model }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { design, record, bulletRecord, shaped, refused, unseated, names } = m
   return (
     <>
@@ -1539,7 +1541,7 @@ function BulletStatus({ m }: { m: Model }) {
       {refused && (
         <p>
           {t('The bullet outline is not drawn: {reason}', {
-            reason: translateMessage(refused, t),
+            reason: translateMessage(refused, i18n),
           })}
         </p>
       )}
@@ -1954,6 +1956,7 @@ function DrawnFigure({
 
 function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Chamber }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { view, fixed, model, levelModel, designer, shape, p } = m
   const fullView = p.fullView
   // a chamber without a cartridge holds no bullet: the Chamber view draws the chamber alone
@@ -1974,7 +1977,7 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
       {view === 'combined' && fixed?.missing && (
         <p>
           {t('The outline needs {missing}.', {
-            missing: fixed.missing.map((x) => translateMessage(x, t)).join(', '),
+            missing: fixed.missing.map((x) => translateMessage(x, i18n)).join(', '),
           })}
         </p>
       )}
@@ -2070,6 +2073,7 @@ function SeatingNotes({
   freebore?: boolean | undefined
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <>
       <p className="note">
@@ -2099,7 +2103,7 @@ function SeatingNotes({
       {seating.notes.length > 0 && (
         <ul className="seating-notes">
           {seating.notes.map((n) => (
-            <li key={n}>{translateMessage(n, t)}</li>
+            <li key={n}>{translateMessage(n, i18n)}</li>
           ))}
         </ul>
       )}
@@ -2236,13 +2240,14 @@ function LeadeRow({ m, seating }: RowsProps) {
 
 function JumpRow({ m, seating }: RowsProps) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const unknown = seating.jump.value === undefined
   return (
     <Row
       term={seating.jump.source === 'lands' ? t('Jump to the lands') : t('Jump to the leade')}
       value={seating.jump.value === undefined ? t('not given') : m.mm(seating.jump.value)}
       tag={unknown ? undefined : seating.jump.tag}
-      note={translateMessage(jumpNote(seating.jump), t)}
+      note={translateMessage(jumpNote(seating.jump), i18n)}
     />
   )
 }

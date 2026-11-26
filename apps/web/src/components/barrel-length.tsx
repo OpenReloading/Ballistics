@@ -1,4 +1,6 @@
 'use client'
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 
 import { Button, SegmentedControl } from '@mantine/core'
 import dynamic from 'next/dynamic'
@@ -36,16 +38,17 @@ const columns = [
 ]
 
 /** Why a row has no values: the model's reason, or one of the study's own. */
-function reasonText(reason: string, t: Translator['t']) {
+function reasonText(reason: string, t: Translator['t'], i18n: I18n) {
   if (reason === 'the longer run ends before this length')
     return t('the longer run ends before this length')
   if (reason === 'invalid') return t('invalid')
-  return translateMessage(reason, t)
+  return translateMessage(reason, i18n)
 }
 
 /** Values up to the workbench barrel are read from the run, longer ones from the longer run. */
 export function BarrelTable({ study, system }: { study: BarrelStudy; system: UnitSystem }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const step = study.steps[study.selected]
   const ladder = study.steps.length > 1
   return (
@@ -96,7 +99,11 @@ export function BarrelTable({ study, system }: { study: BarrelStudy; system: Uni
               {study.pending
                 ? t('Longer run pending')
                 : t('Not computed: {reason}', {
-                    reason: reasonText(r.reason ?? study.message ?? 'longer run not requested', t),
+                    reason: reasonText(
+                      r.reason ?? study.message ?? 'longer run not requested',
+                      t,
+                      i18n,
+                    ),
                   })}
             </td>
           )}
@@ -110,13 +117,14 @@ export function BarrelTable({ study, system }: { study: BarrelStudy; system: Uni
 /** The Barrel length tab: the range, and the table or the chart. */
 export function BarrelLength({ study, system }: { study: BarrelStudy; system: UnitSystem }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [pane, setPane] = useState('Table')
   // every invalid field gives its reason: the field holds its own, spoken as its description
   const reasons = rangeSpecs.flatMap((s) => study.errors?.[s.key] ?? [])
   const first = reasons.length > 0 ? reasons.join(' ') : undefined
   const failed =
     study.message &&
-    t('Longer run failed: {message}', { message: translateMessage(study.message, t) })
+    t('Longer run failed: {message}', { message: translateMessage(study.message, i18n) })
   const text = first ?? (study.pending ? t('Longer run pending') : failed)
   if (study.base === undefined)
     return (

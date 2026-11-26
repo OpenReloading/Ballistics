@@ -1,10 +1,13 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { type ChronographString, interior, powderModelValues } from '@rangefoundry/ballistics'
 import { fromSi, type Powder, userRecord } from '@rangefoundry/schema'
+import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import { saveFailures, TuneNotes } from '../src/components/powder-tune.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english, translator } from '../src/i18n/translate.ts'
 import { dayText, localDay } from '../src/lib/dates.ts'
 import { nth } from '../src/lib/nth.ts'
@@ -15,6 +18,10 @@ import { fitMark, loadFitMark } from '../src/lib/powder-record.ts'
 import { fittedPowder, maxFitPoints, refitOf } from '../src/lib/powder-save.ts'
 import type { TuneString } from '../src/lib/powder-tune.ts'
 import { presetUnits } from '../src/lib/units.ts'
+
+/** Rendered under the English Lingui instance the components read. */
+const markup = (node: ReactNode) =>
+  renderToStaticMarkup(<I18nProvider i18n={linguiOf('en')}>{node}</I18nProvider>)
 
 const strings: TuneString[] = [2.6e-3, 2.65e-3, 2.7e-3, 2.8e-3, 2.9e-3].map((charge, i) => {
   const r = interior({ ...load(), charge })
@@ -275,7 +282,7 @@ describe('the save on the tuning screen', () => {
   // the mark shows today's day: a fixed clock keeps a run across midnight from failing
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(date)
-  const html = renderToStaticMarkup(
+  const html = markup(
     <MantineProvider>
       <TuneNotes
         loaded={undefined}
@@ -297,7 +304,7 @@ describe('the save on the tuning screen', () => {
   })
 
   it('shows the name typed before a new fit', () => {
-    const named = renderToStaticMarkup(
+    const named = markup(
       <MantineProvider>
         <TuneNotes
           loaded={undefined}
@@ -312,7 +319,7 @@ describe('the save on the tuning screen', () => {
   })
 
   it('offers no save before the pressure range has arrived', () => {
-    const waiting = renderToStaticMarkup(
+    const waiting = markup(
       <MantineProvider>
         <TuneNotes
           loaded={undefined}

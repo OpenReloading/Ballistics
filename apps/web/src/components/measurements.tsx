@@ -1,4 +1,5 @@
 'use client'
+import { useLingui } from '@lingui/react'
 
 import { Anchor, Button } from '@mantine/core'
 import type { VelocityUnit } from '@rangefoundry/importers'
@@ -289,6 +290,7 @@ export function Measurements({
   setSessions: Dispatch<SetStateAction<SessionRecord[]>>
 }) {
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const { manufacturerRef, manufacturerName, sessionRefCount, ownFirearm } = useResult()
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
   const [failures, setFailures] = useState<Failure[]>([])
@@ -446,7 +448,7 @@ export function Measurements({
           charge: charge(r.charge),
           speed: speed(e.velocity),
           unit: v.symbol,
-          reason: e.reason === true ? t('excluded at the range') : translateMessage(e.reason, t),
+          reason: e.reason === true ? t('excluded at the range') : translateMessage(e.reason, i18n),
         }),
       ),
     ),

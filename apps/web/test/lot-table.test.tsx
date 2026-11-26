@@ -1,10 +1,13 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { chargeLadder, interior } from '@rangefoundry/ballistics'
+import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { fractionSpec, LotPanel, lotNote } from '../src/components/lot-rows.tsx'
 import { type Outcome, type Step, shownSteps } from '../src/components/workbench-outcome.ts'
 import { LadderTable } from '../src/components/workbench-readouts.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { exampleFields } from '../src/lib/examples.ts'
@@ -14,6 +17,10 @@ import { lotChartDescription, lotFractionError, lotLoad } from '../src/lib/lot-r
 import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
 import { fixtureInterior, fixtureLadder, fixtureRecords } from './fixtures/load.ts'
+
+/** Rendered under the English Lingui instance the components read. */
+const markup = (node: ReactNode) =>
+  renderToStaticMarkup(<I18nProvider i18n={linguiOf('en')}>{node}</I18nProvider>)
 
 const system = presetUnits('us')
 const { load } = interiorBody(
@@ -61,7 +68,7 @@ const table = (withLot: boolean, failed?: number) => {
       },
       english.t,
     )
-  return renderToStaticMarkup(
+  return markup(
     <MantineProvider>
       <LadderTable
         ok={ok}
@@ -116,7 +123,7 @@ it('states no charge as safe or optimal in the table, the fields, the notes or t
     pending: false,
     retry: () => {},
   }
-  const panel = renderToStaticMarkup(
+  const panel = markup(
     <MantineProvider>
       <LotPanel lot={lot} system={system} />
     </MantineProvider>,

@@ -334,6 +334,7 @@ function ReportAfter({
   sections,
   t,
 }: ReportProps) {
+  const { i18n } = useLingui()
   const study =
     barrel.base === undefined ? (
       <p>{t('Needs a seated bullet in the cartridge figure.')}</p>
@@ -349,7 +350,9 @@ function ReportAfter({
           <h2>{ladderName(ok, t)}</h2>
           {ladderTable}
           {lot.message && (
-            <p>{t('Lot rows failed: {message}', { message: translateMessage(lot.message, t) })}</p>
+            <p>
+              {t('Lot rows failed: {message}', { message: translateMessage(lot.message, i18n) })}
+            </p>
           )}
           <LotChartBlock lot={lot} system={system} note={false} />
         </>
