@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test'
 import { recordFigures } from '../../../../packages/svg-drawings/src/cartridge/figures.ts'
 import type { SpecValue } from '../../../../packages/svg-drawings/src/core/types.ts'
 import { gotoHydrated } from './nav.ts'
+import { storeUnits } from './units.ts'
 
 // the pixels depend on the fonts: this runs only in the Playwright image of the installed version, in CI and locally (pnpm run drawing-baseline); DRAWING_BASELINE=full shoots the full set on demand (pnpm run drawing-baseline:full)
 test.skip(!process.env.DRAWING_BASELINE, 'runs in the Playwright image: pnpm run drawing-baseline')
@@ -149,6 +150,8 @@ for (const [title, { cartridge, svg, name, variant, width, colorScheme, at }] of
   test(title, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 })
     await page.emulateMedia({ colorScheme })
+    // the baseline shows the figure's dimensions in inches
+    await storeUnits(page, 'us', {})
     await gotoHydrated(page, `/cartridges/${cartridge}`)
     const figure = page.locator(`svg[aria-labelledby="${svg}-title"]`)
     if (variant !== undefined) {

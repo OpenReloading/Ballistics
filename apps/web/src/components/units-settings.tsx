@@ -21,7 +21,6 @@ import { storageName } from '../lib/edition.ts'
 import { type FieldSpec, type Fields, switchFields } from '../lib/field-spec.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
-  localePreset,
   type PresetId,
   parseUnitChoice,
   presetFromLink,
@@ -108,7 +107,7 @@ function createUnitsStore() {
   return { store, set }
 }
 
-/** Server and first render use "Metric, grains"; after mounting a link's `units` (not stored), else the stored choice, else the locale's preset. */
+/** Server and first render use "Metric, grains"; after mounting a link's `units` (not stored), else the stored choice, else "Metric, grains" for every browser language. */
 export function UnitsProvider({ children }: { children: ReactNode }) {
   const [{ store, set }] = useState(createUnitsStore)
   useEffect(() => {
@@ -127,16 +126,14 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
     set({
       ready: true,
       custom,
-      choice: linked
-        ? { preset: linked, overrides: {} }
-        : (stored ?? { preset: localePreset(navigator.language), overrides: {} }),
+      choice: linked ? { preset: linked, overrides: {} } : (stored ?? initial),
     })
     // a change in another tab applies here too
     const follow = (e: StorageEvent) => {
       if (e.key === customUnitsKey) set({ custom: parseUnitChoice(e.newValue) })
       if (e.key !== unitsKey) return
       const next = parseUnitChoice(e.newValue)
-      set({ choice: next ?? { preset: localePreset(navigator.language), overrides: {} } })
+      set({ choice: next ?? initial })
       if (next && hasOverrides(next)) set({ custom: next })
     }
     window.addEventListener('storage', follow)
