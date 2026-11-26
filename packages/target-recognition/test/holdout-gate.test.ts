@@ -13,6 +13,17 @@ afterAll(() => {
   for (const dir of dirs) rmSync(dir, { recursive: true })
 })
 
+/** A generated photo's hash and size with hand-written marks. */
+const label = (photo: LabeledPhoto, facts: Partial<LabeledPhoto>): LabeledPhoto => ({
+  ...photo,
+  source: 'own photo',
+  author: 'Test Labeler',
+  usable: true,
+  complete: true,
+  visibleDiameterPx: 10,
+  ...facts,
+})
+
 /** Three generated photos, a hand-written label set of them and its freeze file in a new folder. */
 async function frozenFolder(): Promise<
   GatePaths & { names: [string, string, string]; hashes: string[] }
@@ -24,15 +35,6 @@ async function frozenFolder(): Promise<
   const made = labelSet.parse(JSON.parse(readFileSync(join(photos, 'holes.json'), 'utf8')))
   const [a, b, c] = Object.entries(made.photos)
   if (!a || !b || !c) throw new Error('three photos expected')
-  const label = (photo: LabeledPhoto, facts: Partial<LabeledPhoto>): LabeledPhoto => ({
-    ...photo,
-    source: 'own photo',
-    author: 'Test Labeler',
-    usable: true,
-    complete: true,
-    visibleDiameterPx: 10,
-    ...facts,
-  })
   const labels = join(dir, 'labels.json')
   const set = {
     photos: {
@@ -89,35 +91,38 @@ const far = () => {
   return scripted([off, off])
 }
 
+// near: 1 and 1 corrections, within the bar; far: 5 and 5
+const FIRST_LOOK = {
+  look: 1,
+  photos: 3,
+  unusable: 1,
+  incomplete: 0,
+  bar: { median: 1, p90: 3 },
+  detectors: {
+    near: {
+      overall: { photos: 2, median: 1, max: 1 },
+      kinds: {
+        grid: { photos: 1, median: 1, max: 1 },
+        printed: { photos: 1, median: 1, max: 1 },
+      },
+      meetsBar: true,
+    },
+    far: {
+      overall: { photos: 2, median: 5, max: 5 },
+      kinds: {
+        grid: { photos: 1, median: 5, max: 5 },
+        printed: { photos: 1, median: 5, max: 5 },
+      },
+      meetsBar: false,
+    },
+  },
+}
+
 describe('holdout gate', () => {
   it('prints the aggregates of each detector against the default bar and counts each look', async () => {
     const folder = await frozenFolder()
     const first = await gate(folder, { near: near(), far: far() })
-    expect(first).toEqual({
-      look: 1,
-      photos: 3,
-      unusable: 1,
-      incomplete: 0,
-      bar: { median: 1, p90: 3 },
-      detectors: {
-        near: {
-          overall: { photos: 2, median: 1, max: 1 },
-          kinds: {
-            grid: { photos: 1, median: 1, max: 1 },
-            printed: { photos: 1, median: 1, max: 1 },
-          },
-          meetsBar: true,
-        },
-        far: {
-          overall: { photos: 2, median: 5, max: 5 },
-          kinds: {
-            grid: { photos: 1, median: 5, max: 5 },
-            printed: { photos: 1, median: 5, max: 5 },
-          },
-          meetsBar: false,
-        },
-      },
-    })
+    expect(first).toEqual(FIRST_LOOK)
     const second = await gate(folder, { near: near() })
     expect(second.look).toBe(2)
     const printed = JSON.stringify([first, second])
