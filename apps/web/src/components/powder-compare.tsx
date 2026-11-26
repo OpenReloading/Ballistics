@@ -1,13 +1,13 @@
 'use client'
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   noComparableLimitText,
   refusalText,
@@ -30,6 +30,7 @@ import {
 } from '../lib/powder-compare.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, shownLength, type UnitSystem } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/powder-compare.json' with { type: 'json' }
 import {
   type PowderTabState,
   powderTableCsv,
@@ -52,35 +53,73 @@ import {
 import { useLoad } from './workbench-context.ts'
 import { flagView } from './workbench-readouts.tsx'
 
+loadEnglish(englishMessages)
+
+const targetLabel = /*i18n*/ { id: 'powderCompare.target', context: 'charge', message: 'Target' }
+
 type Column = {
   key: string
-  label: Message
+  label: MessageDescriptor
   /** The quantity whose unit symbol follows the label. */
   unit?: 'charge' | 'pressure' | 'velocity' | undefined
   value: (r: CompareRow) => string | number | undefined
 }
 
 const columns: readonly Column[] = [
-  { key: 'powder', label: msg('Powder'), value: (r) => productLabel(r) },
-  { key: 'charge', label: msg('Charge'), unit: 'charge', value: (r) => r.charge },
-  { key: 'flags', label: msg('Flags'), value: (r) => r.flag },
-  { key: 'peak', label: msg('Peak pressure'), unit: 'pressure', value: (r) => r.values?.peak },
-  { key: 'percent', label: msg('Percent of maximum'), value: (r) => r.values?.percent },
+  {
+    key: 'powder',
+    label: /*i18n*/ { id: 'powderCompare.powder', message: 'Powder' },
+    value: (r) => productLabel(r),
+  },
+  {
+    key: 'charge',
+    label: /*i18n*/ { id: 'powderCompare.charge', message: 'Charge' },
+    unit: 'charge',
+    value: (r) => r.charge,
+  },
+  {
+    key: 'flags',
+    label: /*i18n*/ { id: 'powderCompare.flags', message: 'Flags' },
+    value: (r) => r.flag,
+  },
+  {
+    key: 'peak',
+    label: /*i18n*/ { id: 'powderCompare.peakPressure', message: 'Peak pressure' },
+    unit: 'pressure',
+    value: (r) => r.values?.peak,
+  },
+  {
+    key: 'percent',
+    label: /*i18n*/ { id: 'powderCompare.percentMaximum', message: 'Percent of maximum' },
+    value: (r) => r.values?.percent,
+  },
   {
     key: 'velocity',
-    label: msg('Muzzle velocity'),
+    label: /*i18n*/ { id: 'powderCompare.muzzleVelocity', message: 'Muzzle velocity' },
     unit: 'velocity',
     value: (r) => r.values?.velocity,
   },
-  { key: 'fill', label: msg('Case fill'), value: (r) => r.ratio },
-  { key: 'burnt', label: msg('Burnt at the muzzle'), value: (r) => r.values?.burnt },
-  { key: 'burnout', label: msg('Burnout'), value: (r) => r.values?.burnout },
+  {
+    key: 'fill',
+    label: /*i18n*/ { id: 'powderCompare.caseFill', message: 'Case fill' },
+    value: (r) => r.ratio,
+  },
+  {
+    key: 'burnt',
+    label: /*i18n*/ { id: 'powderCompare.burntMuzzle', message: 'Burnt at the muzzle' },
+    value: (r) => r.values?.burnt,
+  },
+  {
+    key: 'burnout',
+    label: /*i18n*/ { id: 'powderCompare.burnout', message: 'Burnout' },
+    value: (r) => r.values?.burnout,
+  },
 ]
 
 /** The target mode shows the pressure range at the charge found where the other modes show the peak. */
 const rangeColumn: Column = {
   key: 'range',
-  label: msg('Pressure range'),
+  label: /*i18n*/ { id: 'powderCompare.pressureRange', message: 'Pressure range' },
   unit: 'pressure',
   value: (r) => r.values?.range.low,
 }
@@ -108,7 +147,7 @@ function SortHead({
   system: UnitSystem
   onSort: (sort: ColumnSort | undefined) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <th
       scope="col"
@@ -118,7 +157,7 @@ function SortHead({
     >
       <UnstyledButton className="sort-button" onClick={() => onSort(nextSort(c.key, dir))}>
         <span>
-          {t(c.label)}
+          {i18n._(c.label)}
           {c.unit && <span className="th-unit"> {system[c.unit].symbol}</span>}
         </span>
         {dir && (
@@ -137,18 +176,19 @@ function SortHead({
 
 /** The case fill of a row; the reason it is unknown is the title. */
 function FillCell({ ratio }: { ratio: number | undefined }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   return (
     <td
-      data-label={t('Case fill')}
+      data-label={i18n._({ id: 'powderCompare.caseFill', message: 'Case fill' })}
       className="num"
       title={ratio === undefined ? i18n._(noBulkDensity) : undefined}
     >
       {ratio === undefined ? (
         <>
           <span aria-hidden="true">&ndash;</span>
-          <span className="visually-hidden">{t('unknown')}</span>
+          <span className="visually-hidden">
+            {i18n._({ id: 'powderCompare.unknown', message: 'unknown' })}
+          </span>
         </>
       ) : (
         `${formatNumber(ratio * 100, 0)} %`
@@ -172,43 +212,72 @@ function ValueCells({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const flag = r.flagText?.(t)
   return (
     <>
-      <td data-label={t('Flags')}>{flag && flagView(flag)}</td>
+      <td data-label={i18n._({ id: 'powderCompare.flags', message: 'Flags' })}>
+        {flag && flagView(flag)}
+      </td>
       {target ? (
         <td
-          data-label={t('Pressure range, {unit}', { unit: system.pressure.symbol })}
+          data-label={i18n._({
+            id: 'powderCompare.pressureRangeUnit',
+            message: 'Pressure range, {unit}',
+            values: { unit: system.pressure.symbol },
+          })}
           className="num"
         >
-          {t('{low} to {high}', {
-            low: formatQuantity('pressure', system, values.range.low),
-            high: formatQuantity('pressure', system, values.range.high),
+          {i18n._({
+            id: 'powderCompare.lowToHigh',
+            message: '{low} to {high}',
+            values: {
+              low: formatQuantity('pressure', system, values.range.low),
+              high: formatQuantity('pressure', system, values.range.high),
+            },
           })}
         </td>
       ) : (
         <td
-          data-label={t('Peak pressure, {unit}', { unit: system.pressure.symbol })}
+          data-label={i18n._({
+            id: 'powderCompare.peakPressureUnit',
+            message: 'Peak pressure, {unit}',
+            values: { unit: system.pressure.symbol },
+          })}
           className="num"
         >
           {formatQuantity('pressure', system, values.peak)}
         </td>
       )}
-      <td data-label={t('Percent of maximum')} className="num">
-        {values.percent === undefined ? t('no limit') : `${formatNumber(values.percent, 0)} %`}
+      <td
+        data-label={i18n._({ id: 'powderCompare.percentMaximum', message: 'Percent of maximum' })}
+        className="num"
+      >
+        {values.percent === undefined
+          ? i18n._({ id: 'powderCompare.noLimit', message: 'no limit' })
+          : `${formatNumber(values.percent, 0)} %`}
       </td>
       <td
-        data-label={t('Muzzle velocity, {unit}', { unit: system.velocity.symbol })}
+        data-label={i18n._({
+          id: 'powderCompare.muzzleVelocityUnit',
+          message: 'Muzzle velocity, {unit}',
+          values: { unit: system.velocity.symbol },
+        })}
         className="num"
       >
         {formatQuantity('velocity', system, values.velocity)}
       </td>
       <FillCell ratio={r.ratio} />
-      <td data-label={t('Burnt at the muzzle')} className="num">
+      <td
+        data-label={i18n._({ id: 'powderCompare.burntMuzzle', message: 'Burnt at the muzzle' })}
+        className="num"
+      >
         {formatNumber(values.burnt * 100, 0)} %
       </td>
-      <td data-label={t('Burnout')} className="num">
-        {values.burnout === undefined ? t('none') : shownLength('travel', system, values.burnout)}
+      <td data-label={i18n._({ id: 'powderCompare.burnout', message: 'Burnout' })} className="num">
+        {values.burnout === undefined
+          ? i18n._({ id: 'powderCompare.none', message: 'none' })
+          : shownLength('travel', system, values.burnout)}
       </td>
     </>
   )
@@ -234,28 +303,46 @@ function PowderRow({
   const name = productLabel(r)
   return (
     <tr aria-current={r.id === current ? 'true' : undefined}>
-      <td data-label={t('Powder')}>
+      <td data-label={i18n._({ id: 'powderCompare.powder', message: 'Powder' })}>
         {/* a long name is cut after two lines: the title holds it in full */}
         <UnstyledButton
           className="powder-open"
-          title={`${name}\n${t('Use this powder in the workbench')}`}
+          title={`${name}\n${i18n._({ id: 'powderCompare.usePowderWorkbench', message: 'Use this powder in the workbench' })}`}
           onClick={() => onOpen(r)}
         >
           {name}
         </UnstyledButton>
-        {r.id === current && <span className="barrel-current">{t('current')}</span>}
+        {r.id === current && (
+          <span className="barrel-current">
+            {i18n._({ id: 'powderCompare.current', message: 'current' })}
+          </span>
+        )}
       </td>
-      <td data-label={t('Charge, {unit}', { unit: system.charge.symbol })} className="num">
+      <td
+        data-label={i18n._({
+          id: 'powderCompare.chargeUnit',
+          message: 'Charge, {unit}',
+          values: { unit: system.charge.symbol },
+        })}
+        className="num"
+      >
         {r.charge !== undefined && formatQuantity('charge', system, r.charge)}
       </td>
       {r.values ? (
         <ValueCells row={r} values={r.values} target={target} system={system} />
       ) : (
-        <td data-label={t('Result')} colSpan={columns.length - 2}>
-          {t('Not computed: {reason}', {
-            reason: r.refusal
-              ? refusalText(r.refusal, 'peakPressure', system, percent, t, i18n)
-              : reasonText(r, i18n),
+        <td
+          data-label={i18n._({ id: 'powderCompare.result', message: 'Result' })}
+          colSpan={columns.length - 2}
+        >
+          {i18n._({
+            id: 'powderCompare.notComputedReason',
+            message: 'Not computed: {reason}',
+            values: {
+              reason: r.refusal
+                ? refusalText(r.refusal, 'peakPressure', system, percent, t, i18n)
+                : reasonText(r, i18n),
+            },
           })}
         </td>
       )}
@@ -284,12 +371,19 @@ const Rows = memo(function Rows({
   current: string | undefined
   onOpen: (row: CompareRow) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <ScrollRegion label={t('Powders for this load')}>
+    <ScrollRegion
+      label={i18n._({ id: 'powderCompare.powdersLoad', message: 'Powders for this load' })}
+    >
       {withTableRoles(
         <table className="limits ladder-table powder-table">
-          <caption className="visually-hidden">{t('Powders for this load (simulation)')}</caption>
+          <caption className="visually-hidden">
+            {i18n._({
+              id: 'powderCompare.powdersLoadSimulation',
+              message: 'Powders for this load (simulation)',
+            })}
+          </caption>
           <thead>
             <tr>
               {columnsFor(target).map((c, i) => (
@@ -345,13 +439,16 @@ function targetOf(
   percent: boolean,
   withCartridge: boolean,
   system: UnitSystem,
-  t: Translator['t'],
+  i18n: I18n,
 ) {
   const unit = targetUnit('peakPressure', system, percent)
   const reason =
     percent && !withCartridge
-      ? t("A share of Pmax needs the cartridge's CIP Pmax.")
-      : targetError(text, unit, t)
+      ? i18n._({
+          id: 'powderCompare.sharePmaxNeedsCartridge',
+          message: "A share of Pmax needs the cartridge's CIP Pmax.",
+        })
+      : targetError(text, unit, i18n)
   return {
     unit,
     valid: reason === undefined,
@@ -455,44 +552,72 @@ function statusText(
     targetShown: string | undefined
     stale: boolean
   },
-  t: Translator['t'],
   i18n: I18n,
 ) {
   let head: string | undefined
   if (o.running && o.progress)
-    head = t('Computing {done} of {total} powders', {
-      done: o.progress.done,
-      total: o.progress.total,
+    head = i18n._({
+      id: 'powderCompare.computingPowders',
+      message: 'Computing {done, decimal} of {total, decimal} powders',
+      values: {
+        done: o.progress.done,
+        total: o.progress.total,
+      },
     })
   else if (o.total > 0)
     head =
       o.shown === o.total
-        ? t('{total} powders, {failed} not computed', { total: o.total, failed: o.failed })
-        : t('{shown} of {total} powders, {failed} not computed', {
-            shown: o.shown,
-            total: o.total,
-            failed: o.failed,
+        ? i18n._({
+            id: 'powderCompare.powdersNotComputed',
+            message: '{total, decimal} powders, {failed, decimal} not computed',
+            values: { total: o.total, failed: o.failed },
+          })
+        : i18n._({
+            id: 'powderCompare.shownPowdersNotComputed',
+            message: '{shown, decimal} of {total, decimal} powders, {failed, decimal} not computed',
+            values: {
+              shown: o.shown,
+              total: o.total,
+              failed: o.failed,
+            },
           })
   const parts = [
     head,
     o.shotgun > 0 && !o.running
-      ? t('Shotgun-only powders left out: {shotgun}', { shotgun: o.shotgun })
+      ? i18n._({
+          id: 'powderCompare.shotgunOnlyPowdersLeft',
+          message: 'Shotgun-only powders left out: {shotgun, decimal}',
+          values: { shotgun: o.shotgun },
+        })
       : undefined,
-    o.message && messageText(o.message, t, i18n),
+    o.message && messageText(o.message, i18n),
     o.targetShown,
-    o.stale ? t('Inputs changed since these rows') : undefined,
+    o.stale
+      ? i18n._({
+          id: 'powderCompare.inputsChangedSinceThese',
+          message: 'Inputs changed since these rows',
+        })
+      : undefined,
   ].filter(Boolean)
   return parts.length > 0 ? `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.` : ''
 }
 
 /** The line after a batch that stopped early or failed. */
-function messageText(message: CompareMessage, t: Translator['t'], i18n: I18n) {
+function messageText(message: CompareMessage, i18n: I18n) {
   if (message.kind === 'stopped')
-    return t('Stopped. {reason}', { reason: i18n._(noComparableLimitText) })
+    return i18n._({
+      id: 'powderCompare.stoppedReason',
+      message: 'Stopped. {reason}',
+      values: { reason: i18n._(noComparableLimitText) },
+    })
   if (message.kind === 'cancelled')
-    return t('Cancelled after {done} of {total} powders.', {
-      done: message.done,
-      total: message.total,
+    return i18n._({
+      id: 'powderCompare.cancelledAfterPowders',
+      message: 'Cancelled after {done, decimal} of {total, decimal} powders.',
+      values: {
+        done: message.done,
+        total: message.total,
+      },
     })
   return translateMessage(thrownText(message.error), i18n)
 }
@@ -551,12 +676,15 @@ function ChargeInput({
   onFill: (v: number | string) => void
   fillValid: boolean
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (kind === 'target')
     return (
       <NumberInput
         size={controlSize.row.input}
-        aria-label={t('Target peak pressure')}
+        aria-label={i18n._({
+          id: 'powderCompare.targetPeakPressure',
+          message: 'Target peak pressure',
+        })}
         suffix={` ${unit.symbol}`}
         hideControls
         allowNegative={false}
@@ -574,7 +702,7 @@ function ChargeInput({
   return (
     <NumberInput
       size={controlSize.row.input}
-      aria-label={t('Case fill')}
+      aria-label={i18n._({ id: 'powderCompare.caseFill', message: 'Case fill' })}
       suffix=" %"
       min={caseFillPercentRange.min}
       max={caseFillPercentRange.max}
@@ -622,7 +750,14 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const { targetText, targetKept, setTargetText } = useTargetText(first, percent, system)
   // the reason shows for a typed value, and for an empty field once it was left
   const [targetLeft, setTargetLeft] = useState(false)
-  const targetField = targetOf(targetText, targetLeft, percent, cartridge !== undefined, system, t)
+  const targetField = targetOf(
+    targetText,
+    targetLeft,
+    percent,
+    cartridge !== undefined,
+    system,
+    i18n,
+  )
   const { unit, valid: targetValid, shown: targetShown } = targetField
   const asPercent = percent && cartridge !== undefined
   const mode = modeOf(
@@ -690,7 +825,6 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       targetShown,
       stale,
     },
-    t,
     i18n,
   )
   const open = (r: CompareRow) => {
@@ -720,11 +854,20 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       <div className="powder-controls">
         <SegmentedControl
           size={controlSize.row.toggle}
-          aria-label={t('Charge')}
+          aria-label={i18n._({ id: 'powderCompare.charge', message: 'Charge' })}
           data={[
-            { value: 'typed', label: t('Typed charge') },
-            { value: 'fill', label: t('Case fill') },
-            { value: 'target', label: t('charge\u0004Target') },
+            {
+              value: 'typed',
+              label: i18n._({ id: 'powderCompare.typedCharge', message: 'Typed charge' }),
+            },
+            {
+              value: 'fill',
+              label: i18n._({ id: 'powderCompare.caseFill', message: 'Case fill' }),
+            },
+            {
+              value: 'target',
+              label: i18n._(targetLabel),
+            },
           ]}
           value={kind}
           onChange={(v) => setKind(v as CompareMode['kind'])}
@@ -746,14 +889,17 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           aria-pressed={percent}
           // a share kept by a load opened without its cartridge can still be switched off
           disabled={kind !== 'target' || (cartridge === undefined && !percent)}
-          title={t("Read the target as a percentage of the cartridge's CIP Pmax")}
+          title={i18n._({
+            id: 'powderCompare.readTargetPercentageCartridge',
+            message: "Read the target as a percentage of the cartridge's CIP Pmax",
+          })}
           onClick={() => {
             setPercent(!percent)
             setTargetText('')
             setTargetLeft(false)
           }}
         >
-          {t('% Pmax')}
+          {i18n._({ id: 'powderCompare.percentPmax', message: '% Pmax' })}
         </Button>
         <Button
           size={controlSize.row.button}
@@ -761,13 +907,19 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           disabled={!running && !modeValid(kind, fillValid, targetValid)}
           onClick={running ? study.cancel : study.compute}
         >
-          {running ? t('Cancel') : t('Compute')}
+          {running
+            ? i18n._({ id: 'powderCompare.cancel', message: 'Cancel' })
+            : i18n._({ id: 'powderCompare.compute', message: 'Compute' })}
         </Button>
       </div>
       <div className="powder-filters">
-        {select('manufacturerName', t('Manufacturer'), manufacturers)}
-        {select('base', t('Base'), bases)}
-        {select('form', t('Form'), forms)}
+        {select(
+          'manufacturerName',
+          i18n._({ id: 'powderCompare.manufacturer', message: 'Manufacturer' }),
+          manufacturers,
+        )}
+        {select('base', i18n._({ id: 'powderCompare.base', message: 'Base' }), bases)}
+        {select('form', i18n._({ id: 'powderCompare.form', message: 'Form' }), forms)}
         <TableCsv csv={csv} disabled={shown.length === 0} />
       </div>
       <p className="barrel-status" aria-hidden="true">
@@ -777,7 +929,9 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       </p>
       {/* the count changes with every answer: the live region says only start, end and cancel */}
       <p className="visually-hidden" role="status">
-        {running ? t('Computing powders.') : text}
+        {running
+          ? i18n._({ id: 'powderCompare.computingPowdersShort', message: 'Computing powders.' })
+          : text}
       </p>
       <Rows
         rows={shown}
