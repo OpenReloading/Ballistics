@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
 import type { ChronoImport, VelocityUnit } from '@rangefoundry/importers'
 import { toSi } from '@rangefoundry/schema'
@@ -7,6 +8,7 @@ import { FileUp } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
+import { ungrouped } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import {
   chronoFileBytes,
@@ -41,7 +43,8 @@ type Read = { fileName: string; data: ChronoImport; pick: number }
 
 /** The velocity-per-shot chart has a tab per string in its panel's title row. */
 export function SessionSummary() {
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   // the unit for files that name none: the Settings unit until one is chosen here
   const [chosen, setChosen] = useState<VelocityUnit>()
@@ -93,16 +96,34 @@ export function SessionSummary() {
         status={
           <span role="status">
             {read &&
-              t('Read {strings}, {shots}.', {
-                strings: tn(strings.length, '{count} string', '{count} strings'),
-                shots: tn(shots, '{count} shot', '{count} shots'),
+              i18n._({
+                id: 'sessionSummary.read',
+                message: 'Read {strings}, {shots}.',
+                values: {
+                  strings: i18n._(
+                    'sessionSummary.stringCount',
+                    { count: strings.length },
+                    {
+                      message: '{count, plural, one {# string} other {# strings}}',
+                      formats: ungrouped,
+                    },
+                  ),
+                  shots: i18n._(
+                    'sessionSummary.shotCount',
+                    { count: shots },
+                    {
+                      message: '{count, plural, one {# shot} other {# shots}}',
+                      formats: ungrouped,
+                    },
+                  ),
+                },
               })}
           </span>
         }
         actions={
           <>
             <Button component={Link} href="/range" variant="default">
-              {t('Range mode')}
+              {i18n._({ id: 'sessionSummary.rangeMode', message: 'Range mode' })}
             </Button>
             <Button
               variant="default"
@@ -115,7 +136,7 @@ export function SessionSummary() {
                 )
               }
             >
-              {t('Export JSON')}
+              {i18n._({ id: 'sessionSummary.exportJson', message: 'Export JSON' })}
             </Button>
             <Button
               variant="default"
@@ -128,7 +149,7 @@ export function SessionSummary() {
                 )
               }
             >
-              {t('Export CSV')}
+              {i18n._({ id: 'sessionSummary.exportCsv', message: 'Export CSV' })}
             </Button>
             <TourButton page="session" />
             <UnitsIconButton />
@@ -140,17 +161,24 @@ export function SessionSummary() {
         <Flex className="session-import" wrap="wrap" rowGap="xs" columnGap="md" align="end" my="xs">
           <ChronoDropZone
             id="chrono-file"
-            label={t('Chronograph file')}
+            label={i18n._({ id: 'sessionSummary.chronoFile', message: 'Chronograph file' })}
             variant="bar"
-            help={t('Reads {formats} in this browser; nothing is uploaded or stored.', {
-              formats,
+            help={i18n._({
+              id: 'sessionSummary.readsFormats',
+              message: 'Reads {formats} in this browser; nothing is uploaded or stored.',
+              values: {
+                formats,
+              },
             })}
             file={read?.fileName}
             onFiles={([picked]) => picked && readFile(picked, unit)}
           />
           <NativeSelect
             id="chrono-unit"
-            label={t('Unit if the file has none')}
+            label={i18n._({
+              id: 'sessionSummary.fallbackUnit',
+              message: 'Unit if the file has none',
+            })}
             value={unit}
             onChange={(e) => setChosen(e.currentTarget.value as VelocityUnit)}
             data={['ft/s', 'm/s']}
@@ -159,7 +187,7 @@ export function SessionSummary() {
         </Flex>
         {error !== undefined && (
           <ErrorNote
-            title={t('The file was not read.')}
+            title={i18n._({ id: 'sessionSummary.notRead', message: 'The file was not read.' })}
             onRetry={() => readFile(file.current, unit)}
           >
             {chronoErrorText(error, t)}
@@ -171,10 +199,12 @@ export function SessionSummary() {
           error === undefined && (
             <EmptyNote
               icon={<FileUp size={24} aria-hidden="true" />}
-              title={t('No file read yet.')}
-              description={t(
-                'Choose or drop a chronograph file, or load the example: three strings of ten made-up shots.',
-              )}
+              title={i18n._({ id: 'sessionSummary.noFile', message: 'No file read yet.' })}
+              description={i18n._({
+                id: 'sessionSummary.noFileHelp',
+                message:
+                  'Choose or drop a chronograph file, or load the example: three strings of ten made-up shots.',
+              })}
               action={
                 <Button
                   variant="default"
@@ -186,7 +216,7 @@ export function SessionSummary() {
                     )
                   }
                 >
-                  {t('Load example')}
+                  {i18n._({ id: 'sessionSummary.loadExample', message: 'Load example' })}
                 </Button>
               }
             />
@@ -209,7 +239,7 @@ function Headline({
   symbol: string
   level: string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const interval = st.standardDeviationInterval
   return (
     <Flex
@@ -221,33 +251,53 @@ function Headline({
       m={0}
     >
       <div>
-        <dt>{t('Mean, n = {n}', { n: st.count })}</dt>
+        <dt>
+          {i18n._({
+            id: 'sessionSummary.meanN',
+            message: 'Mean, n = {n}',
+            values: { n: st.count },
+          })}
+        </dt>
         <dd>
           {speed(st.mean)} {symbol}
         </dd>
       </div>
       <div>
-        <dt>{t('SD, n = {n}', { n: st.count })}</dt>
+        <dt>
+          {i18n._({ id: 'sessionSummary.sdN', message: 'SD, n = {n}', values: { n: st.count } })}
+        </dt>
         <dd>
           {st.standardDeviation !== undefined
             ? `${speed(st.standardDeviation)} ${symbol}`
-            : t('one shot')}
+            : i18n._({ id: 'sessionSummary.oneShot', message: 'one shot' })}
         </dd>
       </div>
       {interval && (
         <div>
-          <dt>{t('SD {level}, n = {n}', { level, n: st.count })}</dt>
+          <dt>
+            {i18n._({
+              id: 'sessionSummary.sdIntervalN',
+              message: 'SD {level}, n = {n}',
+              values: { level, n: st.count },
+            })}
+          </dt>
           <dd>
-            {t('{low} to {high} {unit}', {
-              low: speed(interval.lower),
-              high: speed(interval.upper),
-              unit: symbol,
+            {i18n._({
+              id: 'sessionSummary.rangeWithUnit',
+              message: '{low} to {high} {unit}',
+              values: {
+                low: speed(interval.lower),
+                high: speed(interval.upper),
+                unit: symbol,
+              },
             })}
           </dd>
         </div>
       )}
       <div>
-        <dt>{t('ES, n = {n}', { n: st.count })}</dt>
+        <dt>
+          {i18n._({ id: 'sessionSummary.esN', message: 'ES, n = {n}', values: { n: st.count } })}
+        </dt>
         <dd>
           {speed(st.extremeSpread)} {symbol}
         </dd>
@@ -269,15 +319,19 @@ function StatsRow({
   open: boolean
   speed: (ms: number) => string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const interval = st?.standardDeviationInterval
-  const na = t('n/a')
+  const na = i18n._({ id: 'sessionSummary.notAvailable', message: 'n/a' })
   return (
     <tr className={open ? 'is-open' : undefined}>
       <td>{name}</td>
       <td className="num">
         {st?.excluded
-          ? t('{count} of {total}', { count: st.count, total: shots })
+          ? i18n._({
+              id: 'sessionSummary.countOfTotal',
+              message: '{count} of {total}',
+              values: { count: st.count, total: shots },
+            })
           : (st?.count ?? 0)}
       </td>
       <td className="num">{st ? speed(st.mean) : na}</td>
@@ -286,7 +340,11 @@ function StatsRow({
       </td>
       <td className="num">
         {interval
-          ? t('{low} to {high}', { low: speed(interval.lower), high: speed(interval.upper) })
+          ? i18n._({
+              id: 'sessionSummary.range',
+              message: '{low} to {high}',
+              values: { low: speed(interval.lower), high: speed(interval.upper) },
+            })
           : na}
       </td>
       <td className="num">{st ? speed(st.extremeSpread) : na}</td>
@@ -298,6 +356,7 @@ function StatsRow({
 
 function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
   const { t, language } = useTranslation()
+  const { i18n } = useLingui()
   const { session, stringLabels, warnings, velocityUnits, format: kind } = read.data
   const v = system.velocity
   const speed = (ms: number) => formatNumber(v.fromSi(ms), 1)
@@ -305,29 +364,63 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
     .filter(Boolean)
     .join(', ')
   const badges = [
-    t('File: {name}', { name: read.fileName }),
-    t('Format: {name}', { name: formatNames[kind] }),
-    t('Date: {date}', {
-      date: session.date ? dayText(session.date, language) : t('not in the file'),
+    i18n._({ id: 'sessionSummary.file', message: 'File: {name}', values: { name: read.fileName } }),
+    i18n._({
+      id: 'sessionSummary.format',
+      message: 'Format: {name}',
+      values: { name: formatNames[kind] },
     }),
-    t('Device: {device}', { device }),
-    t('Unit: {units}', {
-      units: velocityUnits
-        .map((u) =>
-          u.source === 'file'
-            ? t('{unit}, from the file', { unit: u.unit })
-            : t('{unit}, named at import', { unit: u.unit }),
-        )
-        .join('; '),
+    i18n._({
+      id: 'sessionSummary.date',
+      message: 'Date: {date}',
+      values: {
+        date: session.date
+          ? dayText(session.date, language)
+          : i18n._({ id: 'sessionSummary.notInFile', message: 'not in the file' }),
+      },
+    }),
+    i18n._({ id: 'sessionSummary.device', message: 'Device: {device}', values: { device } }),
+    i18n._({
+      id: 'sessionSummary.unit',
+      message: 'Unit: {units}',
+      values: {
+        units: velocityUnits
+          .map((u) =>
+            u.source === 'file'
+              ? i18n._({
+                  id: 'sessionSummary.unitFromFile',
+                  message: '{unit}, from the file',
+                  values: { unit: u.unit },
+                })
+              : i18n._({
+                  id: 'sessionSummary.unitAtImport',
+                  message: '{unit}, named at import',
+                  values: { unit: u.unit },
+                }),
+          )
+          .join('; '),
+      },
     }),
     ...(session.muzzleDistance
       ? [
-          t('Muzzle distance: {distance}', {
-            distance: withUnit('length', system, toSi('length', session.muzzleDistance.value)),
+          i18n._({
+            id: 'sessionSummary.muzzleDistance',
+            message: 'Muzzle distance: {distance}',
+            values: {
+              distance: withUnit('length', system, toSi('length', session.muzzleDistance.value)),
+            },
           }),
         ]
       : []),
-    ...(session.note ? [t('Note: {note}', { note: session.note })] : []),
+    ...(session.note
+      ? [
+          i18n._({
+            id: 'sessionSummary.note',
+            message: 'Note: {note}',
+            values: { note: session.note },
+          }),
+        ]
+      : []),
   ]
   const stats = session.strings.map((s) => stringStats(s.shots))
   const level = `${formatNumber(100 * (stats.find(Boolean)?.confidenceLevel ?? 0.95), 0)} %`
@@ -335,7 +428,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
   return (
     <section aria-labelledby="session-result" className="session-result">
       <h2 id="session-result" className="visually-hidden">
-        {t('Session')}
+        {i18n._({ id: 'sessionSummary.heading', message: 'Session' })}
       </h2>
       <Group gap="xs" my="xs">
         {badges.map((b) => (
@@ -345,7 +438,10 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
         ))}
       </Group>
       {warnings.length > 0 && (
-        <Message severity="warning" title={t('Import notes')}>
+        <Message
+          severity="warning"
+          title={i18n._({ id: 'sessionSummary.importNotes', message: 'Import notes' })}
+        >
           <ul>
             {warnings.map((w, k) => (
               // oxlint-disable-next-line react/no-array-index-key -- warnings keep the importer order and may repeat
@@ -357,27 +453,39 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
       <div className="session-panels">
         <Panel
           id="session-strings"
-          title={t('Statistics per string, excluded shots left out ({unit})', { unit: v.symbol })}
+          title={i18n._({
+            id: 'sessionSummary.statsTitle',
+            message: 'Statistics per string, excluded shots left out ({unit})',
+            values: { unit: v.symbol },
+          })}
         >
           <PanelTable
-            label={t('String statistics')}
+            label={i18n._({ id: 'sessionSummary.statsLabel', message: 'String statistics' })}
             className="session-strings"
             testId="session-strings"
             // the panel title says it; the table keeps it as its name
             caption={
               <span className="visually-hidden">
-                {t('Statistics per string, excluded shots left out ({unit})', { unit: v.symbol })}
+                {i18n._({
+                  id: 'sessionSummary.statsTitle',
+                  message: 'Statistics per string, excluded shots left out ({unit})',
+                  values: { unit: v.symbol },
+                })}
               </span>
             }
             columns={[
-              t('String'),
-              t('Shots'),
-              t('Mean'),
-              t('SD'),
-              t('SD {level}', { level }),
-              t('ES'),
-              t('Min'),
-              t('Max'),
+              i18n._({ id: 'sessionSummary.column.string', message: 'String' }),
+              i18n._({ id: 'sessionSummary.shots', message: 'Shots' }),
+              i18n._({ id: 'sessionSummary.mean', message: 'Mean' }),
+              i18n._({ id: 'sessionSummary.column.sd', message: 'SD' }),
+              i18n._({
+                id: 'sessionSummary.column.sdInterval',
+                message: 'SD {level}',
+                values: { level },
+              }),
+              i18n._({ id: 'sessionSummary.column.es', message: 'ES' }),
+              i18n._({ id: 'sessionSummary.column.min', message: 'Min' }),
+              i18n._({ id: 'sessionSummary.column.max', message: 'Max' }),
             ]}
           >
             {session.strings.map((s, k) => (
@@ -399,16 +507,18 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
             }))}
           />
           <p className="session-strings-note">
-            {t(
-              'SD {level}: the range that holds the SD of the population the string is drawn from. It assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow.',
-              { level },
-            )}
+            {i18n._({
+              id: 'sessionSummary.sdIntervalNote',
+              message:
+                'SD {level}: the range that holds the SD of the population the string is drawn from. It assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow.',
+              values: { level },
+            })}
           </p>
         </Panel>
         <Tabs value={open} onChange={(k) => k && setOpen(k)} className="session-tabs">
           <Panel
             id="session-velocity"
-            title={t('Velocity per shot')}
+            title={i18n._({ id: 'sessionSummary.velocityTitle', message: 'Velocity per shot' })}
             className="session-velocity"
             controls={
               <Tabs.List>
@@ -436,26 +546,50 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                     <LazyLineChart
                       x={kept.map(([n]) => n)}
                       y={kept.map(([, shot]) => v.fromSi(shot.velocity.value))}
-                      xLabel={t('Shot')}
-                      yLabel={t('Velocity ({unit})', { unit: v.symbol })}
-                      limits={[{ y: v.fromSi(st.mean), label: t('Mean') }]}
+                      xLabel={i18n._({ id: 'sessionSummary.shot', message: 'Shot' })}
+                      yLabel={i18n._({
+                        id: 'sessionSummary.velocity',
+                        message: 'Velocity ({unit})',
+                        values: { unit: v.symbol },
+                      })}
+                      limits={[
+                        {
+                          y: v.fromSi(st.mean),
+                          label: i18n._({ id: 'sessionSummary.mean', message: 'Mean' }),
+                        },
+                      ]}
                       points
                       integerX
                       height={240}
-                      title={t('Velocity per shot, {name}', { name })}
-                      description={t(
-                        'Velocity of the {count} shots of {name} in {unit} by shot number, mean {mean} as a line, excluded shots left out. The shots table lists every value.',
-                        { count: kept.length, name, unit: v.symbol, mean: speed(st.mean) },
-                      )}
+                      title={i18n._({
+                        id: 'sessionSummary.chartTitle',
+                        message: 'Velocity per shot, {name}',
+                        values: { name },
+                      })}
+                      description={i18n._({
+                        id: 'sessionSummary.chartDescription',
+                        message:
+                          'Velocity of the {count} shots of {name} in {unit} by shot number, mean {mean} as a line, excluded shots left out. The shots table lists every value.',
+                        values: { count: kept.length, name, unit: v.symbol, mean: speed(st.mean) },
+                      })}
                     />
                   ) : (
-                    <p className="note">{t('Fewer than two shots to draw.')}</p>
+                    <p className="note">
+                      {i18n._({
+                        id: 'sessionSummary.tooFewShots',
+                        message: 'Fewer than two shots to draw.',
+                      })}
+                    </p>
                   )}
                 </Tabs.Panel>
               )
             })}
           </Panel>
-          <Panel id="session-shots" title={t('Shots')} className="session-shots-panel">
+          <Panel
+            id="session-shots"
+            title={i18n._({ id: 'sessionSummary.shots', message: 'Shots' })}
+            className="session-shots-panel"
+          >
             {session.strings.map((s, k) => {
               const name = stringName(stringLabels, k, t)
               const anyExcluded = s.shots.some((shot) => shot.excluded)
@@ -468,14 +602,28 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                   data-open={String(k) === open || undefined}
                 >
                   <PanelTable
-                    label={t('Shots of {name}', { name })}
+                    label={i18n._({
+                      id: 'sessionSummary.shotsOf',
+                      message: 'Shots of {name}',
+                      values: { name },
+                    })}
                     className="session-shots"
-                    caption={t('Shots of {name}', { name })}
+                    caption={i18n._({
+                      id: 'sessionSummary.shotsOf',
+                      message: 'Shots of {name}',
+                      values: { name },
+                    })}
                     columns={[
-                      t('Shot'),
-                      t('Velocity ({unit})', { unit: v.symbol }),
-                      t('Cold bore'),
-                      ...(anyExcluded ? [t('Excluded')] : []),
+                      i18n._({ id: 'sessionSummary.shot', message: 'Shot' }),
+                      i18n._({
+                        id: 'sessionSummary.velocity',
+                        message: 'Velocity ({unit})',
+                        values: { unit: v.symbol },
+                      }),
+                      i18n._({ id: 'sessionSummary.coldBore', message: 'Cold bore' }),
+                      ...(anyExcluded
+                        ? [i18n._({ id: 'sessionSummary.excluded', message: 'Excluded' })]
+                        : []),
                     ]}
                   >
                     {s.shots.map((shot, n) => (
@@ -483,11 +631,18 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                       <tr key={n}>
                         <td className="num">{n + 1}</td>
                         <td className="num">{speed(shot.velocity.value)}</td>
-                        <td>{shot.coldBore ? t('yes') : ''}</td>
+                        <td>
+                          {shot.coldBore
+                            ? i18n._({ id: 'sessionSummary.yes', message: 'yes' })
+                            : ''}
+                        </td>
                         {anyExcluded && (
                           <td>
                             {shot.excluded === true
-                              ? t('excluded at the range')
+                              ? i18n._({
+                                  id: 'sessionSummary.excludedAtRange',
+                                  message: 'excluded at the range',
+                                })
                               : (shot.excluded ?? '')}
                           </td>
                         )}

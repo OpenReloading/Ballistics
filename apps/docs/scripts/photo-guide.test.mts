@@ -13,7 +13,8 @@ test("the web app's photo checks name a heading of the photo guide and link its 
       .replace(/[^\p{L}\p{N} -]/gu, '')
       .replace(/ /g, '-')
   for (const rule of Object.values(guideRule)) {
-    const heading = headings.find((h) => h.endsWith(rule.name))
+    const name = rule.name.message ?? rule.name.id
+    const heading = headings.find((h) => h.endsWith(name))
     assert.equal(heading && anchor(heading), rule.anchor)
   }
 })

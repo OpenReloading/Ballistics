@@ -1,8 +1,7 @@
 /** Whether a photograph can be measured (`apps/docs/docs/models/bullet-photo.md`): one too poor gets no values rather than wrong ones. */
-import { msg } from '../i18n/translate.ts'
 import { shankOf } from './bullet-photo-measure.ts'
 import { edgeUncertainty, type Outline } from './bullet-photo-outline.ts'
-import { type Wording, worded } from './wording.ts'
+import type { Wording } from './wording.ts'
 
 /** What the outline allows: sentences about its quality, and the reason no value is given. */
 export interface OutlineHints {
@@ -38,65 +37,69 @@ export function outlineHints(o: Outline): OutlineHints {
   if (width < minWidthPx)
     return {
       hints: [],
-      unusable: worded(
-        msg(
+      unusable: /*i18n*/ {
+        id: 'bulletPhoto.tooNarrow',
+        message:
           'The bullet is only {width} px across, too small to measure. Take the photograph closer or crop it to the bullet, to at least {good} px across.',
-        ),
-        { width: Math.round(width), good: goodWidthPx * 2 },
-      ),
+        values: { width: Math.round(width), good: goodWidthPx * 2 },
+      },
     }
   if (ratio < proportions[0] || ratio > proportions[1])
     return {
       hints: [],
-      unusable: worded(
-        msg(
-          'The cut-out is {ratio} times as long as wide, not a bullet seen from the side. Brush the bullet in and the rest out, or retake the photograph with the bullet alone on a plain background.',
-        ),
-        { ratio: tenths(ratio) },
-      ),
+      unusable: /*i18n*/ {
+        id: 'bulletPhoto.notSideView',
+        message:
+          'The cut-out is {ratio, decimal} times as long as wide, not a bullet seen from the side. Brush the bullet in and the rest out, or retake the photograph with the bullet alone on a plain background.',
+        values: { ratio: tenths(ratio) },
+      },
     }
   const hints: Wording[] = []
   if (width < goodWidthPx)
     hints.push(
-      worded(
-        msg(
-          'The bullet is {width} px across, so each value is known to about {percent} % at best. Take the photograph closer or crop it to the bullet; {good} px across or more is more exact.',
-        ),
-        {
+      /*i18n*/ {
+        id: 'bulletPhoto.fewPixels',
+        message:
+          'The bullet is {width} px across, so each value is known to about {percent, decimal} % at best. Take the photograph closer or crop it to the bullet; {good} px across or more is more exact.',
+        values: {
           width: Math.round(width),
           percent: tenths((100 * Math.SQRT2 * edgeUncertainty) / width),
           good: goodWidthPx * 2,
         },
-      ),
+      },
     )
   if (o.typedOff !== undefined)
     hints.push(
-      worded(
-        msg(
-          "The bullet's sides are not parallel to the typed axis direction: it is about {degrees} degrees off, or a shadow widens one side. Lengths and base may read wrong; clear the axis direction to detect it, or type it again.",
-        ),
-        { degrees: tenths(o.typedOff) },
-      ),
+      /*i18n*/ {
+        id: 'bulletPhoto.offAxis',
+        message:
+          "The bullet's sides are not parallel to the typed axis direction: it is about {degrees, decimal} degrees off, or a shadow widens one side. Lengths and base may read wrong; clear the axis direction to detect it, or type it again.",
+        values: { degrees: tenths(o.typedOff) },
+      },
     )
   if (o.shadow)
     hints.push(
       o.shadow.removed
-        ? msg(
-            'A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline.',
-          )
-        : msg(
-            'One side of the cut-out is wider than the other, as from a shadow beside the bullet: the diameter and every length may be off by more than their uncertainty. Brush the shadow out or take the photograph in even light.',
-          ),
+        ? /*i18n*/ {
+            id: 'bulletPhoto.shadowMirrored',
+            message:
+              'A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline.',
+          }
+        : /*i18n*/ {
+            id: 'bulletPhoto.shadowWidens',
+            message:
+              'One side of the cut-out is wider than the other, as from a shadow beside the bullet: the diameter and every length may be off by more than their uncertainty. Brush the shadow out or take the photograph in even light.',
+          },
     )
   const s = shankOf(o)
   if (s.sigma > Math.max(raggedPx, raggedShare * width))
     hints.push(
-      worded(
-        msg(
-          "The bullet's sides are ragged (about {sigma} px): a reflection, shadow or noise. Retake the photograph in even, soft light, or brush the cut-out where it is wrong.",
-        ),
-        { sigma: tenths(s.sigma) },
-      ),
+      /*i18n*/ {
+        id: 'bulletPhoto.raggedSides',
+        message:
+          "The bullet's sides are ragged (about {sigma, decimal} px): a reflection, shadow or noise. Retake the photograph in even, soft light, or brush the cut-out where it is wrong.",
+        values: { sigma: tenths(s.sigma) },
+      },
     )
   return { hints }
 }

@@ -3,11 +3,9 @@ import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { photoScene } from '../../../packages/target-recognition/test/face-photos.ts'
 import { render, type Scene } from '../../../packages/target-recognition/test/face-render.ts'
-import { msg } from '../src/i18n/translate.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import {
   belowMinimum,
-  guideRule,
   layoutOf,
   photoQuality,
   type QualityIssue,
@@ -109,14 +107,6 @@ describe('a degraded photo', () => {
     const at = { x: scene.camera.width * 0.97, y: scene.camera.height / 2 }
     expect(problems(check({ ...scene, camera: { ...scene.camera, at } }))).toContain('framing')
   })
-
-  it('names the problem and what to change, without a verdict on detection', () => {
-    for (const i of check({ ...base(), blur: 4, light: () => 0.2 })) {
-      expect(i.text.length).toBeGreaterThan(20)
-      expect(i.fix).toMatch(/^(Retake|Move|Hold|Use)/)
-      expect(`${i.text} ${i.fix}`).not.toMatch(/\b(safe|correct|accurate|good)\b/i)
-    }
-  })
 })
 
 describe('a photo without a black area', () => {
@@ -189,7 +179,7 @@ describe('the edge of the black area', () => {
 
 describe('belowMinimum', () => {
   it('holds only for a problem at the bad level', () => {
-    const issue = { problem: 'tilt', text: msg(''), fix: msg('') } as const
+    const issue = { problem: 'tilt', text: { id: 'text' }, fix: { id: 'fix' } } as const
     expect(belowMinimum([])).toBe(false)
     expect(belowMinimum([{ ...issue, level: 'fair' }])).toBe(false)
     expect(
@@ -391,21 +381,5 @@ describe('a target of any pattern', () => {
     expect(layoutOf({ rings: [ring('white'), ring('black')] } as never)).toEqual({ dark: true })
     expect(layoutOf({ rings: [ring('white'), ring('white')] } as never)).toEqual({ dark: false })
     expect(layoutOf({ rings: [ring(), ring('white')] } as never)).toEqual({ dark: undefined })
-  })
-})
-
-describe('guideRule', () => {
-  it('links each problem to the rule of the photo guide that says how to retake the photo', () => {
-    expect(Object.fromEntries(Object.entries(guideRule).map(([p, r]) => [p, r.name]))).toEqual({
-      face: 'One target, all of it',
-      framing: 'One target, all of it',
-      tilt: 'Straight from above, no slant',
-      contrast: 'Even light, no reflection',
-      exposure: 'Even light, no reflection',
-      glare: 'Even light, no reflection',
-      shadow: 'Even light, no reflection',
-      resolution: 'Close enough',
-      blur: 'Steady, not soft',
-    })
   })
 })

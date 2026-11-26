@@ -1,9 +1,10 @@
 /** Caliper sizes give the scale without a ruler and check it with one (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
+
+import type { MessageDescriptor } from '@lingui/core'
 import type { UserBullet } from '@rangefoundry/schema'
-import { type Message, msg } from '../i18n/translate.ts'
 import type { Scale } from './bullet-photo.ts'
 import type { BulletMeasurement } from './bullet-photo-measure.ts'
-import { type Wording, worded } from './wording.ts'
+import type { Wording } from './wording.ts'
 
 /** Sizes of the bullet read off a caliper, mm. */
 export interface Known {
@@ -61,44 +62,52 @@ const percent = (from: number, to: number) => Number((100 * Math.abs(from / to -
 
 /** The note for a known size whose scale is away from the ruler's. */
 const againstRuler = (e: Estimate, ruler: { ppm: number }) =>
-  worded(
-    e.key === 'diameter'
-      ? msg(
-          "At the ruler's scale, the diameter in the photograph is {percent} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera.",
-        )
-      : msg(
-          "At the ruler's scale, the overall length in the photograph is {percent} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera.",
-        ),
-    { percent: percent(e.ppm, ruler.ppm) },
-  )
+  e.key === 'diameter'
+    ? /*i18n*/ {
+        id: 'bulletPhoto.diameterOffRuler',
+        message:
+          "At the ruler's scale, the diameter in the photograph is {percent, decimal} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera.",
+        values: { percent: percent(e.ppm, ruler.ppm) },
+      }
+    : /*i18n*/ {
+        id: 'bulletPhoto.lengthOffRuler',
+        message:
+          "At the ruler's scale, the overall length in the photograph is {percent, decimal} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera.",
+        values: { percent: percent(e.ppm, ruler.ppm) },
+      }
 
 /** The note for two known sizes that give scales apart. */
-const againstEach = (a: Estimate, b: Estimate) =>
-  worded(
-    msg(
-      'The diameter and overall length entered give scales {percent} % apart. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera. The scale used is their weighted mean; the difference adds to its uncertainty.',
-    ),
-    { percent: percent(a.ppm, b.ppm) },
-  )
+const againstEach = (a: Estimate, b: Estimate) => /*i18n*/ ({
+  id: 'bulletPhoto.scalesApart',
+  message:
+    'The diameter and overall length entered give scales {percent, decimal} % apart. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera. The scale used is their weighted mean; the difference adds to its uncertainty.',
+  values: { percent: percent(a.ppm, b.ppm) },
+})
 
 /** What gives the scale: the ruler's points, or the sizes entered without a ruler. */
 export type ScaleBasis = NonNullable<NonNullable<UserBullet['photo']>['scaleBasis']>
 
 /** A bullet turned 10 degrees shows its length 1.5 % short, so scales over 2 % apart are flagged (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`). */
-export function basisNote(basis: ScaleBasis | undefined): Message | undefined {
+export function basisNote(basis: ScaleBasis | undefined): MessageDescriptor | undefined {
   switch (basis) {
     case 'diameter':
-      return msg(
-        "Scale from the diameter entered, no ruler: lengths assume a square side view of the bullet drawn to scale. A bullet turned 10 degrees towards the camera reads 1.5 % short; a maker's product image may not be to scale.",
-      )
+      return /*i18n*/ {
+        id: 'bulletPhoto.basis.diameter',
+        message:
+          "Scale from the diameter entered, no ruler: lengths assume a square side view of the bullet drawn to scale. A bullet turned 10 degrees towards the camera reads 1.5 % short; a maker's product image may not be to scale.",
+      }
     case 'length':
-      return msg(
-        "Scale from the overall length entered, no ruler: widths assume a square side view of the bullet drawn to scale. A bullet turned 10 degrees towards the camera reads 1.5 % too wide; a maker's product image may not be to scale.",
-      )
+      return /*i18n*/ {
+        id: 'bulletPhoto.basis.length',
+        message:
+          "Scale from the overall length entered, no ruler: widths assume a square side view of the bullet drawn to scale. A bullet turned 10 degrees towards the camera reads 1.5 % too wide; a maker's product image may not be to scale.",
+      }
     case 'diameter+length':
-      return msg(
-        "Scale from the diameter and overall length entered, no ruler: their check catches a bullet turned towards the camera only beyond 2 % apart (about 11 degrees); a maker's product image may not be to scale.",
-      )
+      return /*i18n*/ {
+        id: 'bulletPhoto.basis.both',
+        message:
+          "Scale from the diameter and overall length entered, no ruler: their check catches a bullet turned towards the camera only beyond 2 % apart (about 11 degrees); a maker's product image may not be to scale.",
+      }
     default:
       return undefined
   }

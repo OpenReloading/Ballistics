@@ -39,7 +39,7 @@ const empty: FieldValue = { text: '', si: undefined }
 type Without<T> = T extends unknown ? Omit<T, 'id'> : never
 
 /** Started on the first request, answers matched by request id; a worker that failed to load or died ends what waits with an error reply, the next request starts a new one. */
-export function useWorker(onError: (message: string) => void) {
+export function useWorker(onError: (message: Wording) => void) {
   const worker = useRef<Worker | undefined>(undefined)
   const waiting = useRef(new Map<number, (r: WorkerReply) => void>())
   const sequence = useRef(0)
@@ -114,7 +114,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const [spread, setSpread] = useState(0)
   const [busy, setBusy] = useState<Message>()
   /** English, a message where the tool wrote it, translated where it is shown. */
-  const [failure, setFailure] = useState<string>()
+  const [failure, setFailure] = useState<Wording>()
   const ask = useWorker(setFailure)
 
   const rulerScale = useMemo(() => {
@@ -228,7 +228,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     try {
       await work()
     } catch (err) {
-      setFailure(errorText(err))
+      setFailure(errorText(err) as Message)
     }
     setBusy(undefined)
   }
