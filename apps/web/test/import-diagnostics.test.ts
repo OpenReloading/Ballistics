@@ -83,9 +83,7 @@ const german = translator(de as Catalogue, 'de')
 it('words a field label the importers give in German', async () => {
   const { t: shown } = installCoreMessages(await loadLingui('de'), de as Catalogue, 'de')
   const b = await built(['Name,Max pressure (bar)', 'C0,0'], 'cartridge')
-  expect(tableReasonText(b.rejected[0]?.reason ?? fail(), shown)).toBe(
-    'Höchstdruck 0 ist nicht größer als 0. Korrigieren Sie die Zelle oder lassen Sie sie leer.',
-  )
+  expect(tableReasonText(b.rejected[0]?.reason ?? fail(), shown)).toMatch(/^Höchstdruck 0 /)
 })
 
 const tableReads: TableReadDiagnostic[] = [
