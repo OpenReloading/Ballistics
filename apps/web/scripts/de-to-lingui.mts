@@ -1,10 +1,10 @@
-// Writes the German of src/i18n/de.json (keyed by English text) into src/locales/de.po for each id whose English matches
+// Writes the German of src/i18n/de.json (keyed by English text) into the German catalogs of src/locales for each id whose English matches
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import type { Catalogue } from '../src/i18n/translate.ts'
 import { ownKey } from './i18n.mts'
 import { withSourceNote } from './lingui-outdated.mts'
-import { type PoCatalog, readCatalog, writeCatalog } from './po-catalog.mts'
+import { catalogs, type PoCatalog, readCatalog, writeCatalog } from './po-catalog.mts'
 
 // ICU quoting: a lone apostrophe before a brace would quote the placeholder instead of filling it
 const quoted = (text: string) => text.replaceAll("'", "''")
@@ -62,15 +62,17 @@ export function convert(en: PoCatalog, de: PoCatalog, german: Catalogue) {
 if (import.meta.main) {
   const file = path.join(import.meta.dirname, '..', 'src', 'i18n', 'de.json')
   const german = JSON.parse(readFileSync(file, 'utf8')) as Catalogue
-  const en = await readCatalog('en')
-  const de = await readCatalog('de')
-  const { catalog, report, missing, unused } = convert(en, de, german)
-  await writeCatalog('de', catalog)
-  const { written, kept, other } = report
-  console.log(
-    `de.po: ${written.length} written, ${kept.length} unchanged, ${other.length} with other German kept, ${missing.length} without a de.json entry; ${unused} de.json entries no id uses`,
-  )
-  const quoted = (id: string) => JSON.stringify(en[id]?.translation)
-  for (const id of other) console.log(`other German: ${id} ${quoted(id)}: ${de[id]?.translation}`)
-  for (const id of missing) console.log(`no de.json entry: ${id} ${quoted(id)}`)
+  for (const catalogPath of catalogs) {
+    const en = await readCatalog('en', catalogPath)
+    const de = await readCatalog('de', catalogPath)
+    const { catalog, report, missing, unused } = convert(en, de, german)
+    await writeCatalog('de', catalogPath, catalog)
+    const { written, kept, other } = report
+    console.log(
+      `${catalogPath.replace('<rootDir>/', '').replace('{locale}', 'de')}.po: ${written.length} written, ${kept.length} unchanged, ${other.length} with other German kept, ${missing.length} without a de.json entry; ${unused} de.json entries no id uses`,
+    )
+    const quoted = (id: string) => JSON.stringify(en[id]?.translation)
+    for (const id of other) console.log(`other German: ${id} ${quoted(id)}: ${de[id]?.translation}`)
+    for (const id of missing) console.log(`no de.json entry: ${id} ${quoted(id)}`)
+  }
 }

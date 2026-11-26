@@ -171,34 +171,6 @@ msgstr "{count} ausgewählt"
 msgid "comparePicks.selectedMax"
 msgstr "{count} ausgewählt (höchstens {max})"
 
-# en: "{field} must be at least 0."
-msgid "refusal.valueNegative"
-msgstr "{field} muss mindestens 0 betragen."
-
-# en: "{file}.json answered {status}"
-msgid "coreMessage.request.fileStatus"
-msgstr "{file}.json antwortete mit {status}"
-
-# en: "{kind} {id} not found"
-msgid "refusal.recordNotFound"
-msgstr "{kind} {id} nicht gefunden"
-
-# en: "{kind} range"
-msgid "refusal.entryRangeInvalid"
-msgstr "Entfernung ({kind}) ungültig"
-
-# en: "{kind} rounding must not be negative"
-msgid "refusal.entryRoundingNegative"
-msgstr "{kind} rounding darf nicht negativ sein"
-
-# en: "{kind} shotCount must be a whole number of at least 1"
-msgid "refusal.entryShotCountInvalid"
-msgstr "{kind} shotCount muss eine ganze Zahl von mindestens 1 sein"
-
-# en: "{kind} standardDeviation must be positive"
-msgid "refusal.entryStandardDeviationNotPositive"
-msgstr "{kind} standardDeviation muss positiv sein"
-
 # en: "{label} from {velocity}"
 msgid "fieldStrip.bandFrom"
 msgstr "{label} ab {velocity}"
@@ -275,37 +247,13 @@ msgstr "{n, decimal} {unit} je Programmteil"
 msgid "construction.drivingBands"
 msgstr "{n} Führungsbänder"
 
-# en: "{n} of {m} range cases could not be computed ({list}); the range covers only the computed cases, and the true range can be wider."
-msgid "coreMessage.warning.rangeIncomplete"
-msgstr "{n} von {m} Fällen des Druckbereichs konnten nicht berechnet werden ({list}); der Bereich deckt nur die berechneten Fälle ab, der wahre Bereich kann breiter sein."
-
 # en: "{name} (user design)"
 msgid "burnRateCompare.userDesign"
 msgstr "{name} (eigener Entwurf)"
 
-# en: "{name} has no CIP Pmax measured by transducer or piezo. Crusher values are not compared with a simulated pressure."
-msgid "coreMessage.warning.noComparableLimit"
-msgstr "{name} hat kein CIP-Pmax, das mit mechanisch-elektrischem Wandler oder Piezo-Messquarz gemessen wurde. Werte des Kupferstauchzylinders werden nicht mit einem simulierten Druck verglichen."
-
 # en: "{name} has no round count; set one on the Firearms page to add the event to it."
 msgid "events.noRoundCount"
 msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um den Wettkampf hinzuzurechnen."
-
-# en: "{name} must be finite"
-msgid "refusal.coefficientNotFinite"
-msgstr "{name} muss endlich sein"
-
-# en: "{name} table Mach must rise"
-msgid "refusal.coefficientTableMachNotRising"
-msgstr "Die Machzahlen der Tabelle {name} müssen steigen"
-
-# en: "{name} table needs at least two nodes"
-msgid "refusal.coefficientTableTooShort"
-msgstr "Die Tabelle {name} braucht mindestens zwei Stützstellen"
-
-# en: "{name} table node"
-msgid "refusal.coefficientTableNodeInvalid"
-msgstr "Stützstelle der Tabelle {name} ungültig"
 
 # en: "{name} was not deleted: the browser refused."
 msgid "listSources.notDeleted"
@@ -314,10 +262,6 @@ msgstr "{name} wurde nicht gelöscht: Der Browser hat es abgelehnt."
 # en: "{order} of {total}"
 msgid "recordFields.burnRateOrder"
 msgstr "{order} von {total}"
-
-# en: "{path} not found"
-msgid "coreMessage.request.notFound"
-msgstr "{path} nicht gefunden"
 
 # en: "{points} points, hit factor {hf}"
 msgid "events.stageScore"
@@ -392,28 +336,8 @@ msgid "burnRateCompare.loadError"
 msgstr "Eine Kurve konnte nicht geladen werden."
 
 # en: "A data file did not load or the computation failed. Check the connection and retry."
-msgid "coreMessage.request.failed"
-msgstr "Eine Datendatei wurde nicht geladen oder die Berechnung ist fehlgeschlagen. Prüfen Sie die Verbindung und versuchen Sie es erneut."
-
-# en: "A data file did not load or the computation failed. Check the connection and retry."
 msgid "powderCompare.apiSilent"
 msgstr "Eine Datendatei wurde nicht geladen oder die Berechnung ist fehlgeschlagen. Prüfen Sie die Verbindung und versuchen Sie es erneut."
-
-# en: "a drag curve needs at least two nodes"
-msgid "refusal.dragCurveTooShort"
-msgstr "Eine Kurve des Luftwiderstands braucht mindestens zwei Stützstellen"
-
-# en: "a ladder around the charge needs an odd number of steps"
-msgid "coreMessage.answer.oddSteps"
-msgstr "Ein Ladeleiter um die Treibladung braucht eine ungerade Zahl von Schritten"
-
-# en: "a missing moment of inertia needs the length"
-msgid "refusal.inertiaNeedsLength"
-msgstr "Ein fehlendes Trägheitsmoment braucht die Länge"
-
-# en: "a missing momentSlope needs the length"
-msgid "refusal.momentSlopeNeedsLength"
-msgstr "Ein fehlendes momentSlope braucht die Länge"
 
 # en: "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
 msgid "powderRecord.neighborNote"
@@ -423,21 +347,9 @@ msgstr "Ein Nachbar ist ein Kandidat, kein Ersatz: Er braucht eine neue Ladungse
 msgid "bulletPhoto.shadowMirrored"
 msgstr "Ein Schatten neben dem Geschoss verbreitert eine Seite der Freistellung: Diese Seite bleibt außen vor, gemessen wird die andere Seite, an der Achse gespiegelt. Entfernen Sie den Schatten mit dem Pinsel oder fotografieren Sie in gleichmäßigem Licht, für einen genaueren Umriss."
 
-# en: "A user record is not on the server, name a catalogue record"
-msgid "coreMessage.answer.userRecord"
-msgstr "Ein eigener Datensatz liegt nicht auf dem Server, geben Sie den Namen eines Katalogdatensatzes an"
-
-# en: "a zeroOffset prior needs the fitZeroOffset option"
-msgid "refusal.zeroOffsetPriorWithoutFit"
-msgstr "Ein prior für zeroOffset braucht die Option fitZeroOffset"
-
 # en: "Abbreviation"
 msgid "disciplines.column.abbreviation"
 msgstr "Abkürzung"
-
-# en: "aboveRange"
-msgid "coreMessage.code.aboveRange"
-msgstr "über dem Bereich"
 
 # en: "Actions"
 msgid "disciplines.row.actions"
@@ -479,10 +391,6 @@ msgstr "Stage hinzufügen"
 msgid "events.addRoundsTitle"
 msgstr "Zur Schusszahl hinzufügen?"
 
-# en: "aim must be finite"
-msgid "refusal.aim"
-msgstr "Der Haltepunkt muss endlich sein"
-
 # en: "Air pistol"
 msgid "values.airPistol"
 msgstr "Luftpistole"
@@ -514,10 +422,6 @@ msgstr "Alle Geschosse"
 # en: "All cartridges"
 msgid "cartridges.all"
 msgstr "Alle Patronen"
-
-# en: "all compute workers are busy"
-msgid "coreMessage.request.workersBusy"
-msgstr "Alle Rechenprozesse sind ausgelastet"
 
 # en: "All disciplines"
 msgid "disciplines.all"
@@ -555,10 +459,6 @@ msgstr "Auch gedruckt als: {aliases}"
 msgid "units.quantity.altitude"
 msgstr "Höhenlage"
 
-# en: "altitude {altitude} m outside {low} to {high} m"
-msgid "refusal.altitudeOutsideRange"
-msgstr "Höhenlage {altitude} m außerhalb von {low} bis {high} m"
-
 # en: "Aluminum"
 msgid "values.aluminum"
 msgstr "Aluminium"
@@ -583,10 +483,6 @@ msgstr "Beliebig viele"
 msgid "disciplines.rule.aperture"
 msgstr "Diopter"
 
-# en: "apex"
-msgid "coreMessage.code.apex"
-msgstr "Scheitelpunkt"
-
 # en: "Areas"
 msgid "units.quantity.area"
 msgstr "Flächen"
@@ -595,41 +491,9 @@ msgstr "Flächen"
 msgid "recordFields.asPrinted"
 msgstr "Wie gedruckt: {printed}"
 
-# en: "at least one BC band"
-msgid "refusal.noBcBand"
-msgstr "Mindestens ein BC-Band"
-
-# en: "at least one candidate"
-msgid "refusal.noCandidate"
-msgstr "Mindestens ein Kandidat"
-
-# en: "at least one entry or a chronograph"
-msgid "refusal.noEntryOrChronograph"
-msgstr "Mindestens ein Eintrag oder ein Chronograph"
-
-# en: "at least one observation"
-msgid "refusal.noObservation"
-msgstr "Mindestens eine Beobachtung"
-
-# en: "at least one observation per session"
-msgid "refusal.sessionWithoutObservation"
-msgstr "Mindestens eine Beobachtung je Sitzung"
-
-# en: "at least one session"
-msgid "refusal.noSession"
-msgstr "Mindestens eine Sitzung"
-
 # en: "At least one source stays on"
 msgid "listSources.lastOn"
 msgstr "Mindestens eine Quelle bleibt eingeschaltet"
-
-# en: "at least one tolerance must be above 0"
-msgid "coreMessage.answer.tolerance"
-msgstr "Mindestens eine der Toleranzen muss größer als 0 sein"
-
-# en: "at least two knots"
-msgid "refusal.knotsTooFew"
-msgstr "Mindestens zwei Knoten"
 
 # en: "At most {max} at once"
 msgid "directoryTable.full"
@@ -643,14 +507,6 @@ msgstr "Beim Maßstab des Lineals weicht der Durchmesser auf dem Foto um {percen
 msgid "bulletPhoto.lengthOffRuler"
 msgstr "Beim Maßstab des Lineals weicht die Gesamtlänge auf dem Foto um {percent, decimal} % von der eingegebenen ab. Prüfen Sie Maßstabspunkte, Freistellung und ob das Geschoss flach und rechtwinklig zur Kamera liegt."
 
-# en: "atmosphere"
-msgid "coreMessage.code.atmosphere"
-msgstr "Atmosphärengrenze"
-
-# en: "azimuth"
-msgid "refusal.azimuthInvalid"
-msgstr "Azimut ungültig"
-
 # en: "ball"
 msgid "values.ball"
 msgstr "Kugelpulver"
@@ -662,10 +518,6 @@ msgstr "Ballistische Koeffizienten"
 # en: "Ballistic coefficients"
 msgid "bulletRecord.coefficients"
 msgstr "Ballistische Koeffizienten"
-
-# en: "bandDiameter must be at least the diameter"
-msgid "refusal.bandDiameterBelowDiameter"
-msgstr "bandDiameter muss mindestens dem Durchmesser entsprechen"
 
 # en: "Barrel"
 msgid "firearms.column.barrel"
@@ -711,10 +563,6 @@ msgstr "Bodenform"
 msgid "recordFields.baseType"
 msgstr "Bodenform"
 
-# en: "baseDiameter must be positive"
-msgid "refusal.baseDiameterNotPositive"
-msgstr "baseDiameter muss positiv sein"
-
 # en: "basic"
 msgid "cartridgeRecord.note.basic"
 msgstr "Grundmaß"
@@ -735,25 +583,9 @@ msgstr "BC {model}"
 msgid "recordFields.coefficient"
 msgstr "BC {model}"
 
-# en: "BC band"
-msgid "refusal.bcBandInvalid"
-msgstr "BC-Band ungültig"
-
-# en: "BC bands need distinct speeds"
-msgid "refusal.bcBandsSameSpeed"
-msgstr "BC-Bänder brauchen verschiedene Geschwindigkeiten"
-
-# en: "BC reference {reference}"
-msgid "refusal.bcReferenceUnknown"
-msgstr "BC-Bezug {reference} unbekannt"
-
 # en: "Bearing length"
 msgid "recordFields.bearingLength"
 msgstr "Länge des Führungsteils"
-
-# en: "belowRange"
-msgid "coreMessage.code.belowRange"
-msgstr "unter dem Bereich"
 
 # en: "belt diameter (table III)"
 msgid "cartridgeRecord.meaning.beltDiameter"
@@ -795,10 +627,6 @@ msgstr "Bootsheck"
 msgid "recordFields.boatTailAngle"
 msgstr "Bootsheckwinkel"
 
-# en: "boatTailLength must be zero or more"
-msgid "refusal.boatTailLengthNegative"
-msgstr "boatTailLength muss 0 oder größer sein"
-
 # en: "Body"
 msgid "cartridgeRecord.group.body"
 msgstr "Körper"
@@ -819,17 +647,9 @@ msgstr "Körperdurchmesser bei l2"
 msgid "cartridgeRecord.meaning.bodyAtHead"
 msgstr "Körperdurchmesser am Boden"
 
-# en: "Body is not valid JSON"
-msgid "coreMessage.request.notJson"
-msgstr "Der Inhalt ist kein gültiges JSON"
-
 # en: "bonded"
 msgid "values.bonded"
 msgstr "Verbundgeschoss"
-
-# en: "bore angles"
-msgid "refusal.boreAnglesInvalid"
-msgstr "Höhen- und Seitenwinkel der Laufachse ungültig"
 
 # en: "bore cross-section area"
 msgid "cartridgeRecord.meaning.boreArea"
@@ -846,10 +666,6 @@ msgstr "Laufwiderstand"
 # en: "boron nitride"
 msgid "values.boronNitride"
 msgstr "Bornitrid"
-
-# en: "bracketFailed"
-msgid "coreMessage.code.bracketFailed"
-msgstr "kein Paar benachbarter Ladungen schließt das Ziel ein"
 
 # en: "Brass"
 msgid "values.brass"
@@ -880,32 +696,8 @@ msgid "recordFields.build"
 msgstr "Aufbau"
 
 # en: "Bulk density"
-msgid "coreMessage.label.bulkDensity"
-msgstr "Schüttgewicht"
-
-# en: "Bulk density"
 msgid "recordFields.bulkDensity"
 msgstr "Schüttgewicht"
-
-# en: "bullet {bullet} {key} {value} {unit} must be within {low} and {high} {unit}"
-msgid "refusal.bulletValueOutOfBounds"
-msgstr "Geschoss {bullet}: {key} {value} {unit} muss zwischen {low} und {high} {unit} liegen"
-
-# en: "bullet {bullet} has {count} {model} values without distinct velocity bands; send drag explicitly"
-msgid "refusal.bulletCoefficientsWithoutBands"
-msgstr "Geschoss {bullet} hat {count} Werte für {model} ohne verschiedene Geschwindigkeitsbänder; den Luftwiderstand ausdrücklich übergeben"
-
-# en: "bullet {bullet} has no {model} ballistic coefficient"
-msgid "refusal.bulletWithoutCoefficient"
-msgstr "Geschoss {bullet} hat keinen Ballistischen Koeffizienten für {model}"
-
-# en: "bullet {bullet} has no diameter"
-msgid "refusal.bulletWithoutDiameter"
-msgstr "Geschoss {bullet} hat keinen Durchmesser"
-
-# en: "bullet {bullet} has no length"
-msgid "refusal.bulletWithoutLength"
-msgstr "Geschoss {bullet} hat keine Länge"
 
 # en: "Bullet data"
 msgid "bulletCompare.data"
@@ -929,10 +721,6 @@ msgstr "Geschoss-Editor"
 
 # en: "bullet diameter"
 msgid "cartridgeRecord.meaning.bulletDiameter"
-msgstr "Geschossdurchmesser"
-
-# en: "Bullet diameter"
-msgid "coreMessage.label.bulletDiameter"
 msgstr "Geschossdurchmesser"
 
 # en: "Bullet diameter G1"
@@ -987,10 +775,6 @@ msgstr "Abbrandform z1"
 msgid "recordFields.burnFormGroup"
 msgstr "Abbrandform, zweistufig"
 
-# en: "Burn form: {missing} needed with the others, or leave all four empty."
-msgid "refusal.burnFormPartial"
-msgstr "Abbrandform: {missing} zusammen mit den anderen angeben oder alle vier leer lassen."
-
 # en: "Burn rate"
 msgid "recordFields.burnRate"
 msgstr "Abbrandgeschwindigkeit"
@@ -1010,14 +794,6 @@ msgstr "Abbrandgeschwindigkeiten"
 # en: "burn-rate order {order}"
 msgid "powders.burnRateOrder"
 msgstr "Rang {order} der Abbrandgeschwindigkeit"
-
-# en: "busy"
-msgid "coreMessage.code.busy"
-msgstr "ausgelastet"
-
-# en: "Caliber"
-msgid "coreMessage.label.caliber"
-msgstr "Kaliber"
 
 # en: "Caliber"
 msgid "bullets.column.cal"
@@ -1151,10 +927,6 @@ msgstr "Hülsenvolumen"
 msgid "cartridgeRecord.meaning.caseLength"
 msgstr "Hülsenlänge"
 
-# en: "Case length"
-msgid "coreMessage.label.caseLength"
-msgstr "Hülsenlänge"
-
 # en: "Case length L3"
 msgid "cartridges.column.caseLength"
 msgstr "Hülsenlänge L3"
@@ -1162,10 +934,6 @@ msgstr "Hülsenlänge L3"
 # en: "Case type"
 msgid "cartridges.column.type"
 msgstr "Hülsenform"
-
-# en: "case-contact"
-msgid "coreMessage.method.caseContact"
-msgstr "Wandler am Hülsenkörper"
 
 # en: "case-contact"
 msgid "values.caseContact"
@@ -1235,26 +1003,6 @@ msgstr "Mindestmaß des Patronenlagers minus Höchstmaß der Patrone"
 msgid "cartridgeRecord.sideNotes.chamber"
 msgstr "Patronenlager: {notes}"
 
-# en: "chamberVolume"
-msgid "coreMessage.code.chamberVolume"
-msgstr "Ladung passt nicht in das Patronenlager"
-
-# en: "charge solver: {reason}"
-msgid "coreMessage.answer.chargeSolver"
-msgstr "Ladungssuche: {reason}"
-
-# en: "charge too small for the model"
-msgid "coreMessage.advisory.chargeTooSmall"
-msgstr "Treibladung zu klein für das Modell"
-
-# en: "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the ignition pressure ({hold}); results are outside the range the model was built for."
-msgid "coreMessage.warning.chargeTooSmallIgnition"
-msgstr "Treibladung zu klein für das Modell: Der simulierte höchste mittlere Druck, {p}, liegt unter dem {ratio}-Fachen des Zünddrucks ({hold}); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde."
-
-# en: "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the start pressure ({hold}); results are outside the range the model was built for."
-msgid "coreMessage.warning.chargeTooSmall"
-msgstr "Treibladung zu klein für das Modell: Der simulierte höchste mittlere Druck, {p}, liegt unter dem {ratio}-Fachen des Startdrucks ({hold}); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde."
-
 # en: "Check the event: a value is out of its range."
 msgid "events.outOfRange"
 msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
@@ -1270,10 +1018,6 @@ msgstr "Wählen Sie eine Chronograph-Datei aus oder ziehen Sie sie hierher, oder
 # en: "Chronograph file"
 msgid "sessionSummary.chronoFile"
 msgstr "Chronograph-Datei"
-
-# en: "chronograph mean"
-msgid "refusal.chronographMeanInvalid"
-msgstr "Mittelwert des Chronographen ungültig"
 
 # en: "Clear"
 msgid "comparePicks.clear"
@@ -1303,10 +1047,6 @@ msgstr "Spiel {value}"
 msgid "cartridgeRecord.clearanceLine"
 msgstr "Spiel: {meaning}"
 
-# en: "click value must be positive"
-msgid "refusal.clickValueNotPositive"
-msgstr "Der Klickwert muss positiv sein"
-
 # en: "Close enough"
 msgid "photoQuality.rule.closeEnough"
 msgstr "Nah genug"
@@ -1318,10 +1058,6 @@ msgstr "COAL, Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
 # en: "Cold bore"
 msgid "sessionSummary.coldBore"
 msgstr "Kaltschuss"
-
-# en: "collinear"
-msgid "coreMessage.code.collinear"
-msgstr "kollinear"
 
 # en: "community"
 msgid "recordSources.origin.community"
@@ -1367,22 +1103,6 @@ msgstr "Zusammensetzung"
 msgid "primers.column.compound"
 msgstr "Zündsatz"
 
-# en: "computation did not finish within {ms} ms"
-msgid "coreMessage.request.tooSlow"
-msgstr "Die Berechnung wurde nicht innerhalb von {ms} ms fertig"
-
-# en: "compute pool closed"
-msgid "coreMessage.request.poolClosed"
-msgstr "Der Rechenpool ist geschlossen"
-
-# en: "compute worker exited"
-msgid "coreMessage.request.workerExited"
-msgstr "Der Rechenprozess wurde beendet"
-
-# en: "compute worker failed"
-msgid "coreMessage.request.workerFailed"
-msgstr "Der Rechenprozess ist fehlgeschlagen"
-
 # en: "computed"
 msgid "recordSources.kind.computed"
 msgstr "berechnet"
@@ -1402,18 +1122,6 @@ msgstr "Berechnet: Millers Regel bei 2800 ft/s, 59 °F, 29,92 inHg."
 # en: "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is not fitted to plastic tips."
 msgid "bullet.millerMethodPolymerTip"
 msgstr "Berechnet: Millers Regel bei 2800 ft/s, 59 °F, 29,92 inHg. Die Regel ist nicht an Kunststoffspitzen angepasst."
-
-# en: "confidence level must lie in (0, 1)"
-msgid "refusal.confidenceLevelOutsideUnit"
-msgstr "Das Konfidenzniveau muss in (0, 1) liegen"
-
-# en: "confidence level must lie in (0, 1)"
-msgid "refusal.confidenceLevel"
-msgstr "Das Konfidenzniveau muss in (0, 1) liegen"
-
-# en: "confidenceLevel must lie in (0, 1)"
-msgid "refusal.confidenceLevelOptionOutsideUnit"
-msgstr "confidenceLevel muss in (0, 1) liegen"
 
 # en: "Configuration"
 msgid "firearms.column.configuration"
@@ -1475,6 +1183,10 @@ msgstr "Hash {hash} kopieren"
 msgid "recordActions.copyLink"
 msgstr "Link kopieren"
 
+# en: "Copy link"
+msgid "workspace.copyLink"
+msgstr "Link kopieren"
+
 # en: "Core"
 msgid "recordFields.core"
 msgstr "Kern"
@@ -1523,10 +1235,6 @@ msgstr "Zählt bei Berührung"
 msgid "disciplineRecord.column.course"
 msgstr "Schießprogramm"
 
-# en: "coverage must lie in (0, 1)"
-msgid "refusal.coverage"
-msgstr "Die Abdeckung muss in (0, 1) liegen"
-
 # en: "Covers"
 msgid "recordSources.column.covers"
 msgstr "Gilt für"
@@ -1534,10 +1242,6 @@ msgstr "Gilt für"
 # en: "Covolume"
 msgid "recordFields.covolume"
 msgstr "Covolume"
-
-# en: "crusher"
-msgid "coreMessage.method.crusher"
-msgstr "Kupferstauchzylinder"
 
 # en: "crusher"
 msgid "values.crusher"
@@ -1587,14 +1291,6 @@ msgstr "Datum"
 msgid "sessionSummary.date"
 msgstr "Datum: {date}"
 
-# en: "degrees of freedom must be a positive whole number"
-msgid "refusal.degreesOfFreedomNotPositiveWhole"
-msgstr "Die Freiheitsgrade müssen eine positive ganze Zahl sein"
-
-# en: "degrees of freedom must be positive"
-msgid "refusal.degreesOfFreedomNotPositive"
-msgstr "Die Freiheitsgrade müssen positiv sein"
-
 # en: "Delete"
 msgid "listSources.delete"
 msgstr "Löschen"
@@ -1640,10 +1336,6 @@ msgid "sessionSummary.device"
 msgstr "Gerät: {device}"
 
 # en: "Diameter"
-msgid "coreMessage.label.diameter"
-msgstr "Durchmesser"
-
-# en: "Diameter"
 msgid "recordFields.diameter"
 msgstr "Durchmesser"
 
@@ -1662,10 +1354,6 @@ msgstr "Durchmesser bei L1"
 # en: "diameter at the mouth (l)"
 msgid "cartridgeRecord.meaning.mouthDiameter"
 msgstr "Durchmesser an der Mündung (l)"
-
-# en: "diameter must be positive"
-msgid "refusal.diameterNotPositive"
-msgstr "Der Durchmesser muss positiv sein"
 
 # en: "difference to the first bullet"
 msgid "bulletCompare.difference"
@@ -1727,10 +1415,6 @@ msgstr "Tabelle der Disziplinen"
 msgid "disciplines.filtered"
 msgstr "Disziplinen, {filters}"
 
-# en: "dispersion must be positive"
-msgid "refusal.dispersionNotPositive"
-msgstr "Die Streuung muss positiv sein"
-
 # en: "Disqualified: no total."
 msgid "events.disqualifiedNoTotal"
 msgstr "Disqualifiziert: kein Gesamtergebnis."
@@ -1767,49 +1451,17 @@ msgstr "Entfernung"
 msgid "targets.column.distance"
 msgstr "Entfernung"
 
-# en: "distance {distance} m not reached ({stop})"
-msgid "refusal.distanceNotReached"
-msgstr "Entfernung {distance} m nicht erreicht ({stop})"
-
-# en: "distance must be positive"
-msgid "refusal.distance"
-msgstr "Die Entfernung muss positiv sein"
-
-# en: "distance must not be negative"
-msgid "refusal.distanceNegative"
-msgstr "Die Entfernung darf nicht negativ sein"
-
 # en: "Division"
 msgid "events.division"
 msgstr "Division"
-
-# en: "done"
-msgid "coreMessage.code.done"
-msgstr "abgeschlossen"
 
 # en: "double"
 msgid "values.double"
 msgstr "zweibasig"
 
-# en: "drag curve Mach must rise"
-msgid "refusal.dragCurveMachNotRising"
-msgstr "Die Machzahlen der Kurve des Luftwiderstands müssen steigen"
-
-# en: "drag curve node"
-msgid "refusal.dragCurveNodeInvalid"
-msgstr "Stützstelle der Kurve des Luftwiderstands ungültig"
-
-# en: "drag interpolation {interpolation}"
-msgid "refusal.dragInterpolationUnknown"
-msgstr "Interpolation des Luftwiderstands {interpolation} unbekannt"
-
 # en: "Drag model"
 msgid "fieldTable.column.dragModel"
 msgstr "Luftwiderstandsmodell"
-
-# en: "drag model {model}"
-msgid "refusal.dragModelUnknown"
-msgstr "Modell des Luftwiderstands {model} unbekannt"
 
 # en: "Drawing"
 msgid "bulletRecord.drawing"
@@ -1884,10 +1536,6 @@ msgid "events.roundsFiredHint"
 msgstr "Leer: die Schüsse der Serien, wo jede sie aufführt."
 
 # en: "energy"
-msgid "coreMessage.method.energy"
-msgstr "Energie"
-
-# en: "energy"
 msgid "values.energy"
 msgstr "Energie"
 
@@ -1907,14 +1555,6 @@ msgstr "Energieverhältnis"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "Energie, wie unter Pressures (Energies) gedruckt"
 
-# en: "Enter a number for {field}."
-msgid "refusal.valueMissing"
-msgstr "Geben Sie eine Zahl für {field} ein."
-
-# en: "Enter a number."
-msgid "refusal.valueNotNumber"
-msgstr "Geben Sie eine Zahl ein."
-
 # en: "Entered at the range"
 msgid "sourceLink.entry.range"
 msgstr "Auf dem Schießstand erfasst"
@@ -1923,21 +1563,9 @@ msgstr "Auf dem Schießstand erfasst"
 msgid "sourceLink.entry.targetDesigner"
 msgstr "Im Scheiben-Editor erfasst"
 
-# en: "entry kind {kind}"
-msgid "refusal.entryKindUnknown"
-msgstr "Unbekannte Art des Eintrags: {kind}"
-
-# en: "entry value"
-msgid "refusal.entryValueInvalid"
-msgstr "Wert des Eintrags ungültig"
-
 # en: "Error"
 msgid "states.error"
 msgstr "Fehler"
-
-# en: "Error {status}."
-msgid "coreMessage.request.error"
-msgstr "Fehler {status}."
 
 # en: "ES"
 msgid "sessionSummary.column.es"
@@ -2132,10 +1760,6 @@ msgstr "Anpassung nicht aufgelöst: Das Intervall der angepassten Vivacity ({val
 msgid "burnRate.unfit.unresolved"
 msgstr "Anpassung nicht aufgelöst: Das Intervall der angepassten Vivacity (plus und minus {factor} Standardunsicherheiten) reicht bis 0, daher wird das Treibladungspulver nicht eingeordnet."
 
-# en: "fit-failed"
-msgid "coreMessage.code.fitFailed"
-msgstr "Anpassung fehlgeschlagen"
-
 # en: "Fits {name}"
 msgid "bullets.fits"
 msgstr "Passt zu {name}"
@@ -2264,18 +1888,6 @@ msgstr "Messring"
 msgid "values.gildingMetal"
 msgstr "Tombak"
 
-# en: "Give a load or factory ammunition, not both."
-msgid "coreMessage.schema.loadOrFactory"
-msgstr "Geben Sie eine Laborierung oder Fabrikmunition an, nicht beides."
-
-# en: "Grain form"
-msgid "coreMessage.label.grainForm"
-msgstr "Kornform"
-
-# en: "gravity"
-msgid "refusal.gravityInvalid"
-msgstr "Erdbeschleunigung ungültig"
-
 # en: "green"
 msgid "targets.color.green"
 msgstr "grün"
@@ -2291,18 +1903,6 @@ msgstr "Durchmesser über den Zügen"
 # en: "groove front cone angle from the axis (table III: belt cone)"
 msgid "cartridgeRecord.meaning.grooveFrontAngle"
 msgstr "Winkel des vorderen Rillenkegels zur Achse (Tabelle III: Gürtelkegel)"
-
-# en: "group {group}: an impact and a dial entry share their shots, keep one or name two groups"
-msgid "refusal.groupSharesShots"
-msgstr "Gruppe {group}: Ein Eintrag der Art impact und einer der Art dial teilen sich ihre Schüsse, einen davon behalten oder zwei Gruppen mit Namen anlegen"
-
-# en: "group {range} m: an impact and a dial entry share their shots, keep one or name two groups"
-msgid "refusal.rangeGroupSharesShots"
-msgstr "Gruppe {range} m: Ein Eintrag der Art impact und einer der Art dial teilen sich ihre Schüsse, einen davon behalten oder zwei Gruppen mit Namen anlegen"
-
-# en: "gyration radius ignored"
-msgid "coreMessage.advisory.gyrationRadiusIgnored"
-msgstr "Trägheitsradius ignoriert"
 
 # en: "Handloads"
 msgid "disciplines.row.handloads"
@@ -2335,10 +1935,6 @@ msgstr "Boden bis zum Schnittpunkt von Schulterkegel und Achse"
 # en: "Head, rim and groove"
 msgid "cartridgeRecord.group.head"
 msgstr "Boden, Rand und Rille"
-
-# en: "headShape must be from 0 to 1"
-msgid "refusal.headShapeOutsideUnit"
-msgstr "headShape muss zwischen 0 und 1 liegen"
 
 # en: "Headstamp"
 msgid "recordFields.headstamp"
@@ -2388,10 +1984,6 @@ msgstr "Webseite"
 msgid "federationRecord.homepage"
 msgstr "Webseite"
 
-# en: "humidity {humidity} outside 0..1"
-msgid "refusal.humidityOutsideUnit"
-msgstr "Luftfeuchte {humidity} außerhalb von 0..1"
-
 # en: "hybrid"
 msgid "values.hybrid"
 msgstr "hybrid"
@@ -2399,10 +1991,6 @@ msgstr "hybrid"
 # en: "Ignition pressure"
 msgid "recordFields.ignitionPressure"
 msgstr "Zünddruck"
-
-# en: "ill-conditioned"
-msgid "coreMessage.code.illConditioned"
-msgstr "schlecht konditioniert"
 
 # en: "Impetus"
 msgid "recordFields.impetus"
@@ -2415,10 +2003,6 @@ msgstr "JSON importieren"
 # en: "Import notes"
 msgid "sessionSummary.importNotes"
 msgstr "Hinweise zum Import"
-
-# en: "imprecise"
-msgid "coreMessage.code.imprecise"
-msgstr "ungenau"
 
 # en: "in a new tab"
 msgid "recordSources.newTab"
@@ -2444,10 +2028,6 @@ msgstr "Eingeschlossener Winkel des h-Kegels"
 msgid "cartridgeRecord.meaning.shoulderAngle"
 msgstr "Eingeschlossener Schulterwinkel"
 
-# en: "inconsistent"
-msgid "coreMessage.code.inconsistent"
-msgstr "widersprüchlich"
-
 # en: "Inner ten"
 msgid "targets.row.innerTen"
 msgstr "Innen-10"
@@ -2460,25 +2040,13 @@ msgstr "Höhe der Innen-10"
 msgid "targets.row.innerTenRule"
 msgstr "Regel für die Innen-10"
 
-# en: "input"
-msgid "coreMessage.code.input"
-msgstr "Eingabewert außerhalb des Modells"
-
-# en: "integration"
-msgid "coreMessage.code.integration"
-msgstr "Berechnung nicht konvergiert"
+# en: "Inputs"
+msgid "workspace.inputs"
+msgstr "Eingaben"
 
 # en: "Intended use"
 msgid "recordFields.intendedUse"
 msgstr "Verwendungszweck"
-
-# en: "interior: {reason}"
-msgid "coreMessage.answer.interior"
-msgstr "Innenballistik: {reason}"
-
-# en: "internal server error"
-msgid "coreMessage.request.internal"
-msgstr "Interner Serverfehler"
 
 # en: "International"
 msgid "disciplines.international"
@@ -2491,10 +2059,6 @@ msgstr "International"
 # en: "International discipline"
 msgid "disciplineRecord.international"
 msgstr "Internationale Disziplin"
-
-# en: "invalid"
-msgid "coreMessage.code.invalid"
-msgstr "ungültig"
 
 # en: "jacket"
 msgid "construction.jacket"
@@ -2524,18 +2088,6 @@ msgstr "Art"
 msgid "disciplines.rule.kneeling"
 msgstr "kniend"
 
-# en: "knot Mach must be positive"
-msgid "refusal.knotMachNotPositive"
-msgstr "Die Machzahl eines Knotens muss positiv sein"
-
-# en: "knots must rise"
-msgid "refusal.knotsNotRising"
-msgstr "Die Knoten müssen steigen"
-
-# en: "knots need a single-band BC or a curve"
-msgid "refusal.knotsNeedSingleBandOrCurve"
-msgstr "Die Knoten brauchen einen BC mit einem Band oder eine Kurve"
-
 # en: "L3 to the end of the leade"
 msgid "cartridgeRecord.meaning.leadeEnd"
 msgstr "L3 bis Ende des Übergangskegels"
@@ -2547,22 +2099,6 @@ msgstr "L3 bis Beginn des Übergangskegels (Freibohrung)"
 # en: "Lacquered steel"
 msgid "values.lacqueredSteel"
 msgstr "Lackierter Stahl"
-
-# en: "ladder charge {charge} g must be above 0"
-msgid "refusal.ladderChargeNotAboveZero"
-msgstr "Die Treibladung {charge} g des Ladeleiters muss größer als 0 sein"
-
-# en: "ladder output of {n} points is above {max}: fewer steps or a larger options.outputStep"
-msgid "coreMessage.answer.ladderOutput"
-msgstr "Die Ausgabe des Ladeleiters hat {n} Punkte, mehr als {max}: weniger Schritte oder ein größeres options.outputStep"
-
-# en: "ladder would pass {ms} ms"
-msgid "coreMessage.request.ladderTooSlow"
-msgstr "Der Ladeleiter würde {ms} ms überschreiten"
-
-# en: "ladder.kind: a {kind} ladder runs in the workbench, not in this route"
-msgid "coreMessage.answer.ladderKind"
-msgstr "ladder.kind: Ein Ladeleiter vom Typ {kind} läuft in der Werkbank, nicht über diese Route"
 
 # en: "Large pistol"
 msgid "values.largePistol"
@@ -2583,10 +2119,6 @@ msgstr "Letzte Sitzung"
 # en: "Latest chronograph session of these loads."
 msgid "firearms.column.lastSessionHelp"
 msgstr "Jüngste Chronograph-Sitzung dieser Laborierungen."
-
-# en: "latitude"
-msgid "refusal.latitudeInvalid"
-msgstr "Breitengrad ungültig"
 
 # en: "lead"
 msgid "disciplines.rule.lead"
@@ -2629,24 +2161,12 @@ msgid "cartridgeRecord.meaning.leadeAngle"
 msgstr "Winkel des Übergangskegels"
 
 # en: "Length"
-msgid "coreMessage.label.length"
-msgstr "Länge"
-
-# en: "Length"
 msgid "recordFields.length"
 msgstr "Länge"
 
 # en: "Length"
 msgid "bullets.column.length"
 msgstr "Länge"
-
-# en: "length and noseLength must be positive"
-msgid "refusal.outlineLengthsNotPositive"
-msgstr "length und noseLength müssen positiv sein"
-
-# en: "length must be positive"
-msgid "refusal.lengthNotPositive"
-msgstr "Die Länge muss positiv sein"
 
 # en: "length of the cone from H2 down to G1, from L3"
 msgid "cartridgeRecord.meaning.throatConeLength"
@@ -2672,10 +2192,6 @@ msgstr "Ebene"
 msgid "events.column.level"
 msgstr "Ebene"
 
-# en: "level must lie in (0, 1)"
-msgid "refusal.levelOutsideUnit"
-msgstr "Das Niveau muss in (0, 1) liegen"
-
 # en: "lever action"
 msgid "disciplines.rule.leverAction"
 msgstr "Unterhebelrepetierer"
@@ -2688,10 +2204,6 @@ msgstr "Unterhebelrepetierer"
 msgid "recordSources.column.license"
 msgstr "Lizenz"
 
-# en: "limit exceeded"
-msgid "coreMessage.advisory.limitExceeded"
-msgstr "Grenzwert überschritten"
-
 # en: "line {colour}"
 msgid "targets.ringLine"
 msgstr "Linie {colour}"
@@ -2702,6 +2214,10 @@ msgstr "Produktlinie {line}"
 
 # en: "Link copied"
 msgid "recordActions.linkCopied"
+msgstr "Link kopiert"
+
+# en: "Link copied"
+msgid "workspace.linkCopied"
 msgstr "Link kopiert"
 
 # en: "Listed by the manufacturer for"
@@ -2876,14 +2392,6 @@ msgstr "Laborierungen"
 msgid "disciplines.firearm.longGun"
 msgstr "Langwaffe"
 
-# en: "look angle outside -pi/2..pi/2"
-msgid "refusal.lookAngleOutsideRange"
-msgstr "Visierwinkel außerhalb von -pi/2..pi/2"
-
-# en: "mach must be positive"
-msgid "refusal.machNotPositive"
-msgstr "Die Machzahl muss positiv sein"
-
 # en: "Magnification up to"
 msgid "disciplines.row.maxMagnification"
 msgstr "Vergrößerung bis"
@@ -2899,10 +2407,6 @@ msgstr "Magnum"
 # en: "Major"
 msgid "events.major"
 msgstr "Major"
-
-# en: "Maker"
-msgid "coreMessage.label.maker"
-msgstr "Hersteller"
 
 # en: "manufacturer"
 msgid "recordSources.origin.manufacturer"
@@ -2945,10 +2449,6 @@ msgid "bullets.search"
 msgstr "Hersteller, Name, 168, .308 oder 7,82…"
 
 # en: "Mass"
-msgid "coreMessage.label.mass"
-msgstr "Masse"
-
-# en: "Mass"
 msgid "recordFields.mass"
 msgstr "Masse"
 
@@ -2959,18 +2459,6 @@ msgstr "Masse"
 # en: "Mass"
 msgid "cases.column.mass"
 msgstr "Masse"
-
-# en: "mass must be positive"
-msgid "refusal.massNotPositive"
-msgstr "Die Masse muss positiv sein"
-
-# en: "mass, diameter and length are required without bullet"
-msgid "coreMessage.answer.bulletValues"
-msgstr "Ohne bullet (Geschoss) sind mass, diameter und length erforderlich"
-
-# en: "mass, diameter, length, twist and velocity must be positive"
-msgid "refusal.stabilityInputsNotPositive"
-msgstr "Masse, Durchmesser, Länge, Drall und Geschwindigkeit müssen positiv sein"
 
 # en: "matching \"{query}\""
 msgid "lists.matching"
@@ -2996,14 +2484,6 @@ msgstr "Max ({unit})"
 msgid "cartridges.column.cartridgeLength"
 msgstr "Max. Länge L6"
 
-# en: "Max pressure"
-msgid "coreMessage.label.maxPressure"
-msgstr "Höchstdruck"
-
-# en: "maxCondition must be finite and at least 1"
-msgid "refusal.maxConditionOutOfRange"
-msgstr "maxCondition muss endlich und mindestens 1 sein"
-
 # en: "maximum mean pressure"
 msgid "cartridgeRecord.meaning.pmax"
 msgstr "Maximaler mittlerer Druck"
@@ -3011,34 +2491,6 @@ msgstr "Maximaler mittlerer Druck"
 # en: "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
 msgid "cartridges.column.pmaxHelp"
 msgstr "Größter mittlerer Druck laut CIP-Datenblatt, höchste Variante, nach dem Verfahren des Datenblatts."
-
-# en: "maxInflation must exceed 1"
-msgid "refusal.maxInflationNotAboveOne"
-msgstr "maxInflation muss größer als 1 sein"
-
-# en: "maxIterations must be a positive integer"
-msgid "refusal.maxIterationsNotPositiveInteger"
-msgstr "maxIterations muss eine positive ganze Zahl sein"
-
-# en: "maxRelativeStandardUncertainty must be positive"
-msgid "refusal.maxRelativeStandardUncertaintyNotPositive"
-msgstr "maxRelativeStandardUncertainty muss positiv sein"
-
-# en: "maxTime"
-msgid "coreMessage.code.maxTime"
-msgstr "Zeitgrenze erreicht"
-
-# en: "maxTime / outputStep must be at most {max}"
-msgid "coreMessage.answer.outputSteps"
-msgstr "maxTime / outputStep darf höchstens {max} betragen"
-
-# en: "maxTotalSteps must be positive"
-msgid "refusal.maxTotalStepsNotPositive"
-msgstr "maxTotalSteps muss positiv sein"
-
-# en: "maxZeroSigma must be positive"
-msgid "refusal.maxZeroSigmaNotPositive"
-msgstr "maxZeroSigma muss positiv sein"
 
 # en: "Mean"
 msgid "sessionSummary.mean"
@@ -3068,14 +2520,6 @@ msgstr "gemessen"
 msgid "bulletPhoto.measuredFrom"
 msgstr "Aus einem Foto gemessen ({width} × {height} px, {scale} px/mm ± {uncertainty} %, kein Bild gespeichert)."
 
-# en: "measuring method not stated"
-msgid "coreMessage.method.notStated"
-msgstr "Messmethode nicht angegeben"
-
-# en: "measuring method not stated in the record"
-msgid "coreMessage.method.notStatedInRecord"
-msgstr "Messmethode im Datensatz nicht angegeben"
-
 # en: "measuring position"
 msgid "cartridgeRecord.meaning.measuringPosition"
 msgstr "Messstelle"
@@ -3087,10 +2531,6 @@ msgstr "Mitglied von"
 # en: "Meplat diameter"
 msgid "recordFields.meplatDiameter"
 msgstr "Durchmesser der Stirnfläche"
-
-# en: "meplatDiameter must be zero up to the diameter"
-msgid "refusal.meplatDiameterOutsideRange"
-msgstr "meplatDiameter muss von 0 bis zum Durchmesser reichen"
 
 # en: "Metal"
 msgid "events.metal"
@@ -3136,14 +2576,6 @@ msgstr "Minor"
 msgid "events.misses"
 msgstr "Fehlschüsse"
 
-# en: "missingValues"
-msgid "coreMessage.code.missingValues"
-msgstr "fehlende Werte"
-
-# en: "model {model}"
-msgid "refusal.modelUnknown"
-msgstr "Unbekanntes Modell {model}"
-
 # en: "Model fit"
 msgid "powderRecord.modelFit"
 msgstr "Modellanpassung"
@@ -3168,37 +2600,13 @@ msgstr "Molare Masse"
 msgid "values.moly"
 msgstr "Moly"
 
-# en: "moments of inertia must be positive"
-msgid "refusal.inertiaNotPositive"
-msgstr "Die Trägheitsmomente müssen positiv sein"
-
-# en: "momentSlope must be positive (spin-stabilized bullet)"
-msgid "refusal.momentSlopeNotPositive"
-msgstr "momentSlope muss positiv sein (drallstabilisiertes Geschoss)"
-
 # en: "monolithic"
 msgid "values.monolithic"
 msgstr "Monolith"
 
-# en: "more than {max} integration steps"
-msgid "refusal.integrationStepsExceeded"
-msgstr "Mehr als {max} Integrationsschritte"
-
-# en: "more than {max} integration steps in total"
-msgid "refusal.integrationBudgetExceeded"
-msgstr "Mehr als {max} Integrationsschritte insgesamt"
-
 # en: "Move closer so the target fills more of the frame, or use the full resolution of the camera."
 msgid "photoQuality.fix.moveCloser"
 msgstr "Näher herangehen, damit die Zielscheibe mehr vom Bild füllt, oder die volle Auflösung der Kamera nutzen."
-
-# en: "Must be above 0."
-msgid "refusal.valueNotPositive"
-msgstr "Muss größer als 0 sein."
-
-# en: "Must be at least 0."
-msgid "refusal.valueBelowZero"
-msgstr "Muss mindestens 0 betragen."
 
 # en: "Muzzle distance: {distance}"
 msgid "sessionSummary.muzzleDistance"
@@ -3211,14 +2619,6 @@ msgstr "Mündungsenergie ab"
 # en: "Muzzle loader"
 msgid "values.muzzleLoader"
 msgstr "Vorderlader"
-
-# en: "muzzle velocity did not converge"
-msgid "refusal.muzzleVelocityNotConverged"
-msgstr "Die Mündungsgeschwindigkeit ist nicht konvergiert"
-
-# en: "muzzle velocity must be positive"
-msgid "refusal.muzzleVelocityNotPositive"
-msgstr "Die Mündungsgeschwindigkeit muss positiv sein"
 
 # en: "n/a"
 msgid "bulletCompare.notAvailable"
@@ -3312,10 +2712,6 @@ msgstr "Halsdurchmesser bei L2"
 msgid "cartridgeRecord.meaning.neckAtMouth"
 msgstr "Halsdurchmesser an der Mündung"
 
-# en: "Needed with the other engraving value, or from a powder record."
-msgid "refusal.engravingValueNeeded"
-msgstr "Wird zusammen mit dem anderen Einpresswert oder aus einem Datensatz des Treibladungspulvers benötigt."
-
 # en: "New brass group"
 msgid "cases.new"
 msgstr "Neue Hülsengruppe"
@@ -3384,14 +2780,6 @@ msgstr "Keine Geschosse ausgewählt."
 msgid "states.noMatch.bullets"
 msgstr "Keine Geschosse entsprechen diesen Filtern."
 
-# en: "no cartridge"
-msgid "coreMessage.advisory.noCartridge"
-msgstr "keine Patrone"
-
-# en: "No cartridge id was given, so no CIP Pmax was checked."
-msgid "coreMessage.warning.noCartridge"
-msgstr "Es wurde keine Patronen-ID angegeben, daher wurde kein CIP-Pmax geprüft."
-
 # en: "No cartridge matches {query}."
 msgid "bulletRecord.noCartridge"
 msgstr "Keine Patrone entspricht „{query}“."
@@ -3399,14 +2787,6 @@ msgstr "Keine Patrone entspricht „{query}“."
 # en: "No cartridges match these filters."
 msgid "states.noMatch.cartridges"
 msgstr "Keine Patronen entsprechen diesen Filtern."
-
-# en: "no comparable limit"
-msgid "coreMessage.advisory.noComparableLimit"
-msgstr "kein vergleichbarer Grenzwert"
-
-# en: "no compute worker could be started"
-msgid "coreMessage.request.noWorker"
-msgstr "Es konnte kein Rechenprozess gestartet werden"
 
 # en: "No dimensions or pressures in this record"
 msgid "cartridgeRecord.noValues"
@@ -3504,14 +2884,6 @@ msgstr "Keine Zeile in {table} passt zu {query}."
 msgid "events.nothingToExport"
 msgstr "Kein gespeicherter Wettkampf zum Exportieren."
 
-# en: "no scanned charge gives a valid run: interior {reason}"
-msgid "coreMessage.answer.noValidCharge"
-msgstr "Keine untersuchte Treibladung ergibt eine gültige Berechnung: Innenballistik {reason}"
-
-# en: "no scanned charge gives a valid run: interior {reason} ({field})"
-msgid "coreMessage.answer.noValidChargeField"
-msgstr "Keine untersuchte Treibladung ergibt eine gültige Berechnung: Innenballistik {reason} ({field})"
-
 # en: "No target mapping names this discipline."
 msgid "disciplineRecord.noTargets"
 msgstr "Keine Zuordnung enthält den Namen dieser Disziplin."
@@ -3528,17 +2900,9 @@ msgstr "Noch kein Scheibenblatt gespeichert"
 msgid "states.noMatch.targetFaces"
 msgstr "Keine Scheiben entsprechen diesen Filtern."
 
-# en: "no-information"
-msgid "coreMessage.code.noInformation"
-msgstr "keine Information"
-
 # en: "No-shoots"
 msgid "events.noShoots"
 msgstr "No-Shoots"
-
-# en: "noComparableLimit"
-msgid "coreMessage.code.noComparableLimit"
-msgstr "kein vergleichbarer Grenzwert"
 
 # en: "nominal minimum difference of published dimensions"
 msgid "cartridgeRecord.difference"
@@ -3552,21 +2916,9 @@ msgstr "Keine"
 msgid "events.none"
 msgstr "Keine"
 
-# en: "nonFinite"
-msgid "coreMessage.code.nonFinite"
-msgstr "Wert nicht endlich"
-
 # en: "Nose length"
 msgid "recordFields.noseLength"
 msgstr "Kopflänge"
-
-# en: "noseLength plus boatTailLength must not exceed length"
-msgid "refusal.noseAndBoatTailExceedLength"
-msgstr "noseLength plus boatTailLength darf length nicht überschreiten"
-
-# en: "noShotStart"
-msgid "coreMessage.code.noShotStart"
-msgstr "Geschoss setzt sich nicht in Bewegung"
 
 # en: "Not a metallic-cartridge powder"
 msgid "burnRate.notMetallic"
@@ -3604,10 +2956,6 @@ msgstr "Nicht angegeben"
 msgid "matchRounds.notStated"
 msgstr "Nicht angegeben"
 
-# en: "not-converged"
-msgid "coreMessage.code.notConverged"
-msgstr "nicht konvergiert"
-
 # en: "Note"
 msgid "fieldTable.column.note"
 msgstr "Hinweis"
@@ -3632,18 +2980,6 @@ msgstr "Notizen"
 msgid "firearms.column.notes"
 msgstr "Notizen"
 
-# en: "notMonotone"
-msgid "coreMessage.code.notMonotone"
-msgstr "nicht monoton"
-
-# en: "noValidRun"
-msgid "coreMessage.code.noValidRun"
-msgstr "keine gültige Berechnung"
-
-# en: "noValue"
-msgid "coreMessage.code.noValue"
-msgstr "kein Wert"
-
 # en: "Number"
 msgid "disciplines.row.number"
 msgstr "Nummer"
@@ -3667,22 +3003,6 @@ msgstr "Anzahl der Züge"
 # en: "Numerals printed"
 msgid "targets.row.numeralsPrinted"
 msgstr "Ringzahlen aufgedruckt"
-
-# en: "observation kind {kind}"
-msgid "refusal.observationKindUnknown"
-msgstr "Unbekannte Art der Beobachtung: {kind}"
-
-# en: "observation range {range}"
-msgid "refusal.observationRangeInvalid"
-msgstr "Entfernung der Beobachtung {range} ungültig"
-
-# en: "observation value"
-msgid "refusal.observationValueInvalid"
-msgstr "Wert der Beobachtung ungültig"
-
-# en: "observations of different kinds need standard uncertainties"
-msgid "refusal.mixedObservationsNeedUncertainty"
-msgstr "Beobachtungen verschiedener Arten brauchen Standardunsicherheiten"
 
 # en: "Offline"
 msgid "page.offline"
@@ -3748,10 +3068,6 @@ msgstr "Optik, Einschießentfernung"
 msgid "disciplines.rule.optical"
 msgstr "optisch"
 
-# en: "options.maxSteps must be at most {max} for the charge solver"
-msgid "coreMessage.answer.maxSteps"
-msgstr "options.maxSteps darf für die Ladungssuche höchstens {max} betragen"
-
 # en: "orange"
 msgid "targets.color.orange"
 msgstr "orange"
@@ -3792,21 +3108,9 @@ msgstr "Umriss, {name}"
 msgid "bulletDrawing.outline"
 msgstr "Umriss, {name}"
 
-# en: "outputTooLarge"
-msgid "coreMessage.code.outputTooLarge"
-msgstr "Ausgabe zu groß"
-
-# en: "outsideModel"
-msgid "coreMessage.code.outsideModel"
-msgstr "außerhalb des Modells"
-
 # en: "Over the composition ranges: {min, decimal} to {max, decimal}."
 msgid "recordFields.computedRange"
 msgstr "Über den Bereichen der Zusammensetzung: {min, decimal} bis {max, decimal}."
-
-# en: "Overall length"
-msgid "coreMessage.label.overallLength"
-msgstr "Gesamtlänge"
 
 # en: "Overlay"
 msgid "burnRateCompare.overlay"
@@ -3828,10 +3132,6 @@ msgstr "Seite nicht gefunden"
 msgid "values.paint"
 msgstr "Lack"
 
-# en: "params/id must match the record id"
-msgid "coreMessage.request.idMismatch"
-msgstr "params/id muss der ID eines Datensatzes entsprechen"
-
 # en: "partitioned"
 msgid "values.partitioned"
 msgstr "mit Trennsteg"
@@ -3851,10 +3151,6 @@ msgstr "je Zeile der Ladetabelle"
 # en: "Pick 2 to {max}"
 msgid "bullets.pickToCompare"
 msgstr "2 bis {max} auswählen"
-
-# en: "piezo"
-msgid "coreMessage.method.piezo"
-msgstr "Piezo-Messquarz"
 
 # en: "piezo"
 msgid "values.piezo"
@@ -3904,14 +3200,6 @@ msgstr "Polymerspitze"
 msgid "disciplines.row.positions"
 msgstr "Anschläge"
 
-# en: "powder {powder} bulk density {density} kg/m3 must be above 0 and at most {max} kg/m3"
-msgid "refusal.powderBulkDensityOutOfRange"
-msgstr "Das Schüttgewicht {density} kg/m3 des Treibladungspulvers {powder} muss größer als 0 und höchstens {max} kg/m3 sein"
-
-# en: "powder {powder} has no bulk density"
-msgid "refusal.powderWithoutBulkDensity"
-msgstr "Das Treibladungspulver {powder} hat kein Schüttgewicht"
-
 # en: "Powder burn rates"
 msgid "page.powdersBurnRates"
 msgstr "Abbrandgeschwindigkeit der Treibladungspulver"
@@ -3927,10 +3215,6 @@ msgstr "Die Daten der Treibladungspulver sind gerade nicht verfügbar."
 # en: "Powder designer"
 msgid "page.powdersDesigner"
 msgstr "Treibladungspulver-Editor"
-
-# en: "powder fit: {reason}"
-msgid "coreMessage.answer.powderFit"
-msgstr "Anpassung des Treibladungspulvers: {reason}"
 
 # en: "Powders"
 msgid "page.powders"
@@ -3963,14 +3247,6 @@ msgstr "Voreinstellung"
 # en: "Pressure"
 msgid "units.quantity.pressure"
 msgstr "Druck"
-
-# en: "pressure {pressure} Pa"
-msgid "refusal.pressureInvalid"
-msgstr "Druck {pressure} Pa nicht zulässig"
-
-# en: "pressure {pressure} Pa at temperature {temperature} K gives an air density of {density} kg/m3, outside 0 to {max} kg/m3"
-msgid "refusal.airDensityOutsideRange"
-msgstr "Druck {pressure} Pa bei Temperatur {temperature} K ergibt eine Luftdichte von {density} kg/m3 außerhalb von 0 bis {max} kg/m3"
 
 # en: "Pressure exponent"
 msgid "recordFields.pressureExponent"
@@ -4072,18 +3348,6 @@ msgstr "Gedruckt: die ersten {limit} von {total} Zündhütchen."
 msgid "directoryTable.printed.faces"
 msgstr "Gedruckt: die ersten {limit} von {total} Scheiben."
 
-# en: "prior {name}"
-msgid "refusal.priorUnknown"
-msgstr "Unbekannter prior {name}"
-
-# en: "prior {name} must be positive"
-msgid "refusal.priorNotPositive"
-msgstr "prior {name} muss positiv sein"
-
-# en: "probability must lie in (0, 1)"
-msgid "refusal.probabilityOutsideUnit"
-msgstr "Die Wahrscheinlichkeit muss in (0, 1) liegen"
-
 # en: "Procedurals"
 msgid "events.procedurals"
 msgstr "Verfahrensfehler"
@@ -4108,17 +3372,9 @@ msgstr "liegend"
 msgid "cartridgeRecord.meaning.proofPressure"
 msgstr "Beschussdruck"
 
-# en: "Propellant base"
-msgid "coreMessage.label.propellantBase"
-msgstr "Basis des Treibladungspulvers"
-
 # en: "Propellant temperature"
 msgid "recordFields.propellantTemperature"
 msgstr "Temperatur des Treibladungspulvers"
-
-# en: "propellant.bulkDensity or powder is required for the loadRatio target"
-msgid "coreMessage.answer.bulkDensity"
-msgstr "Für das Ziel loadRatio ist propellant.bulkDensity oder powder (Treibladungspulver) erforderlich"
 
 # en: "Properties"
 msgid "caseRecord.data"
@@ -4152,10 +3408,6 @@ msgstr "Größe"
 msgid "fieldTable.column.quantity"
 msgstr "Größe"
 
-# en: "querystring does not match the schema"
-msgid "coreMessage.request.querySchema"
-msgstr "Die Abfrage entspricht nicht dem Schema"
-
 # en: "R right hand, L left hand."
 msgid "firearms.column.twistHelp"
 msgstr "R Rechtsdrall, L Linksdrall."
@@ -4172,17 +3424,9 @@ msgstr "Radius am Schulterbeginn"
 msgid "cartridgeRecord.meaning.rimCornerRadius"
 msgstr "Radius der Randkante an der Bodenfläche"
 
-# en: "range {range}"
-msgid "refusal.rangeInvalid"
-msgstr "Entfernung {range} ungültig"
-
-# en: "range {range} m not reached"
-msgid "refusal.rangeNotReached"
-msgstr "Entfernung {range} m nicht erreicht"
-
-# en: "range incomplete"
-msgid "coreMessage.advisory.rangeIncomplete"
-msgstr "Bereich unvollständig"
+# en: "Range"
+msgid "workspace.range"
+msgstr "Entfernung"
 
 # en: "Range mode"
 msgid "page.range"
@@ -4191,10 +3435,6 @@ msgstr "Schießstand-Modus"
 # en: "Range mode"
 msgid "sessionSummary.rangeMode"
 msgstr "Schießstand-Modus"
-
-# en: "range must be positive"
-msgid "refusal.rangeNotPositive"
-msgstr "Die Entfernung muss positiv sein"
 
 # en: "Range, distance"
 msgid "units.quantity.range"
@@ -4240,14 +3480,6 @@ msgstr "Referenzdruck"
 msgid "disciplines.rule.reflex"
 msgstr "Leuchtpunkt"
 
-# en: "relative half-width must be at least 0.01"
-msgid "refusal.relativeHalfWidthBelowMinimum"
-msgstr "Die relative Halbbreite muss mindestens 0,01 betragen"
-
-# en: "relative half-width needs more shots than the search covers"
-msgid "refusal.relativeHalfWidthOutOfReach"
-msgstr "Die relative Halbbreite braucht mehr Schüsse, als die Suche abdeckt"
-
 # en: "Remove {name}"
 msgid "bulletCompare.remove"
 msgstr "{name} entfernen"
@@ -4276,14 +3508,6 @@ msgstr "Ersetzen"
 msgid "events.replaceEvents"
 msgstr "Wettkämpfe ersetzen?"
 
-# en: "request body above 64 KiB"
-msgid "coreMessage.request.bodyTooLarge"
-msgstr "Die Anfrage ist größer als 64 KiB"
-
-# en: "request does not match the schema"
-msgid "coreMessage.request.schema"
-msgstr "Die Anfrage entspricht nicht dem Schema"
-
 # en: "Reserve, %"
 msgid "matchRounds.reserve"
 msgstr "Reserve, %"
@@ -4291,14 +3515,6 @@ msgstr "Reserve, %"
 # en: "Reset to preset"
 msgid "units.reset"
 msgstr "Auf die Voreinstellung zurücksetzen"
-
-# en: "residualConfidenceLevel must lie in (0, 1)"
-msgid "refusal.residualConfidenceLevelOutsideUnit"
-msgstr "residualConfidenceLevel muss in (0, 1) liegen"
-
-# en: "resistance not applied"
-msgid "coreMessage.advisory.resistanceNotApplied"
-msgstr "Widerstand nicht angewendet"
 
 # en: "rest"
 msgid "disciplines.rule.rest"
@@ -4316,9 +3532,9 @@ msgstr "Ergebnis"
 msgid "log.column.result"
 msgstr "Ergebnis"
 
-# en: "result holds a non-finite number at {path}"
-msgid "refusal.resultNotFinite"
-msgstr "Das Ergebnis enthält an {path} eine nicht endliche Zahl"
+# en: "Results"
+msgid "workspace.results"
+msgstr "Ergebnisse"
 
 # en: "Retake from straight above, with the camera parallel to the paper."
 msgid "photoQuality.fix.fromAbove"
@@ -4512,10 +3728,6 @@ msgstr "Tabelle der Sportordnungen"
 msgid "disciplines.rules"
 msgstr "Regeln"
 
-# en: "sampling applies to a single run, not to a ladder"
-msgid "coreMessage.answer.samplingSingle"
-msgstr "Die Stichprobe gilt für eine einzelne Berechnung, nicht für einen Ladeleiter"
-
 # en: "Save event"
 msgid "events.saveEvent"
 msgstr "Wettkampf speichern"
@@ -4660,10 +3872,6 @@ msgstr "Form"
 msgid "targets.row.sheet"
 msgstr "Blatt"
 
-# en: "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet."
-msgid "coreMessage.import.noTable"
-msgstr "Blatt „{name}“ enthält keine Tabelle mit zwei oder mehr Spalten. Verschieben Sie die Tabelle auf das erste Blatt."
-
 # en: "Shooting log"
 msgid "events.shootingLog"
 msgstr "Schießbuch"
@@ -4680,10 +3888,6 @@ msgstr "Kurzwaffe"
 msgid "sessionSummary.shot"
 msgstr "Schuss"
 
-# en: "shot coordinates must be finite"
-msgid "refusal.shotCoordinates"
-msgstr "Die Koordinaten der Schüsse müssen endlich sein"
-
 # en: "Shot groups"
 msgid "disciplineRecord.column.groups"
 msgstr "Schussbilder"
@@ -4691,10 +3895,6 @@ msgstr "Schussbilder"
 # en: "Shot groups"
 msgid "page.groups"
 msgstr "Schussbilder"
-
-# en: "shot velocity must be finite"
-msgid "refusal.shotVelocity"
-msgstr "Die Geschwindigkeit eines Schusses muss endlich sein"
 
 # en: "Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges."
 msgid "burnRate.unfit.shotgun"
@@ -4744,10 +3944,6 @@ msgstr "Schulter"
 msgid "cartridgeRecord.meaning.shoulderDiameter"
 msgstr "Schulterdurchmesser bei L1"
 
-# en: "sight height and offset"
-msgid "refusal.sightInvalid"
-msgstr "Visierhöhe und Versatz ungültig"
-
 # en: "Sighters"
 msgid "disciplines.row.sighters"
 msgstr "Probeschüsse"
@@ -4771,30 +3967,6 @@ msgstr "Visierung"
 # en: "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
 msgid "bulletDrawing.simplified"
 msgstr "Vereinfachte Zeichnung aus dem Datensatz; nur Werte mit Quelle sind bemaßt. Maßgeblich ist die Tabelle."
-
-# en: "Simulated peak pressure {nominal} (range {low} to {high}) is above {name} {limit} ({spec}; {method})."
-msgid "coreMessage.warning.limitExceeded"
-msgstr "Simulierter Gasdruck {nominal} (Bereich {low} bis {high}) liegt über {name} {limit} ({spec}; {method})."
-
-# en: "Simulated peak pressure {nominal} (range {low} to {high}) is above the typed {name} {limit}."
-msgid "coreMessage.warning.typedLimitExceeded"
-msgstr "Simulierter Gasdruck {nominal} (Bereich {low} bis {high}) liegt über dem eingegebenen {name} {limit}."
-
-# en: "simulation, not load data"
-msgid "coreMessage.advisory.simulation"
-msgstr "Simulation, keine Ladedaten"
-
-# en: "Simulation: load ratio {ratio} is above {max}, solid fill {limit} for this powder; the model is outside the range it was built for."
-msgid "coreMessage.warning.loadRatioHigh"
-msgstr "Simulation: Die Ladedichte {ratio} liegt über {max}, Feststoff-Füllgrad {limit} für dieses Treibladungspulver; das Modell liegt außerhalb des Bereichs, für den es gebaut wurde."
-
-# en: "Simulation: solid fill {fill} is above {limit}; the model is outside the range it was built for."
-msgid "coreMessage.warning.solidFillHigh"
-msgstr "Simulation: Der Feststoff-Füllgrad {fill} liegt über {limit}; das Modell liegt außerhalb des Bereichs, für den es gebaut wurde."
-
-# en: "Simulation: the parameters of {label} were fitted with a bore-resistance law this run cannot apply (missing: {list}); the results are biased."
-msgid "coreMessage.warning.resistanceNotApplied"
-msgstr "Simulation: Die Parameter von {label} wurden mit einem Gesetz des Laufwiderstands angepasst, das diese Berechnung nicht anwenden kann (fehlend: {list}); die Ergebnisse sind verzerrt."
 
 # en: "single"
 msgid "values.single"
@@ -4848,17 +4020,9 @@ msgstr "Teilmantelgeschoss"
 msgid "recordFields.solidDensity"
 msgstr "Feststoffdichte"
 
-# en: "solid fill high"
-msgid "coreMessage.advisory.solidFillHigh"
-msgstr "Feststoff-Füllgrad hoch"
-
 # en: "Some bullets were not found."
 msgid "bulletCompare.notFound"
 msgstr "Einige Geschosse wurden nicht gefunden."
-
-# en: "Some cases of the pressure range could not be computed."
-msgid "coreMessage.advisory.rangeIncompleteRule"
-msgstr "Einige Fälle des Druckbereichs konnten nicht berechnet werden."
 
 # en: "Something went wrong"
 msgid "page.error"
@@ -4920,14 +4084,6 @@ msgstr "Stage-Punkte"
 msgid "events.stages"
 msgstr "Stages"
 
-# en: "standardUncertainty must be positive"
-msgid "refusal.standardUncertaintyNotPositive"
-msgstr "standardUncertainty muss positiv sein"
-
-# en: "standardUncertainty on all observations or none"
-msgid "refusal.standardUncertaintyPartial"
-msgstr "standardUncertainty bei allen Beobachtungen oder bei keiner"
-
 # en: "standing"
 msgid "disciplines.rule.standing"
 msgstr "stehend"
@@ -4935,14 +4091,6 @@ msgstr "stehend"
 # en: "Start pressure"
 msgid "recordFields.startPressure"
 msgstr "Startdruck"
-
-# en: "start pressure has no effect"
-msgid "coreMessage.advisory.startPressureNoEffect"
-msgstr "Startdruck ohne Wirkung"
-
-# en: "start pressure held once"
-msgid "coreMessage.advisory.startPressureHeldOnce"
-msgstr "Startdruck einmal gehalten"
 
 # en: "Statistics per string, excluded shots left out ({unit})"
 msgid "sessionSummary.statsTitle"
@@ -4959,18 +4107,6 @@ msgstr "Stahl"
 # en: "Steel"
 msgid "values.cupSteel"
 msgstr "Stahl"
-
-# en: "step budget"
-msgid "refusal.stepBudgetInvalid"
-msgstr "Schrittbudget ungültig"
-
-# en: "step size {step} s below {min} s"
-msgid "refusal.stepSizeBelowMinimum"
-msgstr "Schrittweite {step} s unter {min} s"
-
-# en: "step-budget"
-msgid "coreMessage.code.stepBudget"
-msgstr "Schrittbudget erreicht"
 
 # en: "Straight from above, no slant"
 msgid "photoQuality.rule.fromAbove"
@@ -4991,10 +4127,6 @@ msgstr "Statistik der Schussreihen"
 # en: "Structure"
 msgid "recordFields.structure"
 msgstr "Bauart"
-
-# en: "stuck"
-msgid "coreMessage.code.stuck"
-msgstr "Geschoss bleibt im Lauf stecken"
 
 # en: "Support"
 msgid "disciplines.row.support"
@@ -5064,17 +4196,9 @@ msgstr "Die Scheibendaten sind gerade nicht verfügbar."
 msgid "page.targetsDesigner"
 msgstr "Scheiben-Editor"
 
-# en: "target heading must be a number"
-msgid "refusal.targetHeadingNotNumber"
-msgstr "Die Richtung des Ziels muss eine Zahl sein"
-
 # en: "Target sheet"
 msgid "events.targetSheet"
 msgstr "Blatt mit Zielscheibe"
-
-# en: "target speed must be 0 or more"
-msgid "refusal.targetSpeedNegative"
-msgstr "Die Geschwindigkeit des Ziels muss 0 oder größer sein"
 
 # en: "Targets"
 msgid "disciplines.column.faces"
@@ -5116,10 +4240,6 @@ msgstr "Technische Zeichnung des Geschosses, Vollschnitt um die Achse, Boden unt
 msgid "units.quantity.temperature"
 msgstr "Temperatur"
 
-# en: "temperature {temperature} K"
-msgid "refusal.temperatureInvalid"
-msgstr "Temperatur {temperature} K nicht zulässig"
-
 # en: "Tenth-ring values"
 msgid "targets.row.tenthRingValues"
 msgstr "Wertungen in Zehnteln"
@@ -5152,14 +4272,6 @@ msgstr "Der Heckkonus ist auf dem Foto kein gerader Kegel (ein abgesetzter Heckk
 msgid "bulletPhoto.tooAlike"
 msgstr "Geschoss und Hintergrund sind sich in der Helligkeit zu ähnlich, um sie zu unterscheiden."
 
-# en: "The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given."
-msgid "coreMessage.seating.behindHead"
-msgstr "Der Geschossboden liegt hinter dem Hülsenboden: Die Setztiefe ist größer als die Hülsenlänge. Es wird kein Volumen hinter dem Geschoss angegeben."
-
-# en: "The bullet below the mouth takes the whole case volume: no volume behind the bullet is given."
-msgid "coreMessage.seating.noVolume"
-msgstr "Das Geschoss unter dem Hülsenmund nimmt das ganze Hülsenvolumen ein: Es wird kein Volumen hinter dem Geschoss angegeben."
-
 # en: "The bullet differs from the background by {gap} grey levels only: the outline may be rough. Use a plainer background, or one much lighter or darker than the bullet."
 msgid "bulletPhoto.lowContrast"
 msgstr "Das Geschoss unterscheidet sich vom Hintergrund nur um {gap} Graustufen: Der Umriss kann grob sein. Verwenden Sie einen schlichteren Hintergrund oder einen, der viel heller oder dunkler als das Geschoss ist."
@@ -5191,10 +4303,6 @@ msgstr "Die Seiten des Geschosses sind ausgefranst (etwa {sigma, decimal} px): e
 # en: "The cartridge has no CIP limit to compare with."
 msgid "powderCompare.noComparableLimit"
 msgstr "Für die Patrone gibt es keinen CIP-Grenzwert zum Vergleich."
-
-# en: "The cartridge has no CIP Pmax measured by transducer or piezo."
-msgid "coreMessage.advisory.noComparableLimitRule"
-msgstr "Die Patrone hat kein CIP-Pmax, das mit Messwandler oder Piezo gemessen wurde."
 
 # en: "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
 msgid "powders.noneHint"
@@ -5236,30 +4344,6 @@ msgstr "Die Disziplinen dieses Verbands"
 msgid "faceRecord.eventsCaption"
 msgstr "Die Wettbewerbe und Disziplinen, in denen auf diese Scheibe Schüsse abgegeben werden"
 
-# en: "The file could not be read."
-msgid "coreMessage.import.notRead"
-msgstr "Die Datei konnte nicht gelesen werden."
-
-# en: "The file has format version {v}; this app reads version {w}."
-msgid "coreMessage.answer.formatVersion"
-msgstr "Die Datei hat die Formatversion {v}; diese App liest die Version {w}."
-
-# en: "The file is larger than 40 MB. Split it and import the parts."
-msgid "coreMessage.import.tooLarge"
-msgstr "Die Datei ist größer als 40 MB. Teilen Sie sie auf und importieren Sie die Teile."
-
-# en: "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again"
-msgid "coreMessage.import.notUnicode"
-msgstr "Die Datei ist kein UTF-8- oder UTF-16-Text; speichern Sie sie als UTF-8 (CSV UTF-8) und importieren Sie sie erneut"
-
-# en: "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again."
-msgid "coreMessage.import.notUnicodeSentence"
-msgstr "Die Datei ist kein UTF-8- oder UTF-16-Text; speichern Sie sie als UTF-8 (CSV UTF-8) und importieren Sie sie erneut."
-
-# en: "The file must hold exactly one load record, it has {n}"
-msgid "coreMessage.answer.oneLoad"
-msgstr "Die Datei muss genau einen Datensatz einer Laborierung enthalten, sie hat {n}"
-
 # en: "The file was not read."
 msgid "sessionSummary.notRead"
 msgstr "Die Datei wurde nicht gelesen."
@@ -5267,14 +4351,6 @@ msgstr "Die Datei wurde nicht gelesen."
 # en: "The first optic of the active configuration and its zero range."
 msgid "firearms.column.opticHelp"
 msgstr "Die erste Optik der aktiven Konfiguration und ihre Einschießentfernung."
-
-# en: "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
-msgid "coreMessage.curveFit.peakRatio"
-msgstr "Der höchste Spitzendruck (Messkurve {high}) ist das {ratio}-Fache des niedrigsten (Messkurve {low}), unter {limit}"
-
-# en: "The import could not run in this browser."
-msgid "coreMessage.import.notRun"
-msgstr "Der Import konnte in diesem Browser nicht laufen."
 
 # en: "The light is uneven: one side of the target is much darker than another."
 msgid "photoQuality.unevenLight"
@@ -5284,26 +4360,6 @@ msgstr "Das Licht ist ungleichmäßig: Eine Seite der Zielscheibe ist deutlich d
 msgid "bulletCompare.tooManyText"
 msgstr "Der Link führt {count} Geschosse namentlich auf; höchstens {max} lassen sich gleichzeitig vergleichen."
 
-# en: "The load file lacks {n} values: {list}. Type them under analysis.overrides, or name catalogue records that give them."
-msgid "coreMessage.answer.lacksValues"
-msgstr "In der Datei der Laborierung fehlen {n} Werte: {list}. Geben Sie sie unter analysis.overrides ein oder geben Sie die Namen von Katalogdatensätzen an, die sie liefern."
-
-# en: "The load file lacks 1 value: {list}. Type them under analysis.overrides, or name catalogue records that give them."
-msgid "coreMessage.answer.lacksValue"
-msgstr "In der Datei der Laborierung fehlt 1 Wert: {list}. Geben Sie ihn unter analysis.overrides ein oder geben Sie die Namen von Katalogdatensätzen an, die ihn liefern."
-
-# en: "the load is no longer in this browser"
-msgid "coreMessage.request.loadGone"
-msgstr "Die Laborierung ist nicht mehr in diesem Browser"
-
-# en: "The longer run did not answer in {seconds} s."
-msgid "coreMessage.request.longerRunSilent"
-msgstr "Die längere Berechnung hat nicht innerhalb von {seconds} s geantwortet."
-
-# en: "The lot rows did not answer in {seconds} s."
-msgid "coreMessage.request.lotRowsSilent"
-msgstr "Die Zeilen des Loses haben nicht innerhalb von {seconds} s geantwortet."
-
 # en: "The manufacturer's first published BC of this drag model."
 msgid "bullets.column.g1Help"
 msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
@@ -5311,22 +4367,6 @@ msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodel
 # en: "The manufacturer's first published BC of this drag model."
 msgid "bullets.column.g7Help"
 msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
-
-# en: "The model refused the load. The error panel gives the reason."
-msgid "coreMessage.request.refused"
-msgstr "Das Modell hat die Laborierung abgelehnt. Der Fehlerbereich nennt den Grund."
-
-# en: "the modified point mass needs liftSlope"
-msgid "refusal.modifiedPointMassNeedsLiftSlope"
-msgstr "Der modifizierte Massenpunkt braucht liftSlope"
-
-# en: "the modified point mass needs projectile.aerodynamics"
-msgid "refusal.modifiedPointMassNeedsAerodynamics"
-msgstr "Der modifizierte Massenpunkt braucht projectile.aerodynamics"
-
-# en: "the modified point mass needs twist and twist hand"
-msgid "refusal.modifiedPointMassNeedsTwist"
-msgstr "Der modifizierte Massenpunkt braucht Drall und Drallrichtung"
 
 # en: "The nose is a secant ogive: its circle cuts the shank at an angle."
 msgid "bulletPhoto.secantOgive"
@@ -5339,14 +4379,6 @@ msgstr "Der Kopf ist eine tangentiale Ogive: Ihr Kreis berührt den Schaft."
 # en: "The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range."
 msgid "bulletPhoto.noArc"
 msgstr "Der Kopf ist kein Kreisbogen (eine Hybrid- oder andere Form): Es wird kein Ogivenradius und kein Rt/R angegeben, und die Kopflänge beginnt dort, wo der Schaft endet, innerhalb eines Bereichs."
-
-# en: "the outline gives no positive finite drag: outside the method"
-msgid "refusal.outlineOutsideMethod"
-msgstr "Der Umriss ergibt keinen positiven endlichen Luftwiderstand: außerhalb des Verfahrens"
-
-# en: "the Pages catalogue holds the index only"
-msgid "coreMessage.request.indexOnly"
-msgstr "Der Katalog der Pages-Ausgabe enthält nur das Verzeichnis"
 
 # en: "The photo is dark: even its brightest part is dim."
 msgid "photoQuality.dark"
@@ -5384,30 +4416,6 @@ msgstr "Die Schusszahl von {name} bleibt unverändert."
 msgid "federationRecord.ruleBooksCaption"
 msgstr "Die Sportordnungen, auf die sich die Datensätze beziehen"
 
-# en: "The run passed the time limit."
-msgid "coreMessage.request.timeLimit"
-msgstr "Die Berechnung hat das Zeitlimit überschritten."
-
-# en: "The simulated peak mean pressure is below {ratio} times the hold pressure; the results are outside the range the model was built for."
-msgid "coreMessage.advisory.chargeTooSmallRule"
-msgstr "Der simulierte höchste mittlere Druck liegt unter dem {ratio}-Fachen des Haltedrucks; die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde."
-
-# en: "The simulated peak pressure is above a CIP maximum pressure of the cartridge."
-msgid "coreMessage.advisory.limitExceededRule"
-msgstr "Der simulierte höchste Druck liegt über einem CIP-Höchstdruck der Patrone."
-
-# en: "the speed measured is lower than the bullet can keep over the distance"
-msgid "refusal.measuredSpeedTooLow"
-msgstr "Die gemessene Geschwindigkeit ist niedriger, als das Geschoss über die Entfernung halten kann"
-
-# en: "The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then starts against the lower bore resistance at travel 0, after which the engraving profile applies."
-msgid "coreMessage.warning.startPressureHeldOnce"
-msgstr "Der Startdruck liegt über dem Laufwiderstand bei Weg 0 und über dem Zünddruck, und der Einpressdruck bei Weg 0 ist nicht 0; das Geschoss wird daher bis zum Startdruck gehalten und beginnt danach gegen den niedrigeren Laufwiderstand bei Weg 0 zu laufen, anschließend gilt das Einpressprofil."
-
-# en: "The start pressure is at or below the bore resistance at travel 0, so the shot starts when the pressure force exceeds that resistance and the start pressure has no effect."
-msgid "coreMessage.warning.startPressureBelowResistance"
-msgstr "Der Startdruck liegt auf oder unter dem Laufwiderstand bei Weg 0; der Schuss beginnt daher, wenn die Druckkraft diesen Widerstand übersteigt, und der Startdruck hat keine Wirkung."
-
 # en: "The target is photographed at a slant of about {n} degrees."
 msgid "photoQuality.tilt"
 msgstr "Die Zielscheibe ist schräg fotografiert, um etwa {n} Grad."
@@ -5423,26 +4431,6 @@ msgstr "Die Scheiben, auf die in seinen Disziplinen Schüsse abgegeben werden"
 # en: "The targets of this discipline state no shot count."
 msgid "matchRounds.shotsUnstated"
 msgstr "Die Zielscheiben dieser Disziplin nennen keine Schusszahl."
-
-# en: "The twist is 0, so the bullet has no rotational energy and the radius of gyration is ignored."
-msgid "coreMessage.warning.gyrationRadiusWithoutTwist"
-msgstr "Der Drall ist 0, das Geschoss hat daher keine Rotationsenergie und der Trägheitsradius wird ignoriert."
-
-# en: "The upper end of the simulated peak pressure range, {high}, is above {name} {limit} ({spec}; {method}); the nominal value is {nominal}."
-msgid "coreMessage.warning.limitExceededUpper"
-msgstr "Das obere Ende des simulierten Gasdruckbereichs, {high}, liegt über {name} {limit} ({spec}; {method}); der Nennwert beträgt {nominal}."
-
-# en: "The upper end of the simulated peak pressure range, {high}, is above the typed {name} {limit}; the nominal value is {nominal}."
-msgid "coreMessage.warning.typedLimitExceededUpper"
-msgstr "Das obere Ende des simulierten Gasdruckbereichs, {high}, liegt über dem eingegebenen {name} {limit}; der Nennwert beträgt {nominal}."
-
-# en: "The workbook cannot be read. Save it again as XLSX or CSV."
-msgid "coreMessage.import.unreadable"
-msgstr "Die Arbeitsmappe kann nicht gelesen werden. Speichern Sie sie erneut als XLSX oder CSV."
-
-# en: "The workbook has no cells with text. Open the right file or paste the table into a sheet."
-msgid "coreMessage.import.noText"
-msgstr "Die Arbeitsmappe hat keine Zellen mit Text. Öffnen Sie die richtige Datei oder fügen Sie die Tabelle in ein Blatt ein."
 
 # en: "Thermochemistry"
 msgid "recordFields.thermochemistry"
@@ -5475,14 +4463,6 @@ msgstr "Zeit (s)"
 # en: "Time limit"
 msgid "disciplines.row.timeLimit"
 msgstr "Schießzeit"
-
-# en: "time of flight must be 0 or more"
-msgid "refusal.timeOfFlightNegative"
-msgstr "Die Flugzeit muss 0 oder größer sein"
-
-# en: "timeout"
-msgid "coreMessage.code.timeout"
-msgstr "Zeitüberschreitung"
 
 # en: "tin"
 msgid "values.tin"
@@ -5520,18 +4500,6 @@ msgstr "Toleranzen"
 msgid "cartridgeRecord.toleranceClearance"
 msgstr "Toleranzen, Spiel"
 
-# en: "toleranceNotReached"
-msgid "coreMessage.code.toleranceNotReached"
-msgstr "Genauigkeit nicht erreicht"
-
-# en: "tolerances and limits"
-msgid "refusal.tolerancesInvalid"
-msgstr "Toleranzen und Grenzen ungültig"
-
-# en: "Too big: expected number to be <={n}"
-msgid "coreMessage.ladder.tooBig"
-msgstr "Zu groß: Der Wert darf höchstens {n} sein"
-
 # en: "Too many bullets."
 msgid "bulletCompare.tooMany"
 msgstr "Zu viele Geschosse."
@@ -5548,17 +4516,9 @@ msgstr "Summe"
 msgid "events.partTotal"
 msgstr "Summe {total}"
 
-# en: "traces {list} have the same charge"
-msgid "coreMessage.curveFit.sameCharge"
-msgstr "Die Messkurven {list} haben dieselbe Treibladung"
-
 # en: "Training rows"
 msgid "powders.column.rows"
 msgstr "Trainingszeilen"
-
-# en: "transducer"
-msgid "coreMessage.method.transducer"
-msgstr "mechanisch-elektrischer Wandler"
 
 # en: "transducer"
 msgid "values.transducer"
@@ -5571,14 +4531,6 @@ msgstr "Abzugsgewicht ab"
 # en: "triple"
 msgid "values.triple"
 msgstr "dreibasig"
-
-# en: "truing: {reason}"
-msgid "coreMessage.answer.truing"
-msgstr "Truing: {reason}"
-
-# en: "truing: {reason} ({detail})"
-msgid "coreMessage.answer.truingDetail"
-msgstr "Truing: {reason} ({detail})"
 
 # en: "Tune a powder"
 msgid "page.powdersTune"
@@ -5608,10 +4560,6 @@ msgstr "Drall"
 msgid "bullet.millerTwist"
 msgstr "Drall für Sg 1,5"
 
-# en: "twist must be positive"
-msgid "refusal.twistNotPositive"
-msgstr "Der Drall muss positiv sein"
-
 # en: "twist, length per turn"
 msgid "cartridgeRecord.meaning.twist"
 msgstr "Drall, Länge je Umdrehung"
@@ -5627,10 +4575,6 @@ msgstr "Art"
 # en: "Typed model parameters"
 msgid "burnRate.typed"
 msgstr "Eingegebene Modellparameter"
-
-# en: "underdetermined"
-msgid "coreMessage.code.underdetermined"
-msgstr "unterbestimmt"
 
 # en: "Undo of {name} failed: {reason}"
 msgid "events.undoOfFailed"
@@ -5648,10 +4592,6 @@ msgstr "Einheit"
 msgid "sessionSummary.fallbackUnit"
 msgstr "Einheit, falls die Datei keine nennt"
 
-# en: "unit percentOfLimit applies to the peakPressure target only"
-msgid "coreMessage.answer.percentOfLimit"
-msgstr "Die Einheit percentOfLimit gilt nur für das Ziel peakPressure"
-
 # en: "Unit: {units}"
 msgid "sessionSummary.unit"
 msgstr "Einheit: {units}"
@@ -5663,18 +4603,6 @@ msgstr "Einheiten: {preset}"
 # en: "Units: {preset}, custom"
 msgid "units.nameCustom"
 msgstr "Einheiten: {preset}, benutzerdefiniert"
-
-# en: "Unknown field"
-msgid "coreMessage.answer.unknownField"
-msgstr "Unbekanntes Feld"
-
-# en: "unreachable"
-msgid "coreMessage.code.unreachable"
-msgstr "nicht erreichbar"
-
-# en: "unresolved"
-msgid "coreMessage.code.unresolved"
-msgstr "nicht aufgelöst"
 
 # en: "Untick"
 msgid "comparePicks.untick"
@@ -5707,14 +4635,6 @@ msgstr "In der Werkbank verwenden"
 # en: "Use in workbench: {name}"
 msgid "bulletCompare.useInWorkbenchFor"
 msgstr "In der Werkbank verwenden: {name}"
-
-# en: "UTF-16 text with an odd number of bytes"
-msgid "coreMessage.import.oddBytes"
-msgstr "UTF-16-Text mit einer ungeraden Anzahl von Bytes"
-
-# en: "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again."
-msgid "coreMessage.import.oddBytesSave"
-msgstr "UTF-16-Text mit einer ungeraden Anzahl von Bytes; speichern Sie ihn als UTF-8 (CSV UTF-8) und importieren Sie ihn erneut."
 
 # en: "Value"
 msgid "cartridgeRecord.value"
@@ -5756,10 +4676,6 @@ msgstr "Varianten"
 msgid "cartridgeRecord.variantsTable"
 msgstr "Tabelle der Varianten"
 
-# en: "velocities must be finite"
-msgid "refusal.velocitiesNotFinite"
-msgstr "Die Geschwindigkeiten müssen endlich sein"
-
 # en: "Velocity"
 msgid "units.quantity.velocity"
 msgstr "Geschwindigkeit"
@@ -5767,10 +4683,6 @@ msgstr "Geschwindigkeit"
 # en: "Velocity ({unit})"
 msgid "sessionSummary.velocity"
 msgstr "Geschwindigkeit ({unit})"
-
-# en: "velocity must be positive"
-msgid "refusal.velocityNotPositive"
-msgstr "Die Geschwindigkeit muss größer als 0 sein"
 
 # en: "Velocity of the {count} shots of {name} in {unit} by shot number, mean {mean} as a line, excluded shots left out. The shots table lists every value."
 msgid "sessionSummary.chartDescription"
@@ -5824,14 +4736,6 @@ msgstr "weiß"
 msgid "recordSources.wholeRecord"
 msgstr "ganzer Datensatz"
 
-# en: "wind segment"
-msgid "refusal.windSegmentInvalid"
-msgstr "Windsegment ungültig"
-
-# en: "wind segments must end in rising order"
-msgid "refusal.windSegmentsNotRising"
-msgstr "Windsegmente müssen mit steigender Entfernung enden"
-
 # en: "Wind speed"
 msgid "units.quantity.windSpeed"
 msgstr "Windgeschwindigkeit"
@@ -5839,10 +4743,6 @@ msgstr "Windgeschwindigkeit"
 # en: "Without a curve"
 msgid "burnRateCompare.noCurve"
 msgstr "Ohne Kurve"
-
-# en: "yaw"
-msgid "coreMessage.code.yaw"
-msgstr "Gierwinkelgrenze"
 
 # en: "yellow"
 msgid "targets.color.yellow"
@@ -5871,23 +4771,3 @@ msgstr "Ja"
 # en: "z1 {z}"
 msgid "powderRecord.z1"
 msgstr "z1 {z}"
-
-# en: "zero did not converge (miss {vertical} m, {horizontal} m)"
-msgid "refusal.zeroNotConverged"
-msgstr "Das Einschießen ist nicht konvergiert (Fehlschuss {vertical} m, {horizontal} m)"
-
-# en: "zero look angle outside -pi/2..pi/2"
-msgid "refusal.zeroLookAngleOutsideRange"
-msgstr "Visierwinkel beim Einschießen außerhalb von -pi/2..pi/2"
-
-# en: "zero range {range} m not reached ({stop})"
-msgid "refusal.zeroRangeNotReached"
-msgstr "Einschießentfernung {range} m nicht erreicht ({stop})"
-
-# en: "zero range must be positive"
-msgid "refusal.zeroRangeNotPositive"
-msgstr "Die Einschießentfernung muss positiv sein"
-
-# en: "zero tolerance and maximum yaw must be positive"
-msgid "refusal.zeroToleranceOrMaxYawNotPositive"
-msgstr "Die Toleranzen beim Einschießen und der größte Gierwinkel müssen positiv sein"

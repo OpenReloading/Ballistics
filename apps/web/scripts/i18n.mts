@@ -80,15 +80,9 @@ export function extract(source: string, file = 'source'): string[] {
   return found
 }
 
-/** The refusal words of `src/lib/refusal-words.ts`, the templates of the message table not yet on Lingui ids. */
-export function tableMessages(root: string): string[] {
-  const file = 'src/lib/refusal-words.ts'
-  return extract(readFileSync(path.join(root, file), 'utf8'), file)
-}
-
-/** The distinct messages of every source under `src/` and of the message table, sorted. */
+/** The distinct messages of every source under `src/`, sorted. */
 export function messages(root = webRoot): string[] {
-  const all = new Set<string>(tableMessages(root))
+  const all = new Set<string>()
   for (const file of globSync('src/**/*.{ts,tsx}', { cwd: root }))
     for (const text of extract(readFileSync(path.join(root, file), 'utf8'), file)) all.add(text)
   return [...all].sort((a, b) => a.localeCompare(b, 'en'))
@@ -109,10 +103,10 @@ const placeholders = (s: string) =>
     .sort((a, b) => a.localeCompare(b))
     .join()
 
-/** The texts that must be translated: the message table and the lines of the Safety notice. */
+/** The texts that must be translated: the lines of the Safety notice. */
 export function requiredMessages(root: string): string[] {
   const safety = 'src/lib/safety.ts'
-  return [...tableMessages(root), ...extract(readFileSync(path.join(root, safety), 'utf8'), safety)]
+  return extract(readFileSync(path.join(root, safety), 'utf8'), safety)
 }
 
 /** Against the English `source`: a text without a translation that `allowed` does not list (a `required` one always), a listed text that has one or that `base` (the base commit's list) lacks, a text left English with a letter or quote mark outside its placeholders that `same` does not list (a `required` one always), a text `same` lists that differs from English, is gone, needs no entry or is listed twice, a key no message matches, an empty text, placeholders other than its key's, and a plural that is no object of the language's categories. */
@@ -447,9 +441,11 @@ if (import.meta.main) {
         ...lint.otherSense,
       }
       // loaded here: the message list runs in CI without the packages the catalogs need
-      const { readCatalog } = await import('./po-catalog.mts')
+      const { catalogs, readCatalog } = await import('./po-catalog.mts')
       // the texts on Lingui ids keep the checks they had in de.json; each catalog on its own, the messages of both
-      const lingui = linguiGerman(await readCatalog('en'), await readCatalog('de'))
+      const lingui = []
+      for (const file of catalogs)
+        lingui.push(...linguiGerman(await readCatalog('en', file), await readCatalog('de', file)))
       const english = [...new Set([...source, ...lingui.flatMap((g) => Object.keys(g))])]
       const checked = [catalogue, ...lingui].flatMap((german) => [
         ...termUseProblems(german, table, senses, english),

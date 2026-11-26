@@ -10,7 +10,6 @@ import {
   problems,
   requiredMessages,
   safeWordingProblems,
-  tableMessages,
   targetRecordProblems,
   termUseProblems,
 } from '../scripts/i18n.mts'
@@ -247,32 +246,17 @@ describe('the catalogue lint', () => {
     ])
   })
 
-  it('counts the refusal words the file marks as texts of the table', () => {
+  it('requires German for each line of the Safety notice', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'i18n-'))
     try {
       mkdirSync(path.join(root, 'src/lib'), { recursive: true })
       writeFileSync(
-        path.join(root, 'src/lib/refusal-words.ts'),
-        "import { msg } from '../i18n/translate.ts'\nexport const r = { x: msg('A seeded refusal.'), y: msg('A seeded rule.') }\n",
-      )
-      writeFileSync(
         path.join(root, 'src/lib/safety.ts'),
         "import { msg } from '../i18n/translate.ts'\nexport const safety = { binding: msg('A seeded safety line.') }\n",
       )
-      const table = tableMessages(root)
-      expect(table).toEqual(['A seeded refusal.', 'A seeded rule.'])
-      // the lines of the Safety notice need German too
       expect(problems(['A seeded safety line.'], {}, 'de', requiredMessages(root))).toEqual([
         'untranslated: A seeded safety line.',
       ])
-      expect(
-        problems(
-          table,
-          { 'A seeded refusal.': 'Eine gesetzte Ablehnung.', 'A seeded rule.': 'A seeded rule.' },
-          'de',
-          table,
-        ),
-      ).toEqual(['left English: A seeded rule.'])
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
