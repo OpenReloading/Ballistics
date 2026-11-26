@@ -416,6 +416,8 @@ export async function simulate(
   if (!parsed.success) throw unknownKeyIssues(parsed.error)
   const { curves } = parsed.data
   const { path, record, name } = readLoadFile(json)
+  const bare = noCartridgeRefusal(record, path)
+  if (bare) return bare
   const values = loadValues(record, knownRecords(context.catalogue, record))
   const lacking = missingValuesAnswer(values, path)
   if (lacking) return lacking
@@ -427,8 +429,6 @@ export async function simulate(
   const refusal = ladderKindRefusal(ladder)
   if (refusal) return refusal
   const { cartridge, bullet, powder, powderLabel } = loadFileRecords(context.catalogue, record)
-  const bare = noCartridgeRefusal(record, path)
-  if (bare) return bare
   fillBoreArea(load, cartridge, values)
   // the temperature sensitivity of the powder record, its own or the default of its grain form, as the workbench adds it to a run
   takeSensitivity(load, powder)

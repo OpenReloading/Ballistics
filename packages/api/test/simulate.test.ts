@@ -719,6 +719,10 @@ describe('POST /interior/load-file', () => {
     expect(body.message).toBe(
       'The load has no cartridge: choose a cartridge record to simulate it.',
     )
+    // before the solver values: filling in those would only lead to this refusal
+    const empty = await simulate(file({ cartridge: '' }))
+    expect(empty.status).toBe(422)
+    expect(empty.body.field).toBe('records.0.data.cartridge')
   })
 })
 
