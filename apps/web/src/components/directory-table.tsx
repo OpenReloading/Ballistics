@@ -19,6 +19,7 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   type DirectorySort,
   type DirectoryState,
@@ -32,10 +33,13 @@ import { type ListNoun, sortRows } from '../lib/lists.ts'
 import { pickRange } from '../lib/selection.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/directory-table.json' with { type: 'json' }
 import { Noted } from './field-table.tsx'
 import { usePrintEvents } from './print.ts'
 import { watchOverflow } from './scroll-region.tsx'
 import { useShortcuts, useSingleKeys } from './shortcuts.tsx'
+
+loadEnglish(englishMessages)
 
 export interface DirectoryColumn<T> {
   key: string

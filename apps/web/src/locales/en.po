@@ -10,8 +10,23 @@ msgstr ""
 msgid "sourceLink.page"
 msgstr ", page {page}"
 
+msgid "bulletPhoto.differs"
+msgstr "(differs)"
+
+msgid "chargeTarget.notLoadData"
+msgstr "(simulation, not load data)."
+
+msgid "log.imported"
+msgstr "{added, decimal} entries added, {equal, decimal} already in this browser, {replaced, decimal} replaced."
+
 msgid "events.imported"
 msgstr "{added} events added, {equal} already in this browser, {replaced} replaced."
+
+msgid "holeDetection.proposedMaybe"
+msgstr "{count, decimal} proposed, {maybe, decimal} maybe"
+
+msgid "holeDetection.proposedMaybeAcceptThem"
+msgstr "{count, decimal} proposed, {maybe, decimal} maybe: accept them to add shots."
 
 msgid "lists.countShown.cases"
 msgstr "{count, plural, one {{shown} of # brass} other {{shown} of # brass}}"
@@ -46,6 +61,9 @@ msgstr "{count, plural, one {{shown} of # primer} other {{shown} of # primers}}"
 msgid "lists.countShown.faces"
 msgstr "{count, plural, one {{shown} of # target} other {{shown} of # targets}}"
 
+msgid "holeDetection.areasByHand"
+msgstr "{count, plural, one {# area to place by hand (dashed box).} other {# areas to place by hand (dashed box).}}"
+
 msgid "lists.count.cases"
 msgstr "{count, plural, one {# brass} other {# brass}}"
 
@@ -64,7 +82,19 @@ msgstr "{count, plural, one {# competition event in this browser} other {# compe
 msgid "lists.count.disciplines"
 msgstr "{count, plural, one {# discipline} other {# disciplines}}"
 
+msgid "log.idTaken"
+msgstr "{count, plural, one {# entry not imported: a record of this browser has its id.} other {# entries not imported: records of this browser have their ids.}}"
+
+msgid "log.replaceCount"
+msgstr "{count, plural, one {# entry of the file differs from the one in this browser. Replace it?} other {# entries of the file differ from the ones in this browser. Replace them?}}"
+
 msgid "lists.count.logEntries"
+msgstr "{count, plural, one {# entry} other {# entries}}"
+
+msgid "logSummary.entryCount"
+msgstr "{count, plural, one {# entry} other {# entries}}"
+
+msgid "log.entryCount"
 msgstr "{count, plural, one {# entry} other {# entries}}"
 
 msgid "events.heldCount"
@@ -85,6 +115,9 @@ msgstr "{count, plural, one {# field} other {# fields}}"
 msgid "lists.count.firearms"
 msgstr "{count, plural, one {# firearm} other {# firearms}}"
 
+msgid "firearms.loadCount"
+msgstr "{count, plural, one {# load} other {# loads}}"
+
 msgid "lists.count.powders"
 msgstr "{count, plural, one {# powder} other {# powders}}"
 
@@ -94,8 +127,26 @@ msgstr "{count, plural, one {# primer} other {# primers}}"
 msgid "events.otherKinds"
 msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
 
+msgid "log.otherKinds"
+msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
+
+msgid "holeDetection.referenceCount"
+msgstr "{count, plural, one {# reference} other {# references}}"
+
 msgid "targets.rings"
 msgstr "{count, plural, one {# ring} other {# rings}}"
+
+msgid "logSummary.unsavedLoadRounds"
+msgstr "{count, plural, one {# round of entries without a saved load is under its firearm only.} other {# rounds of entries without a saved load are under their firearms only.}}"
+
+msgid "logSummary.roundCount"
+msgstr "{count, plural, one {# round} other {# rounds}}"
+
+msgid "log.roundTotal"
+msgstr "{count, plural, one {# round} other {# rounds}}"
+
+msgid "holeDetection.shotsAdded"
+msgstr "{count, plural, one {# shot added.} other {# shots added.}}"
 
 msgid "sessionSummary.shotCount"
 msgstr "{count, plural, one {# shot} other {# shots}}"
@@ -111,6 +162,9 @@ msgstr "{count, plural, one {# training row} other {# training rows}}"
 
 msgid "events.addRounds"
 msgstr "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
+
+msgid "log.addRounds"
+msgstr "{count, plural, one {Add # round to the round count of {name}?} other {Add # rounds to the round count of {name}?}}"
 
 msgid "bulletCompare.notFoundIds"
 msgstr "{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}"
@@ -130,26 +184,17 @@ msgstr "{count} selected"
 msgid "comparePicks.selectedMax"
 msgstr "{count} selected (max {max})"
 
-msgid "refusal.valueNegative"
-msgstr "{field} must be at least 0."
+msgid "holeDetection.faceChoice"
+msgstr "{face} ({outer}): {event}, {distance}"
 
-msgid "coreMessage.request.fileStatus"
-msgstr "{file}.json answered {status}"
+msgid "holeDetection.scaleCenterEllipsesOne"
+msgstr "{face}: scale and center from {count, decimal} ellipses (one ellipse, the center is approximate under tilt)."
 
-msgid "refusal.recordNotFound"
-msgstr "{kind} {id} not found"
+msgid "holeDetection.scaleCenterEllipses"
+msgstr "{face}: scale and center from {count, decimal} ellipses."
 
-msgid "refusal.entryRangeInvalid"
-msgstr "{kind} range"
-
-msgid "refusal.entryRoundingNegative"
-msgstr "{kind} rounding must not be negative"
-
-msgid "refusal.entryShotCountInvalid"
-msgstr "{kind} shotCount must be a whole number of at least 1"
-
-msgid "refusal.entryStandardDeviationNotPositive"
-msgstr "{kind} standardDeviation must be positive"
+msgid "log.fromTo"
+msgstr "{from} to {to}"
 
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
@@ -174,6 +219,12 @@ msgstr "{label}, low to high"
 
 msgid "directoryTable.zToA"
 msgstr "{label}, Z to A"
+
+msgid "holeDetection.doubleClickEnterAccepts"
+msgstr "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it."
+
+msgid "chargeTarget.pressureRangeValue"
+msgstr "{low} to {high}"
 
 msgid "powders.range"
 msgstr "{low} to {high}"
@@ -208,29 +259,14 @@ msgstr "{n, decimal} {unit} per stage"
 msgid "construction.drivingBands"
 msgstr "{n} driving bands"
 
-msgid "coreMessage.warning.rangeIncomplete"
-msgstr "{n} of {m} range cases could not be computed ({list}); the range covers only the computed cases, and the true range can be wider."
-
 msgid "burnRateCompare.userDesign"
 msgstr "{name} (user design)"
-
-msgid "coreMessage.warning.noComparableLimit"
-msgstr "{name} has no CIP Pmax measured by transducer or piezo. Crusher values are not compared with a simulated pressure."
 
 msgid "events.noRoundCount"
 msgstr "{name} has no round count; set one on the Firearms page to add the event to it."
 
-msgid "refusal.coefficientNotFinite"
-msgstr "{name} must be finite"
-
-msgid "refusal.coefficientTableMachNotRising"
-msgstr "{name} table Mach must rise"
-
-msgid "refusal.coefficientTableTooShort"
-msgstr "{name} table needs at least two nodes"
-
-msgid "refusal.coefficientTableNodeInvalid"
-msgstr "{name} table node"
+msgid "log.noRoundCount"
+msgstr "{name} has no round count; set one on the Firearms page to add the log to it."
 
 msgid "listSources.notDeleted"
 msgstr "{name} was not deleted: the browser refused."
@@ -238,8 +274,8 @@ msgstr "{name} was not deleted: the browser refused."
 msgid "recordFields.burnRateOrder"
 msgstr "{order} of {total}"
 
-msgid "coreMessage.request.notFound"
-msgstr "{path} not found"
+msgid "holeDetection.percent"
+msgstr "{pct, decimal} %"
 
 msgid "events.stageScore"
 msgstr "{points} points, hit factor {hf}"
@@ -255,6 +291,9 @@ msgstr "{symbol}: {meaning}"
 
 msgid "fieldTable.groupFilter"
 msgstr "{title}: group"
+
+msgid "firearms.perTurn"
+msgstr "{unit} per turn"
 
 msgid "sessionSummary.unitFromFile"
 msgstr "{unit}, from the file"
@@ -274,17 +313,35 @@ msgstr "{value} ({low} to {high}) {unit}"
 msgid "burnRate.mean"
 msgstr "{value} {unit}"
 
+msgid "chargeTarget.valueAt"
+msgstr "{value} at {charge}"
+
+msgid "logSummary.yearTotals"
+msgstr "{year}: {entries}, {rounds}"
+
+msgid "chargeTarget.percentOfPmax"
+msgstr "% of Pmax"
+
 msgid "recordFields.fastest"
 msgstr "1 = fastest"
 
 msgid "recordFields.turnIn"
 msgstr "1 turn in {length}"
 
+msgid "firearms.twistLeft"
+msgstr "1:{twist} L"
+
+msgid "firearms.twistRight"
+msgstr "1:{twist} R"
+
 msgid "cases.noneOwnHint"
 msgstr "A brass group keeps the cases you measured, with their water capacity, in this browser."
 
 msgid "photoQuality.glare"
 msgstr "A bright reflection covers part of the paper."
+
+msgid "firearms.ownBulletDesign"
+msgstr "A bullet design of this browser"
 
 msgid "cartridgeRecord.fitRule"
 msgstr "A bullet fits a cartridge when its diameter is above the mean of the land and groove diameters F and Z and at most the projectile diameter G1, all from the CIP sheet (G1 to its printed 0.01 mm)."
@@ -295,41 +352,32 @@ msgstr "A bullet hole is only about {n} px across in this photo."
 msgid "burnRateCompare.loadError"
 msgstr "A curve could not be loaded."
 
-msgid "coreMessage.request.failed"
-msgstr "A data file did not load or the computation failed. Check the connection and retry."
-
 msgid "powderCompare.apiSilent"
 msgstr "A data file did not load or the computation failed. Check the connection and retry."
 
-msgid "refusal.dragCurveTooShort"
-msgstr "a drag curve needs at least two nodes"
+msgid "holeDetection.groupHoldsMost1000"
+msgstr "A group holds at most 1000 shots."
 
-msgid "coreMessage.answer.oddSteps"
-msgstr "a ladder around the charge needs an odd number of steps"
-
-msgid "refusal.inertiaNeedsLength"
-msgstr "a missing moment of inertia needs the length"
-
-msgid "refusal.momentSlopeNeedsLength"
-msgstr "a missing momentSlope needs the length"
+msgid "holeDetection.knownDistanceTargetSize"
+msgstr "A known distance on the target or the size of a target ring, marked on the photo in Calibrate."
 
 msgid "powderRecord.neighborNote"
 msgstr "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
 
+msgid "holeDetection.regionNeedsLeast3"
+msgstr "A region needs at least 3 points"
+
 msgid "bulletPhoto.shadowMirrored"
 msgstr "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline."
-
-msgid "coreMessage.answer.userRecord"
-msgstr "A user record is not on the server, name a catalogue record"
-
-msgid "refusal.zeroOffsetPriorWithoutFit"
-msgstr "a zeroOffset prior needs the fitZeroOffset option"
 
 msgid "disciplines.column.abbreviation"
 msgstr "Abbreviation"
 
-msgid "coreMessage.code.aboveRange"
-msgstr "aboveRange"
+msgid "holeDetection.acceptMaybes"
+msgstr "Accept maybes ({count, decimal})"
+
+msgid "holeDetection.acceptSure"
+msgstr "Accept sure ({count, decimal})"
 
 msgid "disciplines.row.actions"
 msgstr "Actions"
@@ -343,7 +391,16 @@ msgstr "Actions"
 msgid "log.column.actions"
 msgstr "Actions"
 
+msgid "firearms.actions"
+msgstr "Actions for {name}"
+
+msgid "log.actionsFor"
+msgstr "Actions for {name}"
+
 msgid "events.add"
+msgstr "Add"
+
+msgid "log.add"
 msgstr "Add"
 
 msgid "bulletCompare.add"
@@ -361,8 +418,8 @@ msgstr "Add stage"
 msgid "events.addRoundsTitle"
 msgstr "Add to the round count?"
 
-msgid "refusal.aim"
-msgstr "aim must be finite"
+msgid "log.addRoundCount"
+msgstr "Add to the round count?"
 
 msgid "values.airPistol"
 msgstr "Air pistol"
@@ -388,14 +445,17 @@ msgstr "All bullets"
 msgid "cartridges.all"
 msgstr "All cartridges"
 
-msgid "coreMessage.request.workersBusy"
-msgstr "all compute workers are busy"
-
 msgid "disciplines.all"
 msgstr "All disciplines"
 
+msgid "log.allEntries"
+msgstr "All entries"
+
 msgid "disciplines.federationsAll"
 msgstr "All federations"
+
+msgid "log.allFirearms"
+msgstr "All firearms"
 
 msgid "powders.all"
 msgstr "All powders"
@@ -409,6 +469,9 @@ msgstr "All sources"
 msgid "targets.all"
 msgstr "All targets"
 
+msgid "log.allYears"
+msgstr "All years"
+
 msgid "disciplines.allowed"
 msgstr "Allowed"
 
@@ -417,9 +480,6 @@ msgstr "Also printed as: {aliases}"
 
 msgid "units.quantity.altitude"
 msgstr "Altitude"
-
-msgid "refusal.altitudeOutsideRange"
-msgstr "altitude {altitude} m outside {low} to {high} m"
 
 msgid "values.aluminum"
 msgstr "Aluminum"
@@ -439,41 +499,23 @@ msgstr "Any number"
 msgid "disciplines.rule.aperture"
 msgstr "aperture"
 
-msgid "coreMessage.code.apex"
-msgstr "apex"
+msgid "chargeTarget.apply"
+msgstr "Apply"
+
+msgid "holeDetection.areaPlaceHandAbout"
+msgstr "Area {n, decimal} to place by hand: about {count, decimal} holes of area joined (touching holes or dark print); detection does not count it."
 
 msgid "units.quantity.area"
 msgstr "Areas"
 
+msgid "bulletPhoto.keysHelp"
+msgstr "Arrow keys move the cursor, Shift for single pixels, Control for large steps. Enter places a scale point or paints with the brush."
+
 msgid "recordFields.asPrinted"
 msgstr "As printed: {printed}"
 
-msgid "refusal.noBcBand"
-msgstr "at least one BC band"
-
-msgid "refusal.noCandidate"
-msgstr "at least one candidate"
-
-msgid "refusal.noEntryOrChronograph"
-msgstr "at least one entry or a chronograph"
-
-msgid "refusal.noObservation"
-msgstr "at least one observation"
-
-msgid "refusal.sessionWithoutObservation"
-msgstr "at least one observation per session"
-
-msgid "refusal.noSession"
-msgstr "at least one session"
-
 msgid "listSources.lastOn"
 msgstr "At least one source stays on"
-
-msgid "coreMessage.answer.tolerance"
-msgstr "at least one tolerance must be above 0"
-
-msgid "refusal.knotsTooFew"
-msgstr "at least two knots"
 
 msgid "directoryTable.full"
 msgstr "At most {max} at once"
@@ -484,11 +526,11 @@ msgstr "At the ruler's scale, the diameter in the photograph is {percent, decima
 msgid "bulletPhoto.lengthOffRuler"
 msgstr "At the ruler's scale, the overall length in the photograph is {percent, decimal} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera."
 
-msgid "coreMessage.code.atmosphere"
-msgstr "atmosphere"
+msgid "bulletPhoto.axisDirection"
+msgstr "Axis direction, degrees from the photograph's x axis"
 
-msgid "refusal.azimuthInvalid"
-msgstr "azimuth"
+msgid "holeDetection.back"
+msgstr "Back"
 
 msgid "values.ball"
 msgstr "ball"
@@ -499,9 +541,6 @@ msgstr "Ballistic coefficients"
 msgid "bulletRecord.coefficients"
 msgstr "Ballistic coefficients"
 
-msgid "refusal.bandDiameterBelowDiameter"
-msgstr "bandDiameter must be at least the diameter"
-
 msgid "firearms.column.barrel"
 msgstr "Barrel"
 
@@ -510,6 +549,9 @@ msgstr "Barrel length"
 
 msgid "disciplines.row.maxBarrelLength"
 msgstr "Barrel length up to"
+
+msgid "chargeTarget.barrelTime"
+msgstr "Barrel time"
 
 msgid "units.quantity.twist"
 msgstr "Barrel twist"
@@ -529,14 +571,14 @@ msgstr "Base length"
 msgid "recordFields.baseToOgive"
 msgstr "Base to ogive"
 
+msgid "bulletPhoto.axisHelp"
+msgstr "Base to tip, y down. Typing a direction fixes the axis."
+
 msgid "bullets.facet.base"
 msgstr "Base type"
 
 msgid "recordFields.baseType"
 msgstr "Base type"
-
-msgid "refusal.baseDiameterNotPositive"
-msgstr "baseDiameter must be positive"
 
 msgid "cartridgeRecord.note.basic"
 msgstr "basic"
@@ -553,20 +595,8 @@ msgstr "BC {model}"
 msgid "recordFields.coefficient"
 msgstr "BC {model}"
 
-msgid "refusal.bcBandInvalid"
-msgstr "BC band"
-
-msgid "refusal.bcBandsSameSpeed"
-msgstr "BC bands need distinct speeds"
-
-msgid "refusal.bcReferenceUnknown"
-msgstr "BC reference {reference}"
-
 msgid "recordFields.bearingLength"
 msgstr "Bearing length"
-
-msgid "coreMessage.code.belowRange"
-msgstr "belowRange"
 
 msgid "cartridgeRecord.meaning.beltDiameter"
 msgstr "belt diameter (table III)"
@@ -598,9 +628,6 @@ msgstr "boat-tail"
 msgid "recordFields.boatTailAngle"
 msgstr "Boat-tail angle"
 
-msgid "refusal.boatTailLengthNegative"
-msgstr "boatTailLength must be zero or more"
-
 msgid "cartridgeRecord.group.body"
 msgstr "Body"
 
@@ -616,14 +643,8 @@ msgstr "body diameter at l2"
 msgid "cartridgeRecord.meaning.bodyAtHead"
 msgstr "body diameter at the head"
 
-msgid "coreMessage.request.notJson"
-msgstr "Body is not valid JSON"
-
 msgid "values.bonded"
 msgstr "bonded"
-
-msgid "refusal.boreAnglesInvalid"
-msgstr "bore angles"
 
 msgid "cartridgeRecord.meaning.boreArea"
 msgstr "bore cross-section area"
@@ -636,9 +657,6 @@ msgstr "Bore resistance"
 
 msgid "values.boronNitride"
 msgstr "boron nitride"
-
-msgid "coreMessage.code.bracketFailed"
-msgstr "bracketFailed"
 
 msgid "values.brass"
 msgstr "Brass"
@@ -658,29 +676,26 @@ msgstr "Brass, {filters}"
 msgid "targets.color.brown"
 msgstr "brown"
 
+msgid "bulletPhoto.brushRadius"
+msgstr "Brush radius"
+
+msgid "bulletPhoto.brushRadiusValue"
+msgstr "Brush radius, {size, decimal} px"
+
+msgid "bulletPhoto.brushAdd"
+msgstr "Brush: add"
+
+msgid "bulletPhoto.brushErase"
+msgstr "Brush: erase"
+
 msgid "recordFields.build"
 msgstr "Build"
-
-msgid "coreMessage.label.bulkDensity"
-msgstr "Bulk density"
 
 msgid "recordFields.bulkDensity"
 msgstr "Bulk density"
 
-msgid "refusal.bulletValueOutOfBounds"
-msgstr "bullet {bullet} {key} {value} {unit} must be within {low} and {high} {unit}"
-
-msgid "refusal.bulletCoefficientsWithoutBands"
-msgstr "bullet {bullet} has {count} {model} values without distinct velocity bands; send drag explicitly"
-
-msgid "refusal.bulletWithoutCoefficient"
-msgstr "bullet {bullet} has no {model} ballistic coefficient"
-
-msgid "refusal.bulletWithoutDiameter"
-msgstr "bullet {bullet} has no diameter"
-
-msgid "refusal.bulletWithoutLength"
-msgstr "bullet {bullet} has no length"
+msgid "holeDetection.bullet"
+msgstr "bullet"
 
 msgid "bulletCompare.data"
 msgstr "Bullet data"
@@ -700,11 +715,14 @@ msgstr "Bullet designer"
 msgid "cartridgeRecord.meaning.bulletDiameter"
 msgstr "bullet diameter"
 
-msgid "coreMessage.label.bulletDiameter"
-msgstr "Bullet diameter"
-
 msgid "cartridges.column.maxBulletDiameter"
 msgstr "Bullet diameter G1"
+
+msgid "bulletPhoto.title"
+msgstr "Bullet from a photograph"
+
+msgid "chargeTarget.bulletLeadTime"
+msgstr "Bullet lead time"
 
 msgid "units.quantity.mass"
 msgstr "Bullet mass"
@@ -742,9 +760,6 @@ msgstr "Burn form z1"
 msgid "recordFields.burnFormGroup"
 msgstr "Burn form, two-stage"
 
-msgid "refusal.burnFormPartial"
-msgstr "Burn form: {missing} needed with the others, or leave all four empty."
-
 msgid "recordFields.burnRate"
 msgstr "Burn rate"
 
@@ -760,11 +775,8 @@ msgstr "Burn rates"
 msgid "powders.burnRateOrder"
 msgstr "burn-rate order {order}"
 
-msgid "coreMessage.code.busy"
-msgstr "busy"
-
-msgid "coreMessage.label.caliber"
-msgstr "Caliber"
+msgid "chargeTarget.burnout"
+msgstr "Burnout"
 
 msgid "bullets.column.cal"
 msgstr "Caliber"
@@ -772,10 +784,16 @@ msgstr "Caliber"
 msgid "cartridges.column.cal"
 msgstr "Caliber"
 
+msgid "holeDetection.caliber"
+msgstr "Caliber"
+
 msgid "bulletRecord.caliber"
 msgstr "Caliber {caliber}"
 
 msgid "disciplines.facet.class"
+msgstr "Caliber class"
+
+msgid "holeDetection.caliberClass"
 msgstr "Caliber class"
 
 msgid "disciplines.row.caliberClasses"
@@ -787,8 +805,20 @@ msgstr "Caliber classes"
 msgid "disciplines.row.caliberClassBasis"
 msgstr "Caliber classes from"
 
+msgid "holeDetection.calibrate"
+msgstr "Calibrate"
+
+msgid "bulletPhoto.caliperHelp"
+msgstr "Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out."
+
 msgid "events.cancel"
 msgstr "Cancel"
+
+msgid "log.cancel"
+msgstr "Cancel"
+
+msgid "holeDetection.cancelPercent"
+msgstr "Cancel ({pct, decimal} %)"
 
 msgid "values.carbine"
 msgstr "Carbine"
@@ -835,6 +865,9 @@ msgstr "Cartridge list"
 msgid "cartridges.column.caseLengthHelp"
 msgstr "Cartridge maximum of the CIP sheet, shortest variant."
 
+msgid "logSummary.cartridgeUnknown"
+msgstr "Cartridge not known"
+
 msgid "cartridges.column.maxBulletDiameterHelp"
 msgstr "Cartridge value of the CIP sheet, smallest variant."
 
@@ -865,17 +898,11 @@ msgstr "Case capacity"
 msgid "cartridgeRecord.meaning.caseLength"
 msgstr "case length"
 
-msgid "coreMessage.label.caseLength"
-msgstr "Case length"
-
 msgid "cartridges.column.caseLength"
 msgstr "Case length L3"
 
 msgid "cartridges.column.type"
 msgstr "Case type"
-
-msgid "coreMessage.method.caseContact"
-msgstr "case-contact"
 
 msgid "values.caseContact"
 msgstr "case-contact"
@@ -928,23 +955,35 @@ msgstr "chamber minimum minus cartridge maximum"
 msgid "cartridgeRecord.sideNotes.chamber"
 msgstr "Chamber: {notes}"
 
-msgid "coreMessage.code.chamberVolume"
-msgstr "chamberVolume"
+msgid "holeDetection.change"
+msgstr "change"
 
-msgid "coreMessage.answer.chargeSolver"
-msgstr "charge solver: {reason}"
+msgid "holeDetection.changeHoleSize"
+msgstr "Change the hole size"
 
-msgid "coreMessage.advisory.chargeTooSmall"
-msgstr "charge too small for the model"
+msgid "holeDetection.changeHoles"
+msgstr "Change the holes"
 
-msgid "coreMessage.warning.chargeTooSmallIgnition"
-msgstr "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the ignition pressure ({hold}); results are outside the range the model was built for."
+msgid "holeDetection.changeScale"
+msgstr "Change the scale"
 
-msgid "coreMessage.warning.chargeTooSmall"
-msgstr "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the start pressure ({hold}); results are outside the range the model was built for."
+msgid "holeDetection.changeTarget"
+msgstr "Change the target"
+
+msgid "chargeTarget.title"
+msgstr "Charge for a target"
+
+msgid "log.outOfRange"
+msgstr "Check the entry: a value is out of its range."
 
 msgid "events.outOfRange"
 msgstr "Check the event: a value is out of its range."
+
+msgid "holeDetection.choose"
+msgstr "Choose"
+
+msgid "bulletPhoto.chooseHelp"
+msgstr "Choose a photograph of the bullet beside a ruler, or try the sample. It is never uploaded."
 
 msgid "bulletCompare.choose"
 msgstr "Choose bullets"
@@ -952,13 +991,16 @@ msgstr "Choose bullets"
 msgid "sessionSummary.noFileHelp"
 msgstr "Choose or drop a chronograph file, or load the example: three strings of ten made-up shots."
 
+msgid "bulletPhoto.choosePhotograph"
+msgstr "Choose photograph"
+
 msgid "sessionSummary.chronoFile"
 msgstr "Chronograph file"
 
-msgid "refusal.chronographMeanInvalid"
-msgstr "chronograph mean"
-
 msgid "comparePicks.clear"
+msgstr "Clear"
+
+msgid "holeDetection.clear"
 msgstr "Clear"
 
 msgid "facetFilters.clear"
@@ -967,11 +1009,20 @@ msgstr "Clear all"
 msgid "states.clearFilters"
 msgstr "Clear filters"
 
+msgid "holeDetection.clearProposals"
+msgstr "Clear proposals"
+
+msgid "holeDetection.clearProposalsAreasPlace"
+msgstr "Clear proposals and areas to place by hand"
+
 msgid "directoryTable.clearSearch"
 msgstr "Clear search"
 
 msgid "comparePicks.clearSelection"
 msgstr "Clear selection"
+
+msgid "bulletPhoto.clearScale"
+msgstr "Clear the scale"
 
 msgid "cartridgeRecord.clearance"
 msgstr "Clearance {value}"
@@ -979,20 +1030,29 @@ msgstr "Clearance {value}"
 msgid "cartridgeRecord.clearanceLine"
 msgstr "Clearance: {meaning}"
 
-msgid "refusal.clickValueNotPositive"
-msgstr "click value must be positive"
+msgid "holeDetection.clickCornersRegionClick"
+msgstr "Click the corners of the region; click the last one again (Enter twice) to close it. {count, decimal} points. Esc cancels."
+
+msgid "holeDetection.clickMiddleOneHole"
+msgstr "Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels."
+
+msgid "holeDetection.clickTwoOppositeCorners"
+msgstr "Click two opposite corners of the region. Point {n, decimal} of 2. Or arrow keys and Enter. Esc cancels."
+
+msgid "bulletPhoto.scaleHelp"
+msgstr "Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first."
 
 msgid "photoQuality.rule.closeEnough"
 msgstr "Close enough"
+
+msgid "bulletPhoto.close"
+msgstr "Close the photograph tool"
 
 msgid "cartridges.column.cartridgeLengthHelp"
 msgstr "COAL, the cartridge maximum of the CIP sheet, shortest variant."
 
 msgid "sessionSummary.coldBore"
 msgstr "Cold bore"
-
-msgid "coreMessage.code.collinear"
-msgstr "collinear"
 
 msgid "recordSources.origin.community"
 msgstr "community"
@@ -1012,6 +1072,9 @@ msgstr "Compare bullets"
 msgid "bulletCompare.compareOthers"
 msgstr "Compare the others"
 
+msgid "log.competitionEvent"
+msgstr "Competition event"
+
 msgid "log.column.event"
 msgstr "Competition event"
 
@@ -1021,23 +1084,14 @@ msgstr "Competition events"
 msgid "events.title"
 msgstr "Competition events"
 
+msgid "logSummary.competitions"
+msgstr "Competitions"
+
 msgid "recordFields.composition"
 msgstr "Composition"
 
 msgid "primers.column.compound"
 msgstr "Compound"
-
-msgid "coreMessage.request.tooSlow"
-msgstr "computation did not finish within {ms} ms"
-
-msgid "coreMessage.request.poolClosed"
-msgstr "compute pool closed"
-
-msgid "coreMessage.request.workerExited"
-msgstr "compute worker exited"
-
-msgid "coreMessage.request.workerFailed"
-msgstr "compute worker failed"
 
 msgid "recordSources.kind.computed"
 msgstr "computed"
@@ -1054,20 +1108,17 @@ msgstr "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg."
 msgid "bullet.millerMethodPolymerTip"
 msgstr "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is not fitted to plastic tips."
 
-msgid "refusal.confidenceLevelOutsideUnit"
-msgstr "confidence level must lie in (0, 1)"
-
-msgid "refusal.confidenceLevel"
-msgstr "confidence level must lie in (0, 1)"
-
-msgid "refusal.confidenceLevelOptionOutsideUnit"
-msgstr "confidenceLevel must lie in (0, 1)"
-
 msgid "firearms.column.configuration"
 msgstr "Configuration"
 
+msgid "log.confirmedBy"
+msgstr "Confirmed by"
+
 msgid "log.column.confirmed"
 msgstr "Confirmed by"
+
+msgid "log.confirmedOn"
+msgstr "Confirmed on"
 
 msgid "values.conicalHollowBase"
 msgstr "conical-hollow-base"
@@ -1108,6 +1159,9 @@ msgstr "Copy hash {hash}"
 msgid "recordActions.copyLink"
 msgstr "Copy link"
 
+msgid "workspace.copyLink"
+msgstr "Copy link"
+
 msgid "recordFields.core"
 msgstr "Core"
 
@@ -1144,17 +1198,11 @@ msgstr "Counts when touched"
 msgid "disciplineRecord.column.course"
 msgstr "Course of fire"
 
-msgid "refusal.coverage"
-msgstr "coverage must lie in (0, 1)"
-
 msgid "recordSources.column.covers"
 msgstr "Covers"
 
 msgid "recordFields.covolume"
 msgstr "Covolume"
-
-msgid "coreMessage.method.crusher"
-msgstr "crusher"
 
 msgid "values.crusher"
 msgstr "crusher"
@@ -1174,6 +1222,12 @@ msgstr "Curve values"
 msgid "units.custom"
 msgstr "Custom"
 
+msgid "bulletPhoto.cutOutAgain"
+msgstr "Cut out again"
+
+msgid "bulletPhoto.cutting"
+msgstr "Cutting out the bullet…"
+
 msgid "bulletDrawing.dashed"
 msgstr "Dashed in the flag color: parts the record does not give, drawn from an assumed shape."
 
@@ -1186,19 +1240,22 @@ msgstr "Date"
 msgid "events.column.date"
 msgstr "Date"
 
+msgid "log.date"
+msgstr "Date"
+
 msgid "log.column.date"
 msgstr "Date"
 
 msgid "sessionSummary.date"
 msgstr "Date: {date}"
 
-msgid "refusal.degreesOfFreedomNotPositiveWhole"
-msgstr "degrees of freedom must be a positive whole number"
-
-msgid "refusal.degreesOfFreedomNotPositive"
-msgstr "degrees of freedom must be positive"
+msgid "firearms.delete"
+msgstr "Delete"
 
 msgid "listSources.delete"
+msgstr "Delete"
+
+msgid "log.delete"
 msgstr "Delete"
 
 msgid "events.delete"
@@ -1216,7 +1273,19 @@ msgstr "Delete from this browser"
 msgid "events.deleteOfFailed"
 msgstr "Delete of {name} failed: {reason}"
 
+msgid "firearms.deleteFailed"
+msgstr "Delete of {name} failed: {reason}"
+
+msgid "log.deleteFailed"
+msgstr "Delete of {name} failed: {reason}"
+
 msgid "events.deletedFromThisBrowser"
+msgstr "Deleted {name} from this browser."
+
+msgid "firearms.deleted"
+msgstr "Deleted {name} from this browser."
+
+msgid "log.deleted"
 msgstr "Deleted {name} from this browser."
 
 msgid "recordSources.kind.derived"
@@ -1228,11 +1297,26 @@ msgstr "Derived from the range or gauge the rule book states"
 msgid "cartridgeRecord.derived"
 msgstr "Derived, not dimensioned"
 
+msgid "holeDetection.detect"
+msgstr "Detect"
+
+msgid "holeDetection.detectAnyway"
+msgstr "Detect anyway"
+
+msgid "holeDetection.detectHoles"
+msgstr "Detect holes"
+
+msgid "holeDetection.detectionCancelled"
+msgstr "Detection cancelled."
+
+msgid "holeDetection.detectionSteps"
+msgstr "Detection steps"
+
+msgid "holeDetection.detectionWaitsDetectAnyway"
+msgstr "Detection waits. Detect anyway runs it on this photo; check every proposed hole."
+
 msgid "sessionSummary.device"
 msgstr "Device: {device}"
-
-msgid "coreMessage.label.diameter"
-msgstr "Diameter"
 
 msgid "recordFields.diameter"
 msgstr "Diameter"
@@ -1249,8 +1333,8 @@ msgstr "diameter at L1"
 msgid "cartridgeRecord.meaning.mouthDiameter"
 msgstr "diameter at the mouth (l)"
 
-msgid "refusal.diameterNotPositive"
-msgstr "diameter must be positive"
+msgid "bulletPhoto.caliperDiameter"
+msgstr "Diameter, caliper (optional)"
 
 msgid "bulletCompare.difference"
 msgstr "difference to the first bullet"
@@ -1268,6 +1352,9 @@ msgid "faceRecord.column.discipline"
 msgstr "Discipline"
 
 msgid "federationRecord.column.discipline"
+msgstr "Discipline"
+
+msgid "log.discipline"
 msgstr "Discipline"
 
 msgid "log.column.discipline"
@@ -1291,14 +1378,14 @@ msgstr "Disciplines"
 msgid "federationRecord.disciplines"
 msgstr "Disciplines ({count})"
 
+msgid "firearms.disciplinesListing"
+msgstr "Disciplines listing {class}"
+
 msgid "federationRecord.disciplinesTable"
 msgstr "Disciplines table"
 
 msgid "disciplines.filtered"
 msgstr "Disciplines, {filters}"
-
-msgid "refusal.dispersionNotPositive"
-msgstr "dispersion must be positive"
 
 msgid "events.disqualifiedNoTotal"
 msgstr "Disqualified: no total."
@@ -1327,44 +1414,32 @@ msgstr "Distance"
 msgid "targets.column.distance"
 msgstr "Distance"
 
-msgid "refusal.distanceNotReached"
-msgstr "distance {distance} m not reached ({stop})"
+msgid "bulletPhoto.distanceAB"
+msgstr "Distance A to B"
 
-msgid "refusal.distance"
-msgstr "distance must be positive"
-
-msgid "refusal.distanceNegative"
-msgstr "distance must not be negative"
+msgid "bulletPhoto.distanceCD"
+msgstr "Distance C to D (optional)"
 
 msgid "events.division"
 msgstr "Division"
 
-msgid "coreMessage.code.done"
-msgstr "done"
-
 msgid "values.double"
 msgstr "double"
 
-msgid "refusal.dragCurveMachNotRising"
-msgstr "drag curve Mach must rise"
-
-msgid "refusal.dragCurveNodeInvalid"
-msgstr "drag curve node"
-
-msgid "refusal.dragInterpolationUnknown"
-msgstr "drag interpolation {interpolation}"
-
 msgid "fieldTable.column.dragModel"
 msgstr "Drag model"
-
-msgid "refusal.dragModelUnknown"
-msgstr "drag model {model}"
 
 msgid "bulletRecord.drawing"
 msgstr "Drawing"
 
 msgid "recordActions.drawingNotes"
 msgstr "Drawing notes"
+
+msgid "bulletPhoto.drawingOpacity"
+msgstr "Drawing opacity"
+
+msgid "bulletPhoto.drawingOpacityValue"
+msgstr "Drawing over the photograph, {percent, decimal} %"
 
 msgid "bulletCompare.drawings"
 msgstr "Drawings"
@@ -1377,6 +1452,9 @@ msgstr "Driving bands"
 
 msgid "units.quantity.lineOfSightOffset"
 msgstr "Drop, windage"
+
+msgid "firearms.duplicate"
+msgstr "Duplicate"
 
 msgid "powderRecord.vivacity"
 msgstr "Dynamic vivacity"
@@ -1402,6 +1480,12 @@ msgstr "Dynamic vivacity of the chosen powders, model output"
 msgid "burnRateCompare.lead"
 msgstr "Dynamic vivacity, the burn rate per pressure, over burnt fraction."
 
+msgid "log.edit"
+msgstr "Edit"
+
+msgid "log.editEntry"
+msgstr "Edit entry"
+
 msgid "events.edit"
 msgstr "Edit event"
 
@@ -1413,9 +1497,6 @@ msgstr "Empty: the event type and the day."
 
 msgid "events.roundsFiredHint"
 msgstr "Empty: the shots of the series, where each lists them."
-
-msgid "coreMessage.method.energy"
-msgstr "energy"
 
 msgid "values.energy"
 msgstr "energy"
@@ -1432,11 +1513,17 @@ msgstr "Energy ratio"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "energy, as printed under Pressures (Energies)"
 
-msgid "refusal.valueMissing"
-msgstr "Enter a number for {field}."
+msgid "log.enterDate"
+msgstr "Enter the date."
 
-msgid "refusal.valueNotNumber"
-msgstr "Enter a number."
+msgid "holeDetection.enterHoleSizeFirst"
+msgstr "Enter the hole size first (step 3)."
+
+msgid "holeDetection.enterHoleSizeHoles"
+msgstr "Enter the hole size: the holes are found next."
+
+msgid "log.enterConfirmedBy"
+msgstr "Enter who confirmed the entry, or clear the day of the confirmation."
 
 msgid "sourceLink.entry.range"
 msgstr "Entered at the range"
@@ -1444,17 +1531,14 @@ msgstr "Entered at the range"
 msgid "sourceLink.entry.targetDesigner"
 msgstr "Entered in the target designer"
 
-msgid "refusal.entryKindUnknown"
-msgstr "entry kind {kind}"
+msgid "logSummary.entries"
+msgstr "Entries"
 
-msgid "refusal.entryValueInvalid"
-msgstr "entry value"
+msgid "log.entries"
+msgstr "Entries"
 
 msgid "states.error"
 msgstr "Error"
-
-msgid "coreMessage.request.error"
-msgstr "Error {status}."
 
 msgid "sessionSummary.column.es"
 msgstr "ES"
@@ -1496,6 +1580,9 @@ msgstr "Events ({count})"
 msgid "faceRecord.eventsTable"
 msgstr "Events table"
 
+msgid "holeDetection.example"
+msgstr "Example"
+
 msgid "sessionSummary.excluded"
 msgstr "Excluded"
 
@@ -1508,7 +1595,13 @@ msgstr "exponent {exponent, decimal}"
 msgid "events.exportCsv"
 msgstr "Export CSV"
 
+msgid "firearms.exportCsv"
+msgstr "Export CSV"
+
 msgid "sessionSummary.exportCsv"
+msgstr "Export CSV"
+
+msgid "log.exportCsv"
 msgstr "Export CSV"
 
 msgid "events.exportJson"
@@ -1516,6 +1609,12 @@ msgstr "Export JSON"
 
 msgid "sessionSummary.exportJson"
 msgstr "Export JSON"
+
+msgid "log.exportJson"
+msgstr "Export JSON"
+
+msgid "logSummary.exportSummaryCsv"
+msgstr "Export summary CSV"
 
 msgid "cartridgeRecord.meaning.extractorGrooveDiameter"
 msgstr "extractor groove diameter"
@@ -1525,6 +1624,9 @@ msgstr "extractor groove width at E1"
 
 msgid "values.extruded"
 msgstr "extruded"
+
+msgid "log.factoryAmmunition"
+msgstr "Factory ammunition"
 
 msgid "powderRecord.faster"
 msgstr "Faster ({unit})"
@@ -1571,11 +1673,32 @@ msgstr "Fewer than two shots to draw."
 msgid "sessionSummary.file"
 msgstr "File: {name}"
 
+msgid "log.fillsResult"
+msgstr "Fills an empty result with the event's total."
+
 msgid "bulletRecord.filter"
 msgstr "Filter cartridges"
 
 msgid "bulletRecord.filterLabel"
 msgstr "Filter the cartridges"
+
+msgid "chargeTarget.findCharge"
+msgstr "Find charge"
+
+msgid "holeDetection.findTarget"
+msgstr "Find target"
+
+msgid "bulletPhoto.findAxisAgain"
+msgstr "Find the axis again"
+
+msgid "holeDetection.findHolesLikeExample"
+msgstr "Find the holes like the example hole."
+
+msgid "holeDetection.findHolesTargetRegion"
+msgstr "Find the holes on the target or in the region; the photo stays in this browser."
+
+msgid "holeDetection.findTargetFirstBlack"
+msgstr "Find the target first: no black area is known."
 
 msgid "disciplines.row.firearm"
 msgstr "Firearm"
@@ -1583,8 +1706,14 @@ msgstr "Firearm"
 msgid "events.firearm"
 msgstr "Firearm"
 
+msgid "log.firearm"
+msgstr "Firearm"
+
 msgid "log.column.firearm"
 msgstr "Firearm"
+
+msgid "log.filterFirearm"
+msgstr "firearm {name}"
 
 msgid "units.quantity.firearmMass"
 msgstr "Firearm mass"
@@ -1592,17 +1721,20 @@ msgstr "Firearm mass"
 msgid "disciplines.row.maxFirearmMass"
 msgstr "Firearm mass up to"
 
+msgid "firearms.title"
+msgstr "Firearms"
+
 msgid "page.firearms"
 msgstr "Firearms"
+
+msgid "firearms.titleFiltered"
+msgstr "Firearms, {filters}"
 
 msgid "burnRate.unresolvedReason"
 msgstr "Fit unresolved: the interval of the fitted vivacity ({value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}) reaches 0, so the powder is not placed."
 
 msgid "burnRate.unfit.unresolved"
 msgstr "Fit unresolved: the interval of the fitted vivacity (plus and minus {factor} standard uncertainties) reaches 0, so the powder is not placed."
-
-msgid "coreMessage.code.fitFailed"
-msgstr "fit-failed"
 
 msgid "bullets.fits"
 msgstr "Fits {name}"
@@ -1652,6 +1784,12 @@ msgstr "flat"
 msgid "values.flatNose"
 msgstr "flat-nose"
 
+msgid "bulletPhoto.flipNose"
+msgstr "Flip nose"
+
+msgid "bulletPhoto.needScale"
+msgstr "For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length."
+
 msgid "recordFields.form"
 msgstr "Form"
 
@@ -1666,6 +1804,9 @@ msgstr "frangible"
 
 msgid "disciplines.rule.freehand"
 msgstr "freehand"
+
+msgid "log.from"
+msgstr "From"
 
 msgid "events.stagePointsHint"
 msgstr "From the official result, where published."
@@ -1700,14 +1841,8 @@ msgstr "Gauge"
 msgid "values.gildingMetal"
 msgstr "gilding metal"
 
-msgid "coreMessage.schema.loadOrFactory"
+msgid "log.loadOrAmmunition"
 msgstr "Give a load or factory ammunition, not both."
-
-msgid "coreMessage.label.grainForm"
-msgstr "Grain form"
-
-msgid "refusal.gravityInvalid"
-msgstr "gravity"
 
 msgid "targets.color.green"
 msgstr "green"
@@ -1720,15 +1855,6 @@ msgstr "groove diameter of the bore"
 
 msgid "cartridgeRecord.meaning.grooveFrontAngle"
 msgstr "groove front cone angle from the axis (table III: belt cone)"
-
-msgid "refusal.groupSharesShots"
-msgstr "group {group}: an impact and a dial entry share their shots, keep one or name two groups"
-
-msgid "refusal.rangeGroupSharesShots"
-msgstr "group {range} m: an impact and a dial entry share their shots, keep one or name two groups"
-
-msgid "coreMessage.advisory.gyrationRadiusIgnored"
-msgstr "gyration radius ignored"
 
 msgid "disciplines.row.handloads"
 msgstr "Handloads"
@@ -1754,9 +1880,6 @@ msgstr "head to where the shoulder cone meets the axis"
 msgid "cartridgeRecord.group.head"
 msgstr "Head, rim and groove"
 
-msgid "refusal.headShapeOutsideUnit"
-msgstr "headShape must be from 0 to 1"
-
 msgid "recordFields.headstamp"
 msgstr "Headstamp"
 
@@ -1772,11 +1895,20 @@ msgstr "Hold the camera steady or rest it on something, let it focus on the targ
 msgid "faceRecord.scoredBy.center"
 msgstr "Hole center"
 
+msgid "holeDetection.title"
+msgstr "Hole detection"
+
+msgid "holeDetection.holeDetectionFailedBrowser"
+msgstr "Hole detection failed in this browser."
+
 msgid "faceRecord.scoredBy.touch"
 msgstr "Hole edge"
 
 msgid "faceRecord.scoredBy.outward"
 msgstr "Hole edge, outward"
+
+msgid "holeDetection.holes"
+msgstr "Holes"
 
 msgid "disciplines.rule.hollowPoint"
 msgstr "hollow point"
@@ -1793,17 +1925,11 @@ msgstr "Homepage"
 msgid "federationRecord.homepage"
 msgstr "Homepage"
 
-msgid "refusal.humidityOutsideUnit"
-msgstr "humidity {humidity} outside 0..1"
-
 msgid "values.hybrid"
 msgstr "hybrid"
 
 msgid "recordFields.ignitionPressure"
 msgstr "Ignition pressure"
-
-msgid "coreMessage.code.illConditioned"
-msgstr "ill-conditioned"
 
 msgid "recordFields.impetus"
 msgstr "Impetus"
@@ -1811,11 +1937,11 @@ msgstr "Impetus"
 msgid "events.importJson"
 msgstr "Import JSON"
 
+msgid "log.importJson"
+msgstr "Import JSON"
+
 msgid "sessionSummary.importNotes"
 msgstr "Import notes"
-
-msgid "coreMessage.code.imprecise"
-msgstr "imprecise"
 
 msgid "recordSources.newTab"
 msgstr "in a new tab"
@@ -1826,6 +1952,9 @@ msgstr "In the discipline list"
 msgid "federationRecord.inDisciplineList"
 msgstr "In the discipline list"
 
+msgid "firearms.inThisBrowser"
+msgstr "In this browser"
+
 msgid "cartridgeRecord.meaning.forcingConeAngle"
 msgstr "included angle of the forcing cone"
 
@@ -1834,9 +1963,6 @@ msgstr "included angle of the h cone"
 
 msgid "cartridgeRecord.meaning.shoulderAngle"
 msgstr "included shoulder angle"
-
-msgid "coreMessage.code.inconsistent"
-msgstr "inconsistent"
 
 msgid "targets.row.innerTen"
 msgstr "Inner ten"
@@ -1847,20 +1973,11 @@ msgstr "Inner ten height"
 msgid "targets.row.innerTenRule"
 msgstr "Inner ten rule"
 
-msgid "coreMessage.code.input"
-msgstr "input"
-
-msgid "coreMessage.code.integration"
-msgstr "integration"
+msgid "workspace.inputs"
+msgstr "Inputs"
 
 msgid "recordFields.intendedUse"
 msgstr "Intended use"
-
-msgid "coreMessage.answer.interior"
-msgstr "interior: {reason}"
-
-msgid "coreMessage.request.internal"
-msgstr "internal server error"
 
 msgid "disciplines.international"
 msgstr "International"
@@ -1870,9 +1987,6 @@ msgstr "International"
 
 msgid "disciplineRecord.international"
 msgstr "International discipline"
-
-msgid "coreMessage.code.invalid"
-msgstr "invalid"
 
 msgid "construction.jacket"
 msgstr "jacket"
@@ -1895,15 +2009,6 @@ msgstr "Kind"
 msgid "disciplines.rule.kneeling"
 msgstr "kneeling"
 
-msgid "refusal.knotMachNotPositive"
-msgstr "knot Mach must be positive"
-
-msgid "refusal.knotsNotRising"
-msgstr "knots must rise"
-
-msgid "refusal.knotsNeedSingleBandOrCurve"
-msgstr "knots need a single-band BC or a curve"
-
 msgid "cartridgeRecord.meaning.leadeEnd"
 msgstr "L3 to the end of the leade"
 
@@ -1912,18 +2017,6 @@ msgstr "L3 to the leade start (freebore)"
 
 msgid "values.lacqueredSteel"
 msgstr "Lacquered steel"
-
-msgid "refusal.ladderChargeNotAboveZero"
-msgstr "ladder charge {charge} g must be above 0"
-
-msgid "coreMessage.answer.ladderOutput"
-msgstr "ladder output of {n} points is above {max}: fewer steps or a larger options.outputStep"
-
-msgid "coreMessage.request.ladderTooSlow"
-msgstr "ladder would pass {ms} ms"
-
-msgid "coreMessage.answer.ladderKind"
-msgstr "ladder.kind: a {kind} ladder runs in the workbench, not in this route"
 
 msgid "values.largePistol"
 msgstr "Large pistol"
@@ -1939,9 +2032,6 @@ msgstr "Last session"
 
 msgid "firearms.column.lastSessionHelp"
 msgstr "Latest chronograph session of these loads."
-
-msgid "refusal.latitudeInvalid"
-msgstr "latitude"
 
 msgid "disciplines.rule.lead"
 msgstr "lead"
@@ -1973,20 +2063,14 @@ msgstr "Lead-free"
 msgid "cartridgeRecord.meaning.leadeAngle"
 msgstr "leade angle"
 
-msgid "coreMessage.label.length"
-msgstr "Length"
+msgid "holeDetection.learned"
+msgstr "learned"
 
 msgid "recordFields.length"
 msgstr "Length"
 
 msgid "bullets.column.length"
 msgstr "Length"
-
-msgid "refusal.outlineLengthsNotPositive"
-msgstr "length and noseLength must be positive"
-
-msgid "refusal.lengthNotPositive"
-msgstr "length must be positive"
 
 msgid "cartridgeRecord.meaning.throatConeLength"
 msgstr "length of the cone from H2 down to G1, from L3"
@@ -2006,9 +2090,6 @@ msgstr "Level"
 msgid "events.column.level"
 msgstr "Level"
 
-msgid "refusal.levelOutsideUnit"
-msgstr "level must lie in (0, 1)"
-
 msgid "disciplines.rule.leverAction"
 msgstr "lever action"
 
@@ -2017,9 +2098,6 @@ msgstr "Lever action"
 
 msgid "recordSources.column.license"
 msgstr "License"
-
-msgid "coreMessage.advisory.limitExceeded"
-msgstr "limit exceeded"
 
 msgid "targets.ringLine"
 msgstr "line {colour}"
@@ -2030,17 +2108,32 @@ msgstr "Line {line}"
 msgid "recordActions.linkCopied"
 msgstr "Link copied"
 
+msgid "workspace.linkCopied"
+msgstr "Link copied"
+
 msgid "recordFields.listedFor"
 msgstr "Listed by the manufacturer for"
 
 msgid "events.load"
 msgstr "Load"
 
+msgid "log.load"
+msgstr "Load"
+
+msgid "holeDetection.loadPhotoFirst"
+msgstr "Load a photo first."
+
 msgid "sessionSummary.loadExample"
 msgstr "Load example"
 
+msgid "log.loadAmmunition"
+msgstr "Load or ammunition"
+
 msgid "log.column.ammunition"
 msgstr "Load or ammunition"
+
+msgid "chargeTarget.loadRatio"
+msgstr "Load ratio"
 
 msgid "powderRecord.loadTable"
 msgstr "Load table"
@@ -2159,12 +2252,6 @@ msgstr "Loads"
 msgid "disciplines.firearm.longGun"
 msgstr "Long gun"
 
-msgid "refusal.lookAngleOutsideRange"
-msgstr "look angle outside -pi/2..pi/2"
-
-msgid "refusal.machNotPositive"
-msgstr "mach must be positive"
-
 msgid "disciplines.row.maxMagnification"
 msgstr "Magnification up to"
 
@@ -2177,8 +2264,11 @@ msgstr "Magnum"
 msgid "events.major"
 msgstr "Major"
 
-msgid "coreMessage.label.maker"
-msgstr "Maker"
+msgid "log.ammunitionHint"
+msgstr "Maker and product, when no saved load was fired."
+
+msgid "bulletPhoto.makingSample"
+msgstr "Making the sample photograph…"
 
 msgid "recordSources.origin.manufacturer"
 msgstr "manufacturer"
@@ -2210,8 +2300,14 @@ msgstr "Manufacturer, name or size…"
 msgid "bullets.search"
 msgstr "Manufacturer, name, 168, .308 or 7.82…"
 
-msgid "coreMessage.label.mass"
-msgstr "Mass"
+msgid "holeDetection.markPolygonPhoto"
+msgstr "Mark a polygon on the photo"
+
+msgid "holeDetection.markRectanglePhoto"
+msgstr "Mark a rectangle on the photo"
+
+msgid "holeDetection.marker"
+msgstr "marker"
 
 msgid "recordFields.mass"
 msgstr "Mass"
@@ -2221,15 +2317,6 @@ msgstr "Mass"
 
 msgid "cases.column.mass"
 msgstr "Mass"
-
-msgid "refusal.massNotPositive"
-msgstr "mass must be positive"
-
-msgid "coreMessage.answer.bulletValues"
-msgstr "mass, diameter and length are required without bullet"
-
-msgid "refusal.stabilityInputsNotPositive"
-msgstr "mass, diameter, length, twist and velocity must be positive"
 
 msgid "lists.matching"
 msgstr "matching \"{query}\""
@@ -2249,38 +2336,17 @@ msgstr "Max ({unit})"
 msgid "cartridges.column.cartridgeLength"
 msgstr "Max length L6"
 
-msgid "coreMessage.label.maxPressure"
-msgstr "Max pressure"
-
-msgid "refusal.maxConditionOutOfRange"
-msgstr "maxCondition must be finite and at least 1"
-
 msgid "cartridgeRecord.meaning.pmax"
 msgstr "maximum mean pressure"
 
 msgid "cartridges.column.pmaxHelp"
 msgstr "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
 
-msgid "refusal.maxInflationNotAboveOne"
-msgstr "maxInflation must exceed 1"
+msgid "holeDetection.maybe"
+msgstr "maybe"
 
-msgid "refusal.maxIterationsNotPositiveInteger"
-msgstr "maxIterations must be a positive integer"
-
-msgid "refusal.maxRelativeStandardUncertaintyNotPositive"
-msgstr "maxRelativeStandardUncertainty must be positive"
-
-msgid "coreMessage.code.maxTime"
-msgstr "maxTime"
-
-msgid "coreMessage.answer.outputSteps"
-msgstr "maxTime / outputStep must be at most {max}"
-
-msgid "refusal.maxTotalStepsNotPositive"
-msgstr "maxTotalSteps must be positive"
-
-msgid "refusal.maxZeroSigmaNotPositive"
-msgstr "maxZeroSigma must be positive"
+msgid "holeDetection.maybePercent"
+msgstr "maybe {pct, decimal} %"
 
 msgid "sessionSummary.mean"
 msgstr "Mean"
@@ -2303,11 +2369,8 @@ msgstr "measured"
 msgid "bulletPhoto.measuredFrom"
 msgstr "Measured from a photograph ({width} × {height} px, {scale} px/mm ± {uncertainty} %, no image stored)."
 
-msgid "coreMessage.method.notStated"
-msgstr "measuring method not stated"
-
-msgid "coreMessage.method.notStatedInRecord"
-msgstr "measuring method not stated in the record"
+msgid "bulletPhoto.measured"
+msgstr "Measured, with standard uncertainty"
 
 msgid "cartridgeRecord.meaning.measuringPosition"
 msgstr "measuring position"
@@ -2317,9 +2380,6 @@ msgstr "Member of"
 
 msgid "recordFields.meplatDiameter"
 msgstr "Meplat diameter"
-
-msgid "refusal.meplatDiameterOutsideRange"
-msgstr "meplatDiameter must be zero up to the diameter"
 
 msgid "events.metal"
 msgstr "Metal"
@@ -2354,12 +2414,6 @@ msgstr "Minor"
 msgid "events.misses"
 msgstr "Misses"
 
-msgid "coreMessage.code.missingValues"
-msgstr "missingValues"
-
-msgid "refusal.modelUnknown"
-msgstr "model {model}"
-
 msgid "powderRecord.modelFit"
 msgstr "Model fit"
 
@@ -2378,29 +2432,17 @@ msgstr "Molar mass"
 msgid "values.moly"
 msgstr "moly"
 
-msgid "refusal.inertiaNotPositive"
-msgstr "moments of inertia must be positive"
-
-msgid "refusal.momentSlopeNotPositive"
-msgstr "momentSlope must be positive (spin-stabilized bullet)"
-
 msgid "values.monolithic"
 msgstr "monolithic"
 
-msgid "refusal.integrationStepsExceeded"
-msgstr "more than {max} integration steps"
+msgid "logSummary.month"
+msgstr "Month"
 
-msgid "refusal.integrationBudgetExceeded"
-msgstr "more than {max} integration steps in total"
+msgid "holeDetection.moreThanOneTarget"
+msgstr "More than one target fits these rings: choose one in Target."
 
 msgid "photoQuality.fix.moveCloser"
 msgstr "Move closer so the target fills more of the frame, or use the full resolution of the camera."
-
-msgid "refusal.valueNotPositive"
-msgstr "Must be above 0."
-
-msgid "refusal.valueBelowZero"
-msgstr "Must be at least 0."
 
 msgid "sessionSummary.muzzleDistance"
 msgstr "Muzzle distance: {distance}"
@@ -2411,11 +2453,8 @@ msgstr "Muzzle energy from"
 msgid "values.muzzleLoader"
 msgstr "Muzzle loader"
 
-msgid "refusal.muzzleVelocityNotConverged"
-msgstr "muzzle velocity did not converge"
-
-msgid "refusal.muzzleVelocityNotPositive"
-msgstr "muzzle velocity must be positive"
+msgid "chargeTarget.muzzleVelocity"
+msgstr "Muzzle velocity"
 
 msgid "bulletCompare.notAvailable"
 msgstr "n/a"
@@ -2459,11 +2498,17 @@ msgstr "Name"
 msgid "primers.column.name"
 msgstr "Name"
 
+msgid "logSummary.name"
+msgstr "Name"
+
 msgid "targets.column.name"
 msgstr "Name"
 
 msgid "cartridges.search"
 msgstr "Name or alias, 308, 7,62 or .308…"
+
+msgid "firearms.searchPlaceholder"
+msgstr "Name or cartridge, 308…"
 
 msgid "disciplines.federationsSearch"
 msgstr "Name, abbreviation or country, DSB…"
@@ -2486,9 +2531,6 @@ msgstr "neck diameter at L2"
 msgid "cartridgeRecord.meaning.neckAtMouth"
 msgstr "neck diameter at the mouth"
 
-msgid "refusal.engravingValueNeeded"
-msgstr "Needed with the other engraving value, or from a powder record."
-
 msgid "cases.new"
 msgstr "New brass group"
 
@@ -2498,14 +2540,23 @@ msgstr "New bullet"
 msgid "cartridges.new"
 msgstr "New cartridge"
 
+msgid "log.newEntry"
+msgstr "New entry"
+
 msgid "events.new"
 msgstr "New event"
+
+msgid "firearms.newFirearm"
+msgstr "New firearm"
 
 msgid "powders.new"
 msgstr "New powder"
 
 msgid "targets.new"
 msgstr "New target"
+
+msgid "holeDetection.next"
+msgstr "Next"
 
 msgid "values.nickelPlatedBrass"
 msgstr "Nickel plated brass"
@@ -2534,17 +2585,17 @@ msgstr "No bulk density in the record"
 msgid "bulletPhoto.noBullet"
 msgstr "No bullet found: no part of the photograph stands out from the background."
 
+msgid "bulletPhoto.noOutline"
+msgstr "No bullet is outlined: brush the bullet in, or place the scale points on the ruler."
+
 msgid "bulletCompare.none"
 msgstr "No bullets chosen."
 
 msgid "states.noMatch.bullets"
 msgstr "No bullets match these filters."
 
-msgid "coreMessage.advisory.noCartridge"
-msgstr "no cartridge"
-
-msgid "coreMessage.warning.noCartridge"
-msgstr "No cartridge id was given, so no CIP Pmax was checked."
+msgid "holeDetection.noCanvas"
+msgstr "No canvas to read the photo."
 
 msgid "bulletRecord.noCartridge"
 msgstr "No cartridge matches {query}."
@@ -2552,16 +2603,22 @@ msgstr "No cartridge matches {query}."
 msgid "states.noMatch.cartridges"
 msgstr "No cartridges match these filters."
 
-msgid "coreMessage.advisory.noComparableLimit"
-msgstr "no comparable limit"
+msgid "chargeTarget.noValidRun"
+msgstr "No charge in the range gives a valid run with this value."
 
-msgid "coreMessage.request.noWorker"
-msgstr "no compute worker could be started"
+msgid "logSummary.noCompetition"
+msgstr "No competition event in this year."
+
+msgid "log.noEvent"
+msgstr "No competition event saved yet"
 
 msgid "cartridgeRecord.noValues"
 msgstr "No dimensions or pressures in this record"
 
 msgid "events.noDisciplineFound"
+msgstr "No discipline found"
+
+msgid "log.noDiscipline"
 msgstr "No discipline found"
 
 msgid "federationRecord.noDisciplines"
@@ -2582,6 +2639,12 @@ msgstr "No edge of a target or a hole was found in this photo."
 msgid "states.noMatch.logEntries"
 msgstr "No entries match these filters."
 
+msgid "log.nothingShown"
+msgstr "No entry shown to export or print."
+
+msgid "log.noEntry"
+msgstr "No entry yet. New entry adds the first range day."
+
 msgid "events.noEventYet"
 msgstr "No event yet."
 
@@ -2591,7 +2654,16 @@ msgstr "No federations match these filters."
 msgid "sessionSummary.noFile"
 msgstr "No file read yet."
 
+msgid "logSummary.noFirearm"
+msgstr "No firearm"
+
 msgid "events.noFirearm"
+msgstr "No firearm saved in this browser yet"
+
+msgid "firearms.noneSaved"
+msgstr "No firearm saved in this browser yet"
+
+msgid "log.noFirearm"
 msgstr "No firearm saved in this browser yet"
 
 msgid "states.noMatch.firearms"
@@ -2602,6 +2674,15 @@ msgstr "No fitted model parameters"
 
 msgid "burnRate.noFit"
 msgstr "No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges."
+
+msgid "holeDetection.noHolesFromThere"
+msgstr "No holes found from there: click the middle of a hole clear of print."
+
+msgid "holeDetection.noHolesPickOne"
+msgstr "No holes found: pick one example hole (step 3)."
+
+msgid "holeDetection.noHolesProposed"
+msgstr "No holes proposed in the region."
 
 msgid "recordSources.noPage"
 msgstr "No page stated"
@@ -2630,11 +2711,11 @@ msgstr "No row of {table} matches {query}."
 msgid "events.nothingToExport"
 msgstr "No saved event to export."
 
-msgid "coreMessage.answer.noValidCharge"
-msgstr "no scanned charge gives a valid run: interior {reason}"
+msgid "bulletPhoto.noScale"
+msgstr "No scale yet."
 
-msgid "coreMessage.answer.noValidChargeField"
-msgstr "no scanned charge gives a valid run: interior {reason} ({field})"
+msgid "holeDetection.noTargetFitsRings"
+msgstr "No target fits the rings found (dashed): choose a target, type the black diameter or set the scale."
 
 msgid "disciplineRecord.noTargets"
 msgstr "No target mapping names this discipline."
@@ -2648,17 +2729,17 @@ msgstr "No target sheet saved yet"
 msgid "states.noMatch.targetFaces"
 msgstr "No targets match these filters."
 
-msgid "coreMessage.code.noInformation"
-msgstr "no-information"
+msgid "chargeTarget.bracketFailed"
+msgstr "No two neighboring charges with a valid run enclose the target."
 
 msgid "events.noShoots"
 msgstr "No-shoots"
 
-msgid "coreMessage.code.noComparableLimit"
-msgstr "noComparableLimit"
-
 msgid "cartridgeRecord.difference"
 msgstr "nominal minimum difference of published dimensions"
+
+msgid "holeDetection.none"
+msgstr "none"
 
 msgid "powderRecord.none"
 msgstr "None"
@@ -2666,17 +2747,14 @@ msgstr "None"
 msgid "events.none"
 msgstr "None"
 
-msgid "coreMessage.code.nonFinite"
-msgstr "nonFinite"
+msgid "log.none"
+msgstr "None"
+
+msgid "holeDetection.noneMarked"
+msgstr "None marked."
 
 msgid "recordFields.noseLength"
 msgstr "Nose length"
-
-msgid "refusal.noseAndBoatTailExceedLength"
-msgstr "noseLength plus boatTailLength must not exceed length"
-
-msgid "coreMessage.code.noShotStart"
-msgstr "noShotStart"
 
 msgid "burnRate.notMetallic"
 msgstr "Not a metallic-cartridge powder"
@@ -2687,8 +2765,17 @@ msgstr "Not allowed"
 msgid "bulletDrawing.notDimensioned"
 msgstr "Not dimensioned: {parts}."
 
+msgid "bulletPhoto.notGiven"
+msgstr "not given"
+
 msgid "events.notImported"
 msgstr "Not imported: {reason}"
+
+msgid "log.notImported"
+msgstr "Not imported: {reason}"
+
+msgid "chargeTarget.notInBarrel"
+msgstr "not in the barrel"
 
 msgid "sessionSummary.notInFile"
 msgstr "not in the file"
@@ -2696,7 +2783,13 @@ msgstr "not in the file"
 msgid "events.notInBrowser"
 msgstr "Not in this browser"
 
+msgid "log.notInBrowser"
+msgstr "Not in this browser"
+
 msgid "events.notSaved"
+msgstr "Not saved: {reason}"
+
+msgid "log.notSaved"
 msgstr "Not saved: {reason}"
 
 msgid "targets.notStated"
@@ -2704,9 +2797,6 @@ msgstr "Not stated"
 
 msgid "matchRounds.notStated"
 msgstr "Not stated"
-
-msgid "coreMessage.code.notConverged"
-msgstr "not-converged"
 
 msgid "fieldTable.column.note"
 msgstr "Note"
@@ -2726,14 +2816,11 @@ msgstr "Notes"
 msgid "firearms.column.notes"
 msgstr "Notes"
 
-msgid "coreMessage.code.notMonotone"
-msgstr "notMonotone"
+msgid "log.notes"
+msgstr "Notes"
 
-msgid "coreMessage.code.noValidRun"
-msgstr "noValidRun"
-
-msgid "coreMessage.code.noValue"
-msgstr "noValue"
+msgid "holeDetection.nowCorners"
+msgstr "Now {count, decimal} corners."
 
 msgid "disciplines.row.number"
 msgstr "Number"
@@ -2752,18 +2839,6 @@ msgstr "number of grooves"
 
 msgid "targets.row.numeralsPrinted"
 msgstr "Numerals printed"
-
-msgid "refusal.observationKindUnknown"
-msgstr "observation kind {kind}"
-
-msgid "refusal.observationRangeInvalid"
-msgstr "observation range {range}"
-
-msgid "refusal.observationValueInvalid"
-msgstr "observation value"
-
-msgid "refusal.mixedObservationsNeedUncertainty"
-msgstr "observations of different kinds need standard uncertainties"
 
 msgid "page.offline"
 msgstr "Offline"
@@ -2795,8 +2870,17 @@ msgstr "open"
 msgid "disciplineRecord.open"
 msgstr "Open"
 
+msgid "firearms.open"
+msgstr "Open"
+
 msgid "disciplineRecord.openStage"
 msgstr "Open {name} in shot groups"
+
+msgid "firearms.printHint"
+msgstr "Open a firearm to print its data card."
+
+msgid "bulletPhoto.openDesigner"
+msgstr "Open in designer"
 
 msgid "recordActions.openInDesigner"
 msgstr "Open in designer"
@@ -2807,14 +2891,17 @@ msgstr "Open in shot groups"
 msgid "values.openMeplat"
 msgstr "open-meplat"
 
+msgid "bulletPhoto.openHelp"
+msgstr "Opens the designer with these values; the design keeps them as measured from a photograph, with their uncertainties. The photograph is not stored."
+
+msgid "firearms.optic"
+msgstr "Optic {n, decimal}"
+
 msgid "firearms.column.optic"
 msgstr "Optic, zero"
 
 msgid "disciplines.rule.optical"
 msgstr "optical"
-
-msgid "coreMessage.answer.maxSteps"
-msgstr "options.maxSteps must be at most {max} for the charge solver"
 
 msgid "targets.color.orange"
 msgstr "orange"
@@ -2846,17 +2933,11 @@ msgstr "Outline, {name}"
 msgid "bulletDrawing.outline"
 msgstr "Outline, {name}"
 
-msgid "coreMessage.code.outputTooLarge"
-msgstr "outputTooLarge"
-
-msgid "coreMessage.code.outsideModel"
-msgstr "outsideModel"
-
 msgid "recordFields.computedRange"
 msgstr "Over the composition ranges: {min, decimal} to {max, decimal}."
 
-msgid "coreMessage.label.overallLength"
-msgstr "Overall length"
+msgid "bulletPhoto.caliperLength"
+msgstr "Overall length, caliper (optional)"
 
 msgid "burnRateCompare.overlay"
 msgstr "Overlay"
@@ -2873,8 +2954,8 @@ msgstr "Page not found"
 msgid "values.paint"
 msgstr "paint"
 
-msgid "coreMessage.request.idMismatch"
-msgstr "params/id must match the record id"
+msgid "bulletPhoto.brushHelp"
+msgstr "Paint over the picture to add to the bullet or erase from it. Keys: arrows move the cursor, Enter paints."
 
 msgid "values.partitioned"
 msgstr "partitioned"
@@ -2882,17 +2963,29 @@ msgstr "partitioned"
 msgid "bulletDrawing.assumed"
 msgstr "Parts drawn dashed are assumed, not from the record."
 
+msgid "chargeTarget.peakPressure"
+msgstr "Peak pressure"
+
 msgid "events.penalties"
 msgstr "Penalties"
 
 msgid "recordFields.perLoadRow"
 msgstr "per load row"
 
+msgid "holeDetection.photoGuide"
+msgstr "Photo guide: {rule}"
+
+msgid "bulletPhoto.messages"
+msgstr "Photograph messages"
+
+msgid "bulletPhoto.photograph"
+msgstr "Photograph of the bullet"
+
 msgid "bullets.pickToCompare"
 msgstr "Pick 2 to {max}"
 
-msgid "coreMessage.method.piezo"
-msgstr "piezo"
+msgid "holeDetection.pickOneHole"
+msgstr "Pick one hole"
 
 msgid "values.piezo"
 msgstr "piezo"
@@ -2903,8 +2996,17 @@ msgstr "Pistol"
 msgid "events.place"
 msgstr "Place"
 
+msgid "log.place"
+msgstr "Place"
+
 msgid "log.column.place"
 msgstr "Place"
+
+msgid "holeDetection.placeHand"
+msgstr "place by hand"
+
+msgid "bulletPhoto.placeScalePoints"
+msgstr "Place scale points"
 
 msgid "values.plated"
 msgstr "plated"
@@ -2918,6 +3020,9 @@ msgstr "Pmax"
 msgid "events.points"
 msgstr "Points"
 
+msgid "holeDetection.polygon"
+msgstr "Polygon"
+
 msgid "values.polymerCoat"
 msgstr "polymer coat"
 
@@ -2930,12 +3035,6 @@ msgstr "polymer-tip"
 msgid "disciplines.row.positions"
 msgstr "Positions"
 
-msgid "refusal.powderBulkDensityOutOfRange"
-msgstr "powder {powder} bulk density {density} kg/m3 must be above 0 and at most {max} kg/m3"
-
-msgid "refusal.powderWithoutBulkDensity"
-msgstr "powder {powder} has no bulk density"
-
 msgid "page.powdersBurnRates"
 msgstr "Powder burn rates"
 
@@ -2947,9 +3046,6 @@ msgstr "Powder data is unavailable right now."
 
 msgid "page.powdersDesigner"
 msgstr "Powder designer"
-
-msgid "coreMessage.answer.powderFit"
-msgstr "powder fit: {reason}"
 
 msgid "page.powders"
 msgstr "Powders"
@@ -2975,12 +3071,6 @@ msgstr "Preset"
 msgid "units.quantity.pressure"
 msgstr "Pressure"
 
-msgid "refusal.pressureInvalid"
-msgstr "pressure {pressure} Pa"
-
-msgid "refusal.airDensityOutsideRange"
-msgstr "pressure {pressure} Pa at temperature {temperature} K gives an air density of {density} kg/m3, outside 0 to {max} kg/m3"
-
 msgid "recordFields.pressureExponent"
 msgstr "Pressure exponent"
 
@@ -2989,6 +3079,9 @@ msgstr "Pressure exponent {exponent, decimal}, not 1: the burn rate per pressure
 
 msgid "burnRate.unfit.exponent"
 msgstr "Pressure exponent other than 1: the burn rate per pressure depends on the pressure, so there is no single curve."
+
+msgid "chargeTarget.pressureRange"
+msgstr "Pressure range"
 
 msgid "states.unavailable.primer"
 msgstr "Primer data is unavailable right now."
@@ -3007,6 +3100,15 @@ msgstr "Priming compound"
 
 msgid "recordActions.print"
 msgstr "Print"
+
+msgid "firearms.printRangeCards"
+msgstr "Print range cards"
+
+msgid "logSummary.printSummary"
+msgstr "Print summary"
+
+msgid "log.printHint"
+msgstr "Print the entries shown"
 
 msgid "events.printList"
 msgstr "Print the list of events"
@@ -3056,15 +3158,6 @@ msgstr "Printed: the first {limit} of {total} primers."
 msgid "directoryTable.printed.faces"
 msgstr "Printed: the first {limit} of {total} targets."
 
-msgid "refusal.priorUnknown"
-msgstr "prior {name}"
-
-msgid "refusal.priorNotPositive"
-msgstr "prior {name} must be positive"
-
-msgid "refusal.probabilityOutsideUnit"
-msgstr "probability must lie in (0, 1)"
-
 msgid "events.procedurals"
 msgstr "Procedurals"
 
@@ -3083,14 +3176,8 @@ msgstr "prone"
 msgid "cartridgeRecord.meaning.proofPressure"
 msgstr "proof pressure"
 
-msgid "coreMessage.label.propellantBase"
-msgstr "Propellant base"
-
 msgid "recordFields.propellantTemperature"
 msgstr "Propellant temperature"
-
-msgid "coreMessage.answer.bulkDensity"
-msgstr "propellant.bulkDensity or powder is required for the loadRatio target"
 
 msgid "caseRecord.data"
 msgstr "Properties"
@@ -3100,6 +3187,15 @@ msgstr "Properties"
 
 msgid "primerRecord.data"
 msgstr "Properties"
+
+msgid "holeDetection.proposalConfidence"
+msgstr "Proposal {n, decimal}, confidence {pct, decimal} %"
+
+msgid "holeDetection.proposalConfidenceOneCluster"
+msgstr "Proposal {n, decimal}, confidence {pct, decimal} %, one of {count, decimal} in a cluster"
+
+msgid "holeDetection.proposalsDashedNoneCounts"
+msgstr "Proposals are dashed; none counts until accepted. On the photo, double-click or Enter accepts one, drag or arrow keys move it, Delete removes it."
 
 msgid "recordSources.origin.public"
 msgstr "public"
@@ -3116,8 +3212,8 @@ msgstr "Quantity"
 msgid "fieldTable.column.quantity"
 msgstr "Quantity"
 
-msgid "coreMessage.request.querySchema"
-msgstr "querystring does not match the schema"
+msgid "holeDetection.quarterTurn"
+msgstr "Quarter turn"
 
 msgid "firearms.column.twistHelp"
 msgstr "R right hand, L left hand."
@@ -3131,23 +3227,17 @@ msgstr "radius at the shoulder start"
 msgid "cartridgeRecord.meaning.rimCornerRadius"
 msgstr "radius of the rim corner at the head face"
 
-msgid "refusal.rangeInvalid"
-msgstr "range {range}"
+msgid "workspace.range"
+msgstr "Range"
 
-msgid "refusal.rangeNotReached"
-msgstr "range {range} m not reached"
-
-msgid "coreMessage.advisory.rangeIncomplete"
-msgstr "range incomplete"
+msgid "logSummary.rangeDaysPerMonth"
+msgstr "Range days per month"
 
 msgid "page.range"
 msgstr "Range mode"
 
 msgid "sessionSummary.rangeMode"
 msgstr "Range mode"
-
-msgid "refusal.rangeNotPositive"
-msgstr "range must be positive"
 
 msgid "units.quantity.range"
 msgstr "Range, distance"
@@ -3161,6 +3251,15 @@ msgstr "Ratio of specific heats"
 msgid "sessionSummary.read"
 msgstr "Read {strings}, {shots}."
 
+msgid "chargeTarget.percentOfCipPmax"
+msgstr "Read the value as a percentage of the cartridge's CIP Pmax"
+
+msgid "chargeTarget.percentOfOwnPmax"
+msgstr "Read the value as a percentage of your Pmax"
+
+msgid "bulletPhoto.reading"
+msgstr "Reading the photograph…"
+
 msgid "sessionSummary.readsFormats"
 msgstr "Reads {formats} in this browser; nothing is uploaded or stored."
 
@@ -3173,6 +3272,9 @@ msgstr "rebated-boat-tail"
 msgid "recordFields.recommendedTwist"
 msgstr "Recommended twist"
 
+msgid "holeDetection.rect"
+msgstr "Rect."
+
 msgid "targets.color.red"
 msgstr "red"
 
@@ -3182,11 +3284,14 @@ msgstr "Reference pressure"
 msgid "disciplines.rule.reflex"
 msgstr "reflex"
 
-msgid "refusal.relativeHalfWidthBelowMinimum"
-msgstr "relative half-width must be at least 0.01"
+msgid "holeDetection.region"
+msgstr "Region"
 
-msgid "refusal.relativeHalfWidthOutOfReach"
-msgstr "relative half-width needs more shots than the search covers"
+msgid "holeDetection.regionOff"
+msgstr "Region off"
+
+msgid "holeDetection.regionOffTargetFound"
+msgstr "Region off: the target found in the photo"
 
 msgid "bulletCompare.remove"
 msgstr "Remove {name}"
@@ -3200,32 +3305,29 @@ msgstr "Remove {name}"
 msgid "events.removeSeries"
 msgstr "Remove series {n}"
 
+msgid "firearms.removedOptic"
+msgstr "Removed optic"
+
 msgid "disciplines.rule.repeater"
 msgstr "repeater"
 
 msgid "events.replace"
 msgstr "Replace"
 
+msgid "log.replace"
+msgstr "Replace"
+
+msgid "log.replaceEntries"
+msgstr "Replace entries?"
+
 msgid "events.replaceEvents"
 msgstr "Replace events?"
-
-msgid "coreMessage.request.bodyTooLarge"
-msgstr "request body above 64 KiB"
-
-msgid "coreMessage.request.schema"
-msgstr "request does not match the schema"
 
 msgid "matchRounds.reserve"
 msgstr "Reserve, %"
 
 msgid "units.reset"
 msgstr "Reset to preset"
-
-msgid "refusal.residualConfidenceLevelOutsideUnit"
-msgstr "residualConfidenceLevel must lie in (0, 1)"
-
-msgid "coreMessage.advisory.resistanceNotApplied"
-msgstr "resistance not applied"
 
 msgid "disciplines.rule.rest"
 msgstr "rest"
@@ -3236,11 +3338,14 @@ msgstr "Result"
 msgid "events.column.state"
 msgstr "Result"
 
+msgid "log.result"
+msgstr "Result"
+
 msgid "log.column.result"
 msgstr "Result"
 
-msgid "refusal.resultNotFinite"
-msgstr "result holds a non-finite number at {path}"
+msgid "workspace.results"
+msgstr "Results"
 
 msgid "photoQuality.fix.fromAbove"
 msgstr "Retake from straight above, with the camera parallel to the paper."
@@ -3268,6 +3373,9 @@ msgstr "Retrieved"
 
 msgid "states.retry"
 msgstr "Retry"
+
+msgid "holeDetection.review"
+msgstr "Review"
 
 msgid "cartridgeRecord.revised"
 msgstr "Revised"
@@ -3338,6 +3446,12 @@ msgstr "Rings"
 msgid "targets.column.rings"
 msgstr "Rings"
 
+msgid "holeDetection.rotate"
+msgstr "Rotate"
+
+msgid "log.roundCount"
+msgstr "Round count of {name}: {count, decimal}."
+
 msgid "events.roundCountOf"
 msgstr "Round count of {name}: {count}."
 
@@ -3347,10 +3461,19 @@ msgstr "round-nose"
 msgid "values.roundedHollowBase"
 msgstr "rounded-hollow-base"
 
+msgid "logSummary.rounds"
+msgstr "Rounds"
+
+msgid "log.rounds"
+msgstr "Rounds"
+
 msgid "log.column.rounds"
 msgstr "Rounds"
 
 msgid "events.roundsFired"
+msgstr "Rounds fired"
+
+msgid "log.roundsFired"
 msgstr "Rounds fired"
 
 msgid "matchRounds.title"
@@ -3364,6 +3487,12 @@ msgstr "Rounds needed"
 
 msgid "matchRounds.onHand"
 msgstr "Rounds on hand"
+
+msgid "logSummary.roundsPerCartridge"
+msgstr "Rounds per cartridge"
+
+msgid "logSummary.roundsPerFirearm"
+msgstr "Rounds per firearm"
 
 msgid "matchRounds.short"
 msgstr "Rounds short"
@@ -3386,14 +3515,23 @@ msgstr "Rule books table"
 msgid "disciplines.rules"
 msgstr "Rules"
 
-msgid "coreMessage.answer.samplingSingle"
-msgstr "sampling applies to a single run, not to a ladder"
+msgid "log.saveEntry"
+msgstr "Save entry"
 
 msgid "events.saveEvent"
 msgstr "Save event"
 
 msgid "firearms.column.notesHelp"
 msgstr "Saved loads of another cartridge, or no saved load."
+
+msgid "holeDetection.scale"
+msgstr "Scale"
+
+msgid "bulletPhoto.scaleValue"
+msgstr "Scale {scale} px/mm, uncertainty {uncertainty} %."
+
+msgid "holeDetection.scaleCenterBlackArea"
+msgstr "Scale and center from the black area (approximate under tilt)."
 
 msgid "bulletPhoto.basis.both"
 msgstr "Scale from the diameter and overall length entered, no ruler: their check catches a bullet turned towards the camera only beyond 2 % apart (about 11 degrees); a maker's product image may not be to scale."
@@ -3491,20 +3629,29 @@ msgstr "Session summary"
 msgid "recordFields.startPressureNote"
 msgstr "Set per load row by the barrel length and the bullet construction."
 
+msgid "holeDetection.setScaleFirstStep"
+msgstr "Set the scale first (step 2)."
+
 msgid "recordFields.shape"
 msgstr "Shape"
 
 msgid "targets.row.sheet"
 msgstr "Sheet"
 
-msgid "coreMessage.import.noTable"
-msgstr "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet."
-
 msgid "events.shootingLog"
+msgstr "Shooting log"
+
+msgid "firearms.shootingLog"
 msgstr "Shooting log"
 
 msgid "page.firearmsLog"
 msgstr "Shooting log"
+
+msgid "log.title"
+msgstr "Shooting log entries in this browser"
+
+msgid "log.titleFiltered"
+msgstr "Shooting log, {filters}"
 
 msgid "disciplines.firearm.shortGun"
 msgstr "Short gun"
@@ -3512,17 +3659,11 @@ msgstr "Short gun"
 msgid "sessionSummary.shot"
 msgstr "Shot"
 
-msgid "refusal.shotCoordinates"
-msgstr "shot coordinates must be finite"
-
 msgid "disciplineRecord.column.groups"
 msgstr "Shot groups"
 
 msgid "page.groups"
 msgstr "Shot groups"
-
-msgid "refusal.shotVelocity"
-msgstr "shot velocity must be finite"
 
 msgid "burnRate.unfit.shotgun"
 msgstr "Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges."
@@ -3560,9 +3701,6 @@ msgstr "Shoulder"
 msgid "cartridgeRecord.meaning.shoulderDiameter"
 msgstr "shoulder diameter at L1"
 
-msgid "refusal.sightInvalid"
-msgstr "sight height and offset"
-
 msgid "disciplines.row.sighters"
 msgstr "Sighters"
 
@@ -3578,26 +3716,11 @@ msgstr "Sighters per event"
 msgid "disciplines.row.sights"
 msgstr "Sights"
 
+msgid "log.signature"
+msgstr "Signature"
+
 msgid "bulletDrawing.simplified"
 msgstr "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
-
-msgid "coreMessage.warning.limitExceeded"
-msgstr "Simulated peak pressure {nominal} (range {low} to {high}) is above {name} {limit} ({spec}; {method})."
-
-msgid "coreMessage.warning.typedLimitExceeded"
-msgstr "Simulated peak pressure {nominal} (range {low} to {high}) is above the typed {name} {limit}."
-
-msgid "coreMessage.advisory.simulation"
-msgstr "simulation, not load data"
-
-msgid "coreMessage.warning.loadRatioHigh"
-msgstr "Simulation: load ratio {ratio} is above {max}, solid fill {limit} for this powder; the model is outside the range it was built for."
-
-msgid "coreMessage.warning.solidFillHigh"
-msgstr "Simulation: solid fill {fill} is above {limit}; the model is outside the range it was built for."
-
-msgid "coreMessage.warning.resistanceNotApplied"
-msgstr "Simulation: the parameters of {label} were fitted with a bore-resistance law this run cannot apply (missing: {list}); the results are biased."
 
 msgid "values.single"
 msgstr "single"
@@ -3607,6 +3730,9 @@ msgstr "single shot"
 
 msgid "disciplines.rule.sitting"
 msgstr "sitting"
+
+msgid "holeDetection.size"
+msgstr "size"
 
 msgid "recordFields.size"
 msgstr "Size"
@@ -3638,14 +3764,8 @@ msgstr "soft-point"
 msgid "recordFields.solidDensity"
 msgstr "Solid density"
 
-msgid "coreMessage.advisory.solidFillHigh"
-msgstr "solid fill high"
-
 msgid "bulletCompare.notFound"
 msgstr "Some bullets were not found."
-
-msgid "coreMessage.advisory.rangeIncompleteRule"
-msgstr "Some cases of the pressure range could not be computed."
 
 msgid "page.error"
 msgstr "Something went wrong"
@@ -3692,23 +3812,11 @@ msgstr "Stage points"
 msgid "events.stages"
 msgstr "Stages"
 
-msgid "refusal.standardUncertaintyNotPositive"
-msgstr "standardUncertainty must be positive"
-
-msgid "refusal.standardUncertaintyPartial"
-msgstr "standardUncertainty on all observations or none"
-
 msgid "disciplines.rule.standing"
 msgstr "standing"
 
 msgid "recordFields.startPressure"
 msgstr "Start pressure"
-
-msgid "coreMessage.advisory.startPressureNoEffect"
-msgstr "start pressure has no effect"
-
-msgid "coreMessage.advisory.startPressureHeldOnce"
-msgstr "start pressure held once"
 
 msgid "sessionSummary.statsTitle"
 msgstr "Statistics per string, excluded shots left out ({unit})"
@@ -3722,17 +3830,14 @@ msgstr "steel"
 msgid "values.cupSteel"
 msgstr "Steel"
 
-msgid "refusal.stepBudgetInvalid"
-msgstr "step budget"
-
-msgid "refusal.stepSizeBelowMinimum"
-msgstr "step size {step} s below {min} s"
-
-msgid "coreMessage.code.stepBudget"
-msgstr "step-budget"
+msgid "log.stored"
+msgstr "Stored"
 
 msgid "photoQuality.rule.fromAbove"
 msgstr "Straight from above, no slant"
+
+msgid "holeDetection.straightenPhotoIfNeeded"
+msgstr "Straighten the photo if needed, then set the scale (step 2)."
 
 msgid "recordFields.boreResistanceNote"
 msgstr "Stress; groove oversize {oversize, decimal} per percent, engraving {engraving, decimal} of the start pressure."
@@ -3746,8 +3851,11 @@ msgstr "String statistics"
 msgid "recordFields.structure"
 msgstr "Structure"
 
-msgid "coreMessage.code.stuck"
-msgstr "stuck"
+msgid "log.resultHint"
+msgstr "Such as rings or a placing."
+
+msgid "logSummary.summaryYear"
+msgstr "Summary year"
 
 msgid "disciplines.row.support"
 msgstr "Support"
@@ -3791,7 +3899,14 @@ msgstr "Target"
 msgid "federationRecord.column.target"
 msgstr "Target"
 
+msgid "holeDetection.target"
+msgstr "Target"
+
 msgid "faceRecord.drawing"
+msgstr "Target"
+
+msgctxt "charge"
+msgid "chargeTarget.target"
 msgstr "Target"
 
 msgid "states.unavailable.targetFace"
@@ -3800,14 +3915,11 @@ msgstr "Target data is unavailable right now."
 msgid "page.targetsDesigner"
 msgstr "Target designer"
 
-msgid "refusal.targetHeadingNotNumber"
-msgstr "target heading must be a number"
+msgid "holeDetection.targetPhoto"
+msgstr "Target on the photo"
 
 msgid "events.targetSheet"
 msgstr "Target sheet"
-
-msgid "refusal.targetSpeedNegative"
-msgstr "target speed must be 0 or more"
 
 msgid "disciplines.column.faces"
 msgstr "Targets"
@@ -3839,9 +3951,6 @@ msgstr "Technical drawing of the bullet, full section about the axis, base at th
 msgid "units.quantity.temperature"
 msgstr "Temperature"
 
-msgid "refusal.temperatureInvalid"
-msgstr "temperature {temperature} K"
-
 msgid "targets.row.tenthRingValues"
 msgstr "Tenth-ring values"
 
@@ -3866,12 +3975,6 @@ msgstr "The boat tail is not a straight cone in the photograph (a rebated boat t
 msgid "bulletPhoto.tooAlike"
 msgstr "The bullet and the background are too alike in brightness to tell apart."
 
-msgid "coreMessage.seating.behindHead"
-msgstr "The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given."
-
-msgid "coreMessage.seating.noVolume"
-msgstr "The bullet below the mouth takes the whole case volume: no volume behind the bullet is given."
-
 msgid "bulletPhoto.lowContrast"
 msgstr "The bullet differs from the background by {gap} grey levels only: the outline may be rough. Use a plainer background, or one much lighter or darker than the bullet."
 
@@ -3893,14 +3996,20 @@ msgstr "The bullet's sides are not parallel to the typed axis direction: it is a
 msgid "bulletPhoto.raggedSides"
 msgstr "The bullet's sides are ragged (about {sigma, decimal} px): a reflection, shadow or noise. Retake the photograph in even, soft light, or brush the cut-out where it is wrong."
 
+msgid "chargeTarget.severalLimits"
+msgstr "The cartridge has a CIP limit per variant, so a percentage has no single limit. Enter the pressure instead."
+
+msgid "chargeTarget.noComparableLimit"
+msgstr "The cartridge has no CIP limit to compare with."
+
 msgid "powderCompare.noComparableLimit"
 msgstr "The cartridge has no CIP limit to compare with."
 
-msgid "coreMessage.advisory.noComparableLimitRule"
-msgstr "The cartridge has no CIP Pmax measured by transducer or piezo."
-
 msgid "powders.noneHint"
 msgstr "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
+
+msgid "chargeTarget.notFound"
+msgstr "The charge could not be found."
 
 msgid "cartridges.column.calHelp"
 msgstr "The common caliber of the bullet diameter G1."
@@ -3929,35 +4038,17 @@ msgstr "The disciplines of this federation"
 msgid "faceRecord.eventsCaption"
 msgstr "The events and disciplines shot on this target"
 
-msgid "coreMessage.import.notRead"
-msgstr "The file could not be read."
-
-msgid "coreMessage.answer.formatVersion"
-msgstr "The file has format version {v}; this app reads version {w}."
-
-msgid "coreMessage.import.tooLarge"
-msgstr "The file is larger than 40 MB. Split it and import the parts."
-
-msgid "coreMessage.import.notUnicode"
-msgstr "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again"
-
-msgid "coreMessage.import.notUnicodeSentence"
-msgstr "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again."
-
-msgid "coreMessage.answer.oneLoad"
-msgstr "The file must hold exactly one load record, it has {n}"
-
 msgid "sessionSummary.notRead"
 msgstr "The file was not read."
+
+msgid "firearms.readFailed"
+msgstr "The firearms of this browser could not be read."
 
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
 
-msgid "coreMessage.curveFit.peakRatio"
-msgstr "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
-
-msgid "coreMessage.import.notRun"
-msgstr "The import could not run in this browser."
+msgid "holeDetection.holeMustLeast4"
+msgstr "The hole must be at least 4 px across"
 
 msgid "photoQuality.unevenLight"
 msgstr "The light is uneven: one side of the target is much darker than another."
@@ -3965,20 +4056,8 @@ msgstr "The light is uneven: one side of the target is much darker than another.
 msgid "bulletCompare.tooManyText"
 msgstr "The link names {count} bullets; at most {max} compare at once."
 
-msgid "coreMessage.answer.lacksValues"
-msgstr "The load file lacks {n} values: {list}. Type them under analysis.overrides, or name catalogue records that give them."
-
-msgid "coreMessage.answer.lacksValue"
-msgstr "The load file lacks 1 value: {list}. Type them under analysis.overrides, or name catalogue records that give them."
-
-msgid "coreMessage.request.loadGone"
-msgstr "the load is no longer in this browser"
-
-msgid "coreMessage.request.longerRunSilent"
-msgstr "The longer run did not answer in {seconds} s."
-
-msgid "coreMessage.request.lotRowsSilent"
-msgstr "The lot rows did not answer in {seconds} s."
+msgid "chargeTarget.needsBulkDensity"
+msgstr "The load ratio needs a powder with a bulk density."
 
 msgid "bullets.column.g1Help"
 msgstr "The manufacturer's first published BC of this drag model."
@@ -3986,17 +4065,8 @@ msgstr "The manufacturer's first published BC of this drag model."
 msgid "bullets.column.g7Help"
 msgstr "The manufacturer's first published BC of this drag model."
 
-msgid "coreMessage.request.refused"
-msgstr "The model refused the load. The error panel gives the reason."
-
-msgid "refusal.modifiedPointMassNeedsLiftSlope"
-msgstr "the modified point mass needs liftSlope"
-
-msgid "refusal.modifiedPointMassNeedsAerodynamics"
-msgstr "the modified point mass needs projectile.aerodynamics"
-
-msgid "refusal.modifiedPointMassNeedsTwist"
-msgstr "the modified point mass needs twist and twist hand"
+msgid "bulletPhoto.noseByTaper"
+msgstr "The nose end was chosen by its longer taper, which is close here: flip the nose if it is wrong."
 
 msgid "bulletPhoto.secantOgive"
 msgstr "The nose is a secant ogive: its circle cuts the shank at an angle."
@@ -4007,20 +4077,32 @@ msgstr "The nose is a tangent ogive: its circle touches the shank."
 msgid "bulletPhoto.noArc"
 msgstr "The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range."
 
-msgid "refusal.outlineOutsideMethod"
-msgstr "the outline gives no positive finite drag: outside the method"
-
-msgid "coreMessage.request.indexOnly"
-msgstr "the Pages catalogue holds the index only"
+msgid "holeDetection.photoDecodesAnotherSize"
+msgstr "The photo decodes at another size than it is shown; detection is off for it."
 
 msgid "photoQuality.dark"
 msgstr "The photo is dark: even its brightest part is dim."
+
+msgid "holeDetection.photoNotInBrowser"
+msgstr "The photo is not in this browser."
+
+msgid "holeDetection.photoNotLoaded"
+msgstr "The photo is not loaded."
 
 msgid "photoQuality.photoPixels"
 msgstr "The photo is only {n} px on its longer side."
 
 msgid "photoQuality.blurred"
 msgstr "The photo is soft: the edges of the target are blurred."
+
+msgid "bulletPhoto.workerFailed"
+msgstr "The photograph could not be processed in this browser."
+
+msgid "bulletPhoto.differsFromRecord"
+msgstr "The photograph differs from {record} in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed."
+
+msgid "bulletPhoto.differsFromChosen"
+msgstr "The photograph differs from the chosen record in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed."
 
 msgid "bulletPhoto.oneGrey"
 msgstr "The photograph has one grey only."
@@ -4031,32 +4113,50 @@ msgstr "The powder record was not found."
 msgid "events.readFailed"
 msgstr "The records of this browser could not be read."
 
+msgid "log.readFailed"
+msgstr "The records of this browser could not be read."
+
+msgid "holeDetection.regionTooLargeHoles"
+msgstr "The region is too large for holes this small; mark a smaller region"
+
+msgid "holeDetection.ringsMayThoseChoose"
+msgstr "The rings may be those of the {face}: choose it in Target to use it."
+
+msgid "log.roundCountHasEntry"
+msgstr "The round count of {name} holds this entry already."
+
 msgid "events.roundCountHeld"
 msgstr "The round count of {name} holds this event already."
 
 msgid "events.roundCountUnchanged"
 msgstr "The round count of {name} is unchanged."
 
+msgid "log.roundCountUnchanged"
+msgstr "The round count of {name} is unchanged."
+
 msgid "federationRecord.ruleBooksCaption"
 msgstr "The rule books the records cite"
 
-msgid "coreMessage.request.timeLimit"
-msgstr "The run passed the time limit."
+msgid "holeDetection.ruleBookTargetFound"
+msgstr "The rule-book target, found from the black area and the ring lines. It sets the scale and center and scores the group. If several fit, choose one; without a fit, targets are ranked by how well their rings match."
 
-msgid "coreMessage.advisory.chargeTooSmallRule"
-msgstr "The simulated peak mean pressure is below {ratio} times the hold pressure; the results are outside the range the model was built for."
+msgid "chargeTarget.toleranceNotReached"
+msgstr "The search did not reach its tolerance."
 
-msgid "coreMessage.advisory.limitExceededRule"
-msgstr "The simulated peak pressure is above a CIP maximum pressure of the cartridge."
+msgid "chargeTarget.aboveRange"
+msgstr "The simulation does not reach this high a value; over the charges tried it spans {low} to {high}."
 
-msgid "refusal.measuredSpeedTooLow"
-msgstr "the speed measured is lower than the bullet can keep over the distance"
+msgid "chargeTarget.belowRange"
+msgstr "The simulation does not reach this low a value; over the charges tried it spans {low} to {high}."
 
-msgid "coreMessage.warning.startPressureHeldOnce"
-msgstr "The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then starts against the lower bore resistance at travel 0, after which the engraving profile applies."
+msgid "chargeTarget.noValidRunField"
+msgstr "The simulation gives no valid run for this load. Reason: {reason}; field: {field}."
 
-msgid "coreMessage.warning.startPressureBelowResistance"
-msgstr "The start pressure is at or below the bore resistance at travel 0, so the shot starts when the pressure force exceeds that resistance and the start pressure has no effect."
+msgid "chargeTarget.noValidRunReason"
+msgstr "The simulation gives no valid run for this load. Reason: {reason}."
+
+msgid "chargeTarget.reachesAt"
+msgstr "The simulation reaches the target at about"
 
 msgid "photoQuality.tilt"
 msgstr "The target is photographed at a slant of about {n} degrees."
@@ -4067,32 +4167,32 @@ msgstr "The targets and stages of this discipline"
 msgid "federationRecord.targetsCaption"
 msgstr "The targets its disciplines are shot on"
 
+msgid "holeDetection.targetsNeedNetworkSet"
+msgstr "The targets need the network: set the scale by hand (step 2)."
+
 msgid "matchRounds.shotsUnstated"
 msgstr "The targets of this discipline state no shot count."
 
-msgid "coreMessage.warning.gyrationRadiusWithoutTwist"
-msgstr "The twist is 0, so the bullet has no rotational energy and the radius of gyration is ignored."
-
-msgid "coreMessage.warning.limitExceededUpper"
-msgstr "The upper end of the simulated peak pressure range, {high}, is above {name} {limit} ({spec}; {method}); the nominal value is {nominal}."
-
-msgid "coreMessage.warning.typedLimitExceededUpper"
-msgstr "The upper end of the simulated peak pressure range, {high}, is above the typed {name} {limit}; the nominal value is {nominal}."
-
-msgid "coreMessage.import.unreadable"
-msgstr "The workbook cannot be read. Save it again as XLSX or CSV."
-
-msgid "coreMessage.import.noText"
-msgstr "The workbook has no cells with text. Open the right file or paste the table into a sheet."
+msgid "chargeTarget.notMonotone"
+msgstr "The value crosses the target at more than one charge."
 
 msgid "recordFields.thermochemistry"
 msgstr "Thermochemistry"
+
+msgid "bulletPhoto.unreadable"
+msgstr "This browser cannot read the photograph."
+
+msgid "bulletPhoto.notAnImage"
+msgstr "This file is not an image this browser can read."
 
 msgid "bulletCompare.invalid"
 msgstr "This link is not valid."
 
 msgid "recordView.needsJavaScript"
 msgstr "This page needs JavaScript."
+
+msgid "holeDetection.targetNotFitEllipses"
+msgstr "This target does not fit the ellipses found."
 
 msgid "cartridgeRecord.group.throat"
 msgstr "Throat and leade"
@@ -4108,12 +4208,6 @@ msgstr "Time (s)"
 
 msgid "disciplines.row.timeLimit"
 msgstr "Time limit"
-
-msgid "refusal.timeOfFlightNegative"
-msgstr "time of flight must be 0 or more"
-
-msgid "coreMessage.code.timeout"
-msgstr "timeout"
 
 msgid "values.tin"
 msgstr "tin"
@@ -4136,23 +4230,20 @@ msgstr "Tip length"
 msgid "federationRecord.column.title"
 msgstr "Title"
 
+msgid "log.to"
+msgstr "To"
+
 msgid "cartridgeRecord.tolerance"
 msgstr "Tolerance"
 
 msgid "cartridgeRecord.toleranceClearance"
 msgstr "Tolerance, clearance"
 
-msgid "coreMessage.code.toleranceNotReached"
-msgstr "toleranceNotReached"
-
-msgid "refusal.tolerancesInvalid"
-msgstr "tolerances and limits"
-
-msgid "coreMessage.ladder.tooBig"
-msgstr "Too big: expected number to be <={n}"
-
 msgid "bulletCompare.tooMany"
 msgstr "Too many bullets."
+
+msgid "bulletPhoto.tool"
+msgstr "Tool"
 
 msgid "events.totalHeading"
 msgstr "Total"
@@ -4163,14 +4254,8 @@ msgstr "Total"
 msgid "events.partTotal"
 msgstr "Total {total}"
 
-msgid "coreMessage.curveFit.sameCharge"
-msgstr "traces {list} have the same charge"
-
 msgid "powders.column.rows"
 msgstr "Training rows"
-
-msgid "coreMessage.method.transducer"
-msgstr "transducer"
 
 msgid "values.transducer"
 msgstr "transducer"
@@ -4181,11 +4266,11 @@ msgstr "Trigger weight from"
 msgid "values.triple"
 msgstr "triple"
 
-msgid "coreMessage.answer.truing"
-msgstr "truing: {reason}"
+msgid "bulletPhoto.trySample"
+msgstr "Try a sample"
 
-msgid "coreMessage.answer.truingDetail"
-msgstr "truing: {reason} ({detail})"
+msgid "holeDetection.trySmallerPhotoAnother"
+msgstr "Try a smaller photo or another browser."
 
 msgid "page.powdersTune"
 msgstr "Tune a powder"
@@ -4199,6 +4284,12 @@ msgstr "tungsten"
 msgid "values.tungstenDisulfide"
 msgstr "tungsten disulfide"
 
+msgid "holeDetection.turnLeft90Degrees"
+msgstr "Turn left 90 degrees"
+
+msgid "holeDetection.turnRight90Degrees"
+msgstr "Turn right 90 degrees"
+
 msgid "recordFields.twist"
 msgstr "Twist"
 
@@ -4207,9 +4298,6 @@ msgstr "Twist"
 
 msgid "bullet.millerTwist"
 msgstr "Twist for Sg 1.5"
-
-msgid "refusal.twistNotPositive"
-msgstr "twist must be positive"
 
 msgid "cartridgeRecord.meaning.twist"
 msgstr "twist, length per turn"
@@ -4220,13 +4308,19 @@ msgstr "Type"
 msgid "bullets.column.type"
 msgstr "Type"
 
+msgid "holeDetection.typed"
+msgstr "typed"
+
 msgid "burnRate.typed"
 msgstr "Typed model parameters"
 
-msgid "coreMessage.code.underdetermined"
-msgstr "underdetermined"
-
 msgid "events.undoOfFailed"
+msgstr "Undo of {name} failed: {reason}"
+
+msgid "firearms.undoFailed"
+msgstr "Undo of {name} failed: {reason}"
+
+msgid "log.undoFailed"
 msgstr "Undo of {name} failed: {reason}"
 
 msgid "bulletCompare.unit"
@@ -4238,9 +4332,6 @@ msgstr "Unit"
 msgid "sessionSummary.fallbackUnit"
 msgstr "Unit if the file has none"
 
-msgid "coreMessage.answer.percentOfLimit"
-msgstr "unit percentOfLimit applies to the peakPressure target only"
-
 msgid "sessionSummary.unit"
 msgstr "Unit: {units}"
 
@@ -4249,15 +4340,6 @@ msgstr "Units: {preset}"
 
 msgid "units.nameCustom"
 msgstr "Units: {preset}, custom"
-
-msgid "coreMessage.answer.unknownField"
-msgstr "Unknown field"
-
-msgid "coreMessage.code.unreachable"
-msgstr "unreachable"
-
-msgid "coreMessage.code.unresolved"
-msgstr "unresolved"
 
 msgid "comparePicks.untick"
 msgstr "Untick"
@@ -4283,17 +4365,20 @@ msgstr "Use in workbench"
 msgid "bulletCompare.useInWorkbenchFor"
 msgstr "Use in workbench: {name}"
 
-msgid "coreMessage.import.oddBytes"
-msgstr "UTF-16 text with an odd number of bytes"
-
-msgid "coreMessage.import.oddBytesSave"
-msgstr "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again."
+msgid "bulletPhoto.value"
+msgstr "Value"
 
 msgid "cartridgeRecord.value"
 msgstr "Value"
 
+msgid "chargeTarget.value"
+msgstr "Value"
+
 msgid "fieldTable.column.value"
 msgstr "Value"
+
+msgid "bulletPhoto.valuesTable"
+msgstr "Values measured from the photograph"
 
 msgid "powderRecord.valuesMissing"
 msgstr "Values missing: no burn values"
@@ -4319,17 +4404,11 @@ msgstr "Variants"
 msgid "cartridgeRecord.variantsTable"
 msgstr "Variants table"
 
-msgid "refusal.velocitiesNotFinite"
-msgstr "velocities must be finite"
-
 msgid "units.quantity.velocity"
 msgstr "Velocity"
 
 msgid "sessionSummary.velocity"
 msgstr "Velocity ({unit})"
-
-msgid "refusal.velocityNotPositive"
-msgstr "velocity must be positive"
 
 msgid "sessionSummary.chartDescription"
 msgstr "Velocity of the {count} shots of {name} in {unit} by shot number, mean {mean} as a line, excluded shots left out. The shots table lists every value."
@@ -4364,17 +4443,14 @@ msgstr "Water to the case mouth, as the manufacturer states."
 msgid "values.waxLube"
 msgstr "wax lube"
 
+msgid "holeDetection.whereLookRectangleTwo"
+msgstr "Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group."
+
 msgid "targets.color.white"
 msgstr "white"
 
 msgid "recordSources.wholeRecord"
 msgstr "whole record"
-
-msgid "refusal.windSegmentInvalid"
-msgstr "wind segment"
-
-msgid "refusal.windSegmentsNotRising"
-msgstr "wind segments must end in rising order"
 
 msgid "units.quantity.windSpeed"
 msgstr "Wind speed"
@@ -4382,8 +4458,23 @@ msgstr "Wind speed"
 msgid "burnRateCompare.noCurve"
 msgstr "Without a curve"
 
-msgid "coreMessage.code.yaw"
-msgstr "yaw"
+msgid "chargeTarget.applyHelp"
+msgstr "Writes the charge into the charge field"
+
+msgid "log.year"
+msgstr "Year"
+
+msgid "log.filterYear"
+msgstr "year {year}"
+
+msgid "log.yearOf"
+msgstr "Year {year}"
+
+msgid "logSummary.yearlySummary"
+msgstr "Yearly summary"
+
+msgid "logSummary.printTitle"
+msgstr "Yearly summary of the shooting log, {year}"
 
 msgid "targets.color.yellow"
 msgstr "yellow"
@@ -4403,20 +4494,8 @@ msgstr "Yes"
 msgid "primers.yes"
 msgstr "Yes"
 
+msgid "log.ownRecord"
+msgstr "Your own record; a club or authority decides whether to accept it."
+
 msgid "powderRecord.z1"
 msgstr "z1 {z}"
-
-msgid "refusal.zeroNotConverged"
-msgstr "zero did not converge (miss {vertical} m, {horizontal} m)"
-
-msgid "refusal.zeroLookAngleOutsideRange"
-msgstr "zero look angle outside -pi/2..pi/2"
-
-msgid "refusal.zeroRangeNotReached"
-msgstr "zero range {range} m not reached ({stop})"
-
-msgid "refusal.zeroRangeNotPositive"
-msgstr "zero range must be positive"
-
-msgid "refusal.zeroToleranceOrMaxYawNotPositive"
-msgstr "zero tolerance and maximum yaw must be positive"

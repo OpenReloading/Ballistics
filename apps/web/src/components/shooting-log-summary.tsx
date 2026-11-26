@@ -1,9 +1,11 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Group, Select, SimpleGrid, Table, Text, Title } from '@mantine/core'
 import { parseRef, type ShootingLogRecord, type UserRecord } from '@rangefoundry/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { resultText } from '../lib/competition-events.ts'
 import { dayText, monthText } from '../lib/dates.ts'
@@ -17,7 +19,12 @@ import {
   yearSummary,
 } from '../lib/shooting-log-summary.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/shooting-log-summary.json' with {
+  type: 'json',
+}
 import { printAlone } from './print.ts'
+
+loadEnglish(englishMessages)
 
 /** A design of this browser by its record name, a catalogue cartridge as the API names it (each asked once), else the reference as stored. */
 function useCartridgeNames(refs: string[], records: readonly UserRecord[]) {
@@ -49,15 +56,19 @@ function TotalsTable({
   rows: SummaryRow[]
   name: (ref: string) => string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <Table className="log-summary-table" withTableBorder>
       <caption>{caption}</caption>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th>{t('Name')}</Table.Th>
-          <Table.Th className="num">{t('Rounds')}</Table.Th>
-          <Table.Th className="num">{t('Entries')}</Table.Th>
+          <Table.Th>{i18n._({ id: 'logSummary.name', message: 'Name' })}</Table.Th>
+          <Table.Th className="num">
+            {i18n._({ id: 'logSummary.rounds', message: 'Rounds' })}
+          </Table.Th>
+          <Table.Th className="num">
+            {i18n._({ id: 'logSummary.entries', message: 'Entries' })}
+          </Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -75,40 +86,68 @@ function TotalsTable({
 
 /** The summary's tables: per firearm, per cartridge, per month and the competition events of the year. */
 function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <>
       <Text size="sm">
-        {t('{year}: {entries}, {rounds}', {
-          year: s.year,
-          entries: tn(s.entries, '{count} entry', '{count} entries'),
-          rounds: tn(s.rounds, '{count} round', '{count} rounds'),
+        {i18n._({
+          id: 'logSummary.yearTotals',
+          message: '{year}: {entries}, {rounds}',
+          values: {
+            year: s.year,
+            entries: i18n._(
+              'logSummary.entryCount',
+              { count: s.entries },
+              { message: '{count, plural, one {# entry} other {# entries}}', formats: ungrouped },
+            ),
+            rounds: i18n._(
+              'logSummary.roundCount',
+              { count: s.rounds },
+              { message: '{count, plural, one {# round} other {# rounds}}', formats: ungrouped },
+            ),
+          },
         })}
       </Text>
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" verticalSpacing="lg" mt="sm">
-        <TotalsTable caption={t('Rounds per firearm')} rows={s.firearms} name={names.firearm} />
+        <TotalsTable
+          caption={i18n._({ id: 'logSummary.roundsPerFirearm', message: 'Rounds per firearm' })}
+          rows={s.firearms}
+          name={names.firearm}
+        />
         <div>
           <TotalsTable
-            caption={t('Rounds per cartridge')}
+            caption={i18n._({
+              id: 'logSummary.roundsPerCartridge',
+              message: 'Rounds per cartridge',
+            })}
             rows={s.cartridges}
             name={names.cartridge}
           />
           {s.withoutLoad > 0 && (
             <Text size="xs" c="dimmed" mt={4}>
-              {tn(
-                s.withoutLoad,
-                '{count} round of entries without a saved load is under its firearm only.',
-                '{count} rounds of entries without a saved load are under their firearms only.',
+              {i18n._(
+                'logSummary.unsavedLoadRounds',
+                { count: s.withoutLoad },
+                {
+                  message:
+                    '{count, plural, one {# round of entries without a saved load is under its firearm only.} other {# rounds of entries without a saved load are under their firearms only.}}',
+                  formats: ungrouped,
+                },
               )}
             </Text>
           )}
         </div>
         <Table className="log-summary-table" withTableBorder>
-          <caption>{t('Range days per month')}</caption>
+          <caption>
+            {i18n._({ id: 'logSummary.rangeDaysPerMonth', message: 'Range days per month' })}
+          </caption>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t('Month')}</Table.Th>
-              <Table.Th className="num">{t('Entries')}</Table.Th>
+              <Table.Th>{i18n._({ id: 'logSummary.month', message: 'Month' })}</Table.Th>
+              <Table.Th className="num">
+                {i18n._({ id: 'logSummary.entries', message: 'Entries' })}
+              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -123,11 +162,14 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
         </Table>
         <div>
           <Text size="sm" fw={600}>
-            {t('Competitions')}
+            {i18n._({ id: 'logSummary.competitions', message: 'Competitions' })}
           </Text>
           {s.events.length === 0 ? (
             <Text size="sm" c="dimmed">
-              {t('No competition event in this year.')}
+              {i18n._({
+                id: 'logSummary.noCompetition',
+                message: 'No competition event in this year.',
+              })}
             </Text>
           ) : (
             <ul className="log-summary-events">
@@ -137,7 +179,14 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
                     dayText(event.data.date),
                     event.name,
                     resultText(event.data, t),
-                    tn(entries.length, '{count} entry', '{count} entries'),
+                    i18n._(
+                      'logSummary.entryCount',
+                      { count: entries.length },
+                      {
+                        message: '{count, plural, one {# entry} other {# entries}}',
+                        formats: ungrouped,
+                      },
+                    ),
                   ]
                     .filter(Boolean)
                     .join(' · ')}
@@ -167,7 +216,7 @@ export function LogSummary({
   year: string | null
   firearmName: (ref: string | undefined) => string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // the year picked here, for the year filter it was picked under: a new filter takes the summary along again
   const [picked, setPicked] = useState<{ year: string; under: string | null }>()
   const chosen = picked?.under === asked ? picked.year : null
@@ -182,8 +231,12 @@ export function LogSummary({
   )
   if (!s) return null
   const names: SummaryNames = {
-    firearm: (ref) => (ref ? firearmName(ref) : t('No firearm')),
-    cartridge: (ref) => (ref ? cartridge(ref) : t('Cartridge not known')),
+    firearm: (ref) =>
+      ref ? firearmName(ref) : i18n._({ id: 'logSummary.noFirearm', message: 'No firearm' }),
+    cartridge: (ref) =>
+      ref
+        ? cartridge(ref)
+        : i18n._({ id: 'logSummary.cartridgeUnknown', message: 'Cartridge not known' }),
   }
   // the CSV leaves a name it does not know empty, in any language
   const csvNames: SummaryNames = {
@@ -195,11 +248,11 @@ export function LogSummary({
       <section aria-labelledby="log-summary" className="log-summary screen-only">
         <Group justify="space-between" align="end" gap="xs">
           <Title order={2} id="log-summary" className="page-panel-title">
-            {t('Yearly summary')}
+            {i18n._({ id: 'logSummary.yearlySummary', message: 'Yearly summary' })}
           </Title>
           <Group gap="xs" align="end">
             <Select
-              label={t('Summary year')}
+              label={i18n._({ id: 'logSummary.summaryYear', message: 'Summary year' })}
               size={controlSize.row.input}
               data={years.includes(s.year) ? years : [s.year, ...years]}
               value={s.year}
@@ -211,7 +264,7 @@ export function LogSummary({
               size={controlSize.row.button}
               onClick={() => printAlone('log-summary')}
             >
-              {t('Print summary')}
+              {i18n._({ id: 'logSummary.printSummary', message: 'Print summary' })}
             </Button>
             <Button
               variant="default"
@@ -223,14 +276,20 @@ export function LogSummary({
                 )
               }
             >
-              {t('Export summary CSV')}
+              {i18n._({ id: 'logSummary.exportSummaryCsv', message: 'Export summary CSV' })}
             </Button>
           </Group>
         </Group>
         <SummaryTables s={s} names={names} />
       </section>
       <div className="log-summary-sheet">
-        <p>{t('Yearly summary of the shooting log, {year}', { year: s.year })}</p>
+        <p>
+          {i18n._({
+            id: 'logSummary.printTitle',
+            message: 'Yearly summary of the shooting log, {year}',
+            values: { year: s.year },
+          })}
+        </p>
         <SummaryTables s={s} names={names} />
       </div>
     </>

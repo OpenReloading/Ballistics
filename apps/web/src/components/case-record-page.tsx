@@ -1,6 +1,7 @@
 'use client'
 
 import type { CatalogueCase } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
@@ -10,11 +11,14 @@ import {
 } from '../lib/manufacturers.ts'
 import { caseRowGroups, caseStrip } from '../lib/record-fields.ts'
 import { refId } from '../lib/record-metadata.ts'
+import englishMessages from '../locales/en/components/case-record-page.json' with { type: 'json' }
 import { CaseCartridgeFact } from './case-cartridge-fact.tsx'
 import { FieldStrip } from './field-strip.tsx'
 import { FieldPanel } from './field-table.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
+
+loadEnglish(englishMessages)
 
 /** What the page reads besides the record: the manufacturer names and the cartridge the case is for. */
 interface Extras {

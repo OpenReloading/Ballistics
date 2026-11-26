@@ -1,7 +1,9 @@
 /** The bullet list page's own data, apart from `bullet-rows.ts`, which the site search of every page loads. */
 import type { I18n } from '@lingui/core'
 import { toSi } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
+import englishMessages from '../locales/en/lib/bullet-list-data.json' with { type: 'json' }
 import { bulletSectionalDensity } from './bullet-kinds.ts'
 import type { BulletItem, BulletRow } from './bullet-rows.ts'
 import { present } from './directory.ts'
@@ -9,6 +11,8 @@ import type { Facet } from './facets.ts'
 import { materialCore, rawWording, spacedWording, yesNo } from './record-values.ts'
 import { inchText, type UnitSystem } from './units.ts'
 import { sayLingui } from './wording.ts'
+
+loadEnglish(englishMessages)
 
 /** The Diameter (inches to 4 decimals, mm to 3) and SD cells in the preset's units; empty without a value. */
 export function listCells(b: BulletRow, system: UnitSystem) {

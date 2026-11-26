@@ -3,13 +3,17 @@
 import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import type { DisciplineRecord } from '../lib/disciplines.ts'
 import { disciplineGroups, disciplineStrip } from '../lib/disciplines.ts'
+import englishMessages from '../locales/en/components/discipline-record.json' with { type: 'json' }
 import { FieldStrip } from './field-strip.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { shownLength } from './shown-length.tsx'
+
+loadEnglish(englishMessages)
 
 /** One stage of a discipline: the face it is shot on, the event, the gauge and the shot count. */
 interface DisciplineStageRow {

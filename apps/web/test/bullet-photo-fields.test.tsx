@@ -1,20 +1,23 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DistanceField } from '../src/components/bullet-photo.tsx'
-import { msg } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
 const html = (text: string, si: number | undefined) =>
   renderToStaticMarkup(
-    <MantineProvider>
-      <DistanceField
-        label={msg('Diameter, caliper (optional)')}
-        system={presetUnits('metric-grams')}
-        value={{ text, si }}
-        onChange={() => {}}
-      />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <DistanceField
+          label={{ id: 'bulletPhoto.caliperDiameter', message: 'Diameter, caliper (optional)' }}
+          system={presetUnits('metric-grams')}
+          value={{ text, si }}
+          onChange={() => {}}
+        />
+      </MantineProvider>
+    </I18nProvider>,
   )
 
 it('a zero or negative size says why the scale ignores it', () => {

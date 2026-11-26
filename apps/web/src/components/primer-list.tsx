@@ -2,15 +2,19 @@
 
 import { useLingui } from '@lingui/react'
 import { useDeferredValue, useMemo } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { filterText, matchingText } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { type PrimerRow, primerMatches } from '../lib/primer-rows.ts'
 import type { Origin } from '../lib/sources.ts'
+import englishMessages from '../locales/en/components/primer-list.json' with { type: 'json' }
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { EmptyList } from './states.tsx'
+
+loadEnglish(englishMessages)
 
 /** No user record holds a primer: the catalogue is the list's one source, so the filter filters nothing. */
 const primerSources: readonly Origin[] = ['rangefoundry']

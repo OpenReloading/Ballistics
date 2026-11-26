@@ -3,6 +3,7 @@
 import { useLingui } from '@lingui/react'
 import { recordFigures } from '@rangefoundry/svg-drawings/cartridge'
 import { useEffect, useState } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
@@ -18,6 +19,9 @@ import { parseCountries } from '../lib/countries.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { methodWording } from '../lib/record-values.ts'
 import { verbatim } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/cartridge-record-page.json' with {
+  type: 'json',
+}
 import { ByLengthUnit } from './by-length-unit.tsx'
 import { CartridgeBullets } from './cartridge-bullets.tsx'
 import { CartridgeDrawing } from './cartridge-drawing.tsx'
@@ -34,6 +38,8 @@ import { Panel } from './panel.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordView } from './record-view.tsx'
 import { GapBadge, StandardBadge } from './standard-badge.tsx'
+
+loadEnglish(englishMessages)
 
 function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
   const { i18n } = useLingui()

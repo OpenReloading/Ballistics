@@ -4,10 +4,14 @@ import { useLingui } from '@lingui/react'
 import { Button, Checkbox, Group, Popover, Stack } from '@mantine/core'
 import { ChevronDown } from 'lucide-react'
 import { useMemo } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import type { DirectoryState } from '../lib/directory.ts'
 import { type Facet, type FacetOption, facetOptions, facetRows } from '../lib/facets.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/facet-filters.json' with { type: 'json' }
 import { AppPopover } from './app-popover.tsx'
+
+loadEnglish(englishMessages)
 
 /** `base` is the list after its search and source; each option's count is what the other choices leave. */
 export function useFacets<T>(

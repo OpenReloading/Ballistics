@@ -6,7 +6,7 @@ import { FlaskConical, Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import {
   maxOverlay,
@@ -36,6 +36,7 @@ import {
   originNames,
   readOrigins,
 } from '../lib/sources.ts'
+import englishMessages from '../locales/en/components/powder-list.json' with { type: 'json' }
 import { CompareButton, hiddenPicks, SelectionSummary, usePicks } from './compare-picks.tsx'
 import { Day } from './day.tsx'
 import { DirectoryPage } from './directory-page.tsx'
@@ -44,6 +45,8 @@ import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { MissingMark } from './missing-mark.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
+
+loadEnglish(englishMessages)
 
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
 

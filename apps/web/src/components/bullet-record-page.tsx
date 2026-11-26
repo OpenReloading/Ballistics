@@ -4,6 +4,7 @@ import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import type { Bullet } from '@rangefoundry/schema'
 import { FlaskConical } from 'lucide-react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { compareFrom } from '../lib/compare-ids.ts'
 import { bulletIncomplete } from '../lib/complete-records.ts'
 import { countryOf } from '../lib/countries.ts'
@@ -14,6 +15,7 @@ import {
 } from '../lib/manufacturers.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { ballisticCoefficientRows, bulletDataGroups, bulletStrip } from '../lib/record-fields.ts'
+import englishMessages from '../locales/en/components/bullet-record-page.json' with { type: 'json' }
 import { BulletCartridges } from './bullet-cartridges.tsx'
 import { BulletDrawing } from './bullet-drawing.tsx'
 import { ByLengthUnit } from './by-length-unit.tsx'
@@ -24,6 +26,8 @@ import { Panel } from './panel.tsx'
 import { LinkButton } from './record-actions.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
+
+loadEnglish(englishMessages)
 
 /** The cartridges a bullet fits, by name. */
 type Fits = { id: string; name: string }[]

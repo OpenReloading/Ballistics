@@ -42,27 +42,25 @@ const ownLingui = setupI18n({
       'refusal.zeroRangeNotReached': ['Fleck ', ['range'], ' m verfehlt (', ['stop'], ')'],
       'refusal.valueMissing': ['Zahl für ', ['field'], '.'],
       'refusal.bulletWithoutLength': ['Geschoss ', ['bullet'], ' ohne Länge'],
+      'refusal.ladderLowestChargeNotPositive': ['Ladung ', ['charge'], ' kg zu klein'],
     },
   },
 })
-/** The same for the interior refusal words and the labels, which the old catalogue words. */
+/** The same for the labels, which the old catalogue words. */
 const own = installCoreMessages(
   ownLingui,
   {
     Pressure: 'Druck',
-    'ladder charge {charge} kg must be above 0': 'Ladung {charge} kg zu klein',
     '→ at {path}': '→ bei {path}',
   },
   'de',
 )
 /** Every message mapped to a marker: a message shows the marker only if a template matched it. */
-const words = coreMessages.filter((m) => typeof m === 'string')
-const ids = coreMessages.flatMap((m) => (typeof m === 'string' ? [] : [m.id]))
 const markerLingui = setupI18n({
   locale: 'de',
-  messages: { de: Object.fromEntries(ids.map((id) => [id, 'MAPPED'])) },
+  messages: { de: Object.fromEntries(coreMessages.map(({ id }) => [id, 'MAPPED'])) },
 })
-installCoreMessages(markerLingui, Object.fromEntries(words.map((m) => [m, 'MAPPED'])), 'de')
+installCoreMessages(markerLingui, {}, 'de')
 const englishLingui = linguiOf('en')
 
 const byText = (a: string, b: string) => a.localeCompare(b)

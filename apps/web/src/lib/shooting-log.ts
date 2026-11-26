@@ -1,4 +1,5 @@
 /** The person's own record, counted through the sessions' one-confirm flow (#633); nothing here says what a club or authority accepts. */
+import type { MessageDescriptor } from '@lingui/core'
 import {
   parseRef,
   type ShootingLogEntry,
@@ -6,11 +7,14 @@ import {
   shootingLogEntry,
   type UserRecord,
 } from '@rangefoundry/schema'
-import { type Message, msg } from '../i18n/translate.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/shooting-log.json' with { type: 'json' }
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'
 import { countedFor, roundsDue, withCountedRounds, withSessionRounds } from './firearm.ts'
 import { userDataText } from './user-data.ts'
+
+loadEnglish(englishMessages)
 
 /** A new entry: today, no rounds yet. */
 export const blankEntry = (now = new Date()): ShootingLogEntry => ({
@@ -121,14 +125,22 @@ export const logFileName = (ext: 'csv' | 'json', now = new Date()) =>
   `rangefoundry-shooting-log-${localDay(now)}.${ext}`
 
 /** Empty optional texts are left out before the check, as Save writes them. */
-export function entryProblem(e: ShootingLogEntry): Message | undefined {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return msg('Enter the date.')
+export function entryProblem(e: ShootingLogEntry): MessageDescriptor | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date))
+    return /*i18n*/ { id: 'log.enterDate', message: 'Enter the date.' }
   if (e.confirmation?.date && !e.confirmation.by?.trim())
-    return msg('Enter who confirmed the entry, or clear the day of the confirmation.')
-  if (e.load && e.ammunition) return msg('Give a load or factory ammunition, not both.')
+    return /*i18n*/ {
+      id: 'log.enterConfirmedBy',
+      message: 'Enter who confirmed the entry, or clear the day of the confirmation.',
+    }
+  if (e.load && e.ammunition)
+    return /*i18n*/ {
+      id: 'log.loadOrAmmunition',
+      message: 'Give a load or factory ammunition, not both.',
+    }
   return shootingLogEntry.safeParse(cleanEntry(e)).success
     ? undefined
-    : msg('Check the entry: a value is out of its range.')
+    : /*i18n*/ { id: 'log.outOfRange', message: 'Check the entry: a value is out of its range.' }
 }
 
 /** `e` without empty optional texts and an empty confirmation, as it is stored. */

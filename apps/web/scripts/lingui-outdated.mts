@@ -1,5 +1,5 @@
-// Fails when an English text of src/locales/en.po changed after its German entry was written: apps/docs/docs/translating.md
-import { type PoCatalog, readCatalog } from './po-catalog.mts'
+// Fails when an English text of a catalog of src/locales changed after its German entry was written: apps/docs/docs/translating.md
+import { catalogs, type PoCatalog, readCatalog } from './po-catalog.mts'
 
 const notePrefix = 'en: '
 
@@ -30,11 +30,13 @@ const lineOf = ({ id, noted, english }: ReturnType<typeof outdated>[number]) =>
     : `${id}: written for ${JSON.stringify(noted)}, the English is now ${JSON.stringify(english)}`
 
 if (import.meta.main) {
-  const found = outdated(await readCatalog('en'), await readCatalog('de'))
-  if (found.length > 0) {
-    console.error(
-      `src/locales/de.po: check these against the English, then update the text and its note\n${found.map(lineOf).join('\n')}`,
-    )
-    process.exit(1)
+  for (const catalog of catalogs) {
+    const found = outdated(await readCatalog('en', catalog), await readCatalog('de', catalog))
+    if (found.length > 0) {
+      console.error(
+        `${catalog.replace('<rootDir>/', '').replace('{locale}', 'de')}.po: check these against the English, then update the text and its note\n${found.map(lineOf).join('\n')}`,
+      )
+      process.exitCode = 1
+    }
   }
 }

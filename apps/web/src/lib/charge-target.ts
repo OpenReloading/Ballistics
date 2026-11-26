@@ -1,21 +1,37 @@
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { ChargeRange, ChargeTargetKind } from '@rangefoundry/ballistics'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
-import { english, type LinguiSay, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { english, type LinguiSay, type Translator } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/lib/charge-target.json' with { type: 'json' }
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
 import { refusalText as thrownText, translateMessage } from './core-messages.ts'
 import { interiorFields } from './interior-input.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
+loadEnglish(englishMessages)
+
 /** Targets of `POST /interior/charge-target`. */
 export type TargetKind = ChargeTargetKind
 
-export const targetKinds: { value: TargetKind; label: Message }[] = [
-  { value: 'peakPressure', label: msg('Peak pressure') },
-  { value: 'muzzleVelocity', label: msg('Muzzle velocity') },
-  { value: 'loadRatio', label: msg('Load ratio') },
-  { value: 'barrelTime', label: msg('Barrel time') },
-  { value: 'bulletLeadTime', label: msg('Bullet lead time') },
+export const targetKinds: { value: TargetKind; label: MessageDescriptor }[] = [
+  {
+    value: 'peakPressure',
+    label: /*i18n*/ { id: 'chargeTarget.peakPressure', message: 'Peak pressure' },
+  },
+  {
+    value: 'muzzleVelocity',
+    label: /*i18n*/ { id: 'chargeTarget.muzzleVelocity', message: 'Muzzle velocity' },
+  },
+  { value: 'loadRatio', label: /*i18n*/ { id: 'chargeTarget.loadRatio', message: 'Load ratio' } },
+  {
+    value: 'barrelTime',
+    label: /*i18n*/ { id: 'chargeTarget.barrelTime', message: 'Barrel time' },
+  },
+  {
+    value: 'bulletLeadTime',
+    label: /*i18n*/ { id: 'chargeTarget.bulletLeadTime', message: 'Bullet lead time' },
+  },
 ]
 
 /** The unit a target is typed and shown in; `toSi` and `fromSi` for the request's SI value. */
@@ -112,7 +128,10 @@ export function chargeTargetBody(
 }
 
 /** The sentence for a percentage target of a cartridge without a comparable CIP limit. */
-export const noComparableLimitText = msg('The cartridge has no CIP limit to compare with.')
+export const noComparableLimitText = /*i18n*/ {
+  id: 'chargeTarget.noComparableLimit',
+  message: 'The cartridge has no CIP limit to compare with.',
+}
 
 const number = (u: TargetUnit, si: number) => formatNumber(u.fromSi(si), u.decimals)
 
@@ -160,46 +179,77 @@ export function refusalText(
     // a percentage target: the reachable pressures as a share of the limit
     const shown = (si: number) => number(u, percent && limit ? (si / limit) * 100 : si)
     const at = ({ value, charge }: ChargeRange['minValue']) =>
-      t('{value} at {charge}', {
-        value: `${shown(value)}${u.symbol ? ` ${u.symbol}` : ''}`,
-        charge: withUnit('charge', system, charge),
+      i18n._({
+        id: 'chargeTarget.valueAt',
+        message: '{value} at {charge}',
+        values: {
+          value: `${shown(value)}${u.symbol ? ` ${u.symbol}` : ''}`,
+          charge: withUnit('charge', system, charge),
+        },
       })
     const range = { low: at(reachable.minValue), high: at(reachable.maxValue) }
     return reason === 'aboveRange'
-      ? t(
-          'The simulation does not reach this high a value; over the charges tried it spans {low} to {high}.',
-          range,
-        )
-      : t(
-          'The simulation does not reach this low a value; over the charges tried it spans {low} to {high}.',
-          range,
-        )
+      ? i18n._({
+          id: 'chargeTarget.aboveRange',
+          message:
+            'The simulation does not reach this high a value; over the charges tried it spans {low} to {high}.',
+          values: range,
+        })
+      : i18n._({
+          id: 'chargeTarget.belowRange',
+          message:
+            'The simulation does not reach this low a value; over the charges tried it spans {low} to {high}.',
+          values: range,
+        })
   }
   // the load is the problem, not the target
   if (reason === 'noValidRun' && failure) {
     const why = translateMessage(failure.reason, i18n)
     return failure.field
-      ? t('The simulation gives no valid run for this load. Reason: {reason}; field: {field}.', {
-          reason: why,
-          field: fieldLabel(failure.field, t),
+      ? i18n._({
+          id: 'chargeTarget.noValidRunField',
+          message:
+            'The simulation gives no valid run for this load. Reason: {reason}; field: {field}.',
+          values: {
+            reason: why,
+            field: fieldLabel(failure.field, t),
+          },
         })
-      : t('The simulation gives no valid run for this load. Reason: {reason}.', { reason: why })
+      : i18n._({
+          id: 'chargeTarget.noValidRunReason',
+          message: 'The simulation gives no valid run for this load. Reason: {reason}.',
+          values: { reason: why },
+        })
   }
-  const reasons: Record<string, Message> = {
-    notMonotone: msg('The value crosses the target at more than one charge.'),
-    bracketFailed: msg('No two neighboring charges with a valid run enclose the target.'),
-    toleranceNotReached: msg('The search did not reach its tolerance.'),
-    noValidRun: msg('No charge in the range gives a valid run with this value.'),
+  const reasons: Record<string, MessageDescriptor> = {
+    notMonotone: /*i18n*/ {
+      id: 'chargeTarget.notMonotone',
+      message: 'The value crosses the target at more than one charge.',
+    },
+    bracketFailed: /*i18n*/ {
+      id: 'chargeTarget.bracketFailed',
+      message: 'No two neighboring charges with a valid run enclose the target.',
+    },
+    toleranceNotReached: /*i18n*/ {
+      id: 'chargeTarget.toleranceNotReached',
+      message: 'The search did not reach its tolerance.',
+    },
+    noValidRun: /*i18n*/ {
+      id: 'chargeTarget.noValidRun',
+      message: 'No charge in the range gives a valid run with this value.',
+    },
     noComparableLimit: noComparableLimitText,
-    severalLimits: msg(
-      'The cartridge has a CIP limit per variant, so a percentage has no single limit. Enter the pressure instead.',
-    ),
+    severalLimits: /*i18n*/ {
+      id: 'chargeTarget.severalLimits',
+      message:
+        'The cartridge has a CIP limit per variant, so a percentage has no single limit. Enter the pressure instead.',
+    },
   }
   const known = reason && reasons[reason]
-  if (known) return t(known)
+  if (known) return i18n._(known)
   return refusal.message
     ? translateMessage(refusal.message, i18n)
-    : t('The charge could not be found.')
+    : i18n._({ id: 'chargeTarget.notFound', message: 'The charge could not be found.' })
 }
 
 /** What the dialog keeps of an answer: the text is written in the language shown, not the one it came in. */
@@ -223,7 +273,13 @@ export function checkedRequest<R extends { bulkDensity?: number | undefined }>(
     return { text: (_, i18n) => translateMessage(thrownText(err), i18n) }
   }
   if (kind === 'loadRatio' && req.bulkDensity === undefined)
-    return { text: (t) => t('The load ratio needs a powder with a bulk density.') }
+    return {
+      text: (_, i18n) =>
+        i18n._({
+          id: 'chargeTarget.needsBulkDensity',
+          message: 'The load ratio needs a powder with a bulk density.',
+        }),
+    }
   return { req }
 }
 

@@ -1,7 +1,10 @@
 /** Filtering and sorting of the data lists (cartridges, bullets, powders) in the browser. */
 import type { I18n } from '@lingui/core'
 import { compareKeys, score, searchKey, sortKey } from '@rangefoundry/schema'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/lists.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
 
 export type SortDirection = 'ascending' | 'descending'
 

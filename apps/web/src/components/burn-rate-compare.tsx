@@ -7,6 +7,7 @@ import { ChartLine } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { storedRecords } from '@/platform/user-store.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fetchPowder } from '../lib/api-client.ts'
 import {
   bandNote,
@@ -25,12 +26,15 @@ import {
 } from '../lib/burn-rate.ts'
 import { designCurves } from '../lib/powder-rows.ts'
 import { userRecordId, userRowId } from '../lib/sources.ts'
+import englishMessages from '../locales/en/components/burn-rate-compare.json' with { type: 'json' }
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
 import { LinkButton } from './record-actions.tsx'
 import { EmptyNote, ErrorNote, Loading } from './states.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
+
+loadEnglish(englishMessages)
 
 /** Line sample of a color slot, for the pills. */
 function Swatch({ slot }: { slot: number }) {

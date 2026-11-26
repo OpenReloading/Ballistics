@@ -1,6 +1,5 @@
 import { type Formatter, type I18n, type Messages, setupI18n } from '@lingui/core'
 import { uiMessages } from '@rangefoundry/ui'
-import en from '../locales/en.json' with { type: 'json' }
 import type { Language } from './language.ts'
 
 /** A compiled catalog's messages: a JSON import types their tokens as arrays, not the tuples Lingui reads. */
@@ -21,17 +20,24 @@ const instance = (locale: Language, messages: Messages) =>
 
 // one instance per language: activating a shared one changes boundaries that hydrate later (React #418)
 const instances: Record<Language, I18n> = {
-  en: instance('en', compiled(en)),
+  en: instance('en', {}),
   de: instance('de', {}),
 }
 
-/** The app's compiled messages of each language but English: its own chunk, so English pages ship without it. */
-const catalogs = { de: () => import('../locales/de.json') }
+/** Adds compiled English: each module with messages loads its own (a worker's, the module that shows them), so a page carries only the English it shows. In place, as `load` emits a change that would re-render the tree while a route's modules evaluate. */
+export const loadEnglish = (...catalogs: { messages: object }[]) => {
+  for (const catalog of catalogs) Object.assign(instances.en.messages, compiled(catalog))
+}
 
-/** Loads the app's messages of `language` into its instance and returns it; `language.ts` awaits it before showing the language. */
+/** The app's compiled messages of each language but English, the views' and the message table's: their own chunks, so English pages ship without them. */
+const catalogs = {
+  de: () => Promise.all([import('../locales/de.json'), import('../locales/table/de.json')]),
+}
+
+/** Loads the app's messages of `language` into its instance and returns it; `language.ts` awaits it with the message table before showing the language. */
 export async function loadLingui(language: keyof typeof catalogs) {
-  const { default: catalog } = await catalogs[language]()
-  instances[language].load(language, compiled(catalog))
+  const [views, table] = await catalogs[language]()
+  instances[language].load(language, { ...compiled(views.default), ...compiled(table.default) })
   return instances[language]
 }
 

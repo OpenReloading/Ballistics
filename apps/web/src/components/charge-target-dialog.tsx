@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react'
 import { Button, Group, NumberInput, Select, Stack, Text } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import {
   answerOf,
@@ -19,9 +20,16 @@ import { translateMessage } from '../lib/core-messages.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { typedSpec } from '../lib/record-specs.ts'
 import { formatQuantity, msText, withUnit } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/charge-target-dialog.json' with {
+  type: 'json',
+}
 import { AppModal } from './app-modal.tsx'
 import { useLoad } from './workbench-context.ts'
 import { notReached } from './workbench-outcome.ts'
+
+loadEnglish(englishMessages)
+
+const targetLabel = /*i18n*/ { id: 'chargeTarget.target', context: 'charge', message: 'Target' }
 
 /** `request` is the load request the answer was solved for: an answer shows only for the same load. */
 type Answer = { request: string } & Outcome
@@ -116,7 +124,12 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
 
   const found = answer?.kind === 'found' ? answer.body : undefined
   return (
-    <AppModal opened={opened} onClose={onClose} title={t('Charge for a target')} size="sm">
+    <AppModal
+      opened={opened}
+      onClose={onClose}
+      title={i18n._({ id: 'chargeTarget.title', message: 'Charge for a target' })}
+      size="sm"
+    >
       <form
         noValidate
         onSubmit={(e) => {
@@ -126,9 +139,9 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       >
         <Stack gap="xs">
           <Select
-            label={t('charge\u0004Target')}
+            label={i18n._(targetLabel)}
             allowDeselect={false}
-            data={targetKinds.map((k) => ({ value: k.value, label: t(k.label) }))}
+            data={targetKinds.map((k) => ({ value: k.value, label: i18n._(k.label) }))}
             value={kind}
             onChange={(v) => v && change(v as TargetKind)}
             comboboxProps={{ withinPortal: false }}
@@ -136,7 +149,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
           <Group align="flex-end" gap="xs" wrap="nowrap">
             <NumberInput
               flex={1}
-              label={t('Value')}
+              label={i18n._({ id: 'chargeTarget.value', message: 'Value' })}
               hideControls
               value={value}
               decimalScale={unit.decimals}
@@ -159,8 +172,14 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
                 aria-pressed={percent}
                 title={
                   yours
-                    ? t('Read the value as a percentage of your Pmax')
-                    : t("Read the value as a percentage of the cartridge's CIP Pmax")
+                    ? i18n._({
+                        id: 'chargeTarget.percentOfOwnPmax',
+                        message: 'Read the value as a percentage of your Pmax',
+                      })
+                    : i18n._({
+                        id: 'chargeTarget.percentOfCipPmax',
+                        message: "Read the value as a percentage of the cartridge's CIP Pmax",
+                      })
                 }
                 onClick={() => {
                   setPercent((p) => !p)
@@ -168,12 +187,12 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
                   reset()
                 }}
               >
-                {t('% of Pmax')}
+                {i18n._({ id: 'chargeTarget.percentOfPmax', message: '% of Pmax' })}
               </Button>
             )}
           </Group>
           <Button type="submit" loading={pending}>
-            {t('Find charge')}
+            {i18n._({ id: 'chargeTarget.findCharge', message: 'Find charge' })}
           </Button>
         </Stack>
       </form>
@@ -186,29 +205,44 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
         {found && (
           <Stack mt="sm" gap="xs" data-testid="charge-target-result">
             <Text size="sm">
-              {t('The simulation reaches the target at about')}{' '}
+              {i18n._({
+                id: 'chargeTarget.reachesAt',
+                message: 'The simulation reaches the target at about',
+              })}{' '}
               <strong data-testid="charge-target-charge">
                 {formatQuantity('charge', system, found.charge)} {system.charge.symbol}
               </strong>{' '}
-              {t('(simulation, not load data).')}
+              {i18n._({ id: 'chargeTarget.notLoadData', message: '(simulation, not load data).' })}
             </Text>
             <Row
-              label={t('Peak pressure')}
+              label={i18n._({ id: 'chargeTarget.peakPressure', message: 'Peak pressure' })}
               value={withUnit('pressure', system, found.pressureRange.nominalPressure)}
             />
             <Row
-              label={t('Pressure range')}
-              value={t('{low} to {high}', {
-                low: formatQuantity('pressure', system, found.pressureRange.lowPressure),
-                high: withUnit('pressure', system, found.pressureRange.highPressure),
+              label={i18n._({ id: 'chargeTarget.pressureRange', message: 'Pressure range' })}
+              value={i18n._({
+                id: 'chargeTarget.pressureRangeValue',
+                message: '{low} to {high}',
+                values: {
+                  low: formatQuantity('pressure', system, found.pressureRange.lowPressure),
+                  high: withUnit('pressure', system, found.pressureRange.highPressure),
+                },
               })}
             />
             <Row
-              label={t('Muzzle velocity')}
+              label={i18n._({ id: 'chargeTarget.muzzleVelocity', message: 'Muzzle velocity' })}
               value={withUnit('velocity', system, found.result.muzzleVelocity)}
             />
-            <Row label={t('Barrel time')} value={msText(found.result.barrelTime)} />
-            {!found.burnoutInBarrel && <Row label={t('Burnout')} value={t('not in the barrel')} />}
+            <Row
+              label={i18n._({ id: 'chargeTarget.barrelTime', message: 'Barrel time' })}
+              value={msText(found.result.barrelTime)}
+            />
+            {!found.burnoutInBarrel && (
+              <Row
+                label={i18n._({ id: 'chargeTarget.burnout', message: 'Burnout' })}
+                value={i18n._({ id: 'chargeTarget.notInBarrel', message: 'not in the barrel' })}
+              />
+            )}
             {powderDesign && (
               <Text size="xs" className="user-design">
                 {powderDesignNote(powderDesign.name, t)}
@@ -223,13 +257,16 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
               ))}
             <Group justify="flex-end" gap="xs">
               <Button
-                title={t('Writes the charge into the charge field')}
+                title={i18n._({
+                  id: 'chargeTarget.applyHelp',
+                  message: 'Writes the charge into the charge field',
+                })}
                 onClick={() => {
                   applyCharge(found.charge)
                   onClose()
                 }}
               >
-                {t('Apply')}
+                {i18n._({ id: 'chargeTarget.apply', message: 'Apply' })}
               </Button>
             </Group>
           </Stack>
