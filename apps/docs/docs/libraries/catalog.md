@@ -7,7 +7,7 @@ description: The catalogue records as one bundle and the checks they pass.
 
 # `@rangefoundry/catalog`
 
-The catalogue records of this repository as one JSON bundle and the checks the records pass. The package reads no files. The code is AGPL-3.0-only. Each record entry states its license in its `license` field; entries without one are CC BY-SA 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see `packages/catalog/LICENSE`). The [Data](../data/federations.md) pages describe the records and their sources.
+The catalogue records of this repository as one JSON bundle and the checks the records pass. The package reads no files. The code is AGPL-3.0-only. Each source states its license in its `license` field; data from a source without one is CC BY-SA 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see `packages/catalog/LICENSE`). The [Data](../data/federations.md) pages describe the records and their sources.
 
 ## Install
 

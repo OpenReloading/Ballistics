@@ -2,8 +2,10 @@ The data records in this package (`records/`) are licensed under the Creative Co
 Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0):
 https://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-Exceptions: a source with its own reuse terms names them in its `license` field (SPDX id) and
-keeps them. Records of data a manufacturer published (a source with `origin` `manufacturer`, such as a
+Each source states its license in its `license` field (SPDX id), and data from that source keeps
+it; data from a source without one is CC BY-SA 4.0.
+
+Exceptions: records of data a manufacturer published (a source with `origin` `manufacturer`, such as a
 load table) carry no project license: the manufacturer's own terms apply, as its source states them
 in `terms`. Parameters fitted to such data (`interior` of a powder, sources of kind `fitted`) are the project's own result and fall under CC BY-SA 4.0.
 
@@ -14,5 +16,7 @@ the shooting sport federations or the C.I.P.
 
 Attribution: "RangeFoundry data records", with a link to the repository and the source named in
 each record's provenance where the source requires it.
+
+Copyright (c) 2026 the RangeFoundry contributors
 
 The code is licensed under the GNU Affero General Public License v3.0 only (AGPL-3.0-only; LICENSE-AGPL in the package, ../../LICENSE in the repository).
