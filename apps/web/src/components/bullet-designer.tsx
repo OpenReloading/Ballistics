@@ -420,7 +420,7 @@ export function BulletDesigner() {
 
   const title = t('Outline, {name}', { name: labelOf(design) || t('new bullet') })
   const { assumed, notes: drawn } = drawingNotes(drawing, t)
-  const notes = design.photo ? [...drawn, ...photoText(design.photo, system, t)] : drawn
+  const notes = design.photo ? [...drawn, ...photoText(design.photo, system, t, i18n)] : drawn
 
   const root = useRef<HTMLDivElement>(null)
   const mark = (t: Element | null) => markDimension(root.current, t)

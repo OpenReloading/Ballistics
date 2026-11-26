@@ -5,7 +5,7 @@ import type { Message, Translator } from '../i18n/translate.ts'
 type Values = Readonly<Record<string, string | number>>
 
 /** A text of the catalogue keyed by its English, or a verbatim text that is never translated. */
-export type OwnWording = Message | { verbatim: string } | { message: Message; values: Values }
+type OwnWording = Message | { verbatim: string } | { message: Message; values: Values }
 
 /** Every form survives the server-to-client step as data; a descriptor is a Lingui message id with its values. */
 export type Wording = OwnWording | MessageDescriptor
@@ -15,9 +15,6 @@ export type LinguiWording = MessageDescriptor | { verbatim: string }
 
 /** A text shown as it is: a record's name or a printed value. */
 export const verbatim = (text: string) => ({ verbatim: text })
-
-/** A message with its placeholders filled where it is shown. */
-export const worded = (message: Message, values: Values): OwnWording => ({ message, values })
 
 /** The text of `w` in the language of `t` (`useTranslation()`). */
 function sayOwn(t: Translator['t'], w: OwnWording): string {

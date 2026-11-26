@@ -1,10 +1,9 @@
 /** Cut-out and ruler scale of a bullet photograph (`apps/docs/docs/models/bullet-photo.md`); photo px, y down, pixel (i, j) covering [i, i + 1) x [j, j + 1); pure, so it runs in a worker. */
 import { clamp, components, otsu } from '@rangefoundry/target-recognition'
-import { msg } from '../i18n/translate.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
 import type { Point } from './target-geometry.ts'
-import { type Wording, worded } from './wording.ts'
+import type { Wording } from './wording.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
 const at = (a: ArrayLike<number>, i: number) => a[i] as number
@@ -337,12 +336,12 @@ function edgeSpreadOf(
 function softEdgeWarning(spread: number, thickness: number): Wording[] {
   return spread > Math.max(4, 0.04 * thickness)
     ? [
-        worded(
-          msg(
+        /*i18n*/ {
+          id: 'bulletPhoto.softEdges',
+          message:
             'The bullet edges are soft, about {spread} px wide: a shadow beside the bullet, or the photograph is out of focus or moved. Measured values are less certain; take a sharp photograph in even light.',
-          ),
-          { spread: Math.round(spread) },
-        ),
+          values: { spread: Math.round(spread) },
+        },
       ]
     : []
 }
@@ -449,13 +448,26 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   const backgroundHigh = borderLevel(g) > t0
   const flat = flatten(g, (v) => v > t0 === backgroundHigh)
   const grey = levels(flat, w, h)
-  if (!grey) return none(msg('The photograph has one grey only.'))
+  if (!grey)
+    return none(
+      /*i18n*/ { id: 'bulletPhoto.oneGrey', message: 'The photograph has one grey only.' },
+    )
   const gap = Math.abs(grey[1] - grey[0])
   if (gap < minContrast)
-    return none(msg('The bullet and the background are too alike in brightness to tell apart.'))
+    return none(
+      /*i18n*/ {
+        id: 'bulletPhoto.tooAlike',
+        message: 'The bullet and the background are too alike in brightness to tell apart.',
+      },
+    )
   const cover = coverOf(flat, grey, [w, h], exclude)
   if (!cover)
-    return none(msg('No bullet found: no part of the photograph stands out from the background.'))
+    return none(
+      /*i18n*/ {
+        id: 'bulletPhoto.noBullet',
+        message: 'No bullet found: no part of the photograph stands out from the background.',
+      },
+    )
 
   const { soft, contrast, best, thickness, rivals } = cover
   const box = padded(best, 4, w, h)
@@ -468,23 +480,31 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   const edgeSpread = edgeSpreadOf(flat, mask, w, box, contrast)
   const warnings: Wording[] = [
     ...(best.edge
-      ? [msg('The cut-out touches the edge of the photograph: the whole bullet may not be in it.')]
+      ? [
+          /*i18n*/ {
+            id: 'bulletPhoto.touchesEdge',
+            message:
+              'The cut-out touches the edge of the photograph: the whole bullet may not be in it.',
+          },
+        ]
       : []),
     ...(gap < lowContrast
       ? [
-          worded(
-            msg(
+          /*i18n*/ {
+            id: 'bulletPhoto.lowContrast',
+            message:
               'The bullet differs from the background by {gap} grey levels only: the outline may be rough. Use a plainer background, or one much lighter or darker than the bullet.',
-            ),
-            { gap: Math.round(gap) },
-          ),
+            values: { gap: Math.round(gap) },
+          },
         ]
       : []),
     ...(rivals
       ? [
-          msg(
-            'Another object about as large as the bullet is in the photograph. Check that the cut-out is the bullet, photograph one bullet alone, or paint the others out with the brush.',
-          ),
+          /*i18n*/ {
+            id: 'bulletPhoto.rivals',
+            message:
+              'Another object about as large as the bullet is in the photograph. Check that the cut-out is the bullet, photograph one bullet alone, or paint the others out with the brush.',
+          },
         ]
       : []),
     ...softEdgeWarning(edgeSpread, thickness),

@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { NativeSelect, Table, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue, useElementSize } from '@mantine/hooks'
 import type { UserCartridge } from '@rangefoundry/schema'
@@ -88,6 +90,7 @@ function helpText(
   system: UnitSystem,
   notes: string[],
   t: Translate,
+  i18n: I18n,
 ) {
   const value = (si: number) => valueText(s.quantity as Derived['quantity'], system, si)
   const from = (() => {
@@ -109,7 +112,7 @@ function helpText(
         return t('Not given')
     }
   })()
-  const text = meaningText(s.meaning, t)
+  const text = meaningText(s.meaning, i18n)
   const meaning = text.charAt(0).toUpperCase() + text.slice(1)
   return [`${meaning}. ${from}.`, ...notes].join(' ')
 }
@@ -439,6 +442,7 @@ function designNameOf(design: Design, t: Translator['t']) {
 /** The last valid drawing stays while the input is refused. */
 export function CartridgeDesigner() {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   /** The view picked; Combined once both sides draw until one is picked. */
   const [view, setView] = useState<View>()
   // the view switch goes in the Drawing panel's header row
@@ -519,7 +523,7 @@ export function CartridgeDesigner() {
         spec={s}
         system={system}
         value={value}
-        help={helpText(s, state, system, e.notes[s.key] ?? [], t)}
+        help={helpText(s, state, system, e.notes[s.key] ?? [], t, i18n)}
         flag={fieldFlag(state)}
         changed={changed}
         error={errorOf(s)}
@@ -534,7 +538,7 @@ export function CartridgeDesigner() {
     <div className="side-grid">
       {rowsOf(g).map((r) => (
         <div key={r.symbol} className="side-row">
-          <span className="prop-label" title={meaningText(r.meaning, t)}>
+          <span className="prop-label" title={meaningText(r.meaning, i18n)}>
             {symbolText(r.symbol)}
           </span>
           {(['cartridge', 'chamber'] as const).map((side) => {
@@ -614,7 +618,7 @@ export function CartridgeDesigner() {
               ? []
               : (Object.keys(groups) as Group[]).map((g) => ({
                   key: g,
-                  title: groupLabel(groups[g], t),
+                  title: groupLabel(groups[g], i18n),
                   content: groupFields(g),
                 }))
           }

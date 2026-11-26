@@ -223,7 +223,9 @@ describe('segment', () => {
 
   it('warns when the cut-out touches the edge of the photograph', () => {
     const photo = renderPhoto(spec(tangent, { base: { x: 2, y: 250 }, ruler: undefined }))
-    expect(segment(grayOf(photo.image)).warnings.join(' ')).toMatch(/edge/)
+    expect(segment(grayOf(photo.image)).warnings).toContainEqual(
+      expect.objectContaining({ id: 'bulletPhoto.touchesEdge' }),
+    )
   })
 })
 

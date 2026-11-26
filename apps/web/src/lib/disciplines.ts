@@ -12,10 +12,8 @@ import {
 } from '@rangefoundry/schema'
 import { linguiOf } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
-import type { Translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
-import { categoryWord } from './face-words.ts'
 import type { Facet } from './facets.ts'
 import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
@@ -184,7 +182,6 @@ const stripLabels = {
 export function disciplineStrip(
   d: Pick<DisciplineRecord, 'federation' | 'distance' | 'category'>,
   i18n: I18n,
-  t: Translator['t'],
   federation = d.federation,
 ): StripItem[] {
   return [
@@ -209,7 +206,7 @@ export function disciplineStrip(
           {
             icon: 'form' as const,
             label: i18n._(stripLabels.category),
-            row: { label: stripLabels.category, text: categoryWord(t, d.category) },
+            row: { label: stripLabels.category, text: kebabValue(i18n, d.category) },
           },
         ]
       : []),

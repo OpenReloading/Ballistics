@@ -1,6 +1,5 @@
 /** Cuts by color distance where luma barely separates bullet and background (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 
-import { msg } from '../i18n/translate.ts'
 import {
   type Gray,
   grayOf,
@@ -241,9 +240,10 @@ function raggedness({ alpha, width: w, height: h }: Segmentation): number {
 /** Above this the edge of a cut-out is a surface's texture, not a bullet's outline. */
 const ragged = 9
 
-const raggedNote = msg(
-  'The cut-out has a ragged edge, likely from a busy background. Use a plain background.',
-)
+const raggedNote = /*i18n*/ {
+  id: 'bulletPhoto.raggedEdge',
+  message: 'The cut-out has a ragged edge, likely from a busy background. Use a plain background.',
+}
 
 const rough = (s: Segmentation) => raggedness(s) > ragged
 

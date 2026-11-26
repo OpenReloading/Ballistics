@@ -3,7 +3,6 @@
 import { useLingui } from '@lingui/react'
 import { recordFigures } from '@rangefoundry/svg-drawings/cartridge'
 import { useEffect, useState } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
@@ -77,12 +76,11 @@ function useFittingBullets(id: string) {
 
 /** The page content of one cartridge record. */
 export function Cartridge({ c }: { c: CartridgeDetail }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const sheet = drawable(c)
   const list = recordFigures(sheet)
-  const rows = inReadingOrder(combinedRows(c, list, t))
-  const matrix = variantMatrix(c, t)
+  const rows = inReadingOrder(combinedRows(c, list, i18n))
+  const matrix = variantMatrix(c, i18n)
   const facts = [...pressureStripValues(c), ...dimensionStripValues(c)]
   const aliases = c.aliases ?? []
   const date = c.revised ?? c.published
@@ -128,7 +126,7 @@ export function Cartridge({ c }: { c: CartridgeDetail }) {
           <>
             <RecordFacts
               values={facts}
-              notes={facts.map((v) => pressureStripNote(v, c.table, t))}
+              notes={facts.map((v) => pressureStripNote(v, c.table, i18n))}
               caseType={c.caseType}
             >
               {bullets > 0 && <CartridgeBullets id={c.id} count={bullets} />}
