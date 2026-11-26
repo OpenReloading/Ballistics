@@ -102,6 +102,18 @@ test('the Database list and a record page show in German', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /^Quellen/ })).toBeVisible()
 })
 
+test('a target sheet created on a full page load in German names its first group in German', async ({
+  page,
+}) => {
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+
+  // the German catalog loads after the editor's first render, which is English
+  await gotoHydrated(page, '/groups')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+  const name = page.getByRole('textbox', { name: 'Name des Schussbilds', exact: true })
+  await expect(name).toHaveValue('Schussbild 1')
+})
+
 test('the workbench in German after the fixture load run has no axe finding', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height })
   await runSavedLoad(page)
