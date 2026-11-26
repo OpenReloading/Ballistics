@@ -8,9 +8,9 @@ export type ModelManifest = {
   schemaVersion: 1
   id: string
   version: string
-  /** The model file: `url` https only, `bytes` and `sha256` checked after the download. */
+  /** The model file: `url` a path relative to the base path of the app edition that serves the manifest, `bytes` and `sha256` checked after the download. */
   file: { name: string; url: string; sha256: string; bytes: number }
-  /** The npm runtime package and the exact version the app pins, `wasmPaths` where it loads its WASM files from, and the ONNX opset. */
+  /** The npm runtime package and the exact version the app pins, `wasmPaths` the folder it loads its WASM files from (relative like `url`), and the ONNX opset. */
   runtime: { package: string; version: string; wasmPaths: string; opset: number }
   /** `holePx` the working hole diameter in px, `range` the pixel values' minimum and maximum, `sizeMultiple` what width and height are padded to. */
   input: { holePx: number; channels: 'rgb' | 'bgr'; range: [number, number]; sizeMultiple: number }
@@ -18,7 +18,7 @@ export type ModelManifest = {
   output: { stride: number; channels: number; threshold: number; sure: number }
   /** The model license and the training photos as counts only, per data class and per target kind; no photo or source is listed. */
   license: {
-    model: 'CC0-1.0' | 'CC-BY-4.0' | 'ISC' | 'MIT' | 'Apache-2.0'
+    model: 'CC0-1.0' | 'CC-BY-4.0' | 'CC-BY-SA-4.0' | 'ISC' | 'MIT' | 'Apache-2.0'
     training: {
       classes: { own: number; 'third-party': number; synthetic: number }
       kinds: Record<string, number>
@@ -33,6 +33,9 @@ const count = z.number().int().nonnegative()
 const share = z.number().min(0).max(1)
 const positiveInt = z.number().int().positive()
 const slug = z.string().regex(/^[a-z][a-z0-9-]*$/)
+// no scheme, leading slash or `..`, so each edition loads its own copy under its base path
+const relativeFile = z.string().regex(/^([\w-]+(\.[\w-]+)*\/)*[\w-]+(\.[\w-]+)*$/)
+const relativeFolder = z.string().regex(/^([\w-]+(\.[\w-]+)*\/)+$/)
 
 const scores = z
   .strictObject({
@@ -54,14 +57,14 @@ const shape = z.strictObject({
   file: z.strictObject({
     // a bare file name, so a download cannot write outside its folder
     name: z.string().regex(/^[\w-]+(\.[\w-]+)*$/),
-    url: z.url({ protocol: /^https$/ }),
+    url: relativeFile,
     sha256: z.string().regex(/^[0-9a-f]{64}$/),
     bytes: positiveInt,
   }),
   runtime: z.strictObject({
     package: text,
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
-    wasmPaths: text,
+    wasmPaths: relativeFolder,
     opset: positiveInt,
   }),
   input: z.strictObject({
@@ -86,7 +89,7 @@ const shape = z.strictObject({
     }),
   license: z.strictObject({
     // a fixed list of SPDX license identifiers, so no file name, domain, credit line or LicenseRef fits
-    model: z.enum(['CC0-1.0', 'CC-BY-4.0', 'ISC', 'MIT', 'Apache-2.0']),
+    model: z.enum(['CC0-1.0', 'CC-BY-4.0', 'CC-BY-SA-4.0', 'ISC', 'MIT', 'Apache-2.0']),
     training: z.strictObject({
       classes: z.strictObject({ own: count, 'third-party': count, synthetic: count }),
       // refuses a URL, file name or credit line as a kind; a site name written as a slug still fits
