@@ -1,9 +1,10 @@
+import type { I18n } from '@lingui/core'
 import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@rangefoundry/ballistics'
 import { fromSi, sheetId, toSi } from '@rangefoundry/schema'
 // the words alone: the package root would pull the schemas of the runs into the workbench
 import { advisoryText } from '@rangefoundry/use-cases/advisories'
 import { formatNumber } from '../i18n/number.ts'
-import { msg, type Say, type Translator } from '../i18n/translate.ts'
+import { type LinguiSay, msg, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { translateMessage } from './core-messages.ts'
 import type { LadderDirection } from './seating-ladder.ts'
@@ -83,20 +84,25 @@ export function resultTabsFit(widths: number[], room: number) {
 }
 
 /** A `say` follows the language shown now, a plain string stays as written. */
-export type Status = string | { say: Say } | { prefix: string | Say }
+export type Status = string | { say: LinguiSay } | { prefix: string | LinguiSay }
 
 /** The status text; `line` is the shown result's line in the units shown now, undefined without a result. */
-export const statusText = (status: Status, line: string | undefined, t: Translator['t']) => {
-  const text = (x: string | Say) => (typeof x === 'string' ? x : x(t))
+export const statusText = (
+  status: Status,
+  line: string | undefined,
+  t: Translator['t'],
+  i18n: I18n,
+) => {
+  const text = (x: string | LinguiSay) => (typeof x === 'string' ? x : x(t, i18n))
   if (typeof status === 'string') return status
-  if ('say' in status) return status.say(t)
+  if ('say' in status) return status.say(t, i18n)
   return line === undefined ? '' : text(status.prefix) + line
 }
 
-/** The short name of a warning code from the advisory registry, in the language of `t`. */
-function ruleName(code: string, t: Translator['t']) {
+/** The short name of a warning code from the advisory registry, in the language of `i18n`. */
+function ruleName(code: string, i18n: I18n) {
   const name = Object.entries(advisoryText).find(([id]) => id === code)?.[1].name
-  return name && translateMessage(name, t)
+  return name && translateMessage(name, i18n)
 }
 
 /** A limit as shown with `d` decimals: in bar the record's value while it needs no more. */
@@ -136,6 +142,7 @@ function limitExceededText(
   pressure: number,
   system: UnitSystem,
   t: Translator['t'],
+  i18n: I18n,
 ): { text: string; name: string } {
   const u = system.pressure
   const range = body.pressureRange
@@ -146,7 +153,7 @@ function limitExceededText(
     unit: u.symbol,
     limit: limitNumber(pressure, system, d),
     revised: l.revised ?? '',
-    method: translateMessage(l.method ?? 'measuring method not stated', t),
+    method: translateMessage(l.method ?? 'measuring method not stated', i18n),
     nominal: formatNumber(u.fromSi(range.nominalPressure), d),
     low: formatNumber(u.fromSi(range.lowPressure), u.decimals),
     high: formatNumber(u.fromSi(range.highPressure), d),
@@ -208,15 +215,16 @@ export function shownWarnings(
   body: InteriorResponse,
   system: UnitSystem,
   t: Translator['t'],
+  i18n: I18n,
 ): { text: string; name?: string | undefined }[] {
   return body.warnings.map((w) => {
     const l = w.code === 'limitExceeded' ? body.limits?.find((x) => warnedLimit(x, w)) : undefined
     if (l?.pressure === undefined || !l.exceeded)
       return {
-        text: translateMessage(convertBarMessage(w.message, system), t),
-        name: ruleName(w.code, t),
+        text: translateMessage(convertBarMessage(w.message, system), i18n),
+        name: ruleName(w.code, i18n),
       }
-    return limitExceededText(body, l, l.pressure, system, t)
+    return limitExceededText(body, l, l.pressure, system, t, i18n)
   })
 }
 

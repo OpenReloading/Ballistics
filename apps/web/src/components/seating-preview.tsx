@@ -1,4 +1,5 @@
 'use client'
+import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 
 import { Anchor, NativeSelect } from '@mantine/core'
@@ -1070,6 +1071,7 @@ function fillOf(powder: PreviewProps['powder'], seating: Seating | undefined) {
 /** The seating's state and values: every hook of the preview, so its parts only draw. */
 function useSeatingModel(p: PreviewProps) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { cartridge, draft, system, initial, onSeatLadder, slots, view = 'combined' } = p
   const { measuredWaterCapacity = emptyValue(), ladderStep } = p
   const id = useId().replace(/:/g, '')
@@ -1246,7 +1248,7 @@ function useSeatingModel(p: PreviewProps) {
   /** The workbench's cards: the fields there show what the rows below leave out. */
   const card = inCard
   const warnings = warningsOf(seating, chamber, designed, contact, fmt.mm, t)
-  const live = useLive(announceOf(seating, fmt.mm, t))
+  const live = useLive(announceOf(seating, fmt.mm, t, i18n))
 
   function changeMode(next: Mode) {
     if (next === mode || !shape) return
@@ -1355,17 +1357,17 @@ function warningsOf(
   return [above, contact].filter((w): w is string => !!w)
 }
 
-const jumpText = (s: Seating, mm: (x: number) => string, t: T) =>
+const jumpText = (s: Seating, mm: (x: number) => string, t: T, i18n: I18n) =>
   s.jump.value === undefined
-    ? translateMessage(jumpNote(s.jump), t)
+    ? translateMessage(jumpNote(s.jump), i18n)
     : `${mm(s.jump.value)}, ${t(tagText[s.jump.tag])}`
 
-function announceOf(seating: Seating | undefined, mm: (x: number) => string, t: T) {
+function announceOf(seating: Seating | undefined, mm: (x: number) => string, t: T, i18n: I18n) {
   if (!seating) return ''
   const values = {
     coal: mm(seating.coal.value),
     depth: mm(seating.depth.value),
-    jump: jumpText(seating, mm, t),
+    jump: jumpText(seating, mm, t, i18n),
   }
   if (!seating.contact) return t('COAL {coal}, seating depth {depth}, jump {jump}.', values)
   return seating.jump.source === 'lands'
@@ -1839,13 +1841,13 @@ function SeatingControls({ m }: { m: Model }) {
 }
 
 /** The figure's description: the half section and the bullet seated in it, if any. */
-function figureDesc(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T) {
+function figureDesc(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T, i18n: I18n) {
   const { view, designed, name, mm } = m
   if (!drawnSeating) return undrawnDesc(view, designed ? undefined : spec.name, t)
   const values = {
     coal: mm(drawnSeating.coal.value),
     depth: mm(drawnSeating.depth.value),
-    jump: jumpText(drawnSeating, mm, t),
+    jump: jumpText(drawnSeating, mm, t, i18n),
   }
   return designed
     ? t(
@@ -1875,13 +1877,13 @@ function undrawnDesc(view: Model['view'], record: string | undefined, t: T) {
 }
 
 /** The figure's title and description for the view and the seating drawn. */
-function figureText(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T) {
+function figureText(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T, i18n: I18n) {
   const { view, designed, name, design } = m
   const where = designed ? name : `${spec.standard} ${spec.name}`
   const fill = drawnSeating && m.fill ? ` ${fillText(m.fill, m.system, t)}` : ''
   return {
     caption: captionOf(view, design?.name, where, t),
-    desc: figureDesc(m, spec, drawnSeating, t) + fill,
+    desc: figureDesc(m, spec, drawnSeating, t, i18n) + fill,
   }
 }
 
@@ -1961,7 +1963,7 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
   const fullView = p.fullView
   // a chamber without a cartridge holds no bullet: the Chamber view draws the chamber alone
   const drawnSeating = view === 'chamber' ? undefined : m.figureSeating
-  const text = figureText(m, spec, drawnSeating, t)
+  const text = figureText(m, spec, drawnSeating, t, i18n)
   const draw = (name: string, shown: FigureModel) => (
     <DrawnFigure
       m={m}

@@ -103,7 +103,7 @@ function CoversCell({ fields, kind }: { fields: string[] | undefined; kind: stri
         { count: fields.length },
         { message: fieldCount.message, formats: ungrouped },
       )}
-      notes={[fields.map((f) => fieldLabel(f, kind, t)).join(', ')]}
+      notes={[fields.map((f) => fieldLabel(f, kind, t, i18n)).join(', ')]}
     />
   )
 }

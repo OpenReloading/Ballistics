@@ -1,11 +1,12 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { Bullet } from '@rangefoundry/schema'
 import { Fragment, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import type { Say } from '../i18n/translate.ts'
+import type { LinguiSay } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import {
@@ -26,7 +27,7 @@ import { RangeCard } from './range-card.tsx'
 /** One saved load of the firearm: its card with the velocity it used, or why it has none. */
 export type LoadRangeCard = { id: string; name: string } & (
   | { result: LoadCard; velocity: MeasuredVelocity }
-  | { reason: Say }
+  | { reason: LinguiSay }
 )
 
 /** The cards of the saved loads of the firearm `firearmId`, read from the store and computed. */
@@ -50,7 +51,7 @@ export async function firearmCards(
         if ('reason' in card) return { ...base, reason: (t) => t(card.reason) }
         return { ...base, result: card, velocity: plan.velocity }
       } catch (e) {
-        return { ...base, reason: (t) => translateMessage(refusalText(e), t) }
+        return { ...base, reason: (_, i18n) => translateMessage(refusalText(e), i18n) }
       }
     }),
   )
@@ -67,6 +68,7 @@ export function FirearmRangeCards({
   onDone: () => void
 }) {
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const body = usePortalBody()
   const printed = cards.flatMap((c) => ('result' in c ? [c] : []))
   const skipped = cards.flatMap((c) => ('reason' in c ? [c] : []))
@@ -117,7 +119,9 @@ export function FirearmRangeCards({
             </p>
             <ul>
               {skipped.map((c) => (
-                <li key={c.id}>{t('{name}: {reason}', { name: c.name, reason: c.reason(t) })}</li>
+                <li key={c.id}>
+                  {t('{name}: {reason}', { name: c.name, reason: c.reason(t, i18n) })}
+                </li>
               ))}
             </ul>
           </div>,

@@ -161,7 +161,7 @@ export function HitProbability({
         range: d.parts.range,
       }
     } catch (e) {
-      failure = hitFailureText(e, t)
+      failure = hitFailureText(e, t, i18n)
     }
   const length = (m: number) => `${formatQuantity('length', system, m)} ${system.length.symbol}`
   const percent = (p: number) => `${formatNumber(100 * p, p < 0.1 ? 2 : 1)} %`

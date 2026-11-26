@@ -2,7 +2,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import type { Outcome } from '../src/components/workbench-outcome.ts'
 import { peakFacts } from '../src/components/workbench-readouts.tsx'
 import de from '../src/i18n/de.json'
-import { loadLingui } from '../src/i18n/lingui.ts'
+import { linguiOf, loadLingui } from '../src/i18n/lingui.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { type Catalogue, english, type Translator, translator } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
@@ -23,6 +23,8 @@ import {
   stepLabel,
 } from '../src/lib/workbench.ts'
 import { defined, missing } from './defined.ts'
+
+const en = linguiOf('en')
 
 type Limit = NonNullable<InteriorResponse['limits']>[number]
 const limit = (l: Partial<Limit>): Limit => ({
@@ -127,6 +129,7 @@ describe('shownWarnings', () => {
       body(4766e5, 4174e5, 5460e5),
       presetUnits('us'),
       english.t,
+      en,
     )
     expect(line).toEqual({
       text: 'Simulated peak pressure 69125 psi (range 60539 to 79191 psi) is above CIP Pmax 60191 psi, source CIP (2008-09-23, transducer).',
@@ -150,12 +153,14 @@ describe('shownWarnings', () => {
       warned('1.5 bar and 25 bar, 3 barrel'),
       presetUnits('us'),
       english.t,
+      en,
     )
     expect(us.text).toBe('22 psi and 363 psi, 3 barrel')
     const [metric = missing()] = shownWarnings(
       warned('1.5 bar and 25 bar'),
       presetUnits('metric-grains'),
       english.t,
+      en,
     )
     expect(metric.text).toBe('1.5 bar and 25 bar')
   })
@@ -165,6 +170,7 @@ describe('shownWarnings', () => {
       body(4000e5, 3600e5, 4400e5),
       presetUnits('metric-grains'),
       english.t,
+      en,
     )
     expect(line).toEqual({
       text: 'The upper end of the simulated peak pressure range, 4400 bar, is above CIP Pmax 4150 bar, source CIP (2008-09-23, transducer); the nominal value is 4000 bar.',
@@ -189,7 +195,7 @@ describe('shownWarnings', () => {
       ],
       warnings: [{ code: 'limitExceeded', symbol: 'Pmax', method: 'typed', message: 'in bar' }],
     } as unknown as InteriorResponse
-    const [line = missing()] = shownWarnings(typed, presetUnits('metric-grains'), english.t)
+    const [line = missing()] = shownWarnings(typed, presetUnits('metric-grains'), english.t, en)
     expect(line).toEqual({
       text: 'Simulated peak pressure 4766 bar (range 4174 to 5460 bar) is above your Pmax 4150 bar.',
       name: 'above your Pmax',
@@ -217,6 +223,7 @@ describe('shownWarnings', () => {
       } as unknown as InteriorResponse,
       presetUnits('metric-grains'),
       english.t,
+      en,
     )
     expect(lines.map((l) => l.name)).toEqual(['above CIP Pmax (A)', 'above CIP Pmax (B)'])
     expect(defined(lines[0]).text).toContain('above CIP Pmax (A) 4150 bar')
@@ -229,6 +236,7 @@ describe('shownWarnings', () => {
       body(60190.8 * psi, 4000e5, 4400e5),
       presetUnits('us'),
       english.t,
+      en,
     )
     expect(line.text).toMatch(
       /^Simulated peak pressure 60190\.8 psi \(range \d+ to 63816\.6 psi\) is above CIP Pmax 60190\.7 psi,/,
@@ -319,8 +327,8 @@ describe('rangeCardNote', () => {
 
 describe('statusText', () => {
   it('writes a result status from the line of the units shown now, with its prefix', () => {
-    expect(statusText({ prefix: '' }, 'Peak 4 bar.', english.t)).toBe('Peak 4 bar.')
-    expect(statusText({ prefix: 'Simulation done. ' }, 'Peak 58 psi.', english.t)).toBe(
+    expect(statusText({ prefix: '' }, 'Peak 4 bar.', english.t, en)).toBe('Peak 4 bar.')
+    expect(statusText({ prefix: 'Simulation done. ' }, 'Peak 58 psi.', english.t, en)).toBe(
       'Simulation done. Peak 58 psi.',
     )
   })
@@ -328,17 +336,17 @@ describe('statusText', () => {
   it('writes a stored text and prefix in the language shown now', () => {
     const own = translator({ 'Simulation done. ': 'Fertig. ', Simulating: 'Läuft' }, 'de')
     const done = { prefix: (t: Translator['t']) => t('Simulation done. ') }
-    expect(statusText(done, 'Peak 4 bar.', english.t)).toBe('Simulation done. Peak 4 bar.')
-    expect(statusText(done, 'Peak 4 bar.', own.t)).toBe('Fertig. Peak 4 bar.')
+    expect(statusText(done, 'Peak 4 bar.', english.t, en)).toBe('Simulation done. Peak 4 bar.')
+    expect(statusText(done, 'Peak 4 bar.', own.t, en)).toBe('Fertig. Peak 4 bar.')
     const running = { say: (t: Translator['t']) => t('Simulating') }
-    expect(statusText(running, undefined, english.t)).toBe('Simulating')
-    expect(statusText(running, undefined, own.t)).toBe('Läuft')
+    expect(statusText(running, undefined, english.t, en)).toBe('Simulating')
+    expect(statusText(running, undefined, own.t, en)).toBe('Läuft')
   })
 
   it('shows another status as it is, and no result status without a result', () => {
-    expect(statusText('Simulating', 'Peak 4 bar.', english.t)).toBe('Simulating')
-    expect(statusText('Error 502.', undefined, english.t)).toBe('Error 502.')
-    expect(statusText({ prefix: '' }, undefined, english.t)).toBe('')
+    expect(statusText('Simulating', 'Peak 4 bar.', english.t, en)).toBe('Simulating')
+    expect(statusText('Error 502.', undefined, english.t, en)).toBe('Error 502.')
+    expect(statusText({ prefix: '' }, undefined, english.t, en)).toBe('')
   })
 })
 
@@ -456,8 +464,10 @@ describe('sampled band', () => {
 
 describe('in German', () => {
   let german = english
+  let germanLingui = en
   beforeAll(async () => {
-    german = installCoreMessages(await loadLingui('de'), de as Catalogue, 'de')
+    germanLingui = await loadLingui('de')
+    german = installCoreMessages(germanLingui, de as Catalogue, 'de')
   })
   beforeEach(() => setShownLanguage('de'))
   afterEach(() => setShownLanguage('en'))
@@ -482,7 +492,7 @@ describe('in German', () => {
     'Charge too small for the model: the simulated peak mean pressure, 250 bar, is below 2.2 times the start pressure (200 bar); results are outside the range the model was built for.'
 
   it('converts the pressures of a message before it is translated', () => {
-    const [, charge] = shownWarnings(sheet(small), presetUnits('us'), german.t)
+    const [, charge] = shownWarnings(sheet(small), presetUnits('us'), german.t, germanLingui)
     expect(charge?.text).toContain('3626 psi')
     expect(charge?.text).toContain('(2901 psi)')
   })

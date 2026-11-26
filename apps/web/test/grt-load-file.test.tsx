@@ -1,8 +1,10 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { UserRecord } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { type CardActions, FileCard } from '../src/components/import-entry.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 import { type ImportReply, type ImportRequest, importWorker } from '../src/lib/import-entry.ts'
 import {
@@ -33,7 +35,11 @@ const grtText = (title = 'Testcal%20load', charge = '0.45') =>
 const bytes = (text: string) => new TextEncoder().encode(text)
 const encoded = (text: string) => bytes(text).buffer as ArrayBuffer
 const html = (node: React.ReactNode) =>
-  renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+  renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>{node}</MantineProvider>
+    </I18nProvider>,
+  )
 const noActions: CardActions = {
   remove: () => {},
   setKind: () => {},

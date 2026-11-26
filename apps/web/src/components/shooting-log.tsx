@@ -1,6 +1,6 @@
 'use client'
 
-import type { MessageDescriptor } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
@@ -479,9 +479,9 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
 }
 
 /** The new entries, and after one question those that differ from the browser's; the report line, a throw with the reason when the file is refused. */
-async function importEntries(f: File, { t, tn }: Translator) {
+async function importEntries(f: File, { t, tn }: Translator, i18n: I18n) {
   const parsed = parseUserDataFile(await f.text())
-  if (!parsed.ok) throw new Error(reasonText(parsed.reason, { t, tn }))
+  if (!parsed.ok) throw new Error(reasonText(parsed.reason, { t, tn, i18n }))
   const incoming = logEntries(parsed.records)
   const stored = await storedRecords()
   const plan = planImport(incoming, stored.records, stored.invalid)
@@ -902,7 +902,7 @@ export function ShootingLog() {
   function importFile(f: File) {
     setFailure('')
     setNote('')
-    importEntries(f, tr).then(
+    importEntries(f, tr, i18n).then(
       (line) => {
         setNote(line)
         refresh()

@@ -180,7 +180,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       <div aria-live="polite" role="status">
         {answer && answer.kind !== 'found' && (
           <Text mt="sm" size="sm" role={answer.kind === 'failed' ? 'alert' : undefined}>
-            {answer.text(t)}
+            {answer.text(t, i18n)}
           </Text>
         )}
         {found && (

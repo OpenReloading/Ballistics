@@ -901,9 +901,10 @@ function PrintViews({
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const sections = usePrintChoice()
   const steps = useMemo(() => shownSteps(ok, t), [ok, t])
-  const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
+  const warnings = useMemo(() => ok && warningLines(ok, system, t, i18n), [ok, system, t, i18n])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
   /** The report's and the load sheets' title: cartridge, bullet and powder of the run. */
   const loadTitle = ok
@@ -1167,7 +1168,7 @@ export function Workbench() {
 
   const ok = outcome?.kind === 'ok' ? outcome : undefined
   const stale = Boolean(ok && changed)
-  const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
+  const warnings = useMemo(() => ok && warningLines(ok, system, t, i18n), [ok, system, t, i18n])
 
   const chargeText = chargeTextOf(ok, shown, system, t)
   const charge = useCallback((kg: number) => withUnit('charge', system, kg), [system])

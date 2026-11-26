@@ -1,3 +1,5 @@
+import type { I18n } from '@lingui/core'
+
 /** A catalogue entry: the text, or the texts of a plural by CLDR plural category (`one`, `other`, ...). */
 type Entry = string | Readonly<Record<string, string>>
 
@@ -77,6 +79,9 @@ export function translator(catalogue?: Catalogue, language = 'en'): Translator {
 
 /** A text written with the translator where it is shown, so a stored one follows a language change. */
 export type Say = (t: Translator['t']) => string
+
+/** A `Say` that may hold a message of the packages, which `translateMessage` words with `i18n`. */
+export type LinguiSay = (t: Translator['t'], i18n: I18n) => string
 
 /** What a file, the clipboard or a link carries whatever language is shown, and the text of a test. */
 export const english: Translator = translator()

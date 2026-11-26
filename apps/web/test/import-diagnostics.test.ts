@@ -1,13 +1,15 @@
 import type { TableKind, TableReadDiagnostic } from '@rangefoundry/importers'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
-import { loadLingui } from '../src/i18n/lingui.ts'
+import { linguiOf, loadLingui } from '../src/i18n/lingui.ts'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import { recordOf } from '../src/lib/candidates.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { parseCsrLoad } from '../src/lib/grt-load-file.ts'
 import { kindRefusalText, tableReadText, tableReasonText } from '../src/lib/import-diagnostics.ts'
 import { type BuildView, type ImportReply, importWorker } from '../src/lib/import-entry.ts'
+
+const en = linguiOf('en')
 
 const { t } = english
 
@@ -40,12 +42,12 @@ describe('the reasons of a table import in words', () => {
       ],
       'bullet',
     )
-    expect(b.rejected.map((r) => tableReasonText(r.reason, t))).toEqual([
+    expect(b.rejected.map((r) => tableReasonText(r.reason, t, en))).toEqual([
       'Name is empty. Fill the cell or delete the row.',
       'Diameter "x7" is not a number with "." as decimal mark. Fix the cell or change the decimal mark of the column.',
       'Diameter 0 is not above 0. Fix the cell or leave it empty.',
     ])
-    expect(tableReasonText(b.firstWarning?.reason ?? fail(), t)).toBe(
+    expect(tableReasonText(b.firstWarning?.reason ?? fail(), t, en)).toBe(
       'Diameter 30 mm is outside the usual 3 to 25 mm. Check the unit of the column.',
     )
   })
@@ -54,7 +56,7 @@ describe('the reasons of a table import in words', () => {
     const first = async (lines: string[], kind: TableKind, which: 'rejected' | 'warning') => {
       const b = await built(lines, kind)
       const reason = which === 'rejected' ? b.rejected[0]?.reason : b.firstWarning?.reason
-      return tableReasonText(reason ?? fail(), t)
+      return tableReasonText(reason ?? fail(), t, en)
     }
     expect(await first(['Name,Weight (g)', 'A,10'], 'bullet', 'rejected')).toBe(
       'No column is mapped to Diameter. Map a column to it or read the file as another kind.',
@@ -81,9 +83,10 @@ describe('the reasons of a table import in words', () => {
 const german = translator(de as Catalogue, 'de')
 
 it('words a field label the importers give in German', async () => {
-  const { t: shown } = installCoreMessages(await loadLingui('de'), de as Catalogue, 'de')
+  const lingui = await loadLingui('de')
+  const { t: shown } = installCoreMessages(lingui, de as Catalogue, 'de')
   const b = await built(['Name,Max pressure (bar)', 'C0,0'], 'cartridge')
-  expect(tableReasonText(b.rejected[0]?.reason ?? fail(), shown)).toMatch(/^Höchstdruck 0 /)
+  expect(tableReasonText(b.rejected[0]?.reason ?? fail(), shown, lingui)).toMatch(/^Höchstdruck 0 /)
 })
 
 const tableReads: TableReadDiagnostic[] = [
@@ -98,10 +101,10 @@ const tableReads: TableReadDiagnostic[] = [
 
 describe('a file without a table and a table without a kind in English and German', () => {
   it.each(tableReads.map((d) => [d.code, d] as const))('words %s in both', (_, d) => {
-    const en = tableReadText(d, t)
-    const shown = tableReadText(d, german.t)
-    expect(en).not.toBe(shown)
-    for (const text of [en, shown]) expect(text).not.toMatch(/[{}]/)
+    const inEnglish = tableReadText(d, t, en)
+    const shown = tableReadText(d, german.t, en)
+    expect(inEnglish).not.toBe(shown)
+    for (const text of [inEnglish, shown]) expect(text).not.toMatch(/[{}]/)
   })
 
   it('words noKind in both, with each kind and the floor', () => {

@@ -1,5 +1,6 @@
 /** The user data file: its text, parsing and validation, and import planning against the browser store. */
 
+import type { I18n } from '@lingui/core'
 import {
   checkedUserDataFileText,
   checkUserRefs,
@@ -24,16 +25,19 @@ export const tooLargeMessage = `The file is larger than ${maxFileBytes / 1e6} MB
 const notJsonMessage = 'The file is not JSON.'
 const notDataFileMessage = 'The file is not a RangeFoundry data file.'
 
+/** A file's text in the language shown, with the Lingui messages that word a message of the packages. */
+export type Wording = Pick<Translator, 't' | 'tn'> & { i18n: I18n }
+
 /** A `reason` of a file that was not read, in the language of `t`: the app's own three, else a message of the packages. */
-export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn'>) {
+export function reasonText(reason: string, { t, tn, i18n }: Wording) {
   if (reason === tooLargeMessage)
     return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
   if (reason === notJsonMessage) return t('The file is not JSON.')
   if (reason === notDataFileMessage) return t('The file is not a RangeFoundry data file.')
   // zod's `✖` and `→ at` lines, then the problem count on the last line only: no `m` flag, since a key in the file may carry a line of its own into a message.
-  if (!reason.startsWith('✖ ')) return translateMessage(reason, t)
+  if (!reason.startsWith('✖ ')) return translateMessage(reason, i18n)
   return reason
-    .replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, t)}`)
+    .replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, i18n)}`)
     .replace(/^ {2}→ at (.+)$/gm, (_, path: string) => `  ${t('→ at {path}', { path })}`)
     .replace(
       /\nand (\d+) more problems?$/,

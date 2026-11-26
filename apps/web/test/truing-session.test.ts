@@ -5,7 +5,8 @@ import {
   trajectory,
 } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
-import { english, type Say } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
+import { english, type LinguiSay } from '../src/i18n/translate.ts'
 import { setRefusalWords } from '../src/lib/core-messages.ts'
 import { refusalSentence } from '../src/lib/refusal-words.ts'
 import {
@@ -25,6 +26,8 @@ import {
 } from '../src/lib/truing-session.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
+
+const en = linguiOf('en')
 
 const system = presetUnits('us')
 const click = 0.1e-3
@@ -114,7 +117,7 @@ describe('fit of the typed strings', () => {
   const fit = fitSession(nominal, input, english.t)
 
   it('gives a result within the stated intervals for strings made with the solver', () => {
-    if (!('answer' in fit)) throw new Error(fit.problem(english.t))
+    if (!('answer' in fit)) throw new Error(fit.problem(english.t, en))
     const wanted = { muzzleVelocity: truth.v, dragFactor: truth.k, clickValue: click * truth.c }
     for (const p of fit.answer.parameters) {
       expect(p.status).toBe('identified')
@@ -128,7 +131,7 @@ describe('fit of the typed strings', () => {
   })
 
   it('shows value, interval and level of an identified parameter in the shown units', () => {
-    if (!('answer' in fit)) throw new Error(fit.problem(english.t))
+    if (!('answer' in fit)) throw new Error(fit.problem(english.t, en))
     const v = at(parameterLines(fit.answer.parameters, system, english.t), 'muzzleVelocity')
     expect(v.statusText).toBe('Identified')
     expect(v.value).toMatch(/^26\d\d ft\/s$/)
@@ -141,7 +144,7 @@ describe('a parameter the data cannot separate', () => {
     // one impact distance: no clicks dialed, and speed and drag cannot be told apart
     const input = { ...measured([300], []), chrono: blankChrono }
     const fit = fitSession(nominal, input, english.t)
-    if (!('answer' in fit)) throw new Error(fit.problem(english.t))
+    if (!('answer' in fit)) throw new Error(fit.problem(english.t, en))
     const lines = parameterLines(fit.answer.parameters, system, english.t)
     expect(at(lines, 'clickValue').status).toBe('unresolved')
     for (const l of lines.filter((x) => x.status !== 'identified')) {
@@ -166,7 +169,7 @@ describe('a parameter the data cannot separate', () => {
       },
       english.t,
     )
-    if (!('answer' in plan)) throw new Error(plan.problem(english.t))
+    if (!('answer' in plan)) throw new Error(plan.problem(english.t, en))
     const lines = parameterLines(plan.answer.parameters, presetUnits('metric-grams'), english.t)
     expect(lines.filter((l) => l.status === 'identified')).toHaveLength(0)
     expect(lines.every((l) => l.value === undefined)).toBe(true)
@@ -177,7 +180,7 @@ describe('plan', () => {
   it('shows which parameters a string of distances identifies, with standard errors', () => {
     const input = measured([300, 600, 900], [400, 700, 1000])
     const plan = planSession(nominal, input, english.t)
-    if (!('answer' in plan)) throw new Error(plan.problem(english.t))
+    if (!('answer' in plan)) throw new Error(plan.problem(english.t, en))
     const lines = parameterLines(plan.answer.parameters, system, english.t)
     expect(lines.map((l) => l.status)).toEqual(['identified', 'identified', 'identified'])
     expect(at(lines, 'muzzleVelocity').error).toMatch(/^±[\d.]+ %$/)
@@ -186,14 +189,14 @@ describe('plan', () => {
   it('names the zero offset only when asked for', () => {
     const input = measured([300, 600, 900], [400, 700, 1000])
     const plan = planSession(nominal, { ...input, fitZeroOffset: true }, english.t)
-    if (!('answer' in plan)) throw new Error(plan.problem(english.t))
+    if (!('answer' in plan)) throw new Error(plan.problem(english.t, en))
     expect(plan.answer.parameters.map((p) => p.name)).toContain('zeroOffset')
   })
 })
 
 /** The English problem of an attempt; undefined for an answer. */
-const problem = (a: { answer: unknown } | { problem: Say }) =>
-  'problem' in a ? a.problem(english.t) : undefined
+const problem = (a: { answer: unknown } | { problem: LinguiSay }) =>
+  'problem' in a ? a.problem(english.t, en) : undefined
 
 describe('entry problems', () => {
   const input = measured([300, 600, 900], [400, 700, 1000])
@@ -267,7 +270,7 @@ describe('nominal line', () => {
 describe('a fit stored with a firearm configuration', () => {
   const input = measured([300, 600], [800])
   const fit = fitSession(nominal, input, english.t)
-  if (!('answer' in fit)) throw new Error(fit.problem(english.t))
+  if (!('answer' in fit)) throw new Error(fit.problem(english.t, en))
   const entryOf = (inputs: TruingInputs) =>
     truingEntry(
       { shot: nominal, bullet: 'Test bullet', zeroRange: 100 },

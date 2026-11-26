@@ -1,6 +1,7 @@
 /** What a source's field list (dot paths of schema keys) reads as in the Sources table. */
+import type { I18n } from '@lingui/core'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { labelText } from './label-text.ts'
+import { translateMessage } from './core-messages.ts'
 
 /** Every other key reads as its words (`waterCapacity`: "Water capacity"). */
 const labels: Record<string, Record<string, Message>> = {
@@ -28,10 +29,18 @@ const humanised = (key: string) => {
   return words.charAt(0).toUpperCase() + words.slice(1)
 }
 
-/** The label of the record field at the dot path `key` for a record of `kind`, in the language of `t`. */
-export function fieldLabel(key: string, kind: string | undefined, t: Translator['t']): string {
+/** The label of the record field at the dot path `key` for a record of `kind`, in the language of `t`: the table words the labels of the importers and the schema, the catalogue the others. */
+export function fieldLabel(
+  key: string,
+  kind: string | undefined,
+  t: Translator['t'],
+  i18n: I18n,
+): string {
   const map = kind && Object.hasOwn(labels, kind) ? labels[kind] : undefined
   // own keys only: a source's field `constructor` reads as its words, not as Object's
   const own = map && Object.hasOwn(map, key) ? map[key] : undefined
-  return own ? t(own) : labelText(humanised(key), t)
+  if (own) return t(own)
+  const words = humanised(key)
+  const tabled = translateMessage(words, i18n)
+  return tabled === words ? t(words as Message) : tabled
 }

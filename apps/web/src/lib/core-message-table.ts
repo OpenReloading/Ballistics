@@ -508,16 +508,14 @@ function value(text: string, language: Language): string {
 }
 
 const byLingui = new WeakMap<I18n, Language>()
-const byT = new WeakMap<Translator['t'], Language>()
 
-/** Makes `translateMessage` translate the messages of this table in the language of `i18n`; returns the translator of `catalogue`, which words the refusal words and labels and which the language module publishes, so a caller's `t` finds its language. */
+/** Makes `translateMessage` translate the messages of this table in the language of `i18n`; returns the translator of `catalogue`, which words the refusal words and labels and which the language module publishes. */
 export function installCoreMessages(i18n: I18n, catalogue: Catalogue, code: string): Translator {
   const shown = translator(catalogue, code)
   const language = { i18n, t: shown.t }
   byLingui.set(i18n, language)
-  byT.set(shown.t, language)
-  setCoreMessages((text, shown) => {
-    const language = typeof shown === 'function' ? byT.get(shown) : byLingui.get(shown)
+  setCoreMessages((text, i18n) => {
+    const language = byLingui.get(i18n)
     return language && translated(text, language)
   })
   return shown
