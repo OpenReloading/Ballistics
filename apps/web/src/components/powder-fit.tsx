@@ -3,9 +3,13 @@
 import { useLingui } from '@lingui/react'
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
 import type { Powder } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fitTables } from '../lib/powder-record.ts'
+import englishMessages from '../locales/en/components/powder-fit.json' with { type: 'json' }
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
+
+loadEnglish(englishMessages)
 
 /** The load tables a powder's model was fitted to, with their training rows; none without a row count. */
 export function PowderFit({ powder }: { powder: Powder }) {

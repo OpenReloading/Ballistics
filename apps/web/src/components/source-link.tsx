@@ -3,6 +3,10 @@
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import type { Source } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/source-link.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
 
 const entryTitles = {
   range: /*i18n*/ { id: 'sourceLink.entry.range', message: 'Entered at the range' },

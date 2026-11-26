@@ -5,9 +5,13 @@ import { TextInput } from '@mantine/core'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/bullet-cartridges.json' with { type: 'json' }
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
+
+loadEnglish(englishMessages)
 
 /** The cartridges the bullet fits by their CIP values (`fitsOf` in `bullet-fit.ts`); nothing when none. */
 export function BulletCartridges({ fits }: { fits: { id: string; name: string }[] }) {

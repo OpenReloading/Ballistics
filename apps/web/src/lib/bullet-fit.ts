@@ -1,5 +1,9 @@
 import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/bullet-fit.json' with { type: 'json' }
 import type { CartridgeSummary } from './api-types.ts'
+
+loadEnglish(englishMessages)
 
 /** The fit rule in words, the hover help of the cartridge lists of a bullet and the bullet lists of a cartridge. */
 export const fitRule = /*i18n*/ {

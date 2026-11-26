@@ -17,7 +17,7 @@ import {
 import { Search as SearchIcon } from 'lucide-react'
 import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
 import Link from '@/platform/link.tsx'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import {
   type FieldGroup,
   type FieldRow,
@@ -29,11 +29,14 @@ import {
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { type LinguiWording, sayLingui } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/field-table.json' with { type: 'json' }
 // oxlint-disable-next-line import/no-cycle -- fact-cards imports Noted back; moving one of them breaks the cycle
 import { Sized, slotUnits } from './fact-cards.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** The name of a table's scroll region. */
 const tableLabel = (i18n: I18n, label: string) =>

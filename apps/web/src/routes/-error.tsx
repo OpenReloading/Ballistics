@@ -3,7 +3,11 @@ import { type ErrorComponentProps, useRouter } from '@tanstack/react-router'
 import { PageBar } from '../components/page-bar.tsx'
 import { ErrorNote } from '../components/states.tsx'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { msg } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/routes/-error.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
 
 // anything may be thrown
 const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error))

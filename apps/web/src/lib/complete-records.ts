@@ -1,4 +1,10 @@
 /** A name-only bullet or a powder without burn values cannot run. */
+
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/complete-records.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
+
 /** A bullet record or list item that only names the bullet. */
 export const bulletIncomplete = (b: { nameOnly?: true | undefined }) => b.nameOnly === true
 

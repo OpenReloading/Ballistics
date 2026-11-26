@@ -19,6 +19,10 @@ msgstr "(weicht ab)"
 msgid "chargeTarget.notLoadData"
 msgstr "(Simulation, keine Ladedaten)."
 
+# en: "{added, decimal} entries added, {equal, decimal} already in this browser, {replaced, decimal} replaced."
+msgid "log.imported"
+msgstr "{added, decimal} Einträge hinzugefügt, {equal, decimal} schon in diesem Browser, {replaced, decimal} ersetzt."
+
 # en: "{added} events added, {equal} already in this browser, {replaced} replaced."
 msgid "events.imported"
 msgstr "{added} Wettkämpfe hinzugefügt, {equal} schon in diesem Browser, {replaced} ersetzt."
@@ -91,12 +95,24 @@ msgstr "{count, plural, one {# Wettkampf in diesem Browser} other {# Wettkämpfe
 msgid "lists.count.disciplines"
 msgstr "{count, plural, one {# Disziplin} other {# Disziplinen}}"
 
+# en: "{count, plural, one {# entry not imported: a record of this browser has its id.} other {# entries not imported: records of this browser have their ids.}}"
+msgid "log.idTaken"
+msgstr "{count, plural, one {# Eintrag nicht importiert: Ein Datensatz dieses Browsers hat seine ID.} other {# Einträge nicht importiert: Datensätze dieses Browsers haben ihre IDs.}}"
+
+# en: "{count, plural, one {# entry of the file differs from the one in this browser. Replace it?} other {# entries of the file differ from the ones in this browser. Replace them?}}"
+msgid "log.replaceCount"
+msgstr "{count, plural, one {# Eintrag der Datei weicht von dem in diesem Browser ab. Ersetzen?} other {# Einträge der Datei weichen von denen in diesem Browser ab. Ersetzen?}}"
+
 # en: "{count, plural, one {# entry} other {# entries}}"
 msgid "lists.count.logEntries"
 msgstr "{count, plural, one {# Eintrag} other {# Einträge}}"
 
 # en: "{count, plural, one {# entry} other {# entries}}"
 msgid "logSummary.entryCount"
+msgstr "{count, plural, one {# Eintrag} other {# Einträge}}"
+
+# en: "{count, plural, one {# entry} other {# entries}}"
+msgid "log.entryCount"
 msgstr "{count, plural, one {# Eintrag} other {# Einträge}}"
 
 # en: "{count, plural, one {# event not imported: a record of this browser has its id.} other {# events not imported: records of this browser have their ids.}}"
@@ -139,6 +155,10 @@ msgstr "{count, plural, one {# Zündhütchen} other {# Zündhütchen}}"
 msgid "events.otherKinds"
 msgstr "{count, plural, one {# Datensatz einer anderen Art ausgelassen; der Import eines Datei-Menüs liest ihn.} other {# Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie.}}"
 
+# en: "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
+msgid "log.otherKinds"
+msgstr "{count, plural, one {# Datensatz einer anderen Art ausgelassen; der Import eines Datei-Menüs liest ihn.} other {# Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie.}}"
+
 # en: "{count, plural, one {# ring} other {# rings}}"
 msgid "targets.rings"
 msgstr "{count, plural, one {# Ring} other {# Ringe}}"
@@ -149,6 +169,10 @@ msgstr "{count, plural, one {# Schuss von Einträgen ohne gespeicherte Laborieru
 
 # en: "{count, plural, one {# round} other {# rounds}}"
 msgid "logSummary.roundCount"
+msgstr "{count, plural, one {# Schuss abgegeben} other {# Schuss abgegeben}}"
+
+# en: "{count, plural, one {# round} other {# rounds}}"
+msgid "log.roundTotal"
 msgstr "{count, plural, one {# Schuss abgegeben} other {# Schuss abgegeben}}"
 
 # en: "{count, plural, one {# shot} other {# shots}}"
@@ -170,6 +194,10 @@ msgstr "{count, plural, one {# Trainingszeile} other {# Trainingszeilen}}"
 # en: "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
 msgid "events.addRounds"
 msgstr "{count, plural, one {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?} other {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?}}"
+
+# en: "{count, plural, one {Add # round to the round count of {name}?} other {Add # rounds to the round count of {name}?}}"
+msgid "log.addRounds"
+msgstr "{count, plural, one {# Schuss zur Schusszahl von {name} hinzufügen?} other {# Schuss zur Schusszahl von {name} hinzufügen?}}"
 
 # en: "{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}"
 msgid "bulletCompare.notFoundIds"
@@ -194,6 +222,10 @@ msgstr "{count} ausgewählt"
 # en: "{count} selected (max {max})"
 msgid "comparePicks.selectedMax"
 msgstr "{count} ausgewählt (höchstens {max})"
+
+# en: "{from} to {to}"
+msgid "log.fromTo"
+msgstr "{from} bis {to}"
 
 # en: "{label} from {velocity}"
 msgid "fieldStrip.bandFrom"
@@ -282,6 +314,10 @@ msgstr "{name} (eigener Entwurf)"
 # en: "{name} has no round count; set one on the Firearms page to add the event to it."
 msgid "events.noRoundCount"
 msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um den Wettkampf hinzuzurechnen."
+
+# en: "{name} has no round count; set one on the Firearms page to add the log to it."
+msgid "log.noRoundCount"
+msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um das Schießbuch hinzuzurechnen."
 
 # en: "{name} was not deleted: the browser refused."
 msgid "listSources.notDeleted"
@@ -427,8 +463,16 @@ msgstr "Aktionen"
 msgid "firearms.actions"
 msgstr "Aktionen für {name}"
 
+# en: "Actions for {name}"
+msgid "log.actionsFor"
+msgstr "Aktionen für {name}"
+
 # en: "Add"
 msgid "events.add"
+msgstr "Hinzufügen"
+
+# en: "Add"
+msgid "log.add"
 msgstr "Hinzufügen"
 
 # en: "Add bullet"
@@ -449,6 +493,10 @@ msgstr "Stage hinzufügen"
 
 # en: "Add to the round count?"
 msgid "events.addRoundsTitle"
+msgstr "Zur Schusszahl hinzufügen?"
+
+# en: "Add to the round count?"
+msgid "log.addRoundCount"
 msgstr "Zur Schusszahl hinzufügen?"
 
 # en: "Air pistol"
@@ -487,9 +535,17 @@ msgstr "Alle Patronen"
 msgid "disciplines.all"
 msgstr "Alle Disziplinen"
 
+# en: "All entries"
+msgid "log.allEntries"
+msgstr "Alle Einträge"
+
 # en: "All federations"
 msgid "disciplines.federationsAll"
 msgstr "Alle Verbände"
+
+# en: "All firearms"
+msgid "log.allFirearms"
+msgstr "Alle Schusswaffen"
 
 # en: "All powders"
 msgid "powders.all"
@@ -506,6 +562,10 @@ msgstr "Alle Quellen"
 # en: "All targets"
 msgid "targets.all"
 msgstr "Alle Scheiben"
+
+# en: "All years"
+msgid "log.allYears"
+msgstr "Alle Jahre"
 
 # en: "Allowed"
 msgid "disciplines.allowed"
@@ -939,6 +999,10 @@ msgstr "Maße vom Messschieber ergeben den Maßstab ohne Lineal und prüfen ihn 
 msgid "events.cancel"
 msgstr "Abbrechen"
 
+# en: "Cancel"
+msgid "log.cancel"
+msgstr "Abbrechen"
+
 # en: "Carbine"
 msgid "values.carbine"
 msgstr "Karabiner"
@@ -1123,6 +1187,10 @@ msgstr "Patronenlager: {notes}"
 msgid "chargeTarget.title"
 msgstr "Treibladung für eine Zielgröße"
 
+# en: "Check the entry: a value is out of its range."
+msgid "log.outOfRange"
+msgstr "Prüfen Sie den Eintrag: Ein Wert liegt außerhalb seines Bereichs."
+
 # en: "Check the event: a value is out of its range."
 msgid "events.outOfRange"
 msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
@@ -1224,6 +1292,10 @@ msgid "bulletCompare.compareOthers"
 msgstr "Die übrigen vergleichen"
 
 # en: "Competition event"
+msgid "log.competitionEvent"
+msgstr "Wettkampf"
+
+# en: "Competition event"
 msgid "log.column.event"
 msgstr "Wettkampf"
 
@@ -1272,8 +1344,16 @@ msgid "firearms.column.configuration"
 msgstr "Konfiguration"
 
 # en: "Confirmed by"
+msgid "log.confirmedBy"
+msgstr "Bestätigt von"
+
+# en: "Confirmed by"
 msgid "log.column.confirmed"
 msgstr "Bestätigt von"
+
+# en: "Confirmed on"
+msgid "log.confirmedOn"
+msgstr "Bestätigt am"
 
 # en: "conical-hollow-base"
 msgid "values.conicalHollowBase"
@@ -1436,6 +1516,10 @@ msgid "events.column.date"
 msgstr "Datum"
 
 # en: "Date"
+msgid "log.date"
+msgstr "Datum"
+
+# en: "Date"
 msgid "log.column.date"
 msgstr "Datum"
 
@@ -1449,6 +1533,10 @@ msgstr "Löschen"
 
 # en: "Delete"
 msgid "listSources.delete"
+msgstr "Löschen"
+
+# en: "Delete"
+msgid "log.delete"
 msgstr "Löschen"
 
 # en: "Delete {name}"
@@ -1475,12 +1563,20 @@ msgstr "Löschen von {name} fehlgeschlagen: {reason}"
 msgid "firearms.deleteFailed"
 msgstr "Löschen von {name} fehlgeschlagen: {reason}"
 
+# en: "Delete of {name} failed: {reason}"
+msgid "log.deleteFailed"
+msgstr "Löschen von {name} fehlgeschlagen: {reason}"
+
 # en: "Deleted {name} from this browser."
 msgid "events.deletedFromThisBrowser"
 msgstr "{name} wurde aus diesem Browser gelöscht."
 
 # en: "Deleted {name} from this browser."
 msgid "firearms.deleted"
+msgstr "{name} wurde aus diesem Browser gelöscht."
+
+# en: "Deleted {name} from this browser."
+msgid "log.deleted"
 msgstr "{name} wurde aus diesem Browser gelöscht."
 
 # en: "derived"
@@ -1545,6 +1641,10 @@ msgstr "Disziplin"
 
 # en: "Discipline"
 msgid "federationRecord.column.discipline"
+msgstr "Disziplin"
+
+# en: "Discipline"
+msgid "log.discipline"
 msgstr "Disziplin"
 
 # en: "Discipline"
@@ -1711,6 +1811,14 @@ msgstr "Dynamische Vivacity der gewählten Treibladungspulver, Modellergebnis"
 msgid "burnRateCompare.lead"
 msgstr "Dynamische Vivacity, die Abbrandgeschwindigkeit je Druck, über dem abgebrannten Anteil."
 
+# en: "Edit"
+msgid "log.edit"
+msgstr "Bearbeiten"
+
+# en: "Edit entry"
+msgid "log.editEntry"
+msgstr "Eintrag bearbeiten"
+
 # en: "Edit event"
 msgid "events.edit"
 msgstr "Wettkampf bearbeiten"
@@ -1747,6 +1855,14 @@ msgstr "Energieverhältnis"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "Energie, wie unter Pressures (Energies) gedruckt"
 
+# en: "Enter the date."
+msgid "log.enterDate"
+msgstr "Geben Sie das Datum ein."
+
+# en: "Enter who confirmed the entry, or clear the day of the confirmation."
+msgid "log.enterConfirmedBy"
+msgstr "Geben Sie ein, wer den Eintrag bestätigt hat, oder leeren Sie den Tag der Bestätigung."
+
 # en: "Entered at the range"
 msgid "sourceLink.entry.range"
 msgstr "Auf dem Schießstand erfasst"
@@ -1757,6 +1873,10 @@ msgstr "Im Scheiben-Editor erfasst"
 
 # en: "Entries"
 msgid "logSummary.entries"
+msgstr "Einträge"
+
+# en: "Entries"
+msgid "log.entries"
 msgstr "Einträge"
 
 # en: "Error"
@@ -1840,12 +1960,20 @@ msgstr "CSV exportieren"
 msgid "sessionSummary.exportCsv"
 msgstr "CSV exportieren"
 
+# en: "Export CSV"
+msgid "log.exportCsv"
+msgstr "CSV exportieren"
+
 # en: "Export JSON"
 msgid "events.exportJson"
 msgstr "JSON exportieren"
 
 # en: "Export JSON"
 msgid "sessionSummary.exportJson"
+msgstr "JSON exportieren"
+
+# en: "Export JSON"
+msgid "log.exportJson"
 msgstr "JSON exportieren"
 
 # en: "Export summary CSV"
@@ -1863,6 +1991,10 @@ msgstr "Breite der Auszieherrille bei E1"
 # en: "extruded"
 msgid "values.extruded"
 msgstr "Röhrchenpulver"
+
+# en: "Factory ammunition"
+msgid "log.factoryAmmunition"
+msgstr "Fabrikmunition"
 
 # en: "Faster ({unit})"
 msgid "powderRecord.faster"
@@ -1924,6 +2056,10 @@ msgstr "Weniger als zwei Schüsse zum Zeichnen."
 msgid "sessionSummary.file"
 msgstr "Datei: {name}"
 
+# en: "Fills an empty result with the event's total."
+msgid "log.fillsResult"
+msgstr "Füllt ein leeres Ergebnis mit dem Gesamtergebnis des Wettkampfs."
+
 # en: "Filter cartridges"
 msgid "bulletRecord.filter"
 msgstr "Patronen filtern"
@@ -1949,8 +2085,16 @@ msgid "events.firearm"
 msgstr "Schusswaffe"
 
 # en: "Firearm"
+msgid "log.firearm"
+msgstr "Schusswaffe"
+
+# en: "Firearm"
 msgid "log.column.firearm"
 msgstr "Schusswaffe"
+
+# en: "firearm {name}"
+msgid "log.filterFirearm"
+msgstr "Schusswaffe {name}"
 
 # en: "Firearm mass"
 msgid "units.quantity.firearmMass"
@@ -2072,6 +2216,10 @@ msgstr "Zerfallsgeschoss"
 msgid "disciplines.rule.freehand"
 msgstr "freihändig"
 
+# en: "From"
+msgid "log.from"
+msgstr "Von"
+
 # en: "From the official result, where published."
 msgid "events.stagePointsHint"
 msgstr "Aus dem offiziellen Ergebnis, wo veröffentlicht."
@@ -2115,6 +2263,10 @@ msgstr "Messring"
 # en: "gilding metal"
 msgid "values.gildingMetal"
 msgstr "Tombak"
+
+# en: "Give a load or factory ammunition, not both."
+msgid "log.loadOrAmmunition"
+msgstr "Geben Sie eine Laborierung oder Fabrikmunition an, nicht beides."
 
 # en: "green"
 msgid "targets.color.green"
@@ -2226,6 +2378,10 @@ msgstr "Impetus"
 
 # en: "Import JSON"
 msgid "events.importJson"
+msgstr "JSON importieren"
+
+# en: "Import JSON"
+msgid "log.importJson"
 msgstr "JSON importieren"
 
 # en: "Import notes"
@@ -2460,9 +2616,17 @@ msgstr "Vom Hersteller angegeben für"
 msgid "events.load"
 msgstr "Laborierung"
 
+# en: "Load"
+msgid "log.load"
+msgstr "Laborierung"
+
 # en: "Load example"
 msgid "sessionSummary.loadExample"
 msgstr "Beispiel laden"
+
+# en: "Load or ammunition"
+msgid "log.loadAmmunition"
+msgstr "Laborierung oder Munition"
 
 # en: "Load or ammunition"
 msgid "log.column.ammunition"
@@ -2643,6 +2807,10 @@ msgstr "Magnum"
 # en: "Major"
 msgid "events.major"
 msgstr "Major"
+
+# en: "Maker and product, when no saved load was fired."
+msgid "log.ammunitionHint"
+msgstr "Hersteller und Produkt, wenn keine gespeicherte Laborierung verschossen wurde."
 
 # en: "Making the sample photograph…"
 msgid "bulletPhoto.makingSample"
@@ -2984,6 +3152,10 @@ msgstr "Neues Geschoss"
 msgid "cartridges.new"
 msgstr "Neue Patrone"
 
+# en: "New entry"
+msgid "log.newEntry"
+msgstr "Neuer Eintrag"
+
 # en: "New event"
 msgid "events.new"
 msgstr "Neuer Wettkampf"
@@ -3064,12 +3236,20 @@ msgstr "Keine Treibladung im Bereich liefert mit diesem Wert eine gültige Berec
 msgid "logSummary.noCompetition"
 msgstr "Kein Wettkampf in diesem Jahr."
 
+# en: "No competition event saved yet"
+msgid "log.noEvent"
+msgstr "Noch kein Wettkampf gespeichert"
+
 # en: "No dimensions or pressures in this record"
 msgid "cartridgeRecord.noValues"
 msgstr "Keine Maße oder Drücke in diesem Datensatz"
 
 # en: "No discipline found"
 msgid "events.noDisciplineFound"
+msgstr "Keine Disziplin gefunden"
+
+# en: "No discipline found"
+msgid "log.noDiscipline"
 msgstr "Keine Disziplin gefunden"
 
 # en: "No discipline record names this federation."
@@ -3096,6 +3276,14 @@ msgstr "Auf diesem Foto wurde keine Kante einer Zielscheibe oder eines Schussloc
 msgid "states.noMatch.logEntries"
 msgstr "Keine Einträge passen zu diesen Filtern."
 
+# en: "No entry shown to export or print."
+msgid "log.nothingShown"
+msgstr "Kein Eintrag angezeigt, der exportiert oder gedruckt werden kann."
+
+# en: "No entry yet. New entry adds the first range day."
+msgid "log.noEntry"
+msgstr "Noch kein Eintrag. Neuer Eintrag legt den ersten Schießtag an."
+
 # en: "No event yet."
 msgid "events.noEventYet"
 msgstr "Noch kein Wettkampf."
@@ -3118,6 +3306,10 @@ msgstr "Noch keine Schusswaffe in diesem Browser gespeichert"
 
 # en: "No firearm saved in this browser yet"
 msgid "firearms.noneSaved"
+msgstr "Noch keine Schusswaffe in diesem Browser gespeichert"
+
+# en: "No firearm saved in this browser yet"
+msgid "log.noFirearm"
 msgstr "Noch keine Schusswaffe in diesem Browser gespeichert"
 
 # en: "No firearms match these filters."
@@ -3208,6 +3400,10 @@ msgstr "Keine"
 msgid "events.none"
 msgstr "Keine"
 
+# en: "None"
+msgid "log.none"
+msgstr "Keine"
+
 # en: "Nose length"
 msgid "recordFields.noseLength"
 msgstr "Kopflänge"
@@ -3232,6 +3428,10 @@ msgstr "nicht angegeben"
 msgid "events.notImported"
 msgstr "Nicht importiert: {reason}"
 
+# en: "Not imported: {reason}"
+msgid "log.notImported"
+msgstr "Nicht importiert: {reason}"
+
 # en: "not in the barrel"
 msgid "chargeTarget.notInBarrel"
 msgstr "nicht im Lauf"
@@ -3244,8 +3444,16 @@ msgstr "nicht in der Datei"
 msgid "events.notInBrowser"
 msgstr "Nicht in diesem Browser"
 
+# en: "Not in this browser"
+msgid "log.notInBrowser"
+msgstr "Nicht in diesem Browser"
+
 # en: "Not saved: {reason}"
 msgid "events.notSaved"
+msgstr "Nicht gespeichert: {reason}"
+
+# en: "Not saved: {reason}"
+msgid "log.notSaved"
 msgstr "Nicht gespeichert: {reason}"
 
 # en: "Not stated"
@@ -3278,6 +3486,10 @@ msgstr "Notizen"
 
 # en: "Notes"
 msgid "firearms.column.notes"
+msgstr "Notizen"
+
+# en: "Notes"
+msgid "log.notes"
 msgstr "Notizen"
 
 # en: "Number"
@@ -3505,6 +3717,10 @@ msgid "events.place"
 msgstr "Ort"
 
 # en: "Place"
+msgid "log.place"
+msgstr "Ort"
+
+# en: "Place"
 msgid "log.column.place"
 msgstr "Ort"
 
@@ -3639,6 +3855,10 @@ msgstr "Schusstafeln drucken"
 # en: "Print summary"
 msgid "logSummary.printSummary"
 msgstr "Übersicht drucken"
+
+# en: "Print the entries shown"
+msgid "log.printHint"
+msgstr "Die angezeigten Einträge drucken"
 
 # en: "Print the list of events"
 msgid "events.printList"
@@ -3880,6 +4100,14 @@ msgstr "Repetierer"
 msgid "events.replace"
 msgstr "Ersetzen"
 
+# en: "Replace"
+msgid "log.replace"
+msgstr "Ersetzen"
+
+# en: "Replace entries?"
+msgid "log.replaceEntries"
+msgstr "Einträge ersetzen?"
+
 # en: "Replace events?"
 msgid "events.replaceEvents"
 msgstr "Wettkämpfe ersetzen?"
@@ -3902,6 +4130,10 @@ msgstr "Ergebnis"
 
 # en: "Result"
 msgid "events.column.state"
+msgstr "Ergebnis"
+
+# en: "Result"
+msgid "log.result"
 msgstr "Ergebnis"
 
 # en: "Result"
@@ -4040,6 +4272,10 @@ msgstr "Ringe"
 msgid "targets.column.rings"
 msgstr "Ringe"
 
+# en: "Round count of {name}: {count, decimal}."
+msgid "log.roundCount"
+msgstr "Schusszahl von {name}: {count, decimal}."
+
 # en: "Round count of {name}: {count}."
 msgid "events.roundCountOf"
 msgstr "Schusszahl von {name}: {count}."
@@ -4057,11 +4293,19 @@ msgid "logSummary.rounds"
 msgstr "Patronen"
 
 # en: "Rounds"
+msgid "log.rounds"
+msgstr "Patronen"
+
+# en: "Rounds"
 msgid "log.column.rounds"
 msgstr "Patronen"
 
 # en: "Rounds fired"
 msgid "events.roundsFired"
+msgstr "Abgegebene Schüsse"
+
+# en: "Rounds fired"
+msgid "log.roundsFired"
 msgstr "Abgegebene Schüsse"
 
 # en: "Rounds for a match"
@@ -4115,6 +4359,10 @@ msgstr "Tabelle der Sportordnungen"
 # en: "Rules"
 msgid "disciplines.rules"
 msgstr "Regeln"
+
+# en: "Save entry"
+msgid "log.saveEntry"
+msgstr "Eintrag speichern"
 
 # en: "Save event"
 msgid "events.saveEvent"
@@ -4276,6 +4524,14 @@ msgstr "Schießbuch"
 msgid "page.firearmsLog"
 msgstr "Schießbuch"
 
+# en: "Shooting log entries in this browser"
+msgid "log.title"
+msgstr "Schießbuch-Einträge in diesem Browser"
+
+# en: "Shooting log, {filters}"
+msgid "log.titleFiltered"
+msgstr "Schießbuch, {filters}"
+
 # en: "Short gun"
 msgid "disciplines.firearm.shortGun"
 msgstr "Kurzwaffe"
@@ -4359,6 +4615,10 @@ msgstr "Probeschüsse je Durchgang"
 # en: "Sights"
 msgid "disciplines.row.sights"
 msgstr "Visierung"
+
+# en: "Signature"
+msgid "log.signature"
+msgstr "Unterschrift"
 
 # en: "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
 msgid "bulletDrawing.simplified"
@@ -4504,6 +4764,10 @@ msgstr "Stahl"
 msgid "values.cupSteel"
 msgstr "Stahl"
 
+# en: "Stored"
+msgid "log.stored"
+msgstr "Gespeichert"
+
 # en: "Straight from above, no slant"
 msgid "photoQuality.rule.fromAbove"
 msgstr "Gerade von oben, nicht schräg"
@@ -4523,6 +4787,10 @@ msgstr "Statistik der Schussreihen"
 # en: "Structure"
 msgid "recordFields.structure"
 msgstr "Bauart"
+
+# en: "Such as rings or a placing."
+msgid "log.resultHint"
+msgstr "Etwa Ringe oder eine Platzierung."
 
 # en: "Summary year"
 msgid "logSummary.summaryYear"
@@ -4845,12 +5113,24 @@ msgstr "Der Datensatz des Treibladungspulvers wurde nicht gefunden."
 msgid "events.readFailed"
 msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
 
+# en: "The records of this browser could not be read."
+msgid "log.readFailed"
+msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
+
+# en: "The round count of {name} holds this entry already."
+msgid "log.roundCountHasEntry"
+msgstr "Die Schusszahl von {name} enthält diesen Eintrag schon."
+
 # en: "The round count of {name} holds this event already."
 msgid "events.roundCountHeld"
 msgstr "Die Schusszahl von {name} enthält diesen Wettkampf schon."
 
 # en: "The round count of {name} is unchanged."
 msgid "events.roundCountUnchanged"
+msgstr "Die Schusszahl von {name} bleibt unverändert."
+
+# en: "The round count of {name} is unchanged."
+msgid "log.roundCountUnchanged"
 msgstr "Die Schusszahl von {name} bleibt unverändert."
 
 # en: "The rule books the records cite"
@@ -4969,6 +5249,10 @@ msgstr "Spitzenlänge"
 msgid "federationRecord.column.title"
 msgstr "Titel"
 
+# en: "To"
+msgid "log.to"
+msgstr "Bis"
+
 # en: "Tolerance"
 msgid "cartridgeRecord.tolerance"
 msgstr "Toleranzen"
@@ -5067,6 +5351,10 @@ msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
 
 # en: "Undo of {name} failed: {reason}"
 msgid "firearms.undoFailed"
+msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
+
+# en: "Undo of {name} failed: {reason}"
+msgid "log.undoFailed"
 msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
 
 # en: "Unit"
@@ -5249,6 +5537,18 @@ msgstr "Ohne Kurve"
 msgid "chargeTarget.applyHelp"
 msgstr "Schreibt die Treibladung in das Treibladungsfeld"
 
+# en: "Year"
+msgid "log.year"
+msgstr "Jahr"
+
+# en: "year {year}"
+msgid "log.filterYear"
+msgstr "Jahr {year}"
+
+# en: "Year {year}"
+msgid "log.yearOf"
+msgstr "Jahr {year}"
+
 # en: "Yearly summary"
 msgid "logSummary.yearlySummary"
 msgstr "Jahresübersicht"
@@ -5280,6 +5580,10 @@ msgstr "Ja"
 # en: "Yes"
 msgid "primers.yes"
 msgstr "Ja"
+
+# en: "Your own record; a club or authority decides whether to accept it."
+msgid "log.ownRecord"
+msgstr "Ihre eigene Aufzeichnung; ob ein Verein oder eine Behörde sie anerkennt, entscheiden diese."
 
 # en: "z1 {z}"
 msgid "powderRecord.z1"

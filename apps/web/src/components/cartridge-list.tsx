@@ -5,6 +5,7 @@ import { Button } from '@mantine/core'
 import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   type CartridgeRow,
   cartridgeCells,
@@ -29,12 +30,15 @@ import {
   userCartridgeRows,
 } from '../lib/sources.ts'
 import { userCartridges } from '../lib/variants.ts'
+import englishMessages from '../locales/en/components/cartridge-list.json' with { type: 'json' }
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { DeleteRow, sourceColumn, useResolved, useUserRecords } from './list-sources.tsx'
 import { GapBadge } from './standard-badge.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** The cartridge directory: page bar with the count, search row, windowed table. */
 export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {

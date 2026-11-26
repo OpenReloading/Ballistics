@@ -16,6 +16,7 @@ import {
   useSyncExternalStore,
 } from 'react'
 import { onLanguageChange } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { storageName } from '../lib/edition.ts'
 import { type FieldSpec, type Fields, switchFields } from '../lib/field-spec.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -32,8 +33,11 @@ import {
   type UnitSystem,
   unitsOf,
 } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/units-settings.json' with { type: 'json' }
 import { SettingsDialog } from './settings-dialog.ts'
 import { Loading } from './states.tsx'
+
+loadEnglish(englishMessages)
 
 /** `localStorage` key of the viewer's unit choice. */
 const unitsKey = storageName('units')

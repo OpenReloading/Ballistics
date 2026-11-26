@@ -21,13 +21,17 @@ import {
   TrendingDown,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { rowNotes, rowParts, type StripItem } from '../lib/record-fields.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { type LinguiWording, sayLingui } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/field-strip.json' with { type: 'json' }
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Sized, slotUnits } from './fact-cards.tsx'
 import { MutedBadge } from './standard-badge.tsx'
 import { useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 const icons: Record<StripItem['icon'], LucideIcon> = {
   manufacturer: Factory,

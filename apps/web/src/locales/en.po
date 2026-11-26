@@ -16,6 +16,9 @@ msgstr "(differs)"
 msgid "chargeTarget.notLoadData"
 msgstr "(simulation, not load data)."
 
+msgid "log.imported"
+msgstr "{added, decimal} entries added, {equal, decimal} already in this browser, {replaced, decimal} replaced."
+
 msgid "events.imported"
 msgstr "{added} events added, {equal} already in this browser, {replaced} replaced."
 
@@ -70,10 +73,19 @@ msgstr "{count, plural, one {# competition event in this browser} other {# compe
 msgid "lists.count.disciplines"
 msgstr "{count, plural, one {# discipline} other {# disciplines}}"
 
+msgid "log.idTaken"
+msgstr "{count, plural, one {# entry not imported: a record of this browser has its id.} other {# entries not imported: records of this browser have their ids.}}"
+
+msgid "log.replaceCount"
+msgstr "{count, plural, one {# entry of the file differs from the one in this browser. Replace it?} other {# entries of the file differ from the ones in this browser. Replace them?}}"
+
 msgid "lists.count.logEntries"
 msgstr "{count, plural, one {# entry} other {# entries}}"
 
 msgid "logSummary.entryCount"
+msgstr "{count, plural, one {# entry} other {# entries}}"
+
+msgid "log.entryCount"
 msgstr "{count, plural, one {# entry} other {# entries}}"
 
 msgid "events.heldCount"
@@ -106,6 +118,9 @@ msgstr "{count, plural, one {# primer} other {# primers}}"
 msgid "events.otherKinds"
 msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
 
+msgid "log.otherKinds"
+msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
+
 msgid "targets.rings"
 msgstr "{count, plural, one {# ring} other {# rings}}"
 
@@ -113,6 +128,9 @@ msgid "logSummary.unsavedLoadRounds"
 msgstr "{count, plural, one {# round of entries without a saved load is under its firearm only.} other {# rounds of entries without a saved load are under their firearms only.}}"
 
 msgid "logSummary.roundCount"
+msgstr "{count, plural, one {# round} other {# rounds}}"
+
+msgid "log.roundTotal"
 msgstr "{count, plural, one {# round} other {# rounds}}"
 
 msgid "sessionSummary.shotCount"
@@ -129,6 +147,9 @@ msgstr "{count, plural, one {# training row} other {# training rows}}"
 
 msgid "events.addRounds"
 msgstr "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
+
+msgid "log.addRounds"
+msgstr "{count, plural, one {Add # round to the round count of {name}?} other {Add # rounds to the round count of {name}?}}"
 
 msgid "bulletCompare.notFoundIds"
 msgstr "{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}"
@@ -147,6 +168,9 @@ msgstr "{count} selected"
 
 msgid "comparePicks.selectedMax"
 msgstr "{count} selected (max {max})"
+
+msgid "log.fromTo"
+msgstr "{from} to {to}"
 
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
@@ -213,6 +237,9 @@ msgstr "{name} (user design)"
 
 msgid "events.noRoundCount"
 msgstr "{name} has no round count; set one on the Firearms page to add the event to it."
+
+msgid "log.noRoundCount"
+msgstr "{name} has no round count; set one on the Firearms page to add the log to it."
 
 msgid "listSources.notDeleted"
 msgstr "{name} was not deleted: the browser refused."
@@ -322,7 +349,13 @@ msgstr "Actions"
 msgid "firearms.actions"
 msgstr "Actions for {name}"
 
+msgid "log.actionsFor"
+msgstr "Actions for {name}"
+
 msgid "events.add"
+msgstr "Add"
+
+msgid "log.add"
 msgstr "Add"
 
 msgid "bulletCompare.add"
@@ -338,6 +371,9 @@ msgid "events.addStage"
 msgstr "Add stage"
 
 msgid "events.addRoundsTitle"
+msgstr "Add to the round count?"
+
+msgid "log.addRoundCount"
 msgstr "Add to the round count?"
 
 msgid "values.airPistol"
@@ -367,8 +403,14 @@ msgstr "All cartridges"
 msgid "disciplines.all"
 msgstr "All disciplines"
 
+msgid "log.allEntries"
+msgstr "All entries"
+
 msgid "disciplines.federationsAll"
 msgstr "All federations"
+
+msgid "log.allFirearms"
+msgstr "All firearms"
 
 msgid "powders.all"
 msgstr "All powders"
@@ -381,6 +423,9 @@ msgstr "All sources"
 
 msgid "targets.all"
 msgstr "All targets"
+
+msgid "log.allYears"
+msgstr "All years"
 
 msgid "disciplines.allowed"
 msgstr "Allowed"
@@ -706,6 +751,9 @@ msgstr "Caliper sizes give the scale without a ruler and check it with one. Toge
 msgid "events.cancel"
 msgstr "Cancel"
 
+msgid "log.cancel"
+msgstr "Cancel"
+
 msgid "values.carbine"
 msgstr "Carbine"
 
@@ -844,6 +892,9 @@ msgstr "Chamber: {notes}"
 msgid "chargeTarget.title"
 msgstr "Charge for a target"
 
+msgid "log.outOfRange"
+msgstr "Check the entry: a value is out of its range."
+
 msgid "events.outOfRange"
 msgstr "Check the event: a value is out of its range."
 
@@ -919,6 +970,9 @@ msgstr "Compare bullets"
 msgid "bulletCompare.compareOthers"
 msgstr "Compare the others"
 
+msgid "log.competitionEvent"
+msgstr "Competition event"
+
 msgid "log.column.event"
 msgstr "Competition event"
 
@@ -955,8 +1009,14 @@ msgstr "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is no
 msgid "firearms.column.configuration"
 msgstr "Configuration"
 
+msgid "log.confirmedBy"
+msgstr "Confirmed by"
+
 msgid "log.column.confirmed"
 msgstr "Confirmed by"
+
+msgid "log.confirmedOn"
+msgstr "Confirmed on"
 
 msgid "values.conicalHollowBase"
 msgstr "conical-hollow-base"
@@ -1078,6 +1138,9 @@ msgstr "Date"
 msgid "events.column.date"
 msgstr "Date"
 
+msgid "log.date"
+msgstr "Date"
+
 msgid "log.column.date"
 msgstr "Date"
 
@@ -1088,6 +1151,9 @@ msgid "firearms.delete"
 msgstr "Delete"
 
 msgid "listSources.delete"
+msgstr "Delete"
+
+msgid "log.delete"
 msgstr "Delete"
 
 msgid "events.delete"
@@ -1108,10 +1174,16 @@ msgstr "Delete of {name} failed: {reason}"
 msgid "firearms.deleteFailed"
 msgstr "Delete of {name} failed: {reason}"
 
+msgid "log.deleteFailed"
+msgstr "Delete of {name} failed: {reason}"
+
 msgid "events.deletedFromThisBrowser"
 msgstr "Deleted {name} from this browser."
 
 msgid "firearms.deleted"
+msgstr "Deleted {name} from this browser."
+
+msgid "log.deleted"
 msgstr "Deleted {name} from this browser."
 
 msgid "recordSources.kind.derived"
@@ -1160,6 +1232,9 @@ msgid "faceRecord.column.discipline"
 msgstr "Discipline"
 
 msgid "federationRecord.column.discipline"
+msgstr "Discipline"
+
+msgid "log.discipline"
 msgstr "Discipline"
 
 msgid "log.column.discipline"
@@ -1285,6 +1360,12 @@ msgstr "Dynamic vivacity of the chosen powders, model output"
 msgid "burnRateCompare.lead"
 msgstr "Dynamic vivacity, the burn rate per pressure, over burnt fraction."
 
+msgid "log.edit"
+msgstr "Edit"
+
+msgid "log.editEntry"
+msgstr "Edit entry"
+
 msgid "events.edit"
 msgstr "Edit event"
 
@@ -1312,6 +1393,12 @@ msgstr "Energy ratio"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "energy, as printed under Pressures (Energies)"
 
+msgid "log.enterDate"
+msgstr "Enter the date."
+
+msgid "log.enterConfirmedBy"
+msgstr "Enter who confirmed the entry, or clear the day of the confirmation."
+
 msgid "sourceLink.entry.range"
 msgstr "Entered at the range"
 
@@ -1319,6 +1406,9 @@ msgid "sourceLink.entry.targetDesigner"
 msgstr "Entered in the target designer"
 
 msgid "logSummary.entries"
+msgstr "Entries"
+
+msgid "log.entries"
 msgstr "Entries"
 
 msgid "states.error"
@@ -1382,10 +1472,16 @@ msgstr "Export CSV"
 msgid "sessionSummary.exportCsv"
 msgstr "Export CSV"
 
+msgid "log.exportCsv"
+msgstr "Export CSV"
+
 msgid "events.exportJson"
 msgstr "Export JSON"
 
 msgid "sessionSummary.exportJson"
+msgstr "Export JSON"
+
+msgid "log.exportJson"
 msgstr "Export JSON"
 
 msgid "logSummary.exportSummaryCsv"
@@ -1399,6 +1495,9 @@ msgstr "extractor groove width at E1"
 
 msgid "values.extruded"
 msgstr "extruded"
+
+msgid "log.factoryAmmunition"
+msgstr "Factory ammunition"
 
 msgid "powderRecord.faster"
 msgstr "Faster ({unit})"
@@ -1445,6 +1544,9 @@ msgstr "Fewer than two shots to draw."
 msgid "sessionSummary.file"
 msgstr "File: {name}"
 
+msgid "log.fillsResult"
+msgstr "Fills an empty result with the event's total."
+
 msgid "bulletRecord.filter"
 msgstr "Filter cartridges"
 
@@ -1463,8 +1565,14 @@ msgstr "Firearm"
 msgid "events.firearm"
 msgstr "Firearm"
 
+msgid "log.firearm"
+msgstr "Firearm"
+
 msgid "log.column.firearm"
 msgstr "Firearm"
+
+msgid "log.filterFirearm"
+msgstr "firearm {name}"
 
 msgid "units.quantity.firearmMass"
 msgstr "Firearm mass"
@@ -1556,6 +1664,9 @@ msgstr "frangible"
 msgid "disciplines.rule.freehand"
 msgstr "freehand"
 
+msgid "log.from"
+msgstr "From"
+
 msgid "events.stagePointsHint"
 msgstr "From the official result, where published."
 
@@ -1588,6 +1699,9 @@ msgstr "Gauge"
 
 msgid "values.gildingMetal"
 msgstr "gilding metal"
+
+msgid "log.loadOrAmmunition"
+msgstr "Give a load or factory ammunition, not both."
 
 msgid "targets.color.green"
 msgstr "green"
@@ -1671,6 +1785,9 @@ msgid "recordFields.impetus"
 msgstr "Impetus"
 
 msgid "events.importJson"
+msgstr "Import JSON"
+
+msgid "log.importJson"
 msgstr "Import JSON"
 
 msgid "sessionSummary.importNotes"
@@ -1847,8 +1964,14 @@ msgstr "Listed by the manufacturer for"
 msgid "events.load"
 msgstr "Load"
 
+msgid "log.load"
+msgstr "Load"
+
 msgid "sessionSummary.loadExample"
 msgstr "Load example"
+
+msgid "log.loadAmmunition"
+msgstr "Load or ammunition"
 
 msgid "log.column.ammunition"
 msgstr "Load or ammunition"
@@ -1984,6 +2107,9 @@ msgstr "Magnum"
 
 msgid "events.major"
 msgstr "Major"
+
+msgid "log.ammunitionHint"
+msgstr "Maker and product, when no saved load was fired."
 
 msgid "bulletPhoto.makingSample"
 msgstr "Making the sample photograph…"
@@ -2240,6 +2366,9 @@ msgstr "New bullet"
 msgid "cartridges.new"
 msgstr "New cartridge"
 
+msgid "log.newEntry"
+msgstr "New entry"
+
 msgid "events.new"
 msgstr "New event"
 
@@ -2300,10 +2429,16 @@ msgstr "No charge in the range gives a valid run with this value."
 msgid "logSummary.noCompetition"
 msgstr "No competition event in this year."
 
+msgid "log.noEvent"
+msgstr "No competition event saved yet"
+
 msgid "cartridgeRecord.noValues"
 msgstr "No dimensions or pressures in this record"
 
 msgid "events.noDisciplineFound"
+msgstr "No discipline found"
+
+msgid "log.noDiscipline"
 msgstr "No discipline found"
 
 msgid "federationRecord.noDisciplines"
@@ -2324,6 +2459,12 @@ msgstr "No edge of a target or a hole was found in this photo."
 msgid "states.noMatch.logEntries"
 msgstr "No entries match these filters."
 
+msgid "log.nothingShown"
+msgstr "No entry shown to export or print."
+
+msgid "log.noEntry"
+msgstr "No entry yet. New entry adds the first range day."
+
 msgid "events.noEventYet"
 msgstr "No event yet."
 
@@ -2340,6 +2481,9 @@ msgid "events.noFirearm"
 msgstr "No firearm saved in this browser yet"
 
 msgid "firearms.noneSaved"
+msgstr "No firearm saved in this browser yet"
+
+msgid "log.noFirearm"
 msgstr "No firearm saved in this browser yet"
 
 msgid "states.noMatch.firearms"
@@ -2408,6 +2552,9 @@ msgstr "None"
 msgid "events.none"
 msgstr "None"
 
+msgid "log.none"
+msgstr "None"
+
 msgid "recordFields.noseLength"
 msgstr "Nose length"
 
@@ -2426,6 +2573,9 @@ msgstr "not given"
 msgid "events.notImported"
 msgstr "Not imported: {reason}"
 
+msgid "log.notImported"
+msgstr "Not imported: {reason}"
+
 msgid "chargeTarget.notInBarrel"
 msgstr "not in the barrel"
 
@@ -2435,7 +2585,13 @@ msgstr "not in the file"
 msgid "events.notInBrowser"
 msgstr "Not in this browser"
 
+msgid "log.notInBrowser"
+msgstr "Not in this browser"
+
 msgid "events.notSaved"
+msgstr "Not saved: {reason}"
+
+msgid "log.notSaved"
 msgstr "Not saved: {reason}"
 
 msgid "targets.notStated"
@@ -2460,6 +2616,9 @@ msgid "events.notes"
 msgstr "Notes"
 
 msgid "firearms.column.notes"
+msgstr "Notes"
+
+msgid "log.notes"
 msgstr "Notes"
 
 msgid "disciplines.row.number"
@@ -2630,6 +2789,9 @@ msgstr "Pistol"
 msgid "events.place"
 msgstr "Place"
 
+msgid "log.place"
+msgstr "Place"
+
 msgid "log.column.place"
 msgstr "Place"
 
@@ -2731,6 +2893,9 @@ msgstr "Print range cards"
 
 msgid "logSummary.printSummary"
 msgstr "Print summary"
+
+msgid "log.printHint"
+msgstr "Print the entries shown"
 
 msgid "events.printList"
 msgstr "Print the list of events"
@@ -2912,6 +3077,12 @@ msgstr "repeater"
 msgid "events.replace"
 msgstr "Replace"
 
+msgid "log.replace"
+msgstr "Replace"
+
+msgid "log.replaceEntries"
+msgstr "Replace entries?"
+
 msgid "events.replaceEvents"
 msgstr "Replace events?"
 
@@ -2928,6 +3099,9 @@ msgid "events.result"
 msgstr "Result"
 
 msgid "events.column.state"
+msgstr "Result"
+
+msgid "log.result"
 msgstr "Result"
 
 msgid "log.column.result"
@@ -3032,6 +3206,9 @@ msgstr "Rings"
 msgid "targets.column.rings"
 msgstr "Rings"
 
+msgid "log.roundCount"
+msgstr "Round count of {name}: {count, decimal}."
+
 msgid "events.roundCountOf"
 msgstr "Round count of {name}: {count}."
 
@@ -3044,10 +3221,16 @@ msgstr "rounded-hollow-base"
 msgid "logSummary.rounds"
 msgstr "Rounds"
 
+msgid "log.rounds"
+msgstr "Rounds"
+
 msgid "log.column.rounds"
 msgstr "Rounds"
 
 msgid "events.roundsFired"
+msgstr "Rounds fired"
+
+msgid "log.roundsFired"
 msgstr "Rounds fired"
 
 msgid "matchRounds.title"
@@ -3088,6 +3271,9 @@ msgstr "Rule books table"
 
 msgid "disciplines.rules"
 msgstr "Rules"
+
+msgid "log.saveEntry"
+msgstr "Save entry"
 
 msgid "events.saveEvent"
 msgstr "Save event"
@@ -3209,6 +3395,12 @@ msgstr "Shooting log"
 msgid "page.firearmsLog"
 msgstr "Shooting log"
 
+msgid "log.title"
+msgstr "Shooting log entries in this browser"
+
+msgid "log.titleFiltered"
+msgstr "Shooting log, {filters}"
+
 msgid "disciplines.firearm.shortGun"
 msgstr "Short gun"
 
@@ -3271,6 +3463,9 @@ msgstr "Sighters per event"
 
 msgid "disciplines.row.sights"
 msgstr "Sights"
+
+msgid "log.signature"
+msgstr "Signature"
 
 msgid "bulletDrawing.simplified"
 msgstr "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
@@ -3380,6 +3575,9 @@ msgstr "steel"
 msgid "values.cupSteel"
 msgstr "Steel"
 
+msgid "log.stored"
+msgstr "Stored"
+
 msgid "photoQuality.rule.fromAbove"
 msgstr "Straight from above, no slant"
 
@@ -3394,6 +3592,9 @@ msgstr "String statistics"
 
 msgid "recordFields.structure"
 msgstr "Structure"
+
+msgid "log.resultHint"
+msgstr "Such as rings or a placing."
 
 msgid "logSummary.summaryYear"
 msgstr "Summary year"
@@ -3636,10 +3837,19 @@ msgstr "The powder record was not found."
 msgid "events.readFailed"
 msgstr "The records of this browser could not be read."
 
+msgid "log.readFailed"
+msgstr "The records of this browser could not be read."
+
+msgid "log.roundCountHasEntry"
+msgstr "The round count of {name} holds this entry already."
+
 msgid "events.roundCountHeld"
 msgstr "The round count of {name} holds this event already."
 
 msgid "events.roundCountUnchanged"
+msgstr "The round count of {name} is unchanged."
+
+msgid "log.roundCountUnchanged"
 msgstr "The round count of {name} is unchanged."
 
 msgid "federationRecord.ruleBooksCaption"
@@ -3729,6 +3939,9 @@ msgstr "Tip length"
 msgid "federationRecord.column.title"
 msgstr "Title"
 
+msgid "log.to"
+msgstr "To"
+
 msgid "cartridgeRecord.tolerance"
 msgstr "Tolerance"
 
@@ -3802,6 +4015,9 @@ msgid "events.undoOfFailed"
 msgstr "Undo of {name} failed: {reason}"
 
 msgid "firearms.undoFailed"
+msgstr "Undo of {name} failed: {reason}"
+
+msgid "log.undoFailed"
 msgstr "Undo of {name} failed: {reason}"
 
 msgid "bulletCompare.unit"
@@ -3939,6 +4155,15 @@ msgstr "Without a curve"
 msgid "chargeTarget.applyHelp"
 msgstr "Writes the charge into the charge field"
 
+msgid "log.year"
+msgstr "Year"
+
+msgid "log.filterYear"
+msgstr "year {year}"
+
+msgid "log.yearOf"
+msgstr "Year {year}"
+
 msgid "logSummary.yearlySummary"
 msgstr "Yearly summary"
 
@@ -3962,6 +4187,9 @@ msgstr "Yes"
 
 msgid "primers.yes"
 msgstr "Yes"
+
+msgid "log.ownRecord"
+msgstr "Your own record; a club or authority decides whether to accept it."
 
 msgid "powderRecord.z1"
 msgstr "z1 {z}"

@@ -1,5 +1,9 @@
 import type { MessageDescriptor } from '@lingui/core'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/record-values.json' with { type: 'json' }
 import { type LinguiWording, verbatim } from './wording.ts'
+
+loadEnglish(englishMessages)
 
 /** A record value as a name: "hollow-point" as "Hollow point". */
 export const titleFromKebab = (value: string) =>

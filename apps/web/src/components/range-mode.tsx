@@ -14,14 +14,18 @@ import { toSi } from '@rangefoundry/schema'
 import { Camera, Delete as DeleteIcon, Gauge } from 'lucide-react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { decimalMark, formatNumber, plainNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import type { RangeStep } from '../lib/range-entry.ts'
 import { loadSummary, rangeStats } from '../lib/range-entry.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/range-mode.json' with { type: 'json' }
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyNote, Message } from './states.tsx'
 import { useOnline, useRangeMode } from './use-range-mode.ts'
+
+loadEnglish(englishMessages)
 
 /** The smallest side of a control on this page, px (WCAG 2.2 criterion 2.5.5). */
 const target = 44

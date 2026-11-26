@@ -16,6 +16,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fixedNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import type { Design } from '../lib/bullet-designer.ts'
@@ -24,11 +25,14 @@ import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { say } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/bullet-photo.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { type MessageEntry, MessageSlot } from './states.tsx'
 import { distanceSpec, useBulletPhoto } from './use-bullet-photo.ts'
 import { type Tool, usePhotoPointer } from './use-photo-pointer.ts'
+
+loadEnglish(englishMessages)
 
 const tools: { value: Tool; label: MessageDescriptor }[] = [
   {

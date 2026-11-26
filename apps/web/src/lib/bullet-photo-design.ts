@@ -1,8 +1,10 @@
 /** What a photograph's measurements become in the bullet designer (`apps/docs/docs/models/bullet-photo.md`). */
 
 import type { I18n } from '@lingui/core'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fixedNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/lib/bullet-photo-design.json' with { type: 'json' }
 import { type Design, type DesignerSpec, designerSpecs } from './bullet-designer.ts'
 import type { Scale } from './bullet-photo.ts'
 // types only: the designer imports this module, and the image maths stays out of its first load
@@ -10,6 +12,8 @@ import type { BulletMeasurement, Measured, PhotoField } from './bullet-photo-mea
 import { basisNote } from './bullet-photo-scale.ts'
 import { fieldOf, siToStored, storedToSi } from './field-spec.ts'
 import type { UnitSystem } from './units.ts'
+
+loadEnglish(englishMessages)
 
 type StoredQuantity = Parameters<typeof storedToSi>[0]
 const quantityOf = (s: DesignerSpec) => s.quantity as StoredQuantity

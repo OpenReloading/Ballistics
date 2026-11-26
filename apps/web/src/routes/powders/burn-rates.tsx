@@ -6,12 +6,16 @@ import {
   PowdersByBurnRate,
 } from '../../components/burn-rate-compare.tsx'
 import { PageBar } from '../../components/page-bar.tsx'
+import { loadEnglish } from '../../i18n/lingui.ts'
 import type { PowderSummary } from '../../lib/api-types.ts'
 import { classifyPowder, isFitted, type UnfittedPowder } from '../../lib/burn-rate.ts'
 import { manufacturerNames } from '../../lib/manufacturers.ts'
+import englishMessages from '../../locales/en/routes/powders/burn-rates.json' with { type: 'json' }
 import { readCatalogue } from '../-data.ts'
 import { listHead } from '../-list-route.ts'
 import { searchOf } from '../-search.ts'
+
+loadEnglish(englishMessages)
 
 export const Route = createFileRoute('/powders/burn-rates')({
   validateSearch: searchOf('add'),
