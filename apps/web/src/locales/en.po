@@ -172,6 +172,9 @@ msgstr "{count, plural, one {No bullet with the id {ids}.} other {No bullets wit
 msgid "bulletCompare.invalidIds"
 msgstr "{count, plural, one {Not a bullet id: {ids}.} other {Not bullet ids: {ids}.}}"
 
+msgid "targetEditor.excluded"
+msgstr "{count} ({excluded} excluded)"
+
 msgid "comparePicks.hidden"
 msgstr "{count} hidden"
 
@@ -195,6 +198,21 @@ msgstr "{face}: scale and center from {count, decimal} ellipses."
 
 msgid "log.fromTo"
 msgstr "{from} to {to}"
+
+msgid "targetEditor.clicksBoth"
+msgstr "{horizontal, decimal} {horizontalDirection}, {vertical, decimal} {verticalDirection}"
+
+msgid "targetEditor.assumesCircularSpread"
+msgstr "{interval}; assumes circular spread."
+
+msgid "targetEditor.intervalOnly"
+msgstr "{interval}."
+
+msgid "targetEditor.referenceLabel"
+msgstr "{kind} {n, decimal}"
+
+msgid "targetEditor.scaleMean"
+msgstr "{kind}; scale {deviation} % from the mean"
 
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
@@ -222,6 +240,9 @@ msgstr "{label}, Z to A"
 
 msgid "holeDetection.doubleClickEnterAccepts"
 msgstr "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it."
+
+msgid "targetEditor.intervalDegreesFreedom"
+msgstr "{level, decimal} % interval {lower} to {upper} {unit} ({df, decimal} degrees of freedom)"
 
 msgid "chargeTarget.pressureRangeValue"
 msgstr "{low} to {high}"
@@ -285,6 +306,9 @@ msgstr "{reason} The drawing needs a diameter and a length."
 
 msgid "sources.only"
 msgstr "{source} only"
+
+msgid "targetEditor.stepCharge"
+msgstr "{step}: {charge}"
 
 msgid "cartridgeRecord.symbolMeaning"
 msgstr "{symbol}: {meaning}"
@@ -355,6 +379,9 @@ msgstr "A curve could not be loaded."
 msgid "powderCompare.apiSilent"
 msgstr "A data file did not load or the computation failed. Check the connection and retry."
 
+msgid "targetEditor.drawnTargetShotsTarget"
+msgstr "A drawn target: shots in target coordinates, no scale needed."
+
 msgid "holeDetection.groupHoldsMost1000"
 msgstr "A group holds at most 1000 shots."
 
@@ -370,8 +397,14 @@ msgstr "A region needs at least 3 points"
 msgid "bulletPhoto.shadowMirrored"
 msgstr "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline."
 
+msgid "targetEditor.shotPointAimOrigin"
+msgstr "A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields."
+
 msgid "disciplines.column.abbreviation"
 msgstr "Abbreviation"
+
+msgid "targetEditor.abovePointAimPositive"
+msgstr "Above the point of aim: positive."
 
 msgid "holeDetection.acceptMaybes"
 msgstr "Accept maybes ({count, decimal})"
@@ -406,11 +439,20 @@ msgstr "Add"
 msgid "bulletCompare.add"
 msgstr "Add bullet"
 
+msgid "targetEditor.addGroup"
+msgstr "Add group"
+
+msgid "targetEditor.addPhoto"
+msgstr "Add photo"
+
 msgid "burnRateCompare.add"
 msgstr "Add powder"
 
 msgid "events.addSeries"
 msgstr "Add series"
+
+msgid "targetEditor.addShot"
+msgstr "Add shot"
 
 msgid "events.addStage"
 msgstr "Add stage"
@@ -420,6 +462,9 @@ msgstr "Add to the round count?"
 
 msgid "log.addRoundCount"
 msgstr "Add to the round count?"
+
+msgid "targetEditor.aimUnit"
+msgstr "Aim ({unit})"
 
 msgid "values.airPistol"
 msgstr "Air pistol"
@@ -622,6 +667,9 @@ msgstr "black oxide"
 msgid "targets.color.blue"
 msgstr "blue"
 
+msgid "targetEditor.blue"
+msgstr "Blue"
+
 msgid "values.boatTail"
 msgstr "boat-tail"
 
@@ -808,8 +856,20 @@ msgstr "Caliber classes from"
 msgid "holeDetection.calibrate"
 msgstr "Calibrate"
 
+msgid "targetEditor.calibrate"
+msgstr "Calibrate"
+
+msgid "targetEditor.calibrateScaleReferencesRotation"
+msgstr "Calibrate: scale references, rotation and origin"
+
+msgid "targetEditor.calibratePhotoHasScale"
+msgstr "Calibrate: the photo has no scale yet; mark a reference of known size"
+
 msgid "bulletPhoto.caliperHelp"
 msgstr "Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out."
+
+msgid "targetEditor.camera"
+msgstr "Camera"
 
 msgid "events.cancel"
 msgstr "Cancel"
@@ -931,6 +991,12 @@ msgstr "Cavity depth"
 msgid "recordFields.cavityDiameter"
 msgstr "Cavity diameter"
 
+msgid "targetEditor.compassCenter"
+msgstr "center"
+
+msgid "targetEditor.cep"
+msgstr "CEP"
+
 msgid "cartridgeRecord.side.chamber"
 msgstr "Chamber"
 
@@ -970,6 +1036,9 @@ msgstr "Change the scale"
 msgid "holeDetection.changeTarget"
 msgstr "Change the target"
 
+msgid "targetEditor.chargeUnit"
+msgstr "Charge ({unit})"
+
 msgid "chargeTarget.title"
 msgstr "Charge for a target"
 
@@ -994,13 +1063,25 @@ msgstr "Choose or drop a chronograph file, or load the example: three strings of
 msgid "bulletPhoto.choosePhotograph"
 msgstr "Choose photograph"
 
+msgid "targetEditor.chooseDropPastePhoto"
+msgstr "Choose, drop or paste a photo; it stays in this browser and is never uploaded."
+
 msgid "sessionSummary.chronoFile"
 msgstr "Chronograph file"
+
+msgid "targetEditor.circularEstimateAssumesCircular"
+msgstr "Circular estimate {value} {unit}, {interval}; assumes circular spread."
+
+msgid "targetEditor.circularEstimateNoInterval"
+msgstr "Circular estimate {value} {unit}; assumes circular spread."
 
 msgid "comparePicks.clear"
 msgstr "Clear"
 
 msgid "holeDetection.clear"
+msgstr "Clear"
+
+msgid "targetEditor.clear"
 msgstr "Clear"
 
 msgid "facetFilters.clear"
@@ -1036,11 +1117,23 @@ msgstr "Click the corners of the region; click the last one again (Enter twice) 
 msgid "holeDetection.clickMiddleOneHole"
 msgstr "Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels."
 
+msgid "targetEditor.clickPointAimTarget"
+msgstr "Click the point of aim on the target"
+
 msgid "holeDetection.clickTwoOppositeCorners"
 msgstr "Click two opposite corners of the region. Point {n, decimal} of 2. Or arrow keys and Enter. Esc cancels."
 
 msgid "bulletPhoto.scaleHelp"
 msgstr "Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first."
+
+msgid "targetEditor.clicks"
+msgstr "Clicks"
+
+msgid "targetEditor.clicksMradMoaThat"
+msgstr "Clicks of {optic} ({mrad} mrad, {moa} MOA) that move the group center onto the point of aim."
+
+msgid "targetEditor.close"
+msgstr "Close"
 
 msgid "photoQuality.rule.closeEnough"
 msgstr "Close enough"
@@ -1053,6 +1146,12 @@ msgstr "COAL, the cartridge maximum of the CIP sheet, shortest variant."
 
 msgid "sessionSummary.coldBore"
 msgstr "Cold bore"
+
+msgid "targetEditor.colorLabel"
+msgstr "Color"
+
+msgid "targetEditor.colorName"
+msgstr "Color {color}"
 
 msgid "recordSources.origin.community"
 msgstr "community"
@@ -1128,6 +1227,9 @@ msgstr "Construction"
 
 msgid "recordFields.construction"
 msgstr "Construction"
+
+msgid "targetEditor.contrast"
+msgstr "Contrast"
 
 msgid "recordActions.copied"
 msgstr "Copied"
@@ -1228,6 +1330,9 @@ msgstr "Cut out again"
 msgid "bulletPhoto.cutting"
 msgstr "Cutting out the bullet…"
 
+msgid "targetEditor.darken"
+msgstr "Darken"
+
 msgid "bulletDrawing.dashed"
 msgstr "Dashed in the flag color: parts the record does not give, drawn from an assumed shape."
 
@@ -1258,6 +1363,9 @@ msgstr "Delete"
 msgid "log.delete"
 msgstr "Delete"
 
+msgid "targetEditor.delete"
+msgstr "Delete"
+
 msgid "events.delete"
 msgstr "Delete {name}"
 
@@ -1278,6 +1386,15 @@ msgstr "Delete of {name} failed: {reason}"
 
 msgid "log.deleteFailed"
 msgstr "Delete of {name} failed: {reason}"
+
+msgid "targetEditor.deleteSheet"
+msgstr "Delete sheet"
+
+msgid "targetEditor.deleteShot"
+msgstr "Delete shot {n}"
+
+msgid "targetEditor.deleteActiveGroupUndo"
+msgstr "Delete the active group; Undo brings it back"
 
 msgid "events.deletedFromThisBrowser"
 msgstr "Deleted {name} from this browser."
@@ -1387,6 +1504,9 @@ msgstr "Disciplines table"
 msgid "disciplines.filtered"
 msgstr "Disciplines, {filters}"
 
+msgid "targetEditor.displayOnlyFileUnchanged"
+msgstr "Display only; the file is unchanged."
+
 msgid "events.disqualifiedNoTotal"
 msgstr "Disqualified: no total."
 
@@ -1425,6 +1545,9 @@ msgstr "Division"
 
 msgid "values.double"
 msgstr "double"
+
+msgid "targetEditor.down"
+msgstr "down"
 
 msgid "fieldTable.column.dragModel"
 msgstr "Drag model"
@@ -1480,6 +1603,12 @@ msgstr "Dynamic vivacity of the chosen powders, model output"
 msgid "burnRateCompare.lead"
 msgstr "Dynamic vivacity, the burn rate per pressure, over burnt fraction."
 
+msgid "targetEditor.compassE"
+msgstr "E"
+
+msgid "targetEditor.eachGroupSPoint"
+msgstr "Each group's point of aim: Set, then click it on the target, or type x and y in target coordinates; drag it with Select."
+
 msgid "log.edit"
 msgstr "Edit"
 
@@ -1513,6 +1642,9 @@ msgstr "Energy ratio"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "energy, as printed under Pressures (Energies)"
 
+msgid "targetEditor.enterName"
+msgstr "Enter a name."
+
 msgid "log.enterDate"
 msgstr "Enter the date."
 
@@ -1542,6 +1674,12 @@ msgstr "Error"
 
 msgid "sessionSummary.column.es"
 msgstr "ES"
+
+msgid "targetEditor.es"
+msgstr "ES"
+
+msgid "targetEditor.esUnit"
+msgstr "ES ({unit})"
 
 msgid "sessionSummary.esN"
 msgstr "ES, n = {n}"
@@ -1583,11 +1721,23 @@ msgstr "Events table"
 msgid "holeDetection.example"
 msgstr "Example"
 
+msgid "targetEditor.excl"
+msgstr "Excl."
+
+msgid "targetEditor.excludeShot"
+msgstr "Exclude shot {n}"
+
 msgid "sessionSummary.excluded"
 msgstr "Excluded"
 
 msgid "sessionSummary.excludedAtRange"
 msgstr "excluded at the range"
+
+msgid "targetEditor.excludedLeftOutStatistics"
+msgstr "Excluded: left out of the statistics, still shown and counted"
+
+msgid "targetEditor.expand"
+msgstr "Expand"
 
 msgid "burnRate.exponentDetail"
 msgstr "exponent {exponent, decimal}"
@@ -1621,6 +1771,9 @@ msgstr "extractor groove diameter"
 
 msgid "cartridgeRecord.meaning.extractorGrooveWidth"
 msgstr "extractor groove width at E1"
+
+msgid "targetEditor.extremeSpreadUnit"
+msgstr "Extreme spread ({unit})"
 
 msgid "values.extruded"
 msgstr "extruded"
@@ -1847,6 +2000,9 @@ msgstr "Give a load or factory ammunition, not both."
 msgid "targets.color.green"
 msgstr "green"
 
+msgid "targetEditor.green"
+msgstr "Green"
+
 msgid "targets.color.gray"
 msgstr "grey"
 
@@ -1855,6 +2011,27 @@ msgstr "groove diameter of the bore"
 
 msgid "cartridgeRecord.meaning.grooveFrontAngle"
 msgstr "groove front cone angle from the axis (table III: belt cone)"
+
+msgid "targetEditor.groupN"
+msgstr "Group {n}"
+
+msgid "targetEditor.groupCenterPointAim"
+msgstr "Group center from the point of aim."
+
+msgid "targetEditor.groupExtremeSpreadAgainst"
+msgstr "Group extreme spread against charge"
+
+msgid "targetEditor.groupName"
+msgstr "Group name"
+
+msgid "targetEditor.groups"
+msgstr "Groups"
+
+msgid "targetEditor.groupsTwoMoreLadder"
+msgstr "Groups at two or more ladder steps give a chart of size against charge."
+
+msgid "targetEditor.groupsPerLadderStep"
+msgstr "Groups per ladder step"
 
 msgid "disciplines.row.handloads"
 msgstr "Handloads"
@@ -1885,6 +2062,15 @@ msgstr "Headstamp"
 
 msgid "comparePicks.hiddenTitle"
 msgstr "Hidden by the search or a filter"
+
+msgid "targetEditor.high"
+msgstr "high"
+
+msgid "targetEditor.highLeft"
+msgstr "high left"
+
+msgid "targetEditor.highRight"
+msgstr "high right"
 
 msgid "events.hitFactor"
 msgstr "Hit factor"
@@ -1924,6 +2110,9 @@ msgstr "Homepage"
 
 msgid "federationRecord.homepage"
 msgstr "Homepage"
+
+msgid "targetEditor.howTakePhotoApp"
+msgstr "How to take a photo the app can score"
 
 msgid "values.hybrid"
 msgstr "hybrid"
@@ -1973,6 +2162,12 @@ msgstr "Inner ten height"
 msgid "targets.row.innerTenRule"
 msgstr "Inner ten rule"
 
+msgid "targetEditor.innerTens"
+msgstr "Inner tens"
+
+msgid "targetEditor.innerTensXAmong"
+msgstr "Inner tens (X) among the included shots."
+
 msgid "workspace.inputs"
 msgstr "Inputs"
 
@@ -2018,6 +2213,9 @@ msgstr "L3 to the leade start (freebore)"
 msgid "values.lacqueredSteel"
 msgstr "Lacquered steel"
 
+msgid "targetEditor.ladderStep"
+msgstr "Ladder step"
+
 msgid "values.largePistol"
 msgstr "Large pistol"
 
@@ -2026,6 +2224,9 @@ msgstr "Large rifle"
 
 msgid "bulletCompare.largest"
 msgstr "largest"
+
+msgid "targetEditor.largestMinusSmallestReference"
+msgstr "Largest minus smallest reference scale over their mean. An angled photo shows here; a rectangle corrects it."
 
 msgid "firearms.column.lastSession"
 msgstr "Last session"
@@ -2065,6 +2266,9 @@ msgstr "leade angle"
 
 msgid "holeDetection.learned"
 msgstr "learned"
+
+msgid "targetEditor.left"
+msgstr "left"
 
 msgid "recordFields.length"
 msgstr "Length"
@@ -2252,6 +2456,15 @@ msgstr "Loads"
 msgid "disciplines.firearm.longGun"
 msgstr "Long gun"
 
+msgid "targetEditor.low"
+msgstr "low"
+
+msgid "targetEditor.lowLeft"
+msgstr "low left"
+
+msgid "targetEditor.lowRight"
+msgstr "low right"
+
 msgid "disciplines.row.maxMagnification"
 msgstr "Magnification up to"
 
@@ -2306,6 +2519,9 @@ msgstr "Mark a polygon on the photo"
 msgid "holeDetection.markRectanglePhoto"
 msgstr "Mark a rectangle on the photo"
 
+msgid "targetEditor.markPhoto"
+msgstr "Mark on photo"
+
 msgid "holeDetection.marker"
 msgstr "marker"
 
@@ -2353,6 +2569,12 @@ msgstr "Mean"
 
 msgid "powderRecord.meanMethod"
 msgstr "Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval."
+
+msgid "targetEditor.meanExtremeSpreadPer"
+msgstr "Mean extreme spread per ladder step as an angle, so groups at different distances compare, against charge; the table lists the values."
+
+msgid "targetEditor.meanRadius"
+msgstr "Mean radius"
 
 msgid "powderRecord.meanVivacity"
 msgstr "Mean vivacity"
@@ -2456,6 +2678,9 @@ msgstr "Muzzle loader"
 msgid "chargeTarget.muzzleVelocity"
 msgstr "Muzzle velocity"
 
+msgid "targetEditor.compassN"
+msgstr "N"
+
 msgid "bulletCompare.notAvailable"
 msgstr "n/a"
 
@@ -2466,6 +2691,9 @@ msgid "powderRecord.notAvailable"
 msgstr "n/a"
 
 msgid "sessionSummary.notAvailable"
+msgstr "n/a"
+
+msgid "targetEditor.notAvailable"
 msgstr "n/a"
 
 msgid "bullets.column.name"
@@ -2522,6 +2750,9 @@ msgstr "Name, number, federation or caliber, 2.53…"
 msgid "disciplines.classBasis.stated"
 msgstr "Named in the rule book"
 
+msgid "targetEditor.compassNE"
+msgstr "NE"
+
 msgid "cartridgeRecord.group.neck"
 msgstr "Neck and length"
 
@@ -2551,6 +2782,9 @@ msgstr "New firearm"
 
 msgid "powders.new"
 msgstr "New powder"
+
+msgid "targetEditor.newSheet"
+msgstr "New sheet"
 
 msgid "targets.new"
 msgstr "New target"
@@ -2750,6 +2984,9 @@ msgstr "None"
 msgid "log.none"
 msgstr "None"
 
+msgid "targetEditor.none"
+msgstr "None"
+
 msgid "holeDetection.noneMarked"
 msgstr "None marked."
 
@@ -2840,8 +3077,23 @@ msgstr "number of grooves"
 msgid "targets.row.numeralsPrinted"
 msgstr "Numerals printed"
 
+msgid "targetEditor.compassNW"
+msgstr "NW"
+
+msgid "targetEditor.ocher"
+msgstr "Ocher"
+
 msgid "page.offline"
 msgstr "Offline"
+
+msgid "targetEditor.offset"
+msgstr "Offset"
+
+msgid "targetEditor.offsetHoriz"
+msgstr "Offset horiz."
+
+msgid "targetEditor.offsetVert"
+msgstr "Offset vert."
 
 msgid "recordFields.ogive"
 msgstr "Ogive"
@@ -2854,6 +3106,9 @@ msgstr "Ogive radius ratio"
 
 msgid "listSources.ok"
 msgstr "OK"
+
+msgid "targetEditor.onPointOfAim"
+msgstr "on the point of aim"
 
 msgid "sessionSummary.oneShot"
 msgstr "one shot"
@@ -2897,6 +3152,9 @@ msgstr "Opens the designer with these values; the design keeps them as measured 
 msgid "firearms.optic"
 msgstr "Optic {n, decimal}"
 
+msgid "targetEditor.opticClicks"
+msgstr "Optic for clicks"
+
 msgid "firearms.column.optic"
 msgstr "Optic, zero"
 
@@ -2906,8 +3164,14 @@ msgstr "optical"
 msgid "targets.color.orange"
 msgstr "orange"
 
+msgid "targetEditor.orange"
+msgstr "Orange"
+
 msgid "recordSources.column.origin"
 msgstr "Origin"
+
+msgid "targetEditor.originPoint"
+msgstr "Origin point"
 
 msgid "disciplines.rule.original"
 msgstr "original"
@@ -2942,6 +3206,12 @@ msgstr "Overall length, caliper (optional)"
 msgid "burnRateCompare.overlay"
 msgstr "Overlay"
 
+msgid "targetEditor.overlays"
+msgstr "Overlays"
+
+msgid "targetEditor.overlaysOn"
+msgstr "Overlays: {count, decimal} on"
+
 msgid "disciplines.row.page"
 msgstr "Page"
 
@@ -2972,8 +3242,20 @@ msgstr "Penalties"
 msgid "recordFields.perLoadRow"
 msgstr "per load row"
 
+msgid "targetEditor.photo"
+msgstr "Photo"
+
+msgid "targetEditor.photoCamera"
+msgstr "Photo from the camera"
+
 msgid "holeDetection.photoGuide"
 msgstr "Photo guide: {rule}"
+
+msgid "targetEditor.photoAddReplaceRemove"
+msgstr "Photo: add, replace or remove; contrast and darken"
+
+msgid "targetEditor.photoChooseDropPaste"
+msgstr "Photo: choose, drop or paste one; it stays in this browser and is never uploaded"
 
 msgid "bulletPhoto.messages"
 msgstr "Photograph messages"
@@ -2989,6 +3271,9 @@ msgstr "Pick one hole"
 
 msgid "values.piezo"
 msgstr "piezo"
+
+msgid "targetEditor.pink"
+msgstr "Pink"
 
 msgid "values.pistol"
 msgstr "Pistol"
@@ -3016,6 +3301,9 @@ msgstr "Plus and minus 2 standard uncertainties of the fitted vivacity, a lower 
 
 msgid "cartridges.column.pmax"
 msgstr "Pmax"
+
+msgid "targetEditor.pointOfAimAxis"
+msgstr "Point of aim {axis}"
 
 msgid "events.points"
 msgstr "Points"
@@ -3206,6 +3494,9 @@ msgstr "published"
 msgid "cartridgeRecord.published"
 msgstr "Published"
 
+msgid "targetEditor.purple"
+msgstr "Purple"
+
 msgid "bulletCompare.quantity"
 msgstr "Quantity"
 
@@ -3278,6 +3569,12 @@ msgstr "Rect."
 msgid "targets.color.red"
 msgstr "red"
 
+msgid "targetEditor.redoShortcut"
+msgstr "Redo ({shortcut})"
+
+msgid "targetEditor.reference"
+msgstr "Reference"
+
 msgid "recordFields.referencePressure"
 msgstr "Reference pressure"
 
@@ -3293,6 +3590,9 @@ msgstr "Region off"
 msgid "holeDetection.regionOffTargetFound"
 msgstr "Region off: the target found in the photo"
 
+msgid "targetEditor.removeLabel"
+msgstr "Remove {label}"
+
 msgid "bulletCompare.remove"
 msgstr "Remove {name}"
 
@@ -3302,11 +3602,17 @@ msgstr "Remove {name}"
 msgid "directoryTable.removeScope"
 msgstr "Remove {name}"
 
+msgid "targetEditor.removePhoto"
+msgstr "Remove photo"
+
 msgid "events.removeSeries"
 msgstr "Remove series {n}"
 
 msgid "firearms.removedOptic"
 msgstr "Removed optic"
+
+msgid "targetEditor.renameSheet"
+msgstr "Rename sheet"
 
 msgid "disciplines.rule.repeater"
 msgstr "repeater"
@@ -3323,8 +3629,14 @@ msgstr "Replace entries?"
 msgid "events.replaceEvents"
 msgstr "Replace events?"
 
+msgid "targetEditor.replacePhoto"
+msgstr "Replace photo"
+
 msgid "matchRounds.reserve"
 msgstr "Reserve, %"
+
+msgid "targetEditor.resetLabel"
+msgstr "Reset {label}"
 
 msgid "units.reset"
 msgstr "Reset to preset"
@@ -3389,6 +3701,12 @@ msgstr "Revolver"
 msgid "values.rifle"
 msgstr "Rifle"
 
+msgid "targetEditor.right"
+msgstr "right"
+
+msgid "targetEditor.rightPointAimPositive"
+msgstr "Right of the point of aim: positive."
+
 msgid "cartridgeRecord.meaning.rimChamferAngle"
 msgstr "rim chamfer angle from the head face"
 
@@ -3430,6 +3748,9 @@ msgstr "Ring diameters"
 
 msgid "targets.group.ringDiametersWidth"
 msgstr "Ring diameters width"
+
+msgid "targetEditor.ringValueTenthsWhere"
+msgstr "Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total."
 
 msgid "events.shotsHint"
 msgstr "Ring values separated by spaces, such as 10 9 10."
@@ -3515,6 +3836,9 @@ msgstr "Rule books table"
 msgid "disciplines.rules"
 msgstr "Rules"
 
+msgid "targetEditor.compassS"
+msgstr "S"
+
 msgid "log.saveEntry"
 msgstr "Save entry"
 
@@ -3542,11 +3866,17 @@ msgstr "Scale from the diameter entered, no ruler: lengths assume a square side 
 msgid "bulletPhoto.basis.length"
 msgstr "Scale from the overall length entered, no ruler: widths assume a square side view of the bullet drawn to scale. A bullet turned 10 degrees towards the camera reads 1.5 % too wide; a maker's product image may not be to scale."
 
+msgid "targetEditor.score"
+msgstr "Score"
+
 msgid "faceRecord.column.scoring"
 msgstr "Scoring"
 
 msgid "targets.row.scoringCenters"
 msgstr "Scoring centers on the sheet"
+
+msgid "targetEditor.screenSize"
+msgstr "screen size"
 
 msgid "bullets.column.sd"
 msgstr "SD"
@@ -3565,6 +3895,9 @@ msgstr "SD {level}: the range that holds the SD of the population the string is 
 
 msgid "sessionSummary.sdN"
 msgstr "SD, n = {n}"
+
+msgid "targetEditor.compassSE"
+msgstr "SE"
 
 msgid "directoryTable.search"
 msgstr "Search"
@@ -3596,8 +3929,14 @@ msgstr "Sectional density, computed: mass over diameter squared."
 msgid "directoryTable.select"
 msgstr "Select"
 
+msgid "targetEditor.select"
+msgstr "Select"
+
 msgid "directoryTable.selectRow"
 msgstr "Select {name}"
+
+msgid "targetEditor.selectDragShotsPoints"
+msgstr "Select: drag shots, points of aim and reference points; drag the background to pan"
 
 msgid "disciplines.rule.semiAutomatic"
 msgstr "semi automatic"
@@ -3626,6 +3965,12 @@ msgstr "Session"
 msgid "page.session"
 msgstr "Session summary"
 
+msgid "targetEditor.set"
+msgstr "Set"
+
+msgid "targetEditor.setPhoto"
+msgstr "Set on photo"
+
 msgid "recordFields.startPressureNote"
 msgstr "Set per load row by the barrel length and the bullet construction."
 
@@ -3637,6 +3982,9 @@ msgstr "Shape"
 
 msgid "targets.row.sheet"
 msgstr "Sheet"
+
+msgid "targetEditor.sheetName"
+msgstr "Sheet name"
 
 msgid "events.shootingLog"
 msgstr "Shooting log"
@@ -3659,11 +4007,20 @@ msgstr "Short gun"
 msgid "sessionSummary.shot"
 msgstr "Shot"
 
+msgid "targetEditor.shot"
+msgstr "Shot"
+
+msgid "targetEditor.shotAxis"
+msgstr "Shot {n} {axis}"
+
 msgid "disciplineRecord.column.groups"
 msgstr "Shot groups"
 
 msgid "page.groups"
 msgstr "Shot groups"
+
+msgid "targetEditor.shotAddShotsActive"
+msgstr "Shot: add shots to the active group by click or tap"
 
 msgid "burnRate.unfit.shotgun"
 msgstr "Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges."
@@ -3679,6 +4036,12 @@ msgstr "Shots"
 
 msgid "sessionSummary.shots"
 msgstr "Shots"
+
+msgid "targetEditor.shots"
+msgstr "Shots"
+
+msgid "targetEditor.shotsStatisticsExcludedShots"
+msgstr "Shots in the statistics; excluded shots are shown and counted, not measured."
 
 msgid "sessionSummary.shotsOf"
 msgstr "Shots of {name}"
@@ -3794,6 +4157,9 @@ msgstr "Sources ({kind})"
 msgid "recordSources.table"
 msgstr "Sources table"
 
+msgid "targetEditor.spread"
+msgstr "Spread"
+
 msgid "disciplineRecord.column.stage"
 msgstr "Stage"
 
@@ -3818,6 +4184,9 @@ msgstr "standing"
 msgid "recordFields.startPressure"
 msgstr "Start pressure"
 
+msgid "targetEditor.statistics"
+msgstr "Statistics of {name}"
+
 msgid "sessionSummary.statsTitle"
 msgstr "Statistics per string, excluded shots left out ({unit})"
 
@@ -3829,6 +4198,9 @@ msgstr "steel"
 
 msgid "values.cupSteel"
 msgstr "Steel"
+
+msgid "targetEditor.step"
+msgstr "Step"
 
 msgid "log.stored"
 msgstr "Stored"
@@ -3854,6 +4226,9 @@ msgstr "Structure"
 msgid "log.resultHint"
 msgstr "Such as rings or a placing."
 
+msgid "targetEditor.sumRingValuesIncluded"
+msgstr "Sum of the ring values of the included shots; decimal sum in brackets."
+
 msgid "logSummary.summaryYear"
 msgstr "Summary year"
 
@@ -3862,6 +4237,9 @@ msgstr "Support"
 
 msgid "recordFields.surface"
 msgstr "Surface"
+
+msgid "targetEditor.compassSW"
+msgstr "SW"
 
 msgid "values.swaged"
 msgstr "swaged"
@@ -3919,6 +4297,9 @@ msgid "holeDetection.targetPhoto"
 msgstr "Target on the photo"
 
 msgid "events.targetSheet"
+msgstr "Target sheet"
+
+msgid "targetEditor.targetSheet"
 msgstr "Target sheet"
 
 msgid "disciplines.column.faces"
@@ -4050,6 +4431,9 @@ msgstr "The first optic of the active configuration and its zero range."
 msgid "holeDetection.holeMustLeast4"
 msgstr "The hole must be at least 4 px across"
 
+msgid "targetEditor.lastReferenceStaysWhile"
+msgstr "The last reference stays while there are shots."
+
 msgid "photoQuality.unevenLight"
 msgstr "The light is uneven: one side of the target is much darker than another."
 
@@ -4080,6 +4464,9 @@ msgstr "The nose is not a circle arc (a hybrid or another form): no ogive radius
 msgid "holeDetection.photoDecodesAnotherSize"
 msgstr "The photo decodes at another size than it is shown; detection is off for it."
 
+msgid "targetEditor.photoHasScaleYet"
+msgstr "The photo has no scale yet."
+
 msgid "photoQuality.dark"
 msgstr "The photo is dark: even its brightest part is dim."
 
@@ -4094,6 +4481,9 @@ msgstr "The photo is only {n} px on its longer side."
 
 msgid "photoQuality.blurred"
 msgstr "The photo is soft: the edges of the target are blurred."
+
+msgid "targetEditor.photoPointTarget0"
+msgstr "The photo point of target (0, 0). Shots stay on their holes."
 
 msgid "bulletPhoto.workerFailed"
 msgstr "The photograph could not be processed in this browser."
@@ -4245,6 +4635,9 @@ msgstr "Too many bullets."
 msgid "bulletPhoto.tool"
 msgstr "Tool"
 
+msgid "targetEditor.tool"
+msgstr "Tool"
+
 msgid "events.totalHeading"
 msgstr "Total"
 
@@ -4314,6 +4707,9 @@ msgstr "typed"
 msgid "burnRate.typed"
 msgstr "Typed model parameters"
 
+msgid "targetEditor.undoShortcut"
+msgstr "Undo ({shortcut})"
+
 msgid "events.undoOfFailed"
 msgstr "Undo of {name} failed: {reason}"
 
@@ -4347,6 +4743,9 @@ msgstr "Untick"
 msgid "comparePicks.untickName"
 msgstr "Untick {name}"
 
+msgid "targetEditor.up"
+msgstr "up"
+
 msgid "burnRateCompare.upTo"
 msgstr "Up to {max}"
 
@@ -4375,6 +4774,9 @@ msgid "chargeTarget.value"
 msgstr "Value"
 
 msgid "fieldTable.column.value"
+msgstr "Value"
+
+msgid "targetEditor.value"
 msgstr "Value"
 
 msgid "bulletPhoto.valuesTable"
@@ -4424,6 +4826,9 @@ msgstr "Vivacity"
 
 msgid "burnRate.unresolvedDetail"
 msgstr "vivacity {value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}"
+
+msgid "targetEditor.compassW"
+msgstr "W"
 
 msgid "disciplines.rule.wadcutter"
 msgstr "wadcutter"

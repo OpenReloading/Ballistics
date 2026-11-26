@@ -65,11 +65,20 @@ const rejected: [string, object, object][] = [
     withFile({ bytes: 0 }),
     { code: 'too_small', minimum: 0, inclusive: false, path: ['file', 'bytes'] },
   ],
-  [
-    'a url that is not https',
-    withFile({ url: 'http://example.org/m.onnx' }),
-    { code: 'invalid_format', format: 'url', path: ['file', 'url'] },
-  ],
+  ...['https://example.org/m.onnx', '/models/m.onnx', '../m.onnx'].map(
+    (url): [string, object, object] => [
+      `${url} as the file url`,
+      withFile({ url }),
+      { code: 'invalid_format', format: 'regex', path: ['file', 'url'] },
+    ],
+  ),
+  ...['/models/ort/', 'https://example.org/ort/', 'models/../ort/', 'models/ort'].map(
+    (wasmPaths): [string, object, object] => [
+      `${wasmPaths} as the WASM folder`,
+      { ...example, runtime: { ...example.runtime, wasmPaths } },
+      { code: 'invalid_format', format: 'regex', path: ['runtime', 'wasmPaths'] },
+    ],
+  ),
   [
     'no model license',
     { ...example, license: licenseWithoutModel },
