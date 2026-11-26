@@ -455,7 +455,7 @@ jobs:
           docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
             --env CI --env GITHUB_ACTIONS --env NEXT_PUBLIC_REPOSITORY_URL \
             --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
-            "$PLAYWRIGHT_IMAGE" npx playwright test --project next-chromium
+            "$PLAYWRIGHT_IMAGE" npx playwright test --project next-chromium --repeat-each 30 --workers 4 --trace retain-on-failure tests/web/box-label.spec.ts:76 tests/web/cartridge-designer.spec.ts:202 tests/web/search.spec.ts:113
       - name: Keep the e2e results of a failed run
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

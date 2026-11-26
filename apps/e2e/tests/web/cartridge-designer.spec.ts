@@ -211,7 +211,7 @@ test('the designer has no axe violation in light and dark, and fits 390 px', asy
     const { violations } = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze()
-    expect(violations.map((v) => `${colorScheme} ${v.id} ${v.nodes.map((n) => n.target)}`)).toEqual(
+    expect(violations.map((v) => `${colorScheme} ${v.id} ${v.nodes.map((n) => `${n.target} ${n.html} ${n.failureSummary} ${JSON.stringify(n.any.concat(n.all, n.none).map((c) => c.data))}`)}`)).toEqual(
       [],
     )
   }
