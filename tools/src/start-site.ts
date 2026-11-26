@@ -29,6 +29,10 @@ function build() {
     { PRERENDER: prerender },
   )
   run(`${web}node_modules/.bin/lingui`, ['compile', '--strict'])
+  run(process.execPath, [
+    '--disable-warning=MODULE_TYPELESS_PACKAGE_JSON',
+    'scripts/english-catalogs.mts',
+  ])
   rmSync(site, { recursive: true, force: true })
   for (const edition of ['stable', 'next'] as const) {
     const base = edition === 'next' ? `${siteBase}/next` : siteBase

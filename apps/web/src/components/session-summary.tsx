@@ -8,7 +8,7 @@ import { FileUp } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import {
   chronoFileBytes,
@@ -27,6 +27,7 @@ import { stringName } from '../lib/string-name.ts'
 import { type StringStats, stringStats } from '../lib/string-stats.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/session-summary.json' with { type: 'json' }
 import { ChronoDropZone } from './chrono-drop-zone.tsx'
 import { TemplateLinks } from './chrono-file-input.tsx'
 import { LazyLineChart, preloadChart } from './lazy-chart.tsx'
@@ -38,6 +39,8 @@ import { EmptyNote, ErrorNote, Message } from './states.tsx'
 import { StringComparison } from './string-comparison.tsx'
 import { TourButton } from './tour-button.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 type Read = { fileName: string; data: ChronoImport; pick: number }
 

@@ -18,6 +18,7 @@ import {
 } from 'react'
 import { buildTag } from '@/platform/edition.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
@@ -40,6 +41,7 @@ import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
 import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { formatQuantity, mmLength, shownLength, type UnitSystem, withUnit } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/workbench.json' with { type: 'json' }
 import { BarrelTable } from './barrel-length.tsx'
 import type { ChargeTargetDialog } from './charge-target-dialog.tsx'
 import { FileMenu } from './file-menu.tsx'
@@ -84,6 +86,8 @@ import { LadderTable, LimitsView, ladderName, Readouts } from './workbench-reado
 import { ResultsArea } from './workbench-results.tsx'
 import { WorkbenchSearch } from './workbench-search.tsx'
 import { Toolbar, useCopyLink, Workspace } from './workspace.tsx'
+
+loadEnglish(englishMessages)
 
 /** The model parameters the typed burn law reads. */
 const burnKeys = ['vivacity', 'exponent', 'referencePressure', 'formA', 'formM', 'formQ', 'formZ1']

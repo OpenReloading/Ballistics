@@ -31,6 +31,7 @@ import {
 } from 'react'
 import { storedPhoto } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { msg, type Message as Text, type Translator } from '../i18n/translate.ts'
 import { commonCaliber } from '../lib/caliber.ts'
 import {
@@ -61,11 +62,15 @@ import type { Frame } from '../lib/target-editor.ts'
 import { type Point, turnedBox } from '../lib/target-geometry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
+import photoQualityEnglish from '../locales/en/lib/photo-quality.json' with { type: 'json' }
 import { SiField } from './si-field.tsx'
 import { Message } from './states.tsx'
 import { arrows, viewPoint } from './svg-point.ts'
 import type { Tool } from './target-canvas.tsx'
 import { useUnits } from './units-settings.tsx'
+
+// photo-quality.ts runs in a worker too, so it leaves its English to the modules that show it
+loadEnglish(photoQualityEnglish)
 
 type Choices = NonNullable<ShotGroup['detection']>
 const defaultContrast = 0.15

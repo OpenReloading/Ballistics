@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react'
 import { Button, Group, NumberInput, Select, Stack, Text } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import {
   answerOf,
@@ -19,9 +20,14 @@ import { translateMessage } from '../lib/core-messages.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { typedSpec } from '../lib/record-specs.ts'
 import { formatQuantity, msText, withUnit } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/charge-target-dialog.json' with {
+  type: 'json',
+}
 import { AppModal } from './app-modal.tsx'
 import { useLoad } from './workbench-context.ts'
 import { notReached } from './workbench-outcome.ts'
+
+loadEnglish(englishMessages)
 
 const targetLabel = /*i18n*/ { id: 'chargeTarget.target', context: 'charge', message: 'Target' }
 

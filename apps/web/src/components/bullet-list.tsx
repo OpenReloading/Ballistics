@@ -6,6 +6,7 @@ import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'
 import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { bulletKinds, bulletSectionalDensity } from '../lib/bullet-kinds.ts'
 import {
   bulletFacetKeys,
@@ -41,6 +42,7 @@ import {
 } from '../lib/sources.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { userBullets } from '../lib/variants.ts'
+import englishMessages from '../locales/en/components/bullet-list.json' with { type: 'json' }
 import { CompareButton, hiddenPicks, SelectionSummary, usePicks } from './compare-picks.tsx'
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
@@ -49,6 +51,8 @@ import { DeleteRow, sourceColumn, useResolved, useUserRecords } from './list-sou
 import { MissingMark } from './missing-mark.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** A cartridge of the "Fits cartridge" filter: its id, name and the CIP values of the fit. */
 type FitCartridge = { id: string; name: string; fit: CartridgeDiameters }

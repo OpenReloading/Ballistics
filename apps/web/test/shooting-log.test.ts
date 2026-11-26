@@ -141,7 +141,7 @@ describe('the entry form', () => {
 
   it('says why an entry cannot be saved', () => {
     expect(entryProblem({ date: '2026-10-12', rounds: 5 })).toBeUndefined()
-    expect(entryProblem({ date: '', rounds: 5 })).toBe('Enter the date.')
+    expect(entryProblem({ date: '', rounds: 5 })).toMatchObject({ id: 'log.enterDate' })
     // a day of the confirmation without who confirmed is not dropped in silence
     expect(
       entryProblem({
@@ -149,13 +149,13 @@ describe('the entry form', () => {
         rounds: 5,
         confirmation: { by: ' ', date: '2026-10-12' },
       }),
-    ).toBe('Enter who confirmed the entry, or clear the day of the confirmation.')
-    expect(entryProblem({ date: '2026-10-12', rounds: 100001 })).toBe(
-      'Check the entry: a value is out of its range.',
-    )
+    ).toMatchObject({ id: 'log.enterConfirmedBy' })
+    expect(entryProblem({ date: '2026-10-12', rounds: 100001 })).toMatchObject({
+      id: 'log.outOfRange',
+    })
     expect(
       entryProblem({ date: '2026-10-12', rounds: 5, load: `user:${load}`, ammunition: 'X' }),
-    ).toBe('Give a load or factory ammunition, not both.')
+    ).toMatchObject({ id: 'log.loadOrAmmunition' })
   })
 })
 

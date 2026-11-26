@@ -7,11 +7,14 @@ import {
   type Figure,
   shotshellVariants,
 } from '@rangefoundry/svg-drawings/cartridge'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
+import englishMessages from '../locales/en/lib/cartridge-record.json' with { type: 'json' }
 import type { CartridgeDetail } from './api-types.ts'
 import { fieldSpecs, type Group, groups } from './cartridge-designer.ts'
 import { inchText, type UnitSystem } from './units.ts'
+
+loadEnglish(englishMessages)
 
 /** What these functions give when no language is passed. */
 const english = linguiOf('en')

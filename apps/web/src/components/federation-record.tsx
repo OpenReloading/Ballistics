@@ -3,15 +3,19 @@
 import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { countryName } from '../lib/countries.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/federation-record.json' with { type: 'json' }
 import { FieldTable, SlashBreaks } from './field-table.tsx'
 import { HomepageLink } from './homepage-link.tsx'
 import { Panel } from './panel.tsx'
 import { LinkButton } from './record-actions.tsx'
 import { PanelTable } from './scroll-region.tsx'
+
+loadEnglish(englishMessages)
 
 /** The rule books a federation's records cite, each linked, with its edition. */
 export function FederationRuleBooks({

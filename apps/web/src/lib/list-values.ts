@@ -1,7 +1,11 @@
 /** The words of the record values that the lists show in their cells: a value the map lacks is shown as the record gives it. */
 import type { I18n, MessageDescriptor } from '@lingui/core'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/lib/list-values.json' with { type: 'json' }
 import { titleFromKebab } from './record-fields.ts'
+
+loadEnglish(englishMessages)
 
 /** The value as a name ("nickel-plated-brass" as "Nickel plated brass"), keyed as it reads. */
 const names: Record<string, MessageDescriptor> = {
