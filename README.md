@@ -2,6 +2,7 @@
 
 # RangeFoundry Workbench
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-eikelandin-db61a2?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/eikelandin)
 [![CI](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml)
 [![License: ISC](https://img.shields.io/badge/license-ISC-blue)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
