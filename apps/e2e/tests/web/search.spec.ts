@@ -130,6 +130,10 @@ test('on the workbench Ctrl+K and the sidebar Search open one search, with the p
   await field(page).fill('powders')
   await search(page).getByRole('button', { name: 'Powders', exact: true }).click()
   await expect(page).toHaveURL(exported('/powders'))
+  // the URL changes before the route's loader settles: until the list replaces the workbench, Ctrl+K opens the workbench's search, which goes with it
+  await expect(page.getByRole('heading', { level: 1, name: 'Powders' })).toHaveAttribute(
+    'data-hydrated',
+  )
   // the site search after the workbench: still one
   await open(page)
   await expect(field(page)).toHaveCount(1)
