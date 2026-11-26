@@ -13,7 +13,7 @@ import {
 } from '@rangefoundry/target-recognition'
 import { errorText } from './error-text.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
-import { folderDetector } from './hole-model.ts'
+import { MODEL_LOAD_MS, servedDetector } from './hole-model.ts'
 import { openOnnxModel } from './onnx-model.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
@@ -149,12 +149,14 @@ async function handleDetect(
     minContrast: r.minContrast,
     onProgress: (done: number) => post({ kind: 'progress', done: 0.2 + 0.8 * done }),
   }
-  const detector = await folderDetector(r.model, {
-    fetch: (url) => fetch(url),
+  const { detector, fellBack } = await servedDetector(r.model, {
+    fetch: (url, signal) => fetch(url, { signal }),
     open: openOnnxModel,
+    signal: AbortSignal.timeout(MODEL_LOAD_MS),
     report: (error) =>
       console.error('The hole model did not load; the classical detector runs.', error),
   })
+  if (fellBack) post({ kind: 'fallback' })
   const found = await detector.propose(requestOf(r, input, toWork))
   return toPhotoPx(found, k, x0, y0)
 }

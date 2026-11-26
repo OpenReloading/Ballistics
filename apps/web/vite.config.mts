@@ -1,4 +1,4 @@
-import { globSync, readFileSync } from 'node:fs'
+import { existsSync, globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
@@ -43,12 +43,16 @@ const appManifest = (basePath: string): Plugin => ({
   },
 })
 
-/** Fails a client output that holds a WebAssembly or ONNX file, emitted or copied from public/: the offline layer precaches that output. */
+/** Fails a client output that holds a WebAssembly or ONNX file other than the served model files copied from public/models/: a bundled one would join the script output the offline layer precaches. */
 const noModelFiles: Plugin = {
   name: 'no-model-files',
   applyToEnvironment: (environment) => environment.name === 'client',
   writeBundle({ dir }) {
-    const found = dir ? globSync('**/*', { cwd: dir }).filter(isModelFile) : []
+    const served = (file: string) =>
+      file.startsWith('models/') && existsSync(path.join(import.meta.dirname, 'public', file))
+    const found = dir
+      ? globSync('**/*', { cwd: dir }).filter((f) => isModelFile(f) && !served(f))
+      : []
     if (found.length) this.error(`the client output holds ${found.join(', ')}`)
   },
 }

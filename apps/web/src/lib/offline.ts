@@ -76,7 +76,7 @@ export const appUrl = (base: string, path: string, slash = '') =>
 /** The catalogue index (`writeStaticApi`), which every list reads: precached, so lists work offline. */
 export const catalogueFile = '/api/catalogue/index.json'
 
-/** A WebAssembly or ONNX file: the model runtime and the model load from outside the precache (`src/lib/onnx-model.ts`), so no build output holds one. */
+/** A WebAssembly or ONNX file: the model runtime and the model load from outside the precache (`src/lib/onnx-model.ts`), so no script output holds one. */
 export const isModelFile = (file: string) => /\.(wasm|onnx)$/.test(file)
 
 /** URLs of the files under `.next/static` (paths relative to it) without maps, and the catalogue index. */
