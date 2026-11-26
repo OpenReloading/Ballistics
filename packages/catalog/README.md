@@ -16,4 +16,4 @@ console.log(twistPlausible(254)) // true
 
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/catalog/
 
-License: code ISC. Data records (`records/`): an entry with a `license` field uses that license, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see `LICENSE`).
+License: code AGPL-3.0-only. Data records (`records/`): an entry with a `license` field uses that license, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see `LICENSE`).

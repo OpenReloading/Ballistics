@@ -1,10 +1,22 @@
 version = 1
 
-# Everything else: the repository's code, documentation and test fixtures (LICENSE).
+# Everything else: the repository's code, tests, test fixtures, scripts and generated files (LICENSE).
 [[annotations]]
 path = "**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
-SPDX-License-Identifier = "ISC"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# Documentation: the docs site pages and the Markdown files.
+[[annotations]]
+path = ["apps/docs/docs/**", "**/*.md", "**/*.mdx"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "MIT"
+
+# API reports generated from the code's declarations, and a test fixture.
+[[annotations]]
+path = ["**/*.api.md", "tools/test/fixtures/markdown-meaning.md"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only"
 
 # Catalog records (NOTICE, packages/catalog/LICENSE).
 [[annotations]]

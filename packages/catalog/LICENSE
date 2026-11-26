@@ -15,4 +15,4 @@ the shooting sport federations or the C.I.P.
 Attribution: "RangeFoundry data records", with a link to the repository and the source named in
 each record's provenance where the source requires it.
 
-The code is licensed under the ISC license (LICENSE-ISC in the package, ../../LICENSE in the repository).
+The code is licensed under the GNU Affero General Public License v3.0 only (AGPL-3.0-only; LICENSE-AGPL in the package, ../../LICENSE in the repository).

@@ -68,7 +68,7 @@ async function writeInto(
     photos[file] = {
       sha256: createHash('sha256').update(bytes).digest('hex'),
       source: 'synthetic',
-      license: 'ISC',
+      license: 'MIT',
       author: 'make-synthetic.mts',
       session: `synthetic seed ${seed}`,
       kind: p.kind,

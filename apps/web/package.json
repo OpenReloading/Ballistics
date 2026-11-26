@@ -2,7 +2,7 @@
   "name": "@rangefoundry/web",
   "version": "0.0.7",
   "private": true,
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "pnpm run lingui:compile && next dev",
     "prebuild": "node -e \"fs.rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\"",

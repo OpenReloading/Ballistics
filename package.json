@@ -2,7 +2,7 @@
   "name": "openreloading",
   "version": "0.0.1",
   "private": true,
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=26"
   },

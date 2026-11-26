@@ -9,7 +9,7 @@
     "zod",
     "units"
   ],
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/schema/",
   "repository": {
     "type": "git",

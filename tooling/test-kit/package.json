@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Test helpers of the logic packages: a tolerance matcher and typed arbitraries.",
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

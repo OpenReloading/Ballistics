@@ -21,4 +21,4 @@ The UI font is Inter as `@fontsource-variable/inter` registers it (`"Inter Varia
 
 Change a token in `tokens/`, then run `pnpm run generate` and commit the source with the generated `css/tokens.css` and `src/index.ts`. The tests fail when the committed files differ from the source, when a pair of `scripts/generate.ts` falls below its WCAG 2.2 contrast in either scheme, or when Mantine, the CSS variables, Docusaurus and BuildGuide show a role differently.
 
-License: ISC
+License: AGPL-3.0-only
