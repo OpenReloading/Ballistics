@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
 import {
   chronoFileBytes,
   exampleCsv,
@@ -89,7 +88,7 @@ export function SessionSummary() {
   return (
     <>
       <PageBar
-        title={msg('Session summary')}
+        title={/*i18n*/ { id: 'page.session', message: 'Session summary' }}
         translated
         status={
           <span role="status">

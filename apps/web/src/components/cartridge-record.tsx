@@ -576,7 +576,6 @@ export function RecordFacts({
   caseType?: string | undefined
   children?: ReactNode
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   const items = values.map((v, i) => ({ v, notes: notes[i] ?? [] }))
@@ -620,7 +619,7 @@ export function RecordFacts({
             label={i18n._({ id: 'cartridgeRecord.case', message: 'Case' })}
             notes={[i18n._(factMeanings.case)]}
           >
-            {caseTypeText(t, caseType)}
+            {caseTypeText(i18n, caseType)}
           </Fact>
         </FactCard>
       )}

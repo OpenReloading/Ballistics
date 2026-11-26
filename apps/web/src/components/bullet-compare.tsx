@@ -19,7 +19,6 @@ import dynamic from 'next/dynamic'
 import { type CSSProperties, type ReactNode, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useRouter } from '@/platform/navigation.ts'
-import { useTranslation } from '../i18n/language.ts'
 import {
   compareGroups,
   differenceMarks,
@@ -33,7 +32,7 @@ import { productLabel } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { controlSize } from '../lib/theme.ts'
-import { say } from '../lib/wording.ts'
+import { sayLingui } from '../lib/wording.ts'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
@@ -96,7 +95,6 @@ export function BulletCompare({
   drawings: ReactNode[]
 }) {
   const { system } = useUnits()
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const ids = bullets.map((b) => b.id)
   const style = { '--n': bullets.length } as CSSProperties
@@ -169,11 +167,11 @@ export function BulletCompare({
                 </TableTh>
               </TableTr>
             </TableThead>
-            {compareGroups(bullets, system, t, i18n).map((g) => (
-              <TableTbody key={say(i18n, t, g.title)}>
+            {compareGroups(bullets, system, i18n).map((g) => (
+              <TableTbody key={sayLingui(i18n, g.title)}>
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={bullets.length + 3}>
-                    {say(i18n, t, g.title)}
+                    {sayLingui(i18n, g.title)}
                   </TableTh>
                 </TableTr>
                 {g.rows.map((row, k) => {
@@ -185,11 +183,11 @@ export function BulletCompare({
                       <TableTd className="field-symbol">{row.symbol}</TableTd>
                       <TableTh scope="row">
                         {row.from === undefined
-                          ? say(i18n, t, row.label)
+                          ? sayLingui(i18n, row.label)
                           : i18n._({
                               id: 'bulletCompare.labelFrom',
                               message: '{label} from {velocity}',
-                              values: { label: say(i18n, t, row.label), velocity: row.from },
+                              values: { label: sayLingui(i18n, row.label), velocity: row.from },
                             })}
                       </TableTh>
                       {row.values.map((v, i) => {

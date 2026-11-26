@@ -10,7 +10,6 @@ import {
   bulletScreenEm,
 } from '@rangefoundry/svg-drawings/bullet'
 import { linguiOf } from '../i18n/lingui.ts'
-import { type Translator, translator } from '../i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   bulletDataGroups,
@@ -21,11 +20,11 @@ import {
   turnIn,
 } from './record-fields.ts'
 import { type UnitSystem, withUnit } from './units.ts'
-import type { Wording } from './wording.ts'
+import type { LinguiWording } from './wording.ts'
 
 /** A row of the comparison: one value per bullet as shown in the preset, undefined where absent. */
 interface CompareRow {
-  label: Wording
+  label: LinguiWording
   /** A coefficient's lower velocity bound, in the preset's unit, after the label. */
   from?: string
   symbol?: string | undefined
@@ -35,11 +34,11 @@ interface CompareRow {
 
 /** A titled group of compared rows. */
 interface CompareGroup {
-  title: Wording
+  title: LinguiWording
   rows: CompareRow[]
 }
 
-const groupOrder: Wording[] = [
+const groupOrder: LinguiWording[] = [
   bulletLabels.size,
   bulletLabels.shape,
   bulletLabels.tipAndBase,
@@ -53,13 +52,12 @@ const coefficientsTitle = /*i18n*/ {
   message: 'Ballistic coefficients',
 }
 
-const keyTitle: Wording = /*i18n*/ { id: 'bulletCompare.keyValues', message: 'Key values' }
+const keyTitle: LinguiWording = /*i18n*/ { id: 'bulletCompare.keyValues', message: 'Key values' }
 
-const untitled: Wording = { verbatim: '' }
+const untitled: LinguiWording = { verbatim: '' }
 
 /** A wording as a map key: a message by its English text, the others by their parts. */
-const keyOf = (w: Wording) =>
-  typeof w === 'string' ? w : 'id' in w ? (w.message ?? w.id) : JSON.stringify(w)
+const keyOf = (w: LinguiWording) => ('id' in w ? (w.message ?? w.id) : JSON.stringify(w))
 
 /** The rows of one bullet's group merged into `rows`: its value at place `at`, a repeated label once per repeat. */
 function mergeRows(
@@ -68,7 +66,6 @@ function mergeRows(
   at: number,
   count: number,
   system: UnitSystem,
-  t: Translator['t'],
   i18n: I18n,
 ) {
   const seen = new Map<string, number>()
@@ -79,7 +76,7 @@ function mergeRows(
     const n = seen.get(label) ?? 0
     seen.set(label, n + 1)
     const key = `${label}#${n}`
-    const { number, unit } = rowParts(r, system, t, i18n)
+    const { number, unit } = rowParts(r, system, i18n)
     const row = rows.get(key) ?? {
       label: r.label,
       ...(from !== undefined && { from }),
@@ -93,7 +90,7 @@ function mergeRows(
 }
 
 /** Each by the start of its key (a coefficient's key goes on with its band), with its label in the Key group. */
-const keyRows: { group: Wording; key: string }[] = [
+const keyRows: { group: LinguiWording; key: string }[] = [
   { group: bulletLabels.size, key: 'Mass#' },
   { group: bulletLabels.size, key: 'Diameter#' },
   { group: bulletLabels.size, key: 'Length#' },
@@ -103,7 +100,7 @@ const keyRows: { group: Wording; key: string }[] = [
 const keyModels = ['G1', 'G7']
 
 /** The first row of `group` whose key starts with `start`, taken out of it, with its key. */
-function take(groups: Map<string, Map<string, CompareRow>>, group: Wording, start: string) {
+function take(groups: Map<string, Map<string, CompareRow>>, group: LinguiWording, start: string) {
   const rows = groups.get(keyOf(group))
   const found = [...(rows?.keys() ?? [])].find((r) => r.startsWith(start))
   const row = found === undefined ? undefined : rows?.get(found)
@@ -119,7 +116,7 @@ function takeCoefficients(groups: Map<string, Map<string, CompareRow>>, ids: str
     const row = coefficients?.get(id)
     if (!row) return []
     coefficients?.delete(id)
-    const model = typeof row.label === 'object' && 'verbatim' in row.label ? row.label.verbatim : ''
+    const model = 'verbatim' in row.label ? row.label.verbatim : ''
     const label = /*i18n*/ {
       id: 'bulletCompare.coefficient',
       message: 'BC {model}',
@@ -159,11 +156,10 @@ function keyCoefficients(bullets: Bullet[], system: UnitSystem): string[] {
 export function compareGroups(
   bullets: Bullet[],
   system: UnitSystem,
-  t: Translator['t'] = translator().t,
   i18n: I18n = linguiOf('en'),
 ): CompareGroup[] {
   // the groups in `bulletDataGroups` order, also where the first bullet lacks one
-  const titles = new Map<string, Wording>()
+  const titles = new Map<string, LinguiWording>()
   const groups = new Map<string, Map<string, CompareRow>>(
     [...groupOrder, coefficientsTitle].map((title) => {
       titles.set(keyOf(title), title)
@@ -181,7 +177,7 @@ export function compareGroups(
       titles.set(title, wording)
       const rows = groups.get(title) ?? new Map<string, CompareRow>()
       groups.set(title, rows)
-      mergeRows(rows, g.rows, i, bullets.length, system, t, i18n)
+      mergeRows(rows, g.rows, i, bullets.length, system, i18n)
     }
   })
   const key = keyGroup(groups, keyCoefficients(bullets, system))

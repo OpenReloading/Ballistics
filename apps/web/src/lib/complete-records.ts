@@ -1,6 +1,4 @@
 /** A name-only bullet or a powder without burn values cannot run. */
-import { msg } from '../i18n/translate.ts'
-
 /** A bullet record or list item that only names the bullet. */
 export const bulletIncomplete = (b: { nameOnly?: true | undefined }) => b.nameOnly === true
 
@@ -12,7 +10,10 @@ export const shotgunOnly = (p: { scope?: readonly string[] | undefined }) =>
   p.scope !== undefined && p.scope.length > 0 && p.scope.every((s) => s === 'shotgun')
 
 /** Why a shotgun-only powder is greyed out in the pickers and not computed. */
-export const notMetallic = msg('Not a metallic-cartridge powder')
+export const notMetallic = /*i18n*/ {
+  id: 'burnRate.notMetallic',
+  message: 'Not a metallic-cartridge powder',
+}
 
 /** A powder row of a list or chooser without the burn values of an interior model, a design's included. */
 export const powderRowIncomplete = (r: { modelled?: true | undefined }) => r.modelled !== true

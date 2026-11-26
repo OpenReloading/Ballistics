@@ -1,6 +1,6 @@
 'use client'
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
   Badge,
@@ -160,7 +160,7 @@ export interface ChooserKind<R extends ChooserRow> {
   /** Values missing (`complete-records.ts`): "Complete records only" hides it, else it follows the complete ones with a mark. */
   incomplete?: (row: R) => boolean
   /** Why the row cannot be chosen: it stays listed, greyed out with the reason. */
-  unavailable?: (row: R) => Message | undefined
+  unavailable?: (row: R) => MessageDescriptor | undefined
 }
 
 type Catalogue<R> =
@@ -274,7 +274,7 @@ function ResultRow<R extends ChooserRow>({
           )}
           {kind.incomplete?.(row) && <MissingMark />}
         </span>
-        {unavailable && <span className="bd-reason">{t(unavailable)}</span>}
+        {unavailable && <span className="bd-reason">{i18n._(unavailable)}</span>}
       </span>
       {kind.columns.map((c) => (
         <span key={c.label}>{c.cell(row, system, t, i18n)}</span>

@@ -1351,7 +1351,7 @@ export function Workbench() {
         <InputEcho value={echo}>
           <div className="page-frame" role="presentation" onKeyDown={frameKeyDown(inputs, run)}>
             <PageBar
-              title={msg('Load workbench')}
+              title={/*i18n*/ { id: 'page.workbench', message: 'Load workbench' }}
               translated
               compact
               // line 1 the shown result, line 2 the File menu's state (portalled after it)

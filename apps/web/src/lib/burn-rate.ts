@@ -6,7 +6,7 @@ import { type Powder, toSi } from '@rangefoundry/schema'
 import { linguiOf } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import type { PowderSummary } from './api-types.ts'
-import { shotgunOnly } from './complete-records.ts'
+import { notMetallic, shotgunOnly } from './complete-records.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
 
@@ -70,11 +70,6 @@ const noFitReason = /*i18n*/ {
   id: 'burnRate.noFit',
   message:
     'No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges.',
-}
-
-const notMetallic = /*i18n*/ {
-  id: 'burnRate.notMetallic',
-  message: 'Not a metallic-cartridge powder',
 }
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */

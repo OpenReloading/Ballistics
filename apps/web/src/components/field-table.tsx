@@ -17,9 +17,7 @@ import {
 import { Search as SearchIcon } from 'lucide-react'
 import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { linguiOf } from '../i18n/lingui.ts'
-import { type Translator, translator } from '../i18n/translate.ts'
 import {
   type FieldGroup,
   type FieldRow,
@@ -30,14 +28,12 @@ import {
 } from '../lib/record-fields.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { say, type Wording } from '../lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../lib/wording.ts'
 // oxlint-disable-next-line import/no-cycle -- fact-cards imports Noted back; moving one of them breaks the cycle
 import { Sized, slotUnits } from './fact-cards.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
-
-type Translate = Translator['t']
 
 /** The name of a table's scroll region. */
 const tableLabel = (i18n: I18n, label: string) =>
@@ -120,22 +116,21 @@ function RowLinks({ links }: { links: NonNullable<FieldRow['links']> }) {
 }
 
 function Row({ row, system }: { row: FieldRow; system: UnitSystem }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
-  const notes = rowNotes(row, t, i18n)
+  const notes = rowNotes(row, i18n)
   if (row.links)
     return (
       <TableTr>
-        <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
+        <TableTh scope="row">{rowLabel(row, system, i18n)}</TableTh>
         <TableTd className="field-links">
           <RowLinks links={row.links} />
         </TableTd>
       </TableTr>
     )
-  const value = <SlashBreaks text={rowValue(row, system, t, i18n)} />
+  const value = <SlashBreaks text={rowValue(row, system, i18n)} />
   return (
     <TableTr>
-      <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
+      <TableTh scope="row">{rowLabel(row, system, i18n)}</TableTh>
       <TableTd className="nowrap num">
         {notes.length > 0 ? <Noted value={value} notes={notes} /> : value}
       </TableTd>
@@ -168,10 +163,9 @@ function SymbolRow({
   /** Left out by the filter or the search: hidden on screen, printed. */
   off: boolean
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
-  const notes = rowNotes(row, t, i18n)
-  const { number, unit } = rowParts(row, system, t, i18n)
+  const notes = rowNotes(row, i18n)
+  const { number, unit } = rowParts(row, system, i18n)
   return (
     <TableTr data-symbol={row.symbol} data-off={off || undefined}>
       {symbolColumn && (
@@ -179,12 +173,12 @@ function SymbolRow({
           {row.symbol && <SymbolStop tabIndex={tabbable ? 0 : -1}>{row.symbol}</SymbolStop>}
         </TableTd>
       )}
-      <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
+      <TableTh scope="row">{rowLabel(row, system, i18n)}</TableTh>
       <TableTd className="nowrap num">
         {notes.length > 0 ? <Noted value={number} notes={notes} /> : number}
       </TableTd>
       <TableTd className="field-unit-cell">
-        <Sized now={unit} also={slotUnits.map((u) => rowParts(row, u, t, i18n).unit)} />
+        <Sized now={unit} also={slotUnits.map((u) => rowParts(row, u, i18n).unit)} />
       </TableTd>
     </TableTr>
   )
@@ -202,7 +196,6 @@ function SymbolTable({
   on: Set<FieldRow>
   symbolColumn: boolean
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   const symbols = groups.flatMap((g) =>
@@ -249,7 +242,7 @@ function SymbolTable({
             {g.title && (
               <TableTr className="field-group">
                 <TableTh scope="rowgroup" colSpan={symbolColumn ? 4 : 3}>
-                  {say(i18n, t, g.title)}
+                  {sayLingui(i18n, g.title)}
                 </TableTh>
               </TableTr>
             )}
@@ -271,11 +264,10 @@ function SymbolTable({
   )
 }
 
-/** Rows whose label (in the language of `i18n` and `t`) or symbol holds `q`, ignoring case; groups left without rows drop out. */
+/** Rows whose label (in the language of `i18n`) or symbol holds `q`, ignoring case; groups left without rows drop out. */
 export function searchGroups(
   groups: FieldGroup[],
   q: string,
-  t: Translate = translator().t,
   i18n: I18n = linguiOf('en'),
 ): FieldGroup[] {
   const needle = q.trim().toLowerCase()
@@ -284,7 +276,7 @@ export function searchGroups(
     .map((g) => ({
       ...g,
       rows: g.rows.filter((r) =>
-        [say(i18n, t, r.label), r.symbol].some((x) => x?.toLowerCase().includes(needle)),
+        [sayLingui(i18n, r.label), r.symbol].some((x) => x?.toLowerCase().includes(needle)),
       ),
     }))
     .filter((g) => g.rows.length > 0)
@@ -300,7 +292,7 @@ export function FieldPanel({
   children,
 }: {
   id: string
-  title: Wording
+  title: LinguiWording
   groups: FieldGroup[]
   className?: string
   /** false: no Symbol column, for a record whose rows have no drawing symbol (case, primer). */
@@ -308,10 +300,9 @@ export function FieldPanel({
   /** Under the table: the record's note. */
   children?: ReactNode
 }) {
-  const { t, language } = useTranslation()
   const { i18n } = useLingui()
   // the filter is kept by the English text of its label, so a change of language keeps it
-  const key = (w: Wording) => say(linguiOf('en'), translator().t, w)
+  const key = (w: LinguiWording) => sayLingui(linguiOf('en'), w)
   const [group, setGroup] = useState('All')
   const [q, setQ] = useState('')
   const filters = [
@@ -327,10 +318,9 @@ export function FieldPanel({
           return w !== undefined && key(w) === scope
         }),
     q,
-    t,
     i18n,
   )
-  const name = say(i18n, t, title)
+  const name = sayLingui(i18n, title)
   return (
     <Panel
       id={id}
@@ -349,7 +339,7 @@ export function FieldPanel({
               { value: 'All', label: i18n._({ id: 'fieldTable.allGroups', message: 'All' }) },
               ...filters.map(([value, w]) => ({
                 value,
-                label: say(i18n, t, w).replace(' and ', ', ').replace(' und ', ', '),
+                label: sayLingui(i18n, w).replace(' and ', ', ').replace(' und ', ', '),
               })),
             ]}
             value={scope}
@@ -371,7 +361,7 @@ export function FieldPanel({
           aria-label={i18n._({
             id: 'fieldTable.search',
             message: 'Search {title}',
-            values: { title: language === 'en' ? name.toLowerCase() : name },
+            values: { title: i18n.locale === 'en' ? name.toLowerCase() : name },
           })}
           placeholder={
             symbols
@@ -405,11 +395,10 @@ export function FieldPanel({
 }
 
 /** The drag model with its velocity band, the value in the viewer's unit, and the record's note. */
-export function CoefficientTable({ label, rows }: { label: Wording; rows: FieldRow[] }) {
-  const { t } = useTranslation()
+export function CoefficientTable({ label, rows }: { label: LinguiWording; rows: FieldRow[] }) {
   const { i18n } = useLingui()
   const { system } = useUnits()
-  const name = say(i18n, t, label)
+  const name = sayLingui(i18n, label)
   const unit = (u: UnitSystem) =>
     i18n._({
       id: 'fieldTable.coefficientUnit',
@@ -436,10 +425,10 @@ export function CoefficientTable({ label, rows }: { label: Wording; rows: FieldR
           {rows.map((row, k) => (
             // oxlint-disable-next-line react/no-array-index-key -- a drag model can repeat
             <TableTr key={k}>
-              <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
-              <TableTd className="nowrap num">{rowParts(row, system, t, i18n).number}</TableTd>
+              <TableTh scope="row">{rowLabel(row, system, i18n)}</TableTh>
+              <TableTd className="nowrap num">{rowParts(row, system, i18n).number}</TableTd>
               <TableTd className="field-note-cell">
-                {row.method && say(i18n, t, row.method)}
+                {row.method && sayLingui(i18n, row.method)}
               </TableTd>
             </TableTr>
           ))}
@@ -455,14 +444,13 @@ export function FieldTable({
   labelledBy,
   groups,
 }: {
-  caption: Wording
+  caption: LinguiWording
   labelledBy?: string | undefined
   groups: FieldGroup[]
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
-  const name = say(i18n, t, caption)
+  const name = sayLingui(i18n, caption)
   return (
     <ScrollRegion label={tableLabel(i18n, name)}>
       <Table className="field-table" captionSide="top" aria-labelledby={labelledBy}>
@@ -475,7 +463,7 @@ export function FieldTable({
               {g.title && (
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={2}>
-                    {say(i18n, t, g.title)}
+                    {sayLingui(i18n, g.title)}
                   </TableTh>
                 </TableTr>
               )}

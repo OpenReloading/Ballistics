@@ -115,7 +115,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           {r.name}
           {shotgunOnly(r) ? (
             <Badge ml="xs" variant="light" color="gray">
-              {t(notMetallic)}
+              {i18n._(notMetallic)}
             </Badge>
           ) : (
             powderRowIncomplete(r) && <MissingMark />

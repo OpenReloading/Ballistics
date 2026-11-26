@@ -665,7 +665,10 @@ export function CartridgeDesigner() {
       {/* of the drawing shown: a refusal keeps them with the earlier drawing */}
       <DerivedTable rows={drawn?.derived ?? []} system={system} />
       <div className="print-only">
-        <FieldTable caption={msg('Values of the design')} groups={[{ rows: values }]} />
+        <FieldTable
+          caption={/*i18n*/ { id: 'designer.values', message: 'Values of the design' }}
+          groups={[{ rows: values }]}
+        />
       </div>
     </>
   )

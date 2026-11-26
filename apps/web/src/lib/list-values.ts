@@ -43,18 +43,18 @@ export function kebabValue(i18n: I18n, value: string) {
   return known ? i18n._(known) : text
 }
 
-const caseTypes: Record<string, Message> = {
-  rimless: msg('rimless'),
-  'semi-rimmed': msg('semi-rimmed'),
-  rimmed: msg('rimmed'),
-  rebated: msg('rebated'),
-  belted: msg('belted'),
+const caseTypes: Record<string, MessageDescriptor> = {
+  rimless: /*i18n*/ { id: 'values.rimless', message: 'rimless' },
+  'semi-rimmed': /*i18n*/ { id: 'values.semiRimmed', message: 'semi-rimmed' },
+  rimmed: /*i18n*/ { id: 'values.rimmed', message: 'rimmed' },
+  rebated: /*i18n*/ { id: 'values.rebated', message: 'rebated' },
+  belted: /*i18n*/ { id: 'values.belted', message: 'belted' },
 }
 
-/** The rim form of a cartridge case ("rimless"). */
-export const caseTypeText = (t: Translator['t'], type: string) => {
+/** The rim form of a cartridge case ("rimless"), in the language of `i18n`. */
+export const caseTypeText = (i18n: I18n, type: string) => {
   const known = caseTypes[type]
-  return known ? t(known) : type
+  return known ? i18n._(known) : type
 }
 
 /** A powder's grain form and propellant base as the lists show them. */

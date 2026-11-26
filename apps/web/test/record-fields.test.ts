@@ -1,7 +1,7 @@
 import type { Bullet, Powder, Provenance } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { msg, translator } from '../src/i18n/translate.ts'
+import { translator } from '../src/i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   buildRows,
@@ -22,7 +22,7 @@ import {
   rowValue,
 } from '../src/lib/record-fields.ts'
 import { presetUnits } from '../src/lib/units.ts'
-import { say } from '../src/lib/wording.ts'
+import { say, verbatim } from '../src/lib/wording.ts'
 import { defined, missing } from './defined.ts'
 import { targetBullet } from './fixtures/bullets.ts'
 
@@ -266,11 +266,11 @@ it('leaves the powder properties of the strip out of the Properties table', () =
       country: 'US',
       bulkDensity: { value: 0.9512, raw: 'VMD 0.0681 cm³/gr' },
       provenance,
-    }),
+    }).map((g) => [g.title && say(linguiOf('en'), english, g.title), g.rows]),
   ).toEqual([
-    { rows: [] },
-    { title: 'Composition', rows: [] },
-    { title: 'Thermochemistry', rows: [] },
+    [undefined, []],
+    ['Composition', []],
+    ['Thermochemistry', []],
   ])
 })
 
@@ -338,14 +338,14 @@ it('gives the aliases, the composition and the computed thermochemistry with its
 
 it('rounds a value row to significant digits when asked', () => {
   const row: FieldRow = {
-    label: msg('Reference pressure'),
+    label: verbatim('Reference pressure'),
     value: { quantity: 'pressure', si: 98066.5, significantDigits: 3 },
   }
   expect(rowValue(row, grains)).toBe('0.981 bar')
   expect(rowValue(row, us)).toBe('14.2 psi')
   expect(
     rowValue(
-      { label: msg('Stress'), value: { quantity: 'pressure', si: 0, significantDigits: 3 } },
+      { label: verbatim('Stress'), value: { quantity: 'pressure', si: 0, significantDigits: 3 } },
       grains,
     ),
   ).toBe('0 bar')
@@ -409,7 +409,9 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
     ['Pressure exponent', '1'],
     ['Bore resistance', '4.20 bar'],
   ])
-  expect(burnFormRows(p).map((r) => [r.symbol, r.label, r.text])).toEqual([
+  expect(
+    burnFormRows(p).map((r) => [r.symbol, say(linguiOf('en'), english, r.label), r.text]),
+  ).toEqual([
     ['a', 'Burn form a', '0'],
     ['m', 'Burn form m', '0.5'],
     ['q', 'Burn form q', '0.5'],
@@ -418,7 +420,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
   expect(
     powderParameterGroups(p, 2).map((g) => [
       g.title && say(linguiOf('en'), english, g.title),
-      g.filter,
+      g.filter && say(linguiOf('en'), english, g.filter),
       g.rows.length,
     ]),
   ).toEqual([
@@ -504,11 +506,11 @@ it('splits a value from its unit for the unit column, a text row with its own un
   expect(rowParts(diameter, us)).toEqual({ number: '.3080', unit: 'in' })
   const twist = dataRows(target).at(-1) as FieldRow
   expect(rowParts(twist, us)).toEqual({ number: '1 turn in 12.0', unit: 'in' })
-  expect(rowParts({ label: msg('Angle'), text: '9', unit: 'deg' }, us)).toEqual({
+  expect(rowParts({ label: verbatim('Angle'), text: '9', unit: 'deg' }, us)).toEqual({
     number: '9',
     unit: 'deg',
   })
-  expect(rowParts({ label: msg('Tip'), text: 'hollow-point' }, us)).toEqual({
+  expect(rowParts({ label: verbatim('Tip'), text: 'hollow-point' }, us)).toEqual({
     number: 'hollow-point',
     unit: '',
   })

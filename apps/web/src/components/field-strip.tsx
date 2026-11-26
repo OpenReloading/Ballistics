@@ -21,11 +21,9 @@ import {
   TrendingDown,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { useTranslation } from '../i18n/language.ts'
-import type { Translator } from '../i18n/translate.ts'
 import { rowNotes, rowParts, type StripItem } from '../lib/record-fields.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
-import { say, type Wording } from '../lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../lib/wording.ts'
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Sized, slotUnits } from './fact-cards.tsx'
 import { MutedBadge } from './standard-badge.tsx'
@@ -52,8 +50,8 @@ const icons: Record<StripItem['icon'], LucideIcon> = {
 }
 
 /** A strip item's label; a coefficient of a velocity band names its lower bound, as the table does. */
-function stripLabel(i: StripItem, system: UnitSystem, i18n: I18n, t: Translator['t']) {
-  const label = i.words ? say(i18n, t, i.words) : i.label
+function stripLabel(i: StripItem, system: UnitSystem, i18n: I18n) {
+  const label = i.words ? sayLingui(i18n, i.words) : i.label
   return i.row.fromVelocity === undefined
     ? label
     : i18n._({
@@ -81,10 +79,9 @@ export function FieldStrip({
 }: {
   items: StripItem[]
   country?: { name: string; code?: string | undefined } | undefined
-  tags?: Wording[]
+  tags?: LinguiWording[]
   children?: ReactNode
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   if (items.length === 0 && !country && tags.length === 0 && !children) return null
@@ -93,13 +90,13 @@ export function FieldStrip({
       {cards(items).map((card) => (
         <FactCard key={card[0]?.icon} icon={icons[card[0]?.icon ?? 'form']}>
           {card.map((i) => {
-            const now = rowParts(i.row, system, t, i18n)
-            const also = slotUnits.map((u) => rowParts(i.row, u, t, i18n))
+            const now = rowParts(i.row, system, i18n)
+            const also = slotUnits.map((u) => rowParts(i.row, u, i18n))
             return (
               <Fact
                 key={i.label}
-                label={stripLabel(i, system, i18n, t)}
-                notes={rowNotes(i.row, t, i18n)}
+                label={stripLabel(i, system, i18n)}
+                notes={rowNotes(i.row, i18n)}
                 unit={{ now: now.unit, also: also.map((p) => p.unit) }}
               >
                 <Sized
@@ -128,7 +125,7 @@ export function FieldStrip({
         <div className="fact-tags">
           {tags.map((tag, i) => (
             // oxlint-disable-next-line react/no-array-index-key -- two facts can read the same
-            <MutedBadge key={i}>{say(i18n, t, tag)}</MutedBadge>
+            <MutedBadge key={i}>{sayLingui(i18n, tag)}</MutedBadge>
           ))}
         </div>
       )}

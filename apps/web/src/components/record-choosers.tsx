@@ -180,11 +180,11 @@ export const cartridgeKind: ChooserKind<CartridgeRow> = {
     {
       label: msg('Case type'),
       nothingFound: msg('No case type found'),
-      options: (_, rows, t) =>
+      options: (_, rows, _t, i18n) =>
         countedOptions(
           rows,
           (r) => r.caseType,
-          (v) => caseTypeText(t, v),
+          (v) => caseTypeText(i18n, v),
         ),
       keep: (r, v) => r.caseType === v,
     },
@@ -211,7 +211,7 @@ export const cartridgeKind: ChooserKind<CartridgeRow> = {
     {
       label: msg('Case type'),
       width: '6rem',
-      cell: (r, _, t) => (r.caseType ? caseTypeText(t, r.caseType) : ''),
+      cell: (r, _, _t, i18n) => (r.caseType ? caseTypeText(i18n, r.caseType) : ''),
     },
     {
       label: msg('Pmax'),
@@ -222,7 +222,7 @@ export const cartridgeKind: ChooserKind<CartridgeRow> = {
           : `${cartridgeCells(r, system).pmax} ${system.pressure.symbol}`,
     },
   ],
-  facts: (row, system, t) => {
+  facts: (row, system, t, i18n) => {
     const cells = cartridgeCells(row, system)
     const length = (text: string) => text && `${text} ${system.length.symbol}`
     return [
@@ -231,7 +231,7 @@ export const cartridgeKind: ChooserKind<CartridgeRow> = {
       [msg('Case length L3'), length(cells.caseLength) || undefined],
       [msg('Max length L6'), length(cells.cartridgeLength) || undefined],
       [msg('Pmax'), cells.pmax ? `${cells.pmax} ${system.pressure.symbol}` : undefined],
-      [msg('Case type'), row.caseType && caseTypeText(t, row.caseType)],
+      [msg('Case type'), row.caseType && caseTypeText(i18n, row.caseType)],
       [
         msg('Country'),
         row.country &&
