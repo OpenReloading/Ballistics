@@ -3,6 +3,10 @@
 import { useLingui } from '@lingui/react'
 import { Badge } from '@mantine/core'
 import type { ReactNode } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/standard-badge.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
 
 /** The standard as text in an outlined badge; the color (`--standard-cip`) only repeats it. */
 export function StandardBadge({ label }: { label: string }) {

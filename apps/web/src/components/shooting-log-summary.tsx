@@ -5,7 +5,7 @@ import { Button, Group, Select, SimpleGrid, Table, Text, Title } from '@mantine/
 import { parseRef, type ShootingLogRecord, type UserRecord } from '@rangefoundry/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { resultText } from '../lib/competition-events.ts'
 import { dayText, monthText } from '../lib/dates.ts'
@@ -19,7 +19,12 @@ import {
   yearSummary,
 } from '../lib/shooting-log-summary.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/shooting-log-summary.json' with {
+  type: 'json',
+}
 import { printAlone } from './print.ts'
+
+loadEnglish(englishMessages)
 
 /** A design of this browser by its record name, a catalogue cartridge as the API names it (each asked once), else the reference as stored. */
 function useCartridgeNames(refs: string[], records: readonly UserRecord[]) {

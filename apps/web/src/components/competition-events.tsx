@@ -32,7 +32,7 @@ import {
   updateRecord,
 } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
@@ -68,12 +68,15 @@ import { newId } from '../lib/new-id.ts'
 import { userIdOf } from '../lib/shooting-log.ts'
 import { controlSize } from '../lib/theme.ts'
 import { parseUserDataFile, planImport, reasonText } from '../lib/user-data.ts'
+import englishMessages from '../locales/en/components/competition-events.json' with { type: 'json' }
 import { confirmDialog, offerUndo } from './confirm.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { BarButton, useDisciplines } from './log-parts.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { LinkButton, PrintButton } from './record-actions.tsx'
 import { ErrorNote, Loading } from './states.tsx'
+
+loadEnglish(englishMessages)
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 type LoadRecord = Extract<UserRecord, { kind: 'load' }>

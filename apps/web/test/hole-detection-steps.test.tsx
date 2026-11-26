@@ -1,20 +1,26 @@
+import type { MessageDescriptor } from '@lingui/core'
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DetectPanel, ReviewStep, RunButton } from '../src/components/hole-detection.tsx'
-import { msg } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 
 const html = (node: React.ReactNode) =>
-  renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+  renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>{node}</MantineProvider>
+    </I18nProvider>,
+  )
 const none = () => {}
 /** Whether the run button of `out` is disabled. */
 const runDisabled = (out: string) =>
   / disabled=""/.test(/<button[^>]*data-detect-run[^>]*>/.exec(out)?.[0] ?? '')
 
-const run = (blocked: ReturnType<typeof msg> | undefined, auto = false) =>
+const run = (blocked: MessageDescriptor | undefined, auto = false) =>
   html(
     <RunButton
-      label={msg('Detect holes')}
+      label={{ id: 'holeDetection.detectHoles', message: 'Detect holes' }}
       auto={auto}
       progress={undefined}
       photo
@@ -26,7 +32,10 @@ const run = (blocked: ReturnType<typeof msg> | undefined, auto = false) =>
   )
 
 it('a guided run without a scale is disabled and says why under its button', () => {
-  const out = run(msg('Set the scale first (step 2).'))
+  const out = run({
+    id: 'holeDetection.setScaleFirstStep',
+    message: 'Set the scale first (step 2).',
+  })
   expect(runDisabled(out)).toBe(true)
   expect(out).toContain('data-detect-blocked')
   expect(out).toContain('Set the scale first (step 2).')
@@ -35,7 +44,10 @@ it('a guided run without a scale is disabled and says why under its button', () 
 })
 
 it('a guided run that can start, and the one-click start, show no reason', () => {
-  for (const out of [run(undefined), run(msg('Set the scale first (step 2).'), true)]) {
+  for (const out of [
+    run(undefined),
+    run({ id: 'holeDetection.setScaleFirstStep', message: 'Set the scale first (step 2).' }, true),
+  ]) {
     expect(runDisabled(out)).toBe(false)
     expect(out).not.toContain('data-detect-blocked')
   }

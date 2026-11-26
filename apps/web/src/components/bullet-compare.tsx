@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic'
 import { type CSSProperties, type ReactNode, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useRouter } from '@/platform/navigation.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   compareGroups,
   differenceMarks,
@@ -33,9 +34,12 @@ import { nth } from '../lib/nth.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { controlSize } from '../lib/theme.ts'
 import { sayLingui } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/bullet-compare.json' with { type: 'json' }
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** The bullet search, a chunk of its own: the comparison loads it on the first Add bullet. */
 const CompareAddChooser = dynamic(

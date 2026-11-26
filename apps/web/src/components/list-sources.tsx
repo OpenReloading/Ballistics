@@ -6,6 +6,7 @@ import type { UserRecord } from '@rangefoundry/schema'
 import { ChevronDown, Trash } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteRecords, storedRecords } from '@/platform/user-store.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   type Origin,
   originNames,
@@ -16,9 +17,12 @@ import {
   userRecordId,
 } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/list-sources.json' with { type: 'json' }
 import { AppPopover } from './app-popover.tsx'
 import { confirmDialog } from './confirm.tsx'
 import type { DirectoryColumn } from './directory-table.tsx'
+
+loadEnglish(englishMessages)
 
 /** Read after mounting (again on each `reread`), none while the store cannot be read; `remove` asks as the File menu's list does, `read`: the store has answered once. */
 export function useUserRecords(reread?: unknown) {

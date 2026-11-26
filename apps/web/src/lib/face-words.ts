@@ -1,4 +1,8 @@
 import type { I18n, MessageDescriptor } from '@lingui/core'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/face-words.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
 
 /** The printed colors of a ring zone or line. */
 const colours: Record<string, MessageDescriptor> = {

@@ -1,17 +1,23 @@
 'use client'
 
 import type { TargetFace, TargetMapping } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { emptyDirectory, writeDirectory } from '../lib/directory.ts'
 import type { FederationListItem } from '../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.ts'
 import { withOrganization } from '../lib/face-organization.ts'
 import { readItems, readRecord } from '../lib/record-reads.ts'
 import { faceEventRows } from '../lib/target-faces.ts'
+import englishMessages from '../locales/en/components/target-face-record-page.json' with {
+  type: 'json',
+}
 import { FaceEvents, FaceStrip, FaceValuesPanel } from './face-record.tsx'
 import { Panel } from './panel.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 import { TargetFaceDrawing } from './target-face-drawing.tsx'
+
+loadEnglish(englishMessages)
 
 /** What the page reads besides the record: the mappings of the face (the list leaves out the shot count), the disciplines and the federations. */
 interface Extras {

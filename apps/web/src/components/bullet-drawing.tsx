@@ -12,9 +12,13 @@ import {
   recordProfile,
 } from '@rangefoundry/svg-drawings/bullet'
 import { Ruler } from 'lucide-react'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/bullet-drawing.json' with { type: 'json' }
 import { DrawingNotes } from './record-actions.tsx'
 import { EmptyNote } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
+
+loadEnglish(englishMessages)
 
 const nameOf = (symbol: string) => bulletSymbols.find((s) => s.symbol === symbol)?.name ?? symbol
 

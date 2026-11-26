@@ -14,8 +14,12 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/workspace.json' with { type: 'json' }
 import { CopyStatus } from './record-actions.tsx'
 import { useScrollFocus } from './scroll-region.tsx'
+
+loadEnglish(englishMessages)
 
 export type WorkspaceHandle = {
   /** Opens the Inputs tab; call it inside `flushSync` to focus a field right after. */

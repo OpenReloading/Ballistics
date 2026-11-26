@@ -2,17 +2,21 @@
 
 import { useLingui } from '@lingui/react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
 import type { Face } from '../lib/face-organization.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { type FaceEventRow, targetFaceGroups, targetFaceStrip } from '../lib/target-faces.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/face-record.json' with { type: 'json' }
 import { FieldStrip } from './field-strip.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { LinkButton } from './record-actions.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { shownLength } from './shown-length.tsx'
+
+loadEnglish(englishMessages)
 
 /** How an event scores a hole, by the stored value. */
 const scoredBy = {

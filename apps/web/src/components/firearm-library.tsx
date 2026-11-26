@@ -35,7 +35,7 @@ import {
 import Link from '@/platform/link.tsx'
 import { deleteRecord, putRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import type { Message } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import {
@@ -64,6 +64,7 @@ import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
 import { catalogueIdOf } from '../lib/variants.ts'
+import englishMessages from '../locales/en/components/firearm-library.json' with { type: 'json' }
 import { offerUndo } from './confirm.tsx'
 import {
   type DirectoryColumn,
@@ -82,6 +83,8 @@ import { EmptyList, EmptyNote, ErrorNote, Loading } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useManufacturers } from './use-manufacturers.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
+
+loadEnglish(englishMessages)
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 

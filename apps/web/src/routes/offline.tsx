@@ -1,9 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { OfflineState } from '../components/offline-state.tsx'
 import { PageBar } from '../components/page-bar.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { msg } from '../i18n/translate.ts'
 import { sections } from '../lib/sections.ts'
 import { titleTemplate } from '../lib/title-template.ts'
+import englishMessages from '../locales/en/routes/offline.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
 
 // the tools and the pages of the user's own records (firearms, a case group) open offline
 const [tools] = sections
