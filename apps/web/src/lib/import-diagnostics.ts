@@ -8,7 +8,7 @@ import type {
 import type { Diagnostic } from '@rangefoundry/statistics'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { translateMessage } from './core-messages.ts'
+import { labelText, translateMessage } from './core-messages.ts'
 
 /** A table row the user record schema refuses, with the schema's reason. */
 export type InvalidRecordDiagnostic = Diagnostic<'invalidRecord', { reason: string }>
@@ -46,7 +46,7 @@ const tableMessages: Record<TableDiagnostic['code'] | InvalidRecordDiagnostic['c
 
 /** Numbers in the language's decimal mark, other text as the file has it. */
 function shown(name: string, v: string | number | readonly string[], t: Translator['t']) {
-  const word = (s: string) => t(s as Message)
+  const word = (s: string) => labelText(s, t)
   if (typeof v === 'number') return v
   if (typeof v !== 'string') return name === 'symbols' ? v.join(', ') : v.map(word).join(', ')
   if (name === 'field') return word(v)

@@ -1,5 +1,6 @@
 /** What a source's field list (dot paths of schema keys) reads as in the Sources table. */
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { labelText } from './core-messages.ts'
 
 /** Every other key reads as its words (`waterCapacity`: "Water capacity"). */
 const labels: Record<string, Record<string, Message>> = {
@@ -32,5 +33,5 @@ export function fieldLabel(key: string, kind: string | undefined, t: Translator[
   const map = kind && Object.hasOwn(labels, kind) ? labels[kind] : undefined
   // own keys only: a source's field `constructor` reads as its words, not as Object's
   const own = map && Object.hasOwn(map, key) ? map[key] : undefined
-  return t(own ?? (humanised(key) as Message))
+  return own ? t(own) : labelText(humanised(key), t)
 }
