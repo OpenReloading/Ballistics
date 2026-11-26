@@ -89,7 +89,7 @@ import {
   storedRecords,
 } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { loadEnglish } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { photoGuide } from '../lib/docs-url.ts'
@@ -224,20 +224,38 @@ const defaultOverlays: Record<Overlay, boolean> = {
   rings: true,
 }
 
-const refNames: Record<RefKind, Message> = {
-  line: msg('Line'),
-  ringCentre: msg('Ring, center and edge'),
-  ringEdge: msg('Ring, three points'),
-  rectangle: msg('Rectangle, four corners'),
+const refNames: Record<RefKind, MessageDescriptor> = {
+  line: /*i18n*/ { id: 'targetEditor.line', message: 'Line' },
+  ringCentre: /*i18n*/ { id: 'targetEditor.ringCenterEdge', message: 'Ring, center and edge' },
+  ringEdge: /*i18n*/ { id: 'targetEditor.ringThreePoints', message: 'Ring, three points' },
+  rectangle: /*i18n*/ {
+    id: 'targetEditor.rectangleFourCorners',
+    message: 'Rectangle, four corners',
+  },
 }
 /** Why placing on the target waits: no scale yet. */
-const noReference = msg('Mark a reference first (Calibrate).')
+const noReference = /*i18n*/ {
+  id: 'targetEditor.markReferenceFirstCalibrate',
+  message: 'Mark a reference first (Calibrate).',
+}
 
-const refHints: Record<RefKind, Message> = {
-  line: msg('Click both ends of a known length.'),
-  ringCentre: msg('Click the ring center, then a point on the ring.'),
-  ringEdge: msg('Click three points on the ring.'),
-  rectangle: msg('Click the corners: top left, top right, bottom right, bottom left.'),
+const refHints: Record<RefKind, MessageDescriptor> = {
+  line: /*i18n*/ {
+    id: 'targetEditor.clickBothEndsKnown',
+    message: 'Click both ends of a known length.',
+  },
+  ringCentre: /*i18n*/ {
+    id: 'targetEditor.clickRingCenterThen',
+    message: 'Click the ring center, then a point on the ring.',
+  },
+  ringEdge: /*i18n*/ {
+    id: 'targetEditor.clickThreePointsRing',
+    message: 'Click three points on the ring.',
+  },
+  rectangle: /*i18n*/ {
+    id: 'targetEditor.clickCornersTopLeft',
+    message: 'Click the corners: top left, top right, bottom right, bottom left.',
+  },
 }
 
 /** A new sheet: one group at `distance` m, of ladder step `step` when the load has a ladder. */
@@ -697,7 +715,6 @@ function MarkerField({ ed }: { ed: Ed }) {
 
 /** One scale reference of a photo: its known size and Remove. */
 function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][number]; i: number }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { sheet, frame, applyCal } = ed
   const cal = frame?.calibration
@@ -706,16 +723,16 @@ function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][numbe
   const label = i18n._({
     id: 'targetEditor.referenceLabel',
     message: '{kind} {n, decimal}',
-    values: { kind: t(refNames[r.kind]).split(',')[0] ?? '', n: i + 1 },
+    values: { kind: i18n._(refNames[r.kind]).split(',')[0] ?? '', n: i + 1 },
   })
   const help =
     dev === undefined || sheet.references.length < 2
-      ? t(refNames[r.kind])
+      ? i18n._(refNames[r.kind])
       : i18n._({
           id: 'targetEditor.scaleMean',
           message: '{kind}; scale {deviation} % from the mean',
           values: {
-            kind: t(refNames[r.kind]),
+            kind: i18n._(refNames[r.kind]),
             deviation: `${dev >= 0 ? '+' : ''}${fixedNumber(dev * 100, 2)}`,
           },
         })
@@ -774,7 +791,6 @@ function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][numbe
 
 /** The Calibrate panel: scale references, rotation and origin; none on a drawn target. */
 function ScalePanel({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { sheet, refKind, setRefKind, known, setKnown, tool, calTool, applyCal, frame } = ed
   const cal = frame?.calibration
@@ -792,10 +808,10 @@ function ScalePanel({ ed }: { ed: Ed }) {
       <NativeSelect
         label={i18n._({ id: 'targetEditor.reference', message: 'Reference' })}
         size={controlSize.row.input}
-        data={Object.entries(refNames).map(([value, label]) => ({ value, label: t(label) }))}
+        data={Object.entries(refNames).map(([value, label]) => ({ value, label: i18n._(label) }))}
         value={refKind}
         onChange={(e) => setRefKind(e.currentTarget.value as RefKind)}
-        title={t(refHints[refKind])}
+        title={i18n._(refHints[refKind])}
       />
       {refKind === 'rectangle' ? (
         <>
@@ -830,7 +846,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
         data-cal="mark"
         disabled={refKind === 'rectangle' ? !(known.width && known.height) : !known.length}
         onClick={() => calTool('mark', refKind)}
-        title={t(refHints[refKind])}
+        title={i18n._(refHints[refKind])}
       >
         {i18n._({ id: 'targetEditor.markPhoto', message: 'Mark on photo' })}
       </Button>
@@ -926,7 +942,6 @@ function GroupPanel({ ed }: { ed: Ed }) {
     setSelected,
     deleteGroup,
   } = ed
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const len = system.length
   const colours = coloursOf(group, i18n)
@@ -1132,7 +1147,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
                       id: 'targetEditor.clickPointAimTarget',
                       message: 'Click the point of aim on the target',
                     })
-                  : t(noReference)
+                  : i18n._(noReference)
               }
               onClick={() => startTool('aim')}
             >
@@ -1156,7 +1171,6 @@ function GroupPanel({ ed }: { ed: Ed }) {
 
 /** The add shot button of the shots panel's head. */
 function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { group, frame, root } = ed
   if (!group) return null
@@ -1181,7 +1195,7 @@ function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void })
               message:
                 'A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields.',
             })
-          : t(noReference)
+          : i18n._(noReference)
       }
     >
       {i18n._({ id: 'targetEditor.addShot', message: 'Add shot' })}
@@ -1622,18 +1636,19 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
 }
 
 /** A key value of the group as text with its unit; n/a without it. */
-function keyValueText(keyValues: Ed['keyValues'], system: System, key: string, t: Translator['t']) {
+function keyValueText(keyValues: Ed['keyValues'], system: System, key: string, i18n: I18n) {
   const r = keyValues.find((x) => x.key === key)
-  return r ? `${formatQuantity('length', system, r.value)} ${system.length.symbol}` : t('n/a')
+  return r
+    ? `${formatQuantity('length', system, r.value)} ${system.length.symbol}`
+    : i18n._({ id: 'targetEditor.notAvailable', message: 'n/a' })
 }
 
 /** The group's count and key values in one row. */
 function Headline({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { group, stats, keyValues, system } = ed
   if (!group || !stats) return null
-  const keyValue = (key: string) => keyValueText(keyValues, system, key, t)
+  const keyValue = (key: string) => keyValueText(keyValues, system, key, i18n)
   return (
     <dl className="stat-head">
       <div>
@@ -1756,6 +1771,7 @@ function LadderPanel({ ed }: { ed: Ed }) {
 /** The statistics box of the canvas and the exports: the group's name, lines and score. */
 function StatsBoxContent({ ed }: { ed: Ed }) {
   const translator = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, keyValues, system, groupScore } = ed
   if (!group || !stats) return null
   return (
@@ -1765,7 +1781,13 @@ function StatsBoxContent({ ed }: { ed: Ed }) {
         <span key={line}>{line}</span>
       ))}
       {groupScore && (
-        <span>{translator.t('Score {score}', { score: scoreLine(groupScore) ?? '' })}</span>
+        <span>
+          {i18n._({
+            id: 'targetEditor.scoreLine',
+            message: 'Score {score}',
+            values: { score: scoreLine(groupScore) ?? '' },
+          })}
+        </span>
       )}
     </>
   )
@@ -2305,14 +2327,14 @@ function ExpandButton({ ed }: { ed: Ed }) {
 
 /** The editor's toolbar: sheet, photo, calibration, tools, undo and the overlays. */
 function Toolbar({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { renaming, heading, exportMenu, toolbarKeys } = ed
   return (
     // oxlint-disable-next-line jsx-a11y/interactive-supports-focus -- a toolbar moves focus among its buttons (toolbarKeys); the bar itself takes none
     <div
       className="target-toolbar"
       role="toolbar"
-      aria-label={t('Target sheet tools')}
+      aria-label={i18n._({ id: 'targetEditor.targetSheetTools', message: 'Target sheet tools' })}
       onKeyDown={toolbarKeys}
     >
       {renaming ? <SheetName ed={ed} /> : <SheetSelect ed={ed} />}
@@ -2391,7 +2413,7 @@ function Canvas({ ed }: { ed: Ed }) {
     takePhoto,
     unscaled,
   } = ed
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const statsBox = group && stats && <StatsBoxContent ed={ed} />
   const photoBox =
     photo && photo !== 'missing'
@@ -2465,21 +2487,29 @@ function Canvas({ ed }: { ed: Ed }) {
       {blankSheet && (
         <div className="canvas-start">
           <p>
-            {t(
-              'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one.',
-            )}
+            {i18n._({
+              id: 'targetEditor.drawnTargetPlaceShots',
+              message:
+                'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one.',
+            })}
           </p>
           {startActions(controlSize.bar.button)}
         </div>
       )}
       {photo === 'missing' && (
         <p className="canvas-note">
-          {t('The photo of this sheet is not in this browser; its shots are kept.')}
+          {i18n._({
+            id: 'targetEditor.photoSheetBrowserShots',
+            message: 'The photo of this sheet is not in this browser; its shots are kept.',
+          })}
         </p>
       )}
       {unscaled && (
         <p className="canvas-note">
-          {t('Mark a reference of known size (Calibrate) to place shots.')}
+          {i18n._({
+            id: 'targetEditor.markReferenceKnownSize',
+            message: 'Mark a reference of known size (Calibrate) to place shots.',
+          })}
         </p>
       )}
     </div>
@@ -2488,7 +2518,7 @@ function Canvas({ ed }: { ed: Ed }) {
 
 /** The shots section's head: the fold toggle and the add button. */
 function ShotsHead({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, uid, shotsOpen, setShotsOpen, addShot } = ed
   if (!group) return null
   return (
@@ -2506,7 +2536,11 @@ function ShotsHead({ ed }: { ed: Ed }) {
           ) : (
             <ChevronUp size={12} aria-hidden="true" />
           )}
-          {t('Shots ({count})', { count: group.shots.length })}
+          {i18n._({
+            id: 'targetEditor.shotsCount',
+            message: 'Shots ({count, decimal})',
+            values: { count: group.shots.length },
+          })}
         </button>
       </h2>
       <AddShotButton ed={ed} addShot={addShot} />
@@ -2554,22 +2588,34 @@ function SidePanel({ ed, v }: { ed: Ed; v: string }) {
 
 /** The panels as tabs: beside the target, or in the phone's bottom sheet. */
 function SideTabs({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, side, setSide, panel, charges } = ed
-  const tabs: [string, Message][] = [
-    ['groups', msg('Group')],
-    ['shots', msg('Shots')],
-    ['stats', msg('Stats')],
-    ['notes', msg('Notes')],
-    ...(charges ? [['ladder', msg('Ladder')] as [string, Message]] : []),
+  const tabs: [string, MessageDescriptor][] = [
+    ['groups', /*i18n*/ { id: 'targetEditor.group', message: 'Group' }],
+    ['shots', /*i18n*/ { id: 'targetEditor.shots', message: 'Shots' }],
+    ['stats', /*i18n*/ { id: 'targetEditor.stats', message: 'Stats' }],
+    ['notes', /*i18n*/ { id: 'targetEditor.notes', message: 'Notes' }],
+    ...(charges
+      ? [
+          ['ladder', /*i18n*/ { id: 'targetEditor.ladder', message: 'Ladder' }] as [
+            string,
+            MessageDescriptor,
+          ],
+        ]
+      : []),
   ]
   return (
     <Tabs value={side} onChange={setSide} className={`target-tabs${panel}`}>
-      {panel && <SideHead ed={ed} title={group?.name ?? t('Groups')} />}
+      {panel && (
+        <SideHead
+          ed={ed}
+          title={group?.name ?? i18n._({ id: 'targetEditor.groups', message: 'Groups' })}
+        />
+      )}
       <Tabs.List>
         {tabs.map(([v, label]) => (
           <Tabs.Tab key={v} value={v}>
-            {t(label)}
+            {i18n._(label)}
           </Tabs.Tab>
         ))}
       </Tabs.List>
@@ -2581,7 +2627,9 @@ function SideTabs({ ed }: { ed: Ed }) {
       {/* the group's key values under every other tab, at the panel's foot */}
       {panel && side !== 'stats' && group && stats && (
         <div className="target-summary">
-          <h3 className="prop-head">{t('Summary')}</h3>
+          <h3 className="prop-head">
+            {i18n._({ id: 'targetEditor.summary', message: 'Summary' })}
+          </h3>
           <Headline ed={ed} />
         </div>
       )}
@@ -2591,22 +2639,32 @@ function SideTabs({ ed }: { ed: Ed }) {
 
 /** The phone's bottom sheet: a summary strip that opens the panels. */
 function BottomSheet({ ed }: { ed: Ed }) {
-  const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, keyValues, system, uid, sheetOpen, setSheetOpen } = ed
   const summaryLine = group
     ? [
         group.name,
-        tn(stats?.shotCount ?? 0, '{count} shot', '{count} shots'),
+        i18n._(
+          'targetEditor.countShots',
+          { count: stats?.shotCount ?? 0 },
+          { message: '{count, plural, one {# shot} other {# shots}}', formats: ungrouped },
+        ),
         ...(stats && stats.shotCount > 1
-          ? [t('ES {value}', { value: keyValueText(keyValues, system, 'extremeSpread', t) })]
+          ? [
+              i18n._({
+                id: 'targetEditor.esValue',
+                message: 'ES {value}',
+                values: { value: keyValueText(keyValues, system, 'extremeSpread', i18n) },
+              }),
+            ]
           : []),
       ].join(' · ')
-    : t('No group')
+    : i18n._({ id: 'targetEditor.noGroup', message: 'No group' })
   return (
     <section
       className="target-sheet"
       data-open={sheetOpen || undefined}
-      aria-label={t('Group panels')}
+      aria-label={i18n._({ id: 'targetEditor.groupPanels', message: 'Group panels' })}
     >
       <button
         type="button"
@@ -2624,7 +2682,11 @@ function BottomSheet({ ed }: { ed: Ed }) {
         ) : (
           <ChevronUp size={16} aria-hidden="true" />
         )}
-        <span className="visually-hidden">{sheetOpen ? t('Hide panels') : t('Show panels')}</span>
+        <span className="visually-hidden">
+          {sheetOpen
+            ? i18n._({ id: 'targetEditor.hidePanels', message: 'Hide panels' })
+            : i18n._({ id: 'targetEditor.showPanels', message: 'Show panels' })}
+        </span>
       </button>
       <div id={`${uid}-sheet`} className="sheet-body" hidden={!sheetOpen}>
         {sheetOpen && <SideTabs ed={ed} />}
@@ -2635,11 +2697,16 @@ function BottomSheet({ ed }: { ed: Ed }) {
 
 /** The side column of the compact tab: the key statistics, or how to start. */
 function KeySide({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, sheet, frame, startActions } = ed
   return (
-    <aside className="target-side key-side" aria-label={t('Key statistics')}>
-      <h3 className="prop-head">{group?.name ?? t('Statistics')}</h3>
+    <aside
+      className="target-side key-side"
+      aria-label={i18n._({ id: 'targetEditor.keyStatistics', message: 'Key statistics' })}
+    >
+      <h3 className="prop-head">
+        {group?.name ?? i18n._({ id: 'targetEditor.statisticsTitle', message: 'Statistics' })}
+      </h3>
       {group?.shots.length ? (
         <>
           {stats && <StatsPanel ed={ed} />}
@@ -2647,7 +2714,7 @@ function KeySide({ ed }: { ed: Ed }) {
         </>
       ) : (
         <Stack gap={4}>
-          <p className="note">{startNote(!!sheet.photo, !!frame, t)}</p>
+          <p className="note">{startNote(!!sheet.photo, !!frame, i18n)}</p>
           {startActions(controlSize.row.button)}
         </Stack>
       )}
@@ -2656,26 +2723,40 @@ function KeySide({ ed }: { ed: Ed }) {
 }
 
 /** What to do first on a compact tab without shots. */
-function startNote(photo: boolean, scaled: boolean, t: Translator['t']) {
+function startNote(photo: boolean, scaled: boolean, i18n: I18n) {
   if (!photo)
-    return t(
-      'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.',
-    )
+    return i18n._({
+      id: 'targetEditor.drawnTargetPlaceShots2',
+      message:
+        'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.',
+    })
   return scaled
-    ? t('Place shots, then click each hole.')
-    : t('Mark a reference of known size (Expand, Calibrate) to place shots.')
+    ? i18n._({
+        id: 'targetEditor.placeShotsThenClick',
+        message: 'Place shots, then click each hole.',
+      })
+    : i18n._({
+        id: 'targetEditor.markReferenceKnownSize2',
+        message: 'Mark a reference of known size (Expand, Calibrate) to place shots.',
+      })
 }
 
 /** The statistics column of the wide layout, with the shots, the notes and the ladder. */
 function StatsSide({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, uid, shotsOpen, panel, charges, notesPanel, keyValues } = ed
   // the key values stay open, the other rows on request: the shot list keeps its room
   const [allStats, setAllStats] = useState(false)
   const more = keyValues.some((r) => !keyReadouts.includes(r.key))
   return (
-    <aside className={`target-side stats-side${panel}`} aria-label={t('Statistics and shots')}>
-      <SideHead ed={ed} title={t('Statistics')} />
+    <aside
+      className={`target-side stats-side${panel}`}
+      aria-label={i18n._({ id: 'targetEditor.statisticsShots', message: 'Statistics and shots' })}
+    >
+      <SideHead
+        ed={ed}
+        title={i18n._({ id: 'targetEditor.statisticsTitle', message: 'Statistics' })}
+      />
       <Headline ed={ed} />
       {group && stats && !more && <StatsPanel ed={ed} />}
       {group && stats && more && (
@@ -2695,7 +2776,7 @@ function StatsSide({ ed }: { ed: Ed }) {
             ) : (
               <ChevronDown size={12} aria-hidden="true" />
             )}
-            {t('All statistics')}
+            {i18n._({ id: 'targetEditor.allStatistics', message: 'All statistics' })}
           </button>
         </>
       )}
@@ -2703,11 +2784,11 @@ function StatsSide({ ed }: { ed: Ed }) {
       <div id={`${uid}-shots`} className="shots-body" hidden={!shotsOpen}>
         {shotsOpen && group && <ShotsPanel ed={ed} />}
       </div>
-      <h2 className="prop-head">{t('Notes')}</h2>
+      <h2 className="prop-head">{i18n._({ id: 'targetEditor.notes', message: 'Notes' })}</h2>
       {notesPanel}
       {charges && (
         <>
-          <h2 className="prop-head">{t('Ladder')}</h2>
+          <h2 className="prop-head">{i18n._({ id: 'targetEditor.ladder', message: 'Ladder' })}</h2>
           <LadderPanel ed={ed} />
         </>
       )}
@@ -2717,7 +2798,7 @@ function StatsSide({ ed }: { ed: Ed }) {
 
 /** The target body: the canvas with the panels beside it, in the layout the width allows. */
 function Body({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, wide, phone, panel, detect } = ed
   if (compact)
     return (
@@ -2730,8 +2811,12 @@ function Body({ ed }: { ed: Ed }) {
   if (wide)
     return (
       <>
-        <aside key="left" className={`target-side${panel}`} aria-label={t('Groups')}>
-          <SideHead ed={ed} title={t('Groups')} />
+        <aside
+          key="left"
+          className={`target-side${panel}`}
+          aria-label={i18n._({ id: 'targetEditor.groups', message: 'Groups' })}
+        >
+          <SideHead ed={ed} title={i18n._({ id: 'targetEditor.groups', message: 'Groups' })} />
           <GroupPanel ed={ed} />
           {detect.panel}
         </aside>
@@ -2763,7 +2848,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
     sheet,
     group,
   } = ed
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [Zero, setZero] = useState<typeof ZeroTargetMenu>()
   if (heading === undefined) return null
   return (
@@ -2776,7 +2861,9 @@ function SheetPageBar({ ed }: { ed: Ed }) {
           {meta.id ? (
             <FileMenu
               kind="targetSheet"
-              name={meta.name || t('Target sheet')}
+              name={
+                meta.name || i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' })
+              }
               data={fileData}
               autosaved={meta.id}
               // the save effect brings the two together again
@@ -2802,16 +2889,18 @@ function SheetPageBar({ ed }: { ed: Ed }) {
                 import('./zero-target.tsx').then((m) => setZero(() => m.ZeroTargetMenu))
               }
             >
-              {t('Zero target')}
+              {i18n._({ id: 'targetEditor.zeroTarget', message: 'Zero target' })}
             </Button>
           )}
           <TourButton page="groups" />
           <PrintButton
             onClick={printSheet}
-            hint={t(
-              'Print: what Fit shows at a stated scale with a ruler, and the statistics (also {shortcut})',
-              { shortcut: shortcutLabel('print') },
-            )}
+            hint={i18n._({
+              id: 'targetEditor.printWhatFitShows',
+              message:
+                'Print: what Fit shows at a stated scale with a ruler, and the statistics (also {shortcut})',
+              values: { shortcut: shortcutLabel('print') },
+            })}
           />
         </>
       }
@@ -2947,22 +3036,44 @@ function toolHintOf(
   pointsDone: number,
   detectHint: string | undefined,
   scoreHint: string | undefined,
-  t: Translator['t'],
+  i18n: I18n,
 ) {
   const first = detectHint ?? scoreHint
   if (first !== undefined) return first
-  const keys = t('Or arrow keys and Enter. Esc cancels.')
+  const keys = i18n._({
+    id: 'targetEditor.arrowKeysEnterEsc',
+    message: 'Or arrow keys and Enter. Esc cancels.',
+  })
   if (toolPoints[tool])
-    return t('{hint} Point {n} of {total}. {keys}', {
-      hint: t(refHints[tool as RefKind]),
-      n: pointsDone + 1,
-      total: toolPoints[tool],
-      keys,
+    return i18n._({
+      id: 'targetEditor.pointOfTotal',
+      message: '{hint} Point {n, decimal} of {total, decimal}. {keys}',
+      values: {
+        hint: i18n._(refHints[tool as RefKind]),
+        n: pointsDone + 1,
+        total: toolPoints[tool],
+        keys,
+      },
     })
-  if (tool === 'origin') return t('Click the photo point of target (0, 0). {keys}', { keys })
-  if (tool === 'aim') return t('Click the point of aim of the active group. {keys}', { keys })
+  if (tool === 'origin')
+    return i18n._({
+      id: 'targetEditor.clickPhotoPointTarget',
+      message: 'Click the photo point of target (0, 0). {keys}',
+      values: { keys },
+    })
+  if (tool === 'aim')
+    return i18n._({
+      id: 'targetEditor.clickPointAimActive',
+      message: 'Click the point of aim of the active group. {keys}',
+      values: { keys },
+    })
   if (tool !== 'shot') return
-  return frame ? t('Click a hole to add a shot to the active group.') : t(noReference)
+  return frame
+    ? i18n._({
+        id: 'targetEditor.clickHoleAddShot',
+        message: 'Click a hole to add a shot to the active group.',
+      })
+    : i18n._(noReference)
 }
 
 /** The state the File menu shows for the sheet. */
@@ -3020,7 +3131,14 @@ export function TargetEditor({
   newDistance.current = system.range.toSi(100)
   const [sheets, setSheets] = useState<TargetSheetRecord[]>([])
   // the id is set on mount (`create` or `open`): no clock or random value during the prerender
-  const [meta, setMeta] = useState({ id: '', name: t('Target sheet {n}', { n: 1 }) })
+  const [meta, setMeta] = useState({
+    id: '',
+    name: i18n._({
+      id: 'targetEditor.targetSheetN',
+      message: 'Target sheet {n, decimal}',
+      values: { n: 1 },
+    }),
+  })
   const [h, setH] = useState(() =>
     historyOf(blank(load, bulletDiameter, newDistance.current, i18n)),
   )
@@ -3145,7 +3263,11 @@ export function TargetEditor({
   const frame = useMemo(() => frameOf(sheet), [sheet])
   const group = activeGroupOf(sheet, active)
   const scrollFocus = useScrollFocus(
-    t('Shots of {name}', { name: group?.name ?? '' }),
+    i18n._({
+      id: 'targetEditor.shotsOf',
+      message: 'Shots of {name}',
+      values: { name: group?.name ?? '' },
+    }),
     shotScroller,
   )
 
@@ -3268,21 +3390,19 @@ export function TargetEditor({
   function create(list = sheets, face?: GroupFace) {
     flush()
     // the units and the language may be read after the mount that calls this, so the refs hold the current ones
-    const t = tNow.current
-    const empty = blank(
-      load,
-      bulletDiameter,
-      newDistance.current,
-      i18nNow.current,
-      charges ? step : undefined,
-    )
+    const i18n = i18nNow.current
+    const empty = blank(load, bulletDiameter, newDistance.current, i18n, charges ? step : undefined)
     const data = face
       ? {
           ...empty,
           groups: empty.groups.map((g, i) => (i === 0 ? { ...g, face } : g)),
         }
       : empty
-    const name = t('Target sheet {n}', { n: list.length + 1 })
+    const name = i18n._({
+      id: 'targetEditor.targetSheetN',
+      message: 'Target sheet {n, decimal}',
+      values: { n: list.length + 1 },
+    })
     setMeta({ id: newId(), name })
     opened.current = { data, name }
     setH(historyOf(data))
@@ -3300,16 +3420,23 @@ export function TargetEditor({
   useEffect(() => {
     const o = opened.current
     if (stored || !meta.id || sheet !== o.data || meta.name !== o.name) return
-    const name = t('Target sheet {n}', { n: sheets.length + 1 })
+    const name = i18n._({
+      id: 'targetEditor.targetSheetN',
+      message: 'Target sheet {n, decimal}',
+      values: { n: sheets.length + 1 },
+    })
     const data = {
       ...sheet,
-      groups: sheet.groups.map((g, i) => ({ ...g, name: t('Group {n}', { n: i + 1 }) })),
+      groups: sheet.groups.map((g, i) => ({
+        ...g,
+        name: i18n._({ id: 'targetEditor.groupN', message: 'Group {n}', values: { n: i + 1 } }),
+      })),
     }
     setMeta((m) => ({ ...m, name }))
     opened.current = { data, name }
     setH(historyOf(data))
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a language change only
-  }, [t])
+  }, [i18n])
 
   /** The sheets of this browser (of the load in the workbench), the newest first. */
   const sheetsOf = (records: UserRecord[]) =>
@@ -3458,9 +3585,15 @@ export function TargetEditor({
       setSaveFailed(false)
       if (!meta.id && storeError)
         say(
-          t('Not saved: the browser store could not be read. {reason}', {
-            reason: storeError.reason,
-          }).trim(),
+          i18n
+            ._({
+              id: 'targetEditor.notSavedStoreUnread',
+              message: 'Not saved: the browser store could not be read. {reason}',
+              values: {
+                reason: storeError.reason,
+              },
+            })
+            .trim(),
           true,
         )
       return
@@ -3470,7 +3603,11 @@ export function TargetEditor({
       pendingSave.current = undefined
       setSaveFailed(true)
       say(
-        t('Not saved: {reason}', { reason: z.prettifyError(parsed.error).split('\n')[0] ?? '' }),
+        i18n._({
+          id: 'targetEditor.notSavedReason',
+          message: 'Not saved: {reason}',
+          values: { reason: z.prettifyError(parsed.error).split('\n')[0] ?? '' },
+        }),
         true,
       )
       return
@@ -3478,7 +3615,7 @@ export function TargetEditor({
     const recordNow = (): TargetSheetRecord => ({
       kind: 'targetSheet',
       id: meta.id,
-      name: meta.name || t('Target sheet'),
+      name: meta.name || i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' }),
       saved: new Date().toISOString(),
       data: parsed.data,
     })
@@ -3510,7 +3647,8 @@ export function TargetEditor({
           setStored(true)
           setSaveFailed(false)
           // on /groups the page bar's File state says it
-          if (heading === undefined) say(t('Saved in this browser.'))
+          if (heading === undefined)
+            say(i18n._({ id: 'targetEditor.savedBrowser', message: 'Saved in this browser.' }))
           rememberSheet(record.id)
         })
         .catch((error) => {
@@ -3518,10 +3656,12 @@ export function TargetEditor({
           if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
           if (shown.current === record.id) setSaveFailed(true)
           say(
-            t(
-              'Not saved: the browser store refused the sheet. {reason} Free browser storage or allow site storage for this page, then edit the sheet again.',
-              { reason: errorText(error) },
-            ),
+            i18n._({
+              id: 'targetEditor.notSavedStoreRefused',
+              message:
+                'Not saved: the browser store refused the sheet. {reason} Free browser storage or allow site storage for this page, then edit the sheet again.',
+              values: { reason: errorText(error) },
+            }),
             true,
           )
         })
@@ -3531,7 +3671,7 @@ export function TargetEditor({
     })
     const timer = setTimeout(save, 300)
     return () => clearTimeout(timer)
-  }, [sheet, meta, storeError, say, heading, t])
+  }, [sheet, meta, storeError, say, heading, i18n])
   // an edit still waiting is saved when the editor goes (a link, a load change) or the page does
   useEffect(() => {
     const flushNow = () => pendingSave.current?.()
@@ -3558,14 +3698,23 @@ export function TargetEditor({
   async function takePhoto(file: File | undefined) {
     if (!file) return
     if (!(photoTypes as readonly string[]).includes(file.type))
-      return say(t('The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.'), true)
+      return say(
+        i18n._({
+          id: 'targetEditor.fileNotPhoto',
+          message: 'The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.',
+        }),
+        true,
+      )
     const target = meta.id
     if (
       sheet.photo &&
       !(await confirmDialog({
-        title: t('Replace the photo?'),
-        message: t('Its references go; the shots keep their target values.'),
-        confirmLabel: t('Replace'),
+        title: i18n._({ id: 'targetEditor.replacePhotoQuestion', message: 'Replace the photo?' }),
+        message: i18n._({
+          id: 'targetEditor.referencesGoShotsKeep',
+          message: 'Its references go; the shots keep their target values.',
+        }),
+        confirmLabel: i18n._({ id: 'targetEditor.replace', message: 'Replace' }),
         danger: true,
       }))
     )
@@ -3593,9 +3742,17 @@ export function TargetEditor({
       setPhoto(undefined)
       detect.photoAdded(id)
       setRefKind('line')
-      say(t('Photo kept in this browser. Looking for the target and the holes.'))
+      say(
+        i18n._({
+          id: 'targetEditor.photoKeptBrowserLooking',
+          message: 'Photo kept in this browser. Looking for the target and the holes.',
+        }),
+      )
     } catch {
-      say(t('The photo could not be read.'), true)
+      say(
+        i18n._({ id: 'targetEditor.photoNotRead', message: 'The photo could not be read.' }),
+        true,
+      )
     }
   }
 
@@ -3605,9 +3762,12 @@ export function TargetEditor({
     if (
       !old ||
       !(await confirmDialog({
-        title: t('Remove the photo?'),
-        message: t('The shots stay on a drawn target.'),
-        confirmLabel: t('Remove'),
+        title: i18n._({ id: 'targetEditor.removePhotoQuestion', message: 'Remove the photo?' }),
+        message: i18n._({
+          id: 'targetEditor.shotsStayDrawnTarget',
+          message: 'The shots stay on a drawn target.',
+        }),
+        confirmLabel: i18n._({ id: 'targetEditor.remove', message: 'Remove' }),
         danger: true,
       })) ||
       shown.current !== target
@@ -3635,7 +3795,7 @@ export function TargetEditor({
       ? {
           kind: 'targetSheet',
           id,
-          name: name || t('Target sheet'),
+          name: name || i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' }),
           saved: '',
           data: parsed.data,
         }
@@ -3653,7 +3813,13 @@ export function TargetEditor({
         open(own)
         if (!put) say(keptNote(own.name, t), true)
       } catch {
-        say(t('Not restored: the browser store refused.'), true)
+        say(
+          i18n._({
+            id: 'targetEditor.notRestoredStoreRefused',
+            message: 'Not restored: the browser store refused.',
+          }),
+          true,
+        )
       }
     }
     deleteRecord(id)
@@ -3668,9 +3834,25 @@ export function TargetEditor({
         setSheets(rest)
         if (rest[0]) open(rest[0])
         else create(rest)
-        if (record) offerUndo(t('Deleted {name}.', { name }), () => restore(record))
+        if (record)
+          offerUndo(
+            i18n._({
+              id: 'targetEditor.deletedName',
+              message: 'Deleted {name}.',
+              values: { name },
+            }),
+            () => restore(record),
+          )
       })
-      .catch(() => say(t('Not deleted: the browser store refused.'), true))
+      .catch(() =>
+        say(
+          i18n._({
+            id: 'targetEditor.notDeletedStoreRefused',
+            message: 'Not deleted: the browser store refused.',
+          }),
+          true,
+        ),
+      )
   }
 
   // a pasted image becomes the photo while the editor is shown and no field has the focus
@@ -3700,7 +3882,11 @@ export function TargetEditor({
 
   function addReference(points: Point[]) {
     const r = referenceOf(refKind, known, points)
-    if (!r) return say(t('Enter the known size first.'), true)
+    if (!r)
+      return say(
+        i18n._({ id: 'targetEditor.enterKnownSizeFirst', message: 'Enter the known size first.' }),
+        true,
+      )
     pushReference(r)
   }
 
@@ -3713,13 +3899,31 @@ export function TargetEditor({
         ref,
       ],
     }
-    if (next.references.length > 20) return say(t('A sheet holds at most 20 references.'), true)
-    if (!frameOf(next)) return say(t('These points give no scale: three lie on one line.'), true)
+    if (next.references.length > 20)
+      return say(
+        i18n._({
+          id: 'targetEditor.sheetHoldsMost20',
+          message: 'A sheet holds at most 20 references.',
+        }),
+        true,
+      )
+    if (!frameOf(next))
+      return say(
+        i18n._({
+          id: 'targetEditor.pointsGiveNoScale',
+          message: 'These points give no scale: three lie on one line.',
+        }),
+        true,
+      )
     applyCal(() => next)
     say(
-      t('{kind} {n} added.', {
-        kind: t(refNames[ref.kind]).split(',')[0] ?? '',
-        n: next.references.length,
+      i18n._({
+        id: 'targetEditor.referenceAdded',
+        message: '{kind} {n, decimal} added.',
+        values: {
+          kind: i18n._(refNames[ref.kind]).split(',')[0] ?? '',
+          n: next.references.length,
+        },
       }),
     )
   }
@@ -3749,14 +3953,26 @@ export function TargetEditor({
     if (!g || !s) return ''
     const value = scored(g.id)?.score.shots[sel.index]
     return [
-      t('{group}, shot {n}, x {x}, y {y}', {
-        group: g.name,
-        n: sel.index + 1,
-        x: formatQuantity('length', system, s.x),
-        y: withUnit('length', system, s.y),
+      i18n._({
+        id: 'targetEditor.shotXY',
+        message: '{group}, shot {n, decimal}, x {x}, y {y}',
+        values: {
+          group: g.name,
+          n: sel.index + 1,
+          x: formatQuantity('length', system, s.x),
+          y: withUnit('length', system, s.y),
+        },
       }),
-      ...(s.excluded ? [t('excluded')] : []),
-      ...(value ? [t('score {score}', { score: shotText(value) })] : []),
+      ...(s.excluded ? [i18n._({ id: 'targetEditor.excludedShot', message: 'excluded' })] : []),
+      ...(value
+        ? [
+            i18n._({
+              id: 'targetEditor.scoreValue',
+              message: 'score {score}',
+              values: { score: shotText(value) },
+            }),
+          ]
+        : []),
     ].join(', ')
   }
 
@@ -3780,7 +3996,14 @@ export function TargetEditor({
 
   const addShot = (q: Point) => {
     if (!group) return
-    if (group.shots.length >= 1000) return say(t('A group holds at most 1000 shots.'), true)
+    if (group.shots.length >= 1000)
+      return say(
+        i18n._({
+          id: 'targetEditor.groupHoldsMost1000',
+          message: 'A group holds at most 1000 shots.',
+        }),
+        true,
+      )
     setSelected({ group: group.id, index: group.shots.length })
     onGroup((g) => ({ ...g, shots: [...g.shots, { x: q.x, y: q.y, placement: 'placed' }] }))
   }
@@ -3851,7 +4074,14 @@ export function TargetEditor({
       earlier?.undo()
     }
     groupUndo.current = {
-      n: offerUndo(t('Deleted {name}.', { name: names.join(', ') }), undo),
+      n: offerUndo(
+        i18n._({
+          id: 'targetEditor.deletedName',
+          message: 'Deleted {name}.',
+          values: { name: names.join(', ') },
+        }),
+        undo,
+      ),
       undo,
       names,
     }
@@ -3886,7 +4116,7 @@ export function TargetEditor({
     [charges, ladderGroups, sessions, slopeAt],
   )
 
-  const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint, t)
+  const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint, i18n)
   const hint = hintOf(status, toolHint, help)
 
   /** The sheet without the photo at a fixed view, for the exports (with the statistics box) and the print. */
@@ -4016,7 +4246,9 @@ export function TargetEditor({
         leftSection={<ImageIcon size={size === 'sm' ? 16 : 12} aria-hidden="true" />}
         onClick={() => fileInput.current?.click()}
       >
-        {sheet.photo ? t('Replace photo') : t('Add photo')}
+        {sheet.photo
+          ? i18n._({ id: 'targetEditor.replacePhoto', message: 'Replace photo' })
+          : i18n._({ id: 'targetEditor.addPhoto', message: 'Add photo' })}
       </Button>
       <Button
         size={size}
@@ -4025,7 +4257,7 @@ export function TargetEditor({
         disabled={!frame}
         onClick={() => startTool('shot')}
       >
-        {t('Place shots')}
+        {i18n._({ id: 'targetEditor.placeShots', message: 'Place shots' })}
       </Button>
     </span>
   )
