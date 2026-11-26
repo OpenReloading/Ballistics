@@ -141,6 +141,7 @@ test('the tick box of a row is at least 24 px, as the row keeps its height', asy
 })
 
 test('the list sorts by L3 through its header button', async ({ page }) => {
+  await storeUnits(page, 'us', {})
   await gotoHydrated(page, '/cartridges')
   const header = page.getByRole('columnheader', { name: /^Case length L3 \(in\)/ })
   await header.getByRole('button').click()
