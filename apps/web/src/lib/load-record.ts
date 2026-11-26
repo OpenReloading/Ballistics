@@ -230,7 +230,7 @@ function caseOf(record: string | undefined, lots: Lots | undefined): Load['case'
   return { ...(record && { record }), ...(lot && { lot }) } as NonNullable<Load['case']>
 }
 
-/** Every solver value typed (the API invents none); user records and what the route does not run are left out. */
+/** Every solver value typed (the API invents none); user records other than a cartridge design in `catalogue.cartridge`, and what the route does not run, are left out. */
 export function toApiLoad(
   p: LoadParts,
   catalogue: {
@@ -256,6 +256,17 @@ export function toApiLoad(
     snapshots: undefined,
     powders: undefined,
   })
+}
+
+type Recorded<K extends UserRecord['kind']> = Extract<UserRecord, { kind: K }>
+
+/** The records of the file for the API: the load, and the user's cartridge design it names, which the route takes as its cartridge. */
+export function apiFileRecords(
+  load: Recorded<'load'>,
+  design: Pick<Recorded<'cartridge'>, 'id' | 'name' | 'data'> | undefined,
+): UserRecord[] {
+  if (!design || load.data.cartridge !== `user:${design.id}`) return [load]
+  return [load, { kind: 'cartridge', ...design, saved: load.saved }]
 }
 
 /** A load as the workbench fills itself from it. */

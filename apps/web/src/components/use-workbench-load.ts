@@ -103,6 +103,7 @@ import {
   notesOf,
 } from '../lib/load-notes.ts'
 import {
+  apiFileRecords,
   capacityOfRecord,
   capacityRecord,
   fromLoad,
@@ -511,6 +512,10 @@ function nextPanelOf(next: number, hasVolume: boolean): InputPanel | undefined {
 }
 
 const refOf = (record: { id: string } | undefined) => record && catalogueRef(record.id)
+
+/** The cartridge the file for the API names: the catalogue record, else the user's design the file carries. */
+const apiCartridgeRef = (record: { id: string } | undefined, design: { id: string } | undefined) =>
+  refOf(record) ?? (design && userRef(design.id))
 
 /** No record and no design is chosen. */
 const noneChosen = (...chosen: unknown[]) => !chosen.some(Boolean)
@@ -3464,12 +3469,16 @@ export function useWorkbenchState() {
     powders: powderTab.saved,
   }
   const loadFile = toLoad(loadParts)
-  // the file for the API: every value of the moment typed, the catalogue records only
+  // the file for the API: every value of the moment typed, the catalogue records only, and the cartridge design the file carries
   const apiFile = toApiLoad(loadParts, {
-    cartridge: refOf(cartridge),
+    cartridge: apiCartridgeRef(cartridge, cartridgeDesign),
     bullet: refOf(bullet),
     powder: refOf(powder),
   })
+  const apiRecords = useCallback(
+    (record: Extract<UserRecord, { kind: 'load' }>) => apiFileRecords(record, cartridgeDesign),
+    [cartridgeDesign],
+  )
   // the File menu's props stay the same objects while the load is unchanged, so its memo holds and its window listeners keep no earlier render, and so no earlier result, alive
   const fileKey = JSON.stringify(loadFile)
   const fileData = useMemo(() => JSON.parse(fileKey) as Load, [fileKey])
@@ -3621,6 +3630,7 @@ export function useWorkbenchState() {
     figureTab,
     setFigureTab,
     apiData,
+    apiRecords,
     fileData,
     fileMenu,
     generated,

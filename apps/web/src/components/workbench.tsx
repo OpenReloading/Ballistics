@@ -1120,6 +1120,7 @@ export function Workbench() {
     designs,
     fields,
     apiData,
+    apiRecords,
     fileData,
     fileMenu,
     firearm,
@@ -1450,6 +1451,7 @@ export function Workbench() {
                           : t('Choose the cartridge.')
                       }
                       apiData={apiData}
+                      apiRecords={apiRecords}
                       store={storeLoad}
                       onOpen={onOpenFile}
                       onStored={stored}
