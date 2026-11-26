@@ -176,7 +176,7 @@ Code: `packages/target-recognition/src/hole-detection.ts`, `shotsFromParts`, `en
 
 A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step; Accept sure leaves it out, and the counts name the sure and the maybe proposals apart. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
-Code: `packages/target-recognition/src/learned-detector.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
+Code: `packages/target-recognition/src/confidence-tier.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
 
 ### Hole size
 
