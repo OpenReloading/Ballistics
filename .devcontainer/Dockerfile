@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/typescript-node:26-bookworm@sha256:621f218f22c2ad132a715c26f64b13bfe030ada64d64d6dcaa50a5dbcbcb3203
+FROM mcr.microsoft.com/devcontainers/typescript-node:26-bookworm@sha256:37a0de6c51d0154ff7035b7471780b379286637207359e1b852704891452bdbd
 
 # agent-side tools that run in the container: MCP servers for Mantine docs and Playwright
 # the e2e headless shell too: keep 1.65.1 equal to @playwright/test in pnpm-lock.yaml (postCreateCommand installs it on a mismatch)
