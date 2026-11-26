@@ -3,8 +3,12 @@ import type { PresetId, Quantity, UnitSystem } from '@rangefoundry/locale-format
 import * as locale from '@rangefoundry/locale-format'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { conversions, waterDensityGramsPerCm3 } from '@rangefoundry/units'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { parseNumber } from '../i18n/number.ts'
 import { shownLanguage } from '../i18n/shown.ts'
+import englishMessages from '../locales/en/lib/units.json' with { type: 'json' }
+
+loadEnglish(englishMessages)
 
 /** The display unit tables and unit formatting of `@rangefoundry/locale-format` in the language shown, with the app's factors and unit-field text. */
 export {

@@ -3,6 +3,7 @@
 import type { MessageDescriptor } from '@lingui/core'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import type { Message } from '../i18n/translate.ts'
 import { type Design, evaluate } from '../lib/bullet-designer.ts'
 import { paintDisc, type Scale, type ScaleSpan, scaleOf } from '../lib/bullet-photo.ts'
@@ -23,6 +24,36 @@ import { type FieldSpec, type FieldValue, fieldOf } from '../lib/field-spec.ts'
 import type { Point } from '../lib/target-geometry.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import type { Wording } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/use-bullet-photo.json' with { type: 'json' }
+import englishBulletPhoto from '../locales/en/lib/bullet-photo.json' with { type: 'json' }
+import englishBulletPhotoWorker from '../locales/en/lib/bullet-photo.worker.json' with {
+  type: 'json',
+}
+import englishBulletPhotoColour from '../locales/en/lib/bullet-photo-colour.json' with {
+  type: 'json',
+}
+import englishBulletPhotoMeasure from '../locales/en/lib/bullet-photo-measure.json' with {
+  type: 'json',
+}
+import englishBulletPhotoQuality from '../locales/en/lib/bullet-photo-quality.json' with {
+  type: 'json',
+}
+import englishBulletPhotoScale from '../locales/en/lib/bullet-photo-scale.json' with {
+  type: 'json',
+}
+import englishPhotoQuality from '../locales/en/lib/photo-quality.json' with { type: 'json' }
+
+// the worker's modules leave their English to the module that shows it
+loadEnglish(
+  englishMessages,
+  englishBulletPhoto,
+  englishBulletPhotoColour,
+  englishBulletPhotoMeasure,
+  englishBulletPhotoQuality,
+  englishBulletPhotoScale,
+  englishBulletPhotoWorker,
+  englishPhotoQuality,
+)
 
 /** The longer side of the working image, px: a larger photograph is shrunk to it while it is read. */
 const workLong = 2400

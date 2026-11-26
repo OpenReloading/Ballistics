@@ -1,7 +1,21 @@
-import { holeDetector, type RunModel } from '@rangefoundry/target-recognition'
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { holeDetector, modelManifest, type RunModel } from '@rangefoundry/target-recognition'
 import { describe, expect, it } from 'vitest'
 import { folderDetector, type ModelLoad } from '../src/lib/hole-model.ts'
 import { wasmSettings } from '../src/lib/onnx-model.ts'
+
+const site = new URL('../public/', import.meta.url)
+
+it('the hole model manifest parses and names the size and SHA-256 of the file its url serves under the base path', () => {
+  const manifest = modelManifest.parse(
+    JSON.parse(readFileSync(new URL('models/hole-model-0.1.0.json', site), 'utf8')),
+  )
+  expect(manifest.file.url).toBe('models/hole-model-0.1.0.onnx')
+  const file = readFileSync(new URL(manifest.file.url, site))
+  expect(file.byteLength).toBe(manifest.file.bytes)
+  expect(createHash('sha256').update(file).digest('hex')).toBe(manifest.file.sha256)
+})
 
 const folder = 'http://localhost:4000/model/'
 

@@ -5,10 +5,14 @@ import { Button, Popover, Tooltip } from '@mantine/core'
 import { ArrowLeftRight, EyeOff, X } from 'lucide-react'
 import { useEffect, useId, useRef } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/compare-picks.json' with { type: 'json' }
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { focusSearch } from './directory-table.tsx'
+
+loadEnglish(englishMessages)
 
 /** In the order ticked, at most `max`, kept in the URL as `pick`; ids that `known` does not hold are left out. */
 export function usePicks(

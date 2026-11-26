@@ -3,6 +3,7 @@
 import { useLingui } from '@lingui/react'
 import type { Cartridge, Powder } from '@rangefoundry/schema'
 import { ChartColumn } from 'lucide-react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fetchPowderList } from '../lib/api-client.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { PowderSummary } from '../lib/api-types.ts'
@@ -26,6 +27,7 @@ import { fittedEnergyRatio } from '../lib/powder-record.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { powderParameterGroups, powderRowGroups, powderStrip } from '../lib/record-fields.ts'
 import { tunePowderHref } from '../lib/tune-href.ts'
+import englishMessages from '../locales/en/components/powder-record-page.json' with { type: 'json' }
 import { type BurnRatePlace, BurnRateSummary, type Neighbour } from './burn-rate-section.tsx'
 import { FieldStrip } from './field-strip.tsx'
 import { FieldPanel, FieldTable } from './field-table.tsx'
@@ -35,6 +37,8 @@ import { LinkButton } from './record-actions.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 import { VivacityPanel } from './vivacity-panel.tsx'
+
+loadEnglish(englishMessages)
 
 /** The powder's burn-rate order among all fitted powders and its neighbors; undefined without one. */
 function place(

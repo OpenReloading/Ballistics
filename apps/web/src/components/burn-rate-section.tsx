@@ -3,6 +3,7 @@
 import { useLingui } from '@lingui/react'
 import type { Powder } from '@rangefoundry/schema'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import {
   classifyPowder,
@@ -14,10 +15,13 @@ import {
 import type { ManufacturerNames } from '../lib/manufacturers.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
 import { verbatim } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/burn-rate-section.json' with { type: 'json' }
 import { Decimal } from './decimal.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { RateBar, RateTicks } from './rate-scale.tsx'
+
+loadEnglish(englishMessages)
 
 /** A powder of the burn-rate order as a neighbor link; `label` leaves out the page powder's manufacturer. */
 export type Neighbour = { id: string; label: string; order: number; rate?: number | undefined }

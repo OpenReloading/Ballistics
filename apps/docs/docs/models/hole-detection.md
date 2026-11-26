@@ -44,7 +44,7 @@ The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fe
 
 Reference holes are labeled one file per labeler in the format of `packages/target-recognition/src/label-set.ts` (`labelSet`): per photo its hash, source, license, author, shooting session, kind, usable and complete, the visible hole diameter in px and the hole centers, each hole with an uncertain flag. `packages/target-recognition/scripts/label-studio.mts` converts a Label Studio export into it, and `packages/target-recognition/scripts/label-agreement.mts` prints how far two labelers disagree in the statistics above, over the photos both mark usable and complete.
 
-A learned model file comes with a manifest in the format of `packages/target-recognition/src/model-manifest.ts` (`modelManifest`): the model id and version; the file's https URL, SHA-256 and size; the runtime package, its exact version and WASM path; the ONNX opset; the input and output contracts; the model license; the training photos as counts per data class (own, third-party, synthetic) and per target kind, with no photo or source listed; the synthetic and holdout corrections in the statistics above; and the largest output difference between PyTorch and ONNX Runtime.
+A learned model file comes with a manifest in the format of `packages/target-recognition/src/model-manifest.ts` (`modelManifest`): the model id and version; the file's path relative to the app's base path, SHA-256 and size; the runtime package, its exact version and WASM folder (relative likewise); the ONNX opset; the input and output contracts; the model license; the training photos as counts per data class (own, third-party, synthetic) and per target kind, with no photo or source listed; the synthetic and holdout corrections in the statistics above; and the largest output difference between PyTorch and ONNX Runtime.
 
 Code: `packages/target-recognition/src/hole-matching.ts`, `matchHoles`, `corrections`, `correctionStats`.
 
@@ -176,7 +176,7 @@ Code: `packages/target-recognition/src/hole-detection.ts`, `shotsFromParts`, `en
 
 A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step; Accept sure leaves it out, and the counts name the sure and the maybe proposals apart. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
-Code: `packages/target-recognition/src/confidence-tier.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
+Code: `packages/target-recognition/src/learned-detector.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
 
 ### Hole size
 
@@ -333,6 +333,19 @@ $$
 Code: `packages/target-recognition/src/learned-detector.ts`, `learnedDetector`, `coverage`, `peaks`, `confidence`, `clustered`.
 
 Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a chain, share a cluster id. Each proposal's diameter is $D_\mathrm{px}$; a working image over $2 \times 10^6$ pixels is refused.
+
+### Model file
+
+`hole-model` 0.1.0 is a heatmap net of 197,153 parameters, trained from random weights by `training/hole-model` and exported to ONNX opset 17. The file is `apps/web/public/models/hole-model-0.1.0.onnx` (792,640 bytes), licensed CC-BY-SA-4.0 and served by each edition under its own base path (`basePath` of `apps/web/src/platform/edition.ts`), on next at <https://openreloading.github.io/Ballistics/next/models/hole-model-0.1.0.onnx>; its manifest is `hole-model-0.1.0.json` beside it. The manifest's `url` and `wasmPaths` are relative to that base path; the runtime's WASM files do not ship yet. The service worker neither precaches nor stores it, and no script bundle holds it.
+
+- Input: RGB in 0 to 1 with the expected hole at 16 px, width and height multiples of 16. Output: one heatmap channel at stride 2.
+- Training photos: 3,000 synthetic and 638 real third-party target photos with unchecked labels. Target kinds are not counted for this model. `NOTICE` credits the third-party photos in aggregate.
+- Threshold 0.45, the best F1 score on the validation photos. The `sure` value 0.9 is not set from scores, so most peaks stay maybes.
+- Validation, 136 real target photos with 938 holes: recall 0.904, precision 0.882, corrections median 0.5, 90th percentile 3.5, maximum 16.
+- Test, 300 synthetic target photos with 1,476 holes: recall 0.731, precision 0.936, corrections median 1, 90th percentile 4, maximum 9.
+- Largest output difference between PyTorch and ONNX Runtime: $2.7 \times 10^{-7}$.
+
+The accuracy gate on the holdout photos has not run on this model, so its manifest has no holdout scores. The classical detector stays the default, and the app neither downloads nor runs this model.
 
 ### Learned detector in the app
 

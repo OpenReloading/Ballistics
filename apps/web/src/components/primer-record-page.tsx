@@ -1,16 +1,20 @@
 'use client'
 
 import type { Primer } from '@rangefoundry/schema'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   fetchManufacturerNames,
   type ManufacturerNames,
   productLabel,
 } from '../lib/manufacturers.ts'
 import { primerRowGroups, primerStrip } from '../lib/record-fields.ts'
+import englishMessages from '../locales/en/components/primer-record-page.json' with { type: 'json' }
 import { FieldStrip } from './field-strip.tsx'
 import { FieldPanel } from './field-table.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
+
+loadEnglish(englishMessages)
 
 /** The primer record page: the record from its data file, rendered in the browser. */
 export function PrimerRecordPage({ id, name }: { id: string; name: string }) {

@@ -6,6 +6,7 @@ import { ActionIcon, Button, Checkbox, NativeSelect, Text, TextInput } from '@ma
 import { Plus, Target, X } from 'lucide-react'
 import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { colourWord } from '../lib/face-words.ts'
 import { fieldError } from '../lib/field-spec.ts'
@@ -28,6 +29,7 @@ import {
 import { controlSize } from '../lib/theme.ts'
 import { namedKey } from '../lib/user-data.ts'
 import { userFaceId, userOrganization } from '../lib/user-faces.ts'
+import englishMessages from '../locales/en/components/target-designer.json' with { type: 'json' }
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
@@ -40,6 +42,8 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useKeptDraft } from './use-kept-draft.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 import { Workspace } from './workspace.tsx'
+
+loadEnglish(englishMessages)
 
 /** The record name of a face without a name. */
 const fallbackName = 'Target design'

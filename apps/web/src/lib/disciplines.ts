@@ -10,8 +10,9 @@ import {
   type Source,
   toSi,
 } from '@rangefoundry/schema'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
+import englishMessages from '../locales/en/lib/disciplines.json' with { type: 'json' }
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Facet } from './facets.ts'
@@ -20,6 +21,8 @@ import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type FieldRow, type StripItem, titleFromKebab } from './record-fields.ts'
 import { metersPerYard, type Quantity } from './units.ts'
 import { type LinguiWording, sayLingui, verbatim } from './wording.ts'
+
+loadEnglish(englishMessages)
 
 /** A discipline record as the API answers it: its sources resolved. */
 export type DisciplineRecord = Omit<Discipline, 'provenance'> & {

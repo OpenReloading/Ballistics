@@ -24,6 +24,7 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   type CombinedRow,
   clearanceLine,
@@ -42,12 +43,15 @@ import { caseTypeText } from '../lib/list-values.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { drawingLengthUnit, type UnitSystem } from '../lib/units.ts'
 import { say, type Wording } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/cartridge-record.json' with { type: 'json' }
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Label, Sized, slotUnits } from './fact-cards.tsx'
 import { arrowStops, Noted, SymbolStop } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { LengthOverride, useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** The unit after a number; lengths carry theirs in the column head. */
 const unitAfter = (q: string, system: UnitSystem) =>
