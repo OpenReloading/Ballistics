@@ -1,9 +1,9 @@
 'use client'
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { Powder } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
-import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { english, type Translator } from '../i18n/translate.ts'
 import { anySignal } from '../lib/any-signal.ts'
 import { fetchPowder, fetchPowderList, postInteriorRun, postJson } from '../lib/api-client.ts'
 import type { InteriorResponse, PowderSummary } from '../lib/api-types.ts'
@@ -12,7 +12,6 @@ import {
   type ChargeTargetRefusal,
   type ChargeTargetResponse,
   chargeTargetBody,
-  noComparableLimitText,
 } from '../lib/charge-target.ts'
 import { notMetallic, shotgunOnly } from '../lib/complete-records.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
@@ -33,36 +32,47 @@ import { percentOfPressureLimit } from '../lib/workbench.ts'
 import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 import { derived, stepFlag } from './workbench-outcome.ts'
 
-const noModel = msg('No fitted model parameters')
-const apiSilent = msg(
-  'A data file did not load or the computation failed. Check the connection and retry.',
-)
-const noRecord = msg('The powder record was not found.')
+const noModel = /*i18n*/ { id: 'powderCompare.noModel', message: 'No fitted model parameters' }
+const apiSilent = /*i18n*/ {
+  id: 'powderCompare.apiSilent',
+  message: 'A data file did not load or the computation failed. Check the connection and retry.',
+}
+const noRecord = /*i18n*/ {
+  id: 'powderCompare.noRecord',
+  message: 'The powder record was not found.',
+}
 /** Why a row has no case fill: the record gives no bulk density. */
-export const noBulkDensity = msg('No bulk density in the record')
+export const noBulkDensity = /*i18n*/ {
+  id: 'powderCompare.noBulkDensity',
+  message: 'No bulk density in the record',
+}
+const noComparableLimit = /*i18n*/ {
+  id: 'powderCompare.noComparableLimit',
+  message: 'The cartridge has no CIP limit to compare with.',
+}
 
-/** The sentences of this tab's rows; a row's other reasons are messages of the API and the packages. */
-const ownReasons: readonly Message[] = [
+/** The sentences of this tab's rows, kept in English as the row's reason; a row's other reasons are messages of the API and the packages. */
+const ownReasons: readonly MessageDescriptor[] = [
   noModel,
   apiSilent,
   noRecord,
   noBulkDensity,
-  noComparableLimitText,
+  noComparableLimit,
+  notMetallic,
 ]
 
 /** A shotgun-only powder's reason, in English as the other reasons. */
 export const notMetallicReason = notMetallic.message
 
-/** A row's reason in the language of `t` and `i18n`; a refusal it caught is worded here, where it is shown. */
+/** A row's reason in the language of `i18n`; `t` words a message of the API or the packages, and a refusal it caught is worded here, where it is shown. */
 export function reasonText(
   { reason, failure }: Pick<CompareRow, 'reason' | 'failure'>,
   t: Translator['t'],
   i18n: I18n,
 ) {
   if (failure !== undefined) return translateMessage(refusalText(failure), t)
-  if (reason === notMetallicReason) return i18n._(notMetallic)
-  const own = ownReasons.find((m) => m === reason)
-  return own ? t(own) : translateMessage(reason ?? '', t)
+  const own = ownReasons.find((m) => m.message === reason)
+  return own ? i18n._(own) : translateMessage(reason ?? '', t)
 }
 
 /** One powder of the Powders tab. */
@@ -196,10 +206,10 @@ async function recordFor(
   try {
     record = await fetchPowder(id, batch)
   } catch {
-    return { row: batch.aborted ? undefined : { ...head, reason: apiSilent } }
+    return { row: batch.aborted ? undefined : { ...head, reason: apiSilent.message } }
   }
-  if (!record) return { row: { ...head, reason: noRecord } }
-  if (!record.interior) return { row: { ...head, reason: noModel } }
+  if (!record) return { row: { ...head, reason: noRecord.message } }
+  if (!record.interior) return { row: { ...head, reason: noModel.message } }
   return { record }
 }
 
@@ -236,12 +246,12 @@ async function powderRow(
   s: PowderSummary,
 ): Promise<CompareRow | undefined> {
   if (shotgunOnly(s)) return { ...head, reason: notMetallicReason }
-  if (!s.interior) return { ...head, reason: noModel }
+  if (!s.interior) return { ...head, reason: noModel.message }
   const fetched = await recordFor(head, s.id, cx.batch)
   if ('row' in fetched) return fetched.row
   const { record } = fetched
   const charge = compareCharge(cx.mode, cx.typed, record.bulkDensity?.value, cx.volume)
-  if (charge === undefined) return { ...head, reason: noBulkDensity }
+  if (charge === undefined) return { ...head, reason: noBulkDensity.message }
   let req: ReturnType<RowContext['loadRequest']>
   try {
     req = cx.loadRequest({ powder: record, charge })
@@ -262,8 +272,8 @@ function skipped(
   noLimit: ChargeTargetRefusal | undefined,
 ): CompareRow {
   if (shotgunOnly(s)) return { ...head, reason: notMetallicReason }
-  if (!s.interior) return { ...head, reason: noModel }
-  return { ...head, reason: noLimit?.message ?? noComparableLimitText, refusal: noLimit }
+  if (!s.interior) return { ...head, reason: noModel.message }
+  return { ...head, reason: noLimit?.message ?? noComparableLimit.message, refusal: noLimit }
 }
 
 /** By place in the powder list, in batches of `compareConcurrency`; undefined when `signal` aborted before the batch started, a later answer dropped; in the target mode a first answer with no comparable limit ends the batch (`noLimit`). */

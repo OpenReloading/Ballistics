@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs'
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { draftSpec, fromRecord } from '../src/lib/cartridge-designer.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -29,9 +31,11 @@ describe('cartridge designer, unchanged verified records', () => {
       // the whole figure as the designer renders it: captions, views and description included
       const page = (s: ReturnType<typeof drawable>) =>
         renderToStaticMarkup(
-          <MantineProvider>
-            <CartridgeDrawing spec={s} />
-          </MantineProvider>,
+          <I18nProvider i18n={linguiOf('en')}>
+            <MantineProvider>
+              <CartridgeDrawing spec={s} />
+            </MantineProvider>
+          </I18nProvider>,
         )
       expect(page({ ...drawable(record), table: spec.table, values: spec.values })).toBe(
         page(drawable(record)),

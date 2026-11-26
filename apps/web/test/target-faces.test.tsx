@@ -7,7 +7,6 @@ import { expect, it, vi } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'
 import { TargetFaceList } from '../src/components/target-face-list.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { type Translator, translator } from '../src/i18n/translate.ts'
 import { facetOptions, facetRows } from '../src/lib/facets.ts'
 import {
   faceEventRows,
@@ -18,13 +17,13 @@ import {
   targetFaceStrip,
   userFaceRows,
 } from '../src/lib/target-faces.ts'
-import { say as sayIn, type Wording } from '../src/lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../src/lib/wording.ts'
 import { faceById, faces } from './catalog-faces.ts'
 import { defined, missing } from './defined.ts'
 import { readRecord } from './read-record.ts'
 
 /** A wording in the language of `t`; these rows carry no Lingui id. */
-const say = (t: Translator['t'], w: Wording) => sayIn(linguiOf('en'), t, w)
+const say = (w: LinguiWording) => sayLingui(linguiOf('en'), w)
 
 // the list renders its tab bar, which reads the route and the router
 vi.mock('next/navigation', () => ({
@@ -96,17 +95,17 @@ it('renders the list: one row per face linking its page, the outer diameter in t
 })
 
 it('gives the strip, then the scoring values and the ring diameters outer to inner with the inner ten', () => {
-  const { t } = translator()
-  expect(targetFaceStrip(precision, t).map((i) => i.label)).toEqual([
+  const en = linguiOf('en')
+  expect(targetFaceStrip(precision, en).map((i) => i.label)).toEqual([
     'Federation',
     'Distance',
     'Outer diameter',
     'Black area',
     'Rings',
   ])
-  const [face = missing(), rings = missing()] = targetFaceGroups(precision, t)
-  expect(face.rows.find((r) => say(t, r.label) === 'Numerals printed')?.text).toBe('Yes')
-  expect(face.rows.find((r) => say(t, r.label) === 'Tenth-ring values')?.text).toBe('Yes')
+  const [face = missing(), rings = missing()] = targetFaceGroups(precision, en)
+  expect(face.rows.find((r) => say(r.label) === 'Numerals printed')?.text).toBe('Yes')
+  expect(face.rows.find((r) => say(r.label) === 'Tenth-ring values')?.text).toBe('Yes')
   const unstated = {
     ...precision,
     decimal: undefined,
@@ -115,11 +114,11 @@ it('gives the strip, then the scoring values and the ring diameters outer to inn
   }
   const stated = ['Inner ten rule', 'Tenth-ring values', 'Numerals printed']
   expect(
-    defined(targetFaceGroups(unstated, t)[0])
-      .rows.filter((r) => stated.includes(say(t, r.label)))
+    defined(targetFaceGroups(unstated, en)[0])
+      .rows.filter((r) => stated.includes(say(r.label)))
       .map((r) => r.text),
   ).toEqual(['Not stated', 'Not stated', 'Not stated'])
-  expect(rings.rows.map((r) => say(t, r.label))).toEqual([
+  expect(rings.rows.map((r) => say(r.label))).toEqual([
     ...precision.rings.map((r) => `Ring ${r.value}`),
     'Inner ten',
   ])

@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { ActionIcon, Button, Checkbox, NativeSelect, Text, TextInput } from '@mantine/core'
 import { Plus, Target, X } from 'lucide-react'
 import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
@@ -51,10 +53,10 @@ const ruleOptions: { value: InnerRule; label: Message }[] = [
   { value: 'cover', label: msg('Cover counts') },
 ]
 
-const colourOptions = (part: 'fill' | 'line', t: Translator['t']) => [
+const colourOptions = (part: 'fill' | 'line', t: Translator['t'], i18n: I18n) => [
   { value: '', label: part === 'fill' ? t('Fill: not set') : t('Line: not set') },
   ...colours.map((c) => {
-    const colour = colourWord(t, c)
+    const colour = colourWord(i18n, c)
     return {
       value: c,
       label: part === 'fill' ? t('Fill: {colour}', { colour }) : t('Line: {colour}', { colour }),
@@ -65,6 +67,7 @@ const colourOptions = (part: 'fill' | 'line', t: Translator['t']) => [
 /** The face is drawn by `@rangefoundry/svg-drawings` while its fields change; the draft is kept in this browser on every change (a record of kind `targetFaceDesign`), and once it passes the schema the shot groups and hit probability tools offer it; `?record=` opens a browser record, a Mine row's link. */
 export function TargetDesigner() {
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const [history, dispatch] = useReducer(reduce, undefined, () => historyOf(newDesign()))
   const design = history.present
@@ -175,7 +178,7 @@ export function TargetDesigner() {
                 ? t('Color of the zone this ring line bounds on the outside.')
                 : undefined
             }
-            data={colourOptions(part, t)}
+            data={colourOptions(part, t, i18n)}
             value={r[part]}
             onChange={(e) =>
               dispatch({ type: 'colour', id: r.id, part, value: e.currentTarget.value })

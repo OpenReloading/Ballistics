@@ -3,10 +3,9 @@
 import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { countryName } from '../lib/countries.ts'
-import { categoryWord } from '../lib/face-words.ts'
+import { kebabValue } from '../lib/list-values.ts'
 import { controlSize } from '../lib/theme.ts'
 import { FieldTable, SlashBreaks } from './field-table.tsx'
 import { HomepageLink } from './homepage-link.tsx'
@@ -137,7 +136,6 @@ export function FederationDisciplines({
   rows: readonly FederationDisciplineRow[]
   listHref: string
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const numbered = rows.some((d) => d.number)
   return (
@@ -198,7 +196,7 @@ export function FederationDisciplines({
                 <Link href={`/disciplines/${d.id}`}>{d.name}</Link>
               </th>
               <td className="num nowrap">{`${plainNumber(d.distanceM)} m`}</td>
-              <td>{d.category && categoryWord(t, d.category)}</td>
+              <td>{d.category && kebabValue(i18n, d.category)}</td>
               <td className="num">{d.faces}</td>
             </tr>
           ))}
