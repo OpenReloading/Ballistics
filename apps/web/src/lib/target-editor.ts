@@ -1,4 +1,6 @@
 /** SI in and out (m, rad); no React, DOM or Next.js. */
+
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import {
   type CalibrationReference,
   type ShotGroup,
@@ -12,7 +14,8 @@ import {
   type GroupStatistics,
   subtendedAngle,
 } from '@rangefoundry/shot-groups'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/target-editor.json' with { type: 'json' }
 import { nth } from './nth.ts'
 import {
   applyMatrix,
@@ -24,6 +27,8 @@ import {
   turnPoint,
 } from './target-geometry.ts'
 import { groupStatisticsOf } from './target-groups.ts'
+
+loadEnglish(englishMessages)
 
 /** Image px to target m and back; for a drawn target the view is target mm with y down. */
 export type Frame = { toTarget: Matrix; toImage: Matrix; calibration?: Calibration }
@@ -143,16 +148,11 @@ export const withoutRegions = <S extends Pick<TargetSheet, 'groups'>>(sheet: S):
 /** Group colors in order of creation: the light chart series colors (`--series-*`). */
 export const groupColours = ['#2a78d6', '#eb6834', '#19a371', '#c18300', '#e46494', '#7c4dcc']
 
-export function newGroup(
-  sheet: TargetSheet,
-  id: string,
-  distance: number,
-  t: Translator['t'],
-): ShotGroup {
+export function newGroup(sheet: TargetSheet, id: string, distance: number, i18n: I18n): ShotGroup {
   const n = sheet.groups.length + 1
   return {
     id,
-    name: t('Group {n}', { n }),
+    name: i18n._({ id: 'targetEditor.groupN', message: 'Group {n}', values: { n } }),
     colour: nth(groupColours, (n - 1) % groupColours.length),
     distance,
     shots: [],
@@ -267,16 +267,16 @@ export const offsetAngles = (o: AimOffset, distance: number) => ({
 })
 
 /** Compass words of `AimOffset.compass` for screen readers and hover text. */
-export const compassNames: Record<AimOffset['compass'], Message> = {
-  N: msg('high'),
-  NE: msg('high right'),
-  E: msg('right'),
-  SE: msg('low right'),
-  S: msg('low'),
-  SW: msg('low left'),
-  W: msg('left'),
-  NW: msg('high left'),
-  centre: msg('on the point of aim'),
+export const compassNames: Record<AimOffset['compass'], MessageDescriptor> = {
+  N: /*i18n*/ { id: 'targetEditor.high', message: 'high' },
+  NE: /*i18n*/ { id: 'targetEditor.highRight', message: 'high right' },
+  E: /*i18n*/ { id: 'targetEditor.right', message: 'right' },
+  SE: /*i18n*/ { id: 'targetEditor.lowRight', message: 'low right' },
+  S: /*i18n*/ { id: 'targetEditor.low', message: 'low' },
+  SW: /*i18n*/ { id: 'targetEditor.lowLeft', message: 'low left' },
+  W: /*i18n*/ { id: 'targetEditor.left', message: 'left' },
+  NW: /*i18n*/ { id: 'targetEditor.highLeft', message: 'high left' },
+  centre: /*i18n*/ { id: 'targetEditor.onPointOfAim', message: 'on the point of aim' },
 }
 
 /** The known sizes the scale references take, m. */

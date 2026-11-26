@@ -1,6 +1,7 @@
 import type { ShotGroup, TargetSheet } from '@rangefoundry/schema'
 import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@rangefoundry/shot-groups'
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 import { readouts } from '../src/lib/group-readouts.ts'
 import { type LabelBox, type LabelScene, placeLabel } from '../src/lib/label-placement.ts'
@@ -503,6 +504,6 @@ describe('close-the-page copies', () => {
 describe('newGroup', () => {
   it('names the group after its place, in the language shown', () => {
     const sheet = { references: [], targetRotation: 0, groups: [group] }
-    expect(newGroup(sheet, 'g2', 100, english.t).name).toBe('Group 2')
+    expect(newGroup(sheet, 'g2', 100, linguiOf('en')).name).toBe('Group 2')
   })
 })

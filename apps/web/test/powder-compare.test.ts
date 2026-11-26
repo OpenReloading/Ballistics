@@ -1,7 +1,7 @@
 import type { Powder } from '@rangefoundry/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { answerRow, computeRows } from '../src/components/use-powder-compare.ts'
-import { english } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { fetchPowder, postInteriorRun, postJson } from '../src/lib/api-client.ts'
 import { runBatch } from '../src/lib/batch.ts'
 import { targetError, targetUnit } from '../src/lib/charge-target.ts'
@@ -441,6 +441,7 @@ describe('sortForMode', () => {
 })
 
 describe('targetError', () => {
+  const en = linguiOf('en')
   const mpa = {
     symbol: 'MPa',
     toSi: (x: number) => x * 1e6,
@@ -450,24 +451,24 @@ describe('targetError', () => {
   const percent = targetUnit('peakPressure', {} as never, true)
 
   it('names the unit shown for an empty, zero or negative target', () => {
-    expect(targetError('', mpa, english.t)).toBe('Enter a target above 0 MPa.')
-    expect(targetError(0, mpa, english.t)).toBe('Enter a target above 0 MPa.')
-    expect(targetError('-3', mpa, english.t)).toBe('Enter a target above 0 MPa.')
-    expect(targetError('x', percent, english.t)).toBe('Enter a target above 0 % of Pmax.')
+    expect(targetError('', mpa, en)).toBe('Enter a target above 0 MPa.')
+    expect(targetError(0, mpa, en)).toBe('Enter a target above 0 MPa.')
+    expect(targetError('-3', mpa, en)).toBe('Enter a target above 0 MPa.')
+    expect(targetError('x', percent, en)).toBe('Enter a target above 0 % of Pmax.')
   })
 
   it('refuses a target above what the API accepts, in the unit shown', () => {
-    expect(targetError(3e6 + 1, mpa, english.t)).toBe('Enter a target of at most 1000000 MPa.')
-    expect(targetError(1e12, percent, english.t)).toBeUndefined()
-    expect(targetError(1e12 + 1, percent, english.t)).toBe(
+    expect(targetError(3e6 + 1, mpa, en)).toBe('Enter a target of at most 1000000 MPa.')
+    expect(targetError(1e12, percent, en)).toBeUndefined()
+    expect(targetError(1e12 + 1, percent, en)).toBe(
       'Enter a target of at most 1000000000000 % of Pmax.',
     )
-    expect(targetError(Number.POSITIVE_INFINITY, percent, english.t)).toMatch(/at most/)
+    expect(targetError(Number.POSITIVE_INFINITY, percent, en)).toMatch(/at most/)
   })
 
   it('accepts a target in range, typed text included', () => {
-    expect(targetError('350', mpa, english.t)).toBeUndefined()
-    expect(targetError(90.5, percent, english.t)).toBeUndefined()
+    expect(targetError('350', mpa, en)).toBeUndefined()
+    expect(targetError(90.5, percent, en)).toBeUndefined()
   })
 })
 
