@@ -227,6 +227,10 @@ msgstr "{count, plural, one {Kein Geschoss mit der ID {ids}.} other {Keine Gesch
 msgid "bulletCompare.invalidIds"
 msgstr "{count, plural, one {Keine Geschoss-ID: {ids}.} other {Keine Geschoss-IDs: {ids}.}}"
 
+# en: "{count} ({excluded} excluded)"
+msgid "targetEditor.excluded"
+msgstr "{count} ({excluded} ausgeschlossen)"
+
 # en: "{count} hidden"
 msgid "comparePicks.hidden"
 msgstr "{count} ausgeblendet"
@@ -258,6 +262,26 @@ msgstr "{face}: Maßstab und Mitte aus {count, decimal} Ellipsen."
 # en: "{from} to {to}"
 msgid "log.fromTo"
 msgstr "{from} bis {to}"
+
+# en: "{horizontal, decimal} {horizontalDirection}, {vertical, decimal} {verticalDirection}"
+msgid "targetEditor.clicksBoth"
+msgstr "{horizontal, decimal} {horizontalDirection}, {vertical, decimal} {verticalDirection}"
+
+# en: "{interval}; assumes circular spread."
+msgid "targetEditor.assumesCircularSpread"
+msgstr "{interval}; setzt kreisförmige Streuung voraus."
+
+# en: "{interval}."
+msgid "targetEditor.intervalOnly"
+msgstr "{interval}."
+
+# en: "{kind} {n, decimal}"
+msgid "targetEditor.referenceLabel"
+msgstr "{kind} {n, decimal}"
+
+# en: "{kind}; scale {deviation} % from the mean"
+msgid "targetEditor.scaleMean"
+msgstr "{kind}; Maßstab {deviation} % vom Mittel"
 
 # en: "{label} from {velocity}"
 msgid "fieldStrip.bandFrom"
@@ -294,6 +318,10 @@ msgstr "{label}, Z bis A"
 # en: "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it."
 msgid "holeDetection.doubleClickEnterAccepts"
 msgstr "{label}. Doppelklick oder Eingabetaste übernimmt ihn, Ziehen oder Pfeiltasten verschieben ihn, Entf löscht ihn."
+
+# en: "{level, decimal} % interval {lower} to {upper} {unit} ({df, decimal} degrees of freedom)"
+msgid "targetEditor.intervalDegreesFreedom"
+msgstr "{level, decimal} %-Intervall {lower} bis {upper} {unit} ({df, decimal} Freiheitsgrade)"
 
 # en: "{low} to {high}"
 msgid "chargeTarget.pressureRangeValue"
@@ -378,6 +406,10 @@ msgstr "{reason} Für die Zeichnung werden ein Durchmesser und eine Länge benö
 # en: "{source} only"
 msgid "sources.only"
 msgstr "nur {source}"
+
+# en: "{step}: {charge}"
+msgid "targetEditor.stepCharge"
+msgstr "{step}: {charge}"
 
 # en: "{symbol}: {meaning}"
 msgid "cartridgeRecord.symbolMeaning"
@@ -471,6 +503,10 @@ msgstr "Eine Kurve konnte nicht geladen werden."
 msgid "powderCompare.apiSilent"
 msgstr "Eine Datendatei wurde nicht geladen oder die Berechnung ist fehlgeschlagen. Prüfen Sie die Verbindung und versuchen Sie es erneut."
 
+# en: "A drawn target: shots in target coordinates, no scale needed."
+msgid "targetEditor.drawnTargetShotsTarget"
+msgstr "Eine gezeichnete Zielscheibe: Schüsse in Zielscheibenkoordinaten, kein Maßstab nötig."
+
 # en: "A group holds at most 1000 shots."
 msgid "holeDetection.groupHoldsMost1000"
 msgstr "Ein Schussbild enthält höchstens 1000 Schüsse."
@@ -491,9 +527,17 @@ msgstr "Ein Bereich braucht mindestens 3 Punkte"
 msgid "bulletPhoto.shadowMirrored"
 msgstr "Ein Schatten neben dem Geschoss verbreitert eine Seite der Freistellung: Diese Seite bleibt außen vor, gemessen wird die andere Seite, an der Achse gespiegelt. Entfernen Sie den Schatten mit dem Pinsel oder fotografieren Sie in gleichmäßigem Licht, für einen genaueren Umriss."
 
+# en: "A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields."
+msgid "targetEditor.shotPointAimOrigin"
+msgstr "Ein Schuss am Haltepunkt (oder am Ursprung); mit Alt und den Pfeiltasten oder über die Felder verschieben."
+
 # en: "Abbreviation"
 msgid "disciplines.column.abbreviation"
 msgstr "Abkürzung"
+
+# en: "Above the point of aim: positive."
+msgid "targetEditor.abovePointAimPositive"
+msgstr "Über dem Haltepunkt: positiv."
 
 # en: "Accept maybes ({count, decimal})"
 msgid "holeDetection.acceptMaybes"
@@ -539,6 +583,14 @@ msgstr "Hinzufügen"
 msgid "bulletCompare.add"
 msgstr "Geschoss hinzufügen"
 
+# en: "Add group"
+msgid "targetEditor.addGroup"
+msgstr "Schussbild hinzufügen"
+
+# en: "Add photo"
+msgid "targetEditor.addPhoto"
+msgstr "Foto hinzufügen"
+
 # en: "Add powder"
 msgid "burnRateCompare.add"
 msgstr "Treibladungspulver hinzufügen"
@@ -546,6 +598,10 @@ msgstr "Treibladungspulver hinzufügen"
 # en: "Add series"
 msgid "events.addSeries"
 msgstr "Serie hinzufügen"
+
+# en: "Add shot"
+msgid "targetEditor.addShot"
+msgstr "Schuss hinzufügen"
 
 # en: "Add stage"
 msgid "events.addStage"
@@ -558,6 +614,10 @@ msgstr "Zur Schusszahl hinzufügen?"
 # en: "Add to the round count?"
 msgid "log.addRoundCount"
 msgstr "Zur Schusszahl hinzufügen?"
+
+# en: "Aim ({unit})"
+msgid "targetEditor.aimUnit"
+msgstr "Haltepunkt ({unit})"
 
 # en: "Air pistol"
 msgid "values.airPistol"
@@ -827,6 +887,10 @@ msgstr "Schwarzoxid"
 msgid "targets.color.blue"
 msgstr "blau"
 
+# en: "Blue"
+msgid "targetEditor.blue"
+msgstr "Blau"
+
 # en: "boat-tail"
 msgid "values.boatTail"
 msgstr "Bootsheck"
@@ -1075,9 +1139,25 @@ msgstr "Kaliberklassen aus"
 msgid "holeDetection.calibrate"
 msgstr "Kalibrieren"
 
+# en: "Calibrate"
+msgid "targetEditor.calibrate"
+msgstr "Kalibrieren"
+
+# en: "Calibrate: scale references, rotation and origin"
+msgid "targetEditor.calibrateScaleReferencesRotation"
+msgstr "Kalibrieren: Maßstabsreferenzen, Drehung und Ursprung"
+
+# en: "Calibrate: the photo has no scale yet; mark a reference of known size"
+msgid "targetEditor.calibratePhotoHasScale"
+msgstr "Kalibrieren: Das Foto hat noch keinen Maßstab; markieren Sie eine Referenz bekannter Größe"
+
 # en: "Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out."
 msgid "bulletPhoto.caliperHelp"
 msgstr "Maße vom Messschieber ergeben den Maßstab ohne Lineal und prüfen ihn mit Lineal. Zusammen zeigen sie ein schräg liegendes Geschoss oder einen Schatten in der Freistellung."
+
+# en: "Camera"
+msgid "targetEditor.camera"
+msgstr "Kamera"
 
 # en: "Cancel"
 msgid "events.cancel"
@@ -1239,6 +1319,14 @@ msgstr "Hohlraumtiefe"
 msgid "recordFields.cavityDiameter"
 msgstr "Hohlraumdurchmesser"
 
+# en: "center"
+msgid "targetEditor.compassCenter"
+msgstr "Mitte"
+
+# en: "CEP"
+msgid "targetEditor.cep"
+msgstr "CEP"
+
 # en: "Chamber"
 msgid "cartridgeRecord.side.chamber"
 msgstr "Patronenlager"
@@ -1291,6 +1379,10 @@ msgstr "Maßstab ändern"
 msgid "holeDetection.changeTarget"
 msgstr "Zielscheibe ändern"
 
+# en: "Charge ({unit})"
+msgid "targetEditor.chargeUnit"
+msgstr "Treibladung ({unit})"
+
 # en: "Charge for a target"
 msgid "chargeTarget.title"
 msgstr "Treibladung für eine Zielgröße"
@@ -1323,9 +1415,21 @@ msgstr "Wählen Sie eine Chronograph-Datei aus oder ziehen Sie sie hierher, oder
 msgid "bulletPhoto.choosePhotograph"
 msgstr "Foto wählen"
 
+# en: "Choose, drop or paste a photo; it stays in this browser and is never uploaded."
+msgid "targetEditor.chooseDropPastePhoto"
+msgstr "Wählen Sie ein Foto aus, ziehen Sie es hierher oder fügen Sie es ein; es bleibt in diesem Browser und wird nie hochgeladen."
+
 # en: "Chronograph file"
 msgid "sessionSummary.chronoFile"
 msgstr "Chronograph-Datei"
+
+# en: "Circular estimate {value} {unit}, {interval}; assumes circular spread."
+msgid "targetEditor.circularEstimateAssumesCircular"
+msgstr "Kreisschätzung {value} {unit}, {interval}; setzt kreisförmige Streuung voraus."
+
+# en: "Circular estimate {value} {unit}; assumes circular spread."
+msgid "targetEditor.circularEstimateNoInterval"
+msgstr "Kreisschätzung {value} {unit}; setzt kreisförmige Streuung voraus."
 
 # en: "Clear"
 msgid "comparePicks.clear"
@@ -1333,6 +1437,10 @@ msgstr "Leeren"
 
 # en: "Clear"
 msgid "holeDetection.clear"
+msgstr "Leeren"
+
+# en: "Clear"
+msgid "targetEditor.clear"
 msgstr "Leeren"
 
 # en: "Clear all"
@@ -1379,6 +1487,10 @@ msgstr "Klicken Sie die Ecken des Bereichs; klicken Sie die letzte erneut (zweim
 msgid "holeDetection.clickMiddleOneHole"
 msgstr "Klicken Sie in die Mitte eines Schusslochs ohne Aufdruck. Oder Pfeiltasten und Eingabetaste. Esc bricht ab."
 
+# en: "Click the point of aim on the target"
+msgid "targetEditor.clickPointAimTarget"
+msgstr "Klicken Sie den Haltepunkt auf der Zielscheibe an"
+
 # en: "Click two opposite corners of the region. Point {n, decimal} of 2. Or arrow keys and Enter. Esc cancels."
 msgid "holeDetection.clickTwoOppositeCorners"
 msgstr "Klicken Sie zwei gegenüberliegende Ecken des Bereichs. Punkt {n, decimal} von 2. Oder Pfeiltasten und Eingabetaste. Esc bricht ab."
@@ -1386,6 +1498,18 @@ msgstr "Klicken Sie zwei gegenüberliegende Ecken des Bereichs. Punkt {n, decima
 # en: "Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first."
 msgid "bulletPhoto.scaleHelp"
 msgstr "Klicken Sie auf zwei Teilstriche des Lineals, A und B, und geben Sie ihren Abstand ein. Ziehen Sie einen Punkt, um ihn zu verschieben. Ein zweites Paar, C und D, prüft das erste."
+
+# en: "Clicks"
+msgid "targetEditor.clicks"
+msgstr "Klicks"
+
+# en: "Clicks of {optic} ({mrad} mrad, {moa} MOA) that move the group center onto the point of aim."
+msgid "targetEditor.clicksMradMoaThat"
+msgstr "Klicks von {optic} ({mrad} mrad, {moa} MOA), die die Mitte des Schussbilds auf den Haltepunkt verschieben."
+
+# en: "Close"
+msgid "targetEditor.close"
+msgstr "Schließen"
 
 # en: "Close enough"
 msgid "photoQuality.rule.closeEnough"
@@ -1402,6 +1526,14 @@ msgstr "COAL, Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
 # en: "Cold bore"
 msgid "sessionSummary.coldBore"
 msgstr "Kaltschuss"
+
+# en: "Color"
+msgid "targetEditor.colorLabel"
+msgstr "Farbe"
+
+# en: "Color {color}"
+msgid "targetEditor.colorName"
+msgstr "Farbe {color}"
 
 # en: "community"
 msgid "recordSources.origin.community"
@@ -1502,6 +1634,10 @@ msgstr "Konstruktion"
 # en: "Construction"
 msgid "recordFields.construction"
 msgstr "Konstruktion"
+
+# en: "Contrast"
+msgid "targetEditor.contrast"
+msgstr "Kontrast"
 
 # en: "Copied"
 msgid "recordActions.copied"
@@ -1635,6 +1771,10 @@ msgstr "Erneut freistellen"
 msgid "bulletPhoto.cutting"
 msgstr "Das Geschoss wird freigestellt…"
 
+# en: "Darken"
+msgid "targetEditor.darken"
+msgstr "Abdunkeln"
+
 # en: "Dashed in the flag color: parts the record does not give, drawn from an assumed shape."
 msgid "bulletDrawing.dashed"
 msgstr "Gestrichelt in der Markierungsfarbe: Teile, die der Datensatz nicht angibt, gezeichnet nach einer angenommenen Form."
@@ -1675,6 +1815,10 @@ msgstr "Löschen"
 msgid "log.delete"
 msgstr "Löschen"
 
+# en: "Delete"
+msgid "targetEditor.delete"
+msgstr "Löschen"
+
 # en: "Delete {name}"
 msgid "events.delete"
 msgstr "{name} löschen"
@@ -1702,6 +1846,18 @@ msgstr "Löschen von {name} fehlgeschlagen: {reason}"
 # en: "Delete of {name} failed: {reason}"
 msgid "log.deleteFailed"
 msgstr "Löschen von {name} fehlgeschlagen: {reason}"
+
+# en: "Delete sheet"
+msgid "targetEditor.deleteSheet"
+msgstr "Blatt löschen"
+
+# en: "Delete shot {n}"
+msgid "targetEditor.deleteShot"
+msgstr "Schuss {n} löschen"
+
+# en: "Delete the active group; Undo brings it back"
+msgid "targetEditor.deleteActiveGroupUndo"
+msgstr "Das aktive Schussbild löschen; Rückgängig stellt es wieder her"
 
 # en: "Deleted {name} from this browser."
 msgid "events.deletedFromThisBrowser"
@@ -1847,6 +2003,10 @@ msgstr "Tabelle der Disziplinen"
 msgid "disciplines.filtered"
 msgstr "Disziplinen, {filters}"
 
+# en: "Display only; the file is unchanged."
+msgid "targetEditor.displayOnlyFileUnchanged"
+msgstr "Nur die Anzeige; die Datei bleibt unverändert."
+
 # en: "Disqualified: no total."
 msgid "events.disqualifiedNoTotal"
 msgstr "Disqualifiziert: kein Gesamtergebnis."
@@ -1898,6 +2058,10 @@ msgstr "Division"
 # en: "double"
 msgid "values.double"
 msgstr "zweibasig"
+
+# en: "down"
+msgid "targetEditor.down"
+msgstr "tief"
 
 # en: "Drag model"
 msgid "fieldTable.column.dragModel"
@@ -1971,6 +2135,14 @@ msgstr "Dynamische Vivacity der gewählten Treibladungspulver, Modellergebnis"
 msgid "burnRateCompare.lead"
 msgstr "Dynamische Vivacity, die Abbrandgeschwindigkeit je Druck, über dem abgebrannten Anteil."
 
+# en: "E"
+msgid "targetEditor.compassE"
+msgstr "O"
+
+# en: "Each group's point of aim: Set, then click it on the target, or type x and y in target coordinates; drag it with Select."
+msgid "targetEditor.eachGroupSPoint"
+msgstr "Haltepunkt je Schussbild: Setzen, dann auf der Zielscheibe anklicken, oder x und y in Zielscheibenkoordinaten eintippen; mit Auswählen ziehen."
+
 # en: "Edit"
 msgid "log.edit"
 msgstr "Bearbeiten"
@@ -2015,6 +2187,10 @@ msgstr "Energieverhältnis"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "Energie, wie unter Pressures (Energies) gedruckt"
 
+# en: "Enter a name."
+msgid "targetEditor.enterName"
+msgstr "Geben Sie einen Namen ein."
+
 # en: "Enter the date."
 msgid "log.enterDate"
 msgstr "Geben Sie das Datum ein."
@@ -2054,6 +2230,14 @@ msgstr "Fehler"
 # en: "ES"
 msgid "sessionSummary.column.es"
 msgstr "ES"
+
+# en: "ES"
+msgid "targetEditor.es"
+msgstr "ES"
+
+# en: "ES ({unit})"
+msgid "targetEditor.esUnit"
+msgstr "ES ({unit})"
 
 # en: "ES, n = {n}"
 msgid "sessionSummary.esN"
@@ -2108,6 +2292,14 @@ msgstr "Tabelle der Wettbewerbe"
 msgid "holeDetection.example"
 msgstr "Beispiel"
 
+# en: "Excl."
+msgid "targetEditor.excl"
+msgstr "Ausgeschl."
+
+# en: "Exclude shot {n}"
+msgid "targetEditor.excludeShot"
+msgstr "Schuss {n} ausschließen"
+
 # en: "Excluded"
 msgid "sessionSummary.excluded"
 msgstr "Ausgeschlossen"
@@ -2115,6 +2307,14 @@ msgstr "Ausgeschlossen"
 # en: "excluded at the range"
 msgid "sessionSummary.excludedAtRange"
 msgstr "auf dem Schießstand ausgeschlossen"
+
+# en: "Excluded: left out of the statistics, still shown and counted"
+msgid "targetEditor.excludedLeftOutStatistics"
+msgstr "Ausgeschlossen: nicht in der Statistik, aber weiterhin angezeigt und gezählt"
+
+# en: "Expand"
+msgid "targetEditor.expand"
+msgstr "Vergrößern"
 
 # en: "exponent {exponent, decimal}"
 msgid "burnRate.exponentDetail"
@@ -2159,6 +2359,10 @@ msgstr "Durchmesser der Auszieherrille"
 # en: "extractor groove width at E1"
 msgid "cartridgeRecord.meaning.extractorGrooveWidth"
 msgstr "Breite der Auszieherrille bei E1"
+
+# en: "Extreme spread ({unit})"
+msgid "targetEditor.extremeSpreadUnit"
+msgstr "Größter Schussabstand ({unit})"
 
 # en: "extruded"
 msgid "values.extruded"
@@ -2460,6 +2664,10 @@ msgstr "Geben Sie eine Laborierung oder Fabrikmunition an, nicht beides."
 msgid "targets.color.green"
 msgstr "grün"
 
+# en: "Green"
+msgid "targetEditor.green"
+msgstr "Grün"
+
 # en: "grey"
 msgid "targets.color.gray"
 msgstr "grau"
@@ -2471,6 +2679,34 @@ msgstr "Durchmesser über den Zügen"
 # en: "groove front cone angle from the axis (table III: belt cone)"
 msgid "cartridgeRecord.meaning.grooveFrontAngle"
 msgstr "Winkel des vorderen Rillenkegels zur Achse (Tabelle III: Gürtelkegel)"
+
+# en: "Group {n}"
+msgid "targetEditor.groupN"
+msgstr "Schussbild {n}"
+
+# en: "Group center from the point of aim."
+msgid "targetEditor.groupCenterPointAim"
+msgstr "Mitte des Schussbilds vom Haltepunkt aus."
+
+# en: "Group extreme spread against charge"
+msgid "targetEditor.groupExtremeSpreadAgainst"
+msgstr "Größter Schussabstand des Schussbilds über der Treibladung"
+
+# en: "Group name"
+msgid "targetEditor.groupName"
+msgstr "Name des Schussbilds"
+
+# en: "Groups"
+msgid "targetEditor.groups"
+msgstr "Schussbilder"
+
+# en: "Groups at two or more ladder steps give a chart of size against charge."
+msgid "targetEditor.groupsTwoMoreLadder"
+msgstr "Schussbilder bei zwei oder mehr Stufen der Ladeleiter ergeben ein Diagramm der Größe über der Treibladung."
+
+# en: "Groups per ladder step"
+msgid "targetEditor.groupsPerLadderStep"
+msgstr "Schussbilder je Stufe der Ladeleiter"
 
 # en: "Handloads"
 msgid "disciplines.row.handloads"
@@ -2511,6 +2747,18 @@ msgstr "Bodenstempel"
 # en: "Hidden by the search or a filter"
 msgid "comparePicks.hiddenTitle"
 msgstr "Von der Suche oder einem Filter ausgeblendet"
+
+# en: "high"
+msgid "targetEditor.high"
+msgstr "hoch"
+
+# en: "high left"
+msgid "targetEditor.highLeft"
+msgstr "hoch links"
+
+# en: "high right"
+msgid "targetEditor.highRight"
+msgstr "hoch rechts"
 
 # en: "Hit factor"
 msgid "events.hitFactor"
@@ -2563,6 +2811,10 @@ msgstr "Webseite"
 # en: "Homepage"
 msgid "federationRecord.homepage"
 msgstr "Webseite"
+
+# en: "How to take a photo the app can score"
+msgid "targetEditor.howTakePhotoApp"
+msgstr "So gelingt ein Foto, das die App auswerten kann"
 
 # en: "hybrid"
 msgid "values.hybrid"
@@ -2628,6 +2880,14 @@ msgstr "Höhe der Innen-10"
 msgid "targets.row.innerTenRule"
 msgstr "Regel für die Innen-10"
 
+# en: "Inner tens"
+msgid "targetEditor.innerTens"
+msgstr "Innen-10"
+
+# en: "Inner tens (X) among the included shots."
+msgid "targetEditor.innerTensXAmong"
+msgstr "Innen-10 (X) unter den berücksichtigten Schüssen."
+
 # en: "Inputs"
 msgid "workspace.inputs"
 msgstr "Eingaben"
@@ -2688,6 +2948,10 @@ msgstr "L3 bis Beginn des Übergangskegels (Freibohrung)"
 msgid "values.lacqueredSteel"
 msgstr "Lackierter Stahl"
 
+# en: "Ladder step"
+msgid "targetEditor.ladderStep"
+msgstr "Stufe der Ladeleiter"
+
 # en: "Large pistol"
 msgid "values.largePistol"
 msgstr "Pistole, groß"
@@ -2699,6 +2963,10 @@ msgstr "Büchse, groß"
 # en: "largest"
 msgid "bulletCompare.largest"
 msgstr "größter Wert"
+
+# en: "Largest minus smallest reference scale over their mean. An angled photo shows here; a rectangle corrects it."
+msgid "targetEditor.largestMinusSmallestReference"
+msgstr "Größter minus kleinster Maßstab der Referenzen, bezogen auf ihr Mittel. Ein schräg aufgenommenes Foto zeigt sich hier; ein Rechteck korrigiert es."
 
 # en: "Last session"
 msgid "firearms.column.lastSession"
@@ -2751,6 +3019,10 @@ msgstr "Winkel des Übergangskegels"
 # en: "learned"
 msgid "holeDetection.learned"
 msgstr "gelernt"
+
+# en: "left"
+msgid "targetEditor.left"
+msgstr "links"
 
 # en: "Length"
 msgid "recordFields.length"
@@ -3000,6 +3272,18 @@ msgstr "Laborierungen"
 msgid "disciplines.firearm.longGun"
 msgstr "Langwaffe"
 
+# en: "low"
+msgid "targetEditor.low"
+msgstr "tief"
+
+# en: "low left"
+msgid "targetEditor.lowLeft"
+msgstr "tief links"
+
+# en: "low right"
+msgid "targetEditor.lowRight"
+msgstr "tief rechts"
+
 # en: "Magnification up to"
 msgid "disciplines.row.maxMagnification"
 msgstr "Vergrößerung bis"
@@ -3072,6 +3356,10 @@ msgstr "Ein Polygon auf dem Foto markieren"
 msgid "holeDetection.markRectanglePhoto"
 msgstr "Ein Rechteck auf dem Foto markieren"
 
+# en: "Mark on photo"
+msgid "targetEditor.markPhoto"
+msgstr "Auf dem Foto markieren"
+
 # en: "marker"
 msgid "holeDetection.marker"
 msgstr "Markierung"
@@ -3135,6 +3423,14 @@ msgstr "Mittelwert"
 # en: "Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval."
 msgid "powderRecord.meanMethod"
 msgstr "Mittlere dynamische Vivacity über dem abgebrannten Anteil 0,1 bis 0,9, mit ihrem Intervall."
+
+# en: "Mean extreme spread per ladder step as an angle, so groups at different distances compare, against charge; the table lists the values."
+msgid "targetEditor.meanExtremeSpreadPer"
+msgstr "Mittlerer größter Schussabstand je Stufe der Ladeleiter als Winkel, damit Schussbilder bei verschiedenen Entfernungen vergleichbar sind, über der Treibladung; die Tabelle nennt die Werte."
+
+# en: "Mean radius"
+msgid "targetEditor.meanRadius"
+msgstr "Mittlerer Radius"
 
 # en: "Mean vivacity"
 msgid "powderRecord.meanVivacity"
@@ -3272,6 +3568,10 @@ msgstr "Vorderlader"
 msgid "chargeTarget.muzzleVelocity"
 msgstr "Mündungs­geschwindigkeit"
 
+# en: "N"
+msgid "targetEditor.compassN"
+msgstr "N"
+
 # en: "n/a"
 msgid "bulletCompare.notAvailable"
 msgstr "k. A."
@@ -3286,6 +3586,10 @@ msgstr "k. A."
 
 # en: "n/a"
 msgid "sessionSummary.notAvailable"
+msgstr "k. A."
+
+# en: "n/a"
+msgid "targetEditor.notAvailable"
 msgstr "k. A."
 
 # en: "Name"
@@ -3360,6 +3664,10 @@ msgstr "Name, Nummer, Verband oder Kaliber, 2,53…"
 msgid "disciplines.classBasis.stated"
 msgstr "In der Sportordnung genannt"
 
+# en: "NE"
+msgid "targetEditor.compassNE"
+msgstr "NO"
+
 # en: "Neck and length"
 msgid "cartridgeRecord.group.neck"
 msgstr "Hals und Länge"
@@ -3399,6 +3707,10 @@ msgstr "Neue Schusswaffe"
 # en: "New powder"
 msgid "powders.new"
 msgstr "Neues Treibladungspulver"
+
+# en: "New sheet"
+msgid "targetEditor.newSheet"
+msgstr "Neues Blatt"
 
 # en: "New target"
 msgid "targets.new"
@@ -3664,6 +3976,10 @@ msgstr "Keine"
 msgid "log.none"
 msgstr "Keine"
 
+# en: "None"
+msgid "targetEditor.none"
+msgstr "Keine"
+
 # en: "None marked."
 msgid "holeDetection.noneMarked"
 msgstr "Keine markiert."
@@ -3784,9 +4100,29 @@ msgstr "Anzahl der Züge"
 msgid "targets.row.numeralsPrinted"
 msgstr "Ringzahlen aufgedruckt"
 
+# en: "NW"
+msgid "targetEditor.compassNW"
+msgstr "NW"
+
+# en: "Ocher"
+msgid "targetEditor.ocher"
+msgstr "Ocker"
+
 # en: "Offline"
 msgid "page.offline"
 msgstr "Offline"
+
+# en: "Offset"
+msgid "targetEditor.offset"
+msgstr "Versatz"
+
+# en: "Offset horiz."
+msgid "targetEditor.offsetHoriz"
+msgstr "Versatz horiz."
+
+# en: "Offset vert."
+msgid "targetEditor.offsetVert"
+msgstr "Versatz vert."
 
 # en: "Ogive"
 msgid "recordFields.ogive"
@@ -3803,6 +4139,10 @@ msgstr "Verhältnis des Ogivenradius"
 # en: "OK"
 msgid "listSources.ok"
 msgstr "OK"
+
+# en: "on the point of aim"
+msgid "targetEditor.onPointOfAim"
+msgstr "auf dem Haltepunkt"
 
 # en: "one shot"
 msgid "sessionSummary.oneShot"
@@ -3860,6 +4200,10 @@ msgstr "Öffnet den Editor mit diesen Werten; der Entwurf hält sie als aus eine
 msgid "firearms.optic"
 msgstr "Optik {n, decimal}"
 
+# en: "Optic for clicks"
+msgid "targetEditor.opticClicks"
+msgstr "Optik für Klicks"
+
 # en: "Optic, zero"
 msgid "firearms.column.optic"
 msgstr "Optik, Einschießentfernung"
@@ -3872,9 +4216,17 @@ msgstr "optisch"
 msgid "targets.color.orange"
 msgstr "orange"
 
+# en: "Orange"
+msgid "targetEditor.orange"
+msgstr "Orange"
+
 # en: "Origin"
 msgid "recordSources.column.origin"
 msgstr "Herkunft"
+
+# en: "Origin point"
+msgid "targetEditor.originPoint"
+msgstr "Nullpunkt"
 
 # en: "original"
 msgid "disciplines.rule.original"
@@ -3920,6 +4272,14 @@ msgstr "Gesamtlänge, Messschieber (optional)"
 msgid "burnRateCompare.overlay"
 msgstr "Überlagerung"
 
+# en: "Overlays"
+msgid "targetEditor.overlays"
+msgstr "Überlagerungen"
+
+# en: "Overlays: {count, decimal} on"
+msgid "targetEditor.overlaysOn"
+msgstr "Überlagerungen: {count, decimal} an"
+
 # en: "Page"
 msgid "disciplines.row.page"
 msgstr "Seite"
@@ -3960,9 +4320,25 @@ msgstr "Strafen"
 msgid "recordFields.perLoadRow"
 msgstr "je Zeile der Ladetabelle"
 
+# en: "Photo"
+msgid "targetEditor.photo"
+msgstr "Foto"
+
+# en: "Photo from the camera"
+msgid "targetEditor.photoCamera"
+msgstr "Foto von der Kamera"
+
 # en: "Photo guide: {rule}"
 msgid "holeDetection.photoGuide"
 msgstr "Fotoanleitung: {rule}"
+
+# en: "Photo: add, replace or remove; contrast and darken"
+msgid "targetEditor.photoAddReplaceRemove"
+msgstr "Foto: hinzufügen, ersetzen oder entfernen; Kontrast und Abdunkeln"
+
+# en: "Photo: choose, drop or paste one; it stays in this browser and is never uploaded"
+msgid "targetEditor.photoChooseDropPaste"
+msgstr "Foto: auswählen, hierher ziehen oder einfügen; es bleibt in diesem Browser und wird nie hochgeladen"
 
 # en: "Photograph messages"
 msgid "bulletPhoto.messages"
@@ -3983,6 +4359,10 @@ msgstr "Ein Schussloch wählen"
 # en: "piezo"
 msgid "values.piezo"
 msgstr "Piezo-Messquarz"
+
+# en: "Pink"
+msgid "targetEditor.pink"
+msgstr "Rosa"
 
 # en: "Pistol"
 msgid "values.pistol"
@@ -4019,6 +4399,10 @@ msgstr "Plus und minus 2 Standardunsicherheiten der angepassten Vivacity, eine U
 # en: "Pmax"
 msgid "cartridges.column.pmax"
 msgstr "Pmax"
+
+# en: "Point of aim {axis}"
+msgid "targetEditor.pointOfAimAxis"
+msgstr "Haltepunkt {axis}"
 
 # en: "Points"
 msgid "events.points"
@@ -4272,6 +4656,10 @@ msgstr "veröffentlicht"
 msgid "cartridgeRecord.published"
 msgstr "Veröffentlicht"
 
+# en: "Purple"
+msgid "targetEditor.purple"
+msgstr "Violett"
+
 # en: "Quantity"
 msgid "bulletCompare.quantity"
 msgstr "Größe"
@@ -4368,6 +4756,14 @@ msgstr "Rechteck"
 msgid "targets.color.red"
 msgstr "rot"
 
+# en: "Redo ({shortcut})"
+msgid "targetEditor.redoShortcut"
+msgstr "Wiederholen ({shortcut})"
+
+# en: "Reference"
+msgid "targetEditor.reference"
+msgstr "Referenz"
+
 # en: "Reference pressure"
 msgid "recordFields.referencePressure"
 msgstr "Referenzdruck"
@@ -4388,6 +4784,10 @@ msgstr "Bereich aus"
 msgid "holeDetection.regionOffTargetFound"
 msgstr "Bereich aus: die im Foto gefundene Zielscheibe"
 
+# en: "Remove {label}"
+msgid "targetEditor.removeLabel"
+msgstr "{label} entfernen"
+
 # en: "Remove {name}"
 msgid "bulletCompare.remove"
 msgstr "{name} entfernen"
@@ -4400,6 +4800,10 @@ msgstr "{name} entfernen"
 msgid "directoryTable.removeScope"
 msgstr "{name} entfernen"
 
+# en: "Remove photo"
+msgid "targetEditor.removePhoto"
+msgstr "Foto entfernen"
+
 # en: "Remove series {n}"
 msgid "events.removeSeries"
 msgstr "Serie {n} entfernen"
@@ -4407,6 +4811,10 @@ msgstr "Serie {n} entfernen"
 # en: "Removed optic"
 msgid "firearms.removedOptic"
 msgstr "Entfernte Optik"
+
+# en: "Rename sheet"
+msgid "targetEditor.renameSheet"
+msgstr "Blatt umbenennen"
 
 # en: "repeater"
 msgid "disciplines.rule.repeater"
@@ -4428,9 +4836,17 @@ msgstr "Einträge ersetzen?"
 msgid "events.replaceEvents"
 msgstr "Wettkämpfe ersetzen?"
 
+# en: "Replace photo"
+msgid "targetEditor.replacePhoto"
+msgstr "Foto ersetzen"
+
 # en: "Reserve, %"
 msgid "matchRounds.reserve"
 msgstr "Reserve, %"
+
+# en: "Reset {label}"
+msgid "targetEditor.resetLabel"
+msgstr "{label} zurücksetzen"
 
 # en: "Reset to preset"
 msgid "units.reset"
@@ -4516,6 +4932,14 @@ msgstr "Revolver"
 msgid "values.rifle"
 msgstr "Gewehr"
 
+# en: "right"
+msgid "targetEditor.right"
+msgstr "rechts"
+
+# en: "Right of the point of aim: positive."
+msgid "targetEditor.rightPointAimPositive"
+msgstr "Rechts vom Haltepunkt: positiv."
+
 # en: "rim chamfer angle from the head face"
 msgid "cartridgeRecord.meaning.rimChamferAngle"
 msgstr "Winkel der Randfase zur Bodenfläche"
@@ -4571,6 +4995,10 @@ msgstr "Ringdurchmesser"
 # en: "Ring diameters width"
 msgid "targets.group.ringDiametersWidth"
 msgstr "Ringdurchmesser (Breite)"
+
+# en: "Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total."
+msgid "targetEditor.ringValueTenthsWhere"
+msgstr "Ringwertung, mit Zehnteln, wo die Scheibe sie hat; X: Innen-10. Ausgeschlossene Schüsse zeigen ihren Wert und zählen nicht zur Summe."
 
 # en: "Ring values separated by spaces, such as 10 9 10."
 msgid "events.shotsHint"
@@ -4684,6 +5112,10 @@ msgstr "Tabelle der Sportordnungen"
 msgid "disciplines.rules"
 msgstr "Regeln"
 
+# en: "S"
+msgid "targetEditor.compassS"
+msgstr "S"
+
 # en: "Save entry"
 msgid "log.saveEntry"
 msgstr "Eintrag speichern"
@@ -4720,6 +5152,10 @@ msgstr "Maßstab aus dem eingegebenen Durchmesser, ohne Lineal: Die Längen setz
 msgid "bulletPhoto.basis.length"
 msgstr "Maßstab aus der eingegebenen Gesamtlänge, ohne Lineal: Die Breiten setzen eine rechtwinklige, maßstabsgetreue Seitenansicht des Geschosses voraus. Ein um 10 Grad zur Kamera gedrehtes Geschoss ergibt um 1,5 % zu große Breiten; ein Produktbild des Herstellers ist womöglich nicht maßstabsgetreu."
 
+# en: "Score"
+msgid "targetEditor.score"
+msgstr "Wertung"
+
 # en: "Scoring"
 msgid "faceRecord.column.scoring"
 msgstr "Wertung"
@@ -4727,6 +5163,10 @@ msgstr "Wertung"
 # en: "Scoring centers on the sheet"
 msgid "targets.row.scoringCenters"
 msgstr "Wertungsmittelpunkte auf dem Blatt"
+
+# en: "screen size"
+msgid "targetEditor.screenSize"
+msgstr "Bildschirmgröße"
 
 # en: "SD"
 msgid "bullets.column.sd"
@@ -4751,6 +5191,10 @@ msgstr "SD {level}: der Bereich, der die SD der Grundgesamtheit enthält, aus de
 # en: "SD, n = {n}"
 msgid "sessionSummary.sdN"
 msgstr "SD, n = {n}"
+
+# en: "SE"
+msgid "targetEditor.compassSE"
+msgstr "SO"
 
 # en: "Search"
 msgid "directoryTable.search"
@@ -4792,9 +5236,17 @@ msgstr "Querschnittsbelastung, berechnet: Masse durch Durchmesser im Quadrat."
 msgid "directoryTable.select"
 msgstr "Auswählen"
 
+# en: "Select"
+msgid "targetEditor.select"
+msgstr "Auswählen"
+
 # en: "Select {name}"
 msgid "directoryTable.selectRow"
 msgstr "{name} auswählen"
+
+# en: "Select: drag shots, points of aim and reference points; drag the background to pan"
+msgid "targetEditor.selectDragShotsPoints"
+msgstr "Auswählen: Schüsse, Haltepunkte und Referenzpunkte ziehen; den Hintergrund ziehen, um die Ansicht zu verschieben"
 
 # en: "semi automatic"
 msgid "disciplines.rule.semiAutomatic"
@@ -4832,6 +5284,14 @@ msgstr "Sitzung"
 msgid "page.session"
 msgstr "Sitzungsübersicht"
 
+# en: "Set"
+msgid "targetEditor.set"
+msgstr "Setzen"
+
+# en: "Set on photo"
+msgid "targetEditor.setPhoto"
+msgstr "Auf dem Foto setzen"
+
 # en: "Set per load row by the barrel length and the bullet construction."
 msgid "recordFields.startPressureNote"
 msgstr "Je Zeile der Ladetabelle durch die Lauflänge und den Geschossaufbau festgelegt."
@@ -4847,6 +5307,10 @@ msgstr "Form"
 # en: "Sheet"
 msgid "targets.row.sheet"
 msgstr "Blatt"
+
+# en: "Sheet name"
+msgid "targetEditor.sheetName"
+msgstr "Name des Blatts"
 
 # en: "Shooting log"
 msgid "events.shootingLog"
@@ -4876,6 +5340,14 @@ msgstr "Kurzwaffe"
 msgid "sessionSummary.shot"
 msgstr "Schuss"
 
+# en: "Shot"
+msgid "targetEditor.shot"
+msgstr "Schuss"
+
+# en: "Shot {n} {axis}"
+msgid "targetEditor.shotAxis"
+msgstr "Schuss {n} {axis}"
+
 # en: "Shot groups"
 msgid "disciplineRecord.column.groups"
 msgstr "Schussbilder"
@@ -4883,6 +5355,10 @@ msgstr "Schussbilder"
 # en: "Shot groups"
 msgid "page.groups"
 msgstr "Schussbilder"
+
+# en: "Shot: add shots to the active group by click or tap"
+msgid "targetEditor.shotAddShotsActive"
+msgstr "Schuss: Schüsse per Klick oder Tippen zum aktiven Schussbild hinzufügen"
 
 # en: "Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges."
 msgid "burnRate.unfit.shotgun"
@@ -4903,6 +5379,14 @@ msgstr "Schüsse"
 # en: "Shots"
 msgid "sessionSummary.shots"
 msgstr "Schüsse"
+
+# en: "Shots"
+msgid "targetEditor.shots"
+msgstr "Schüsse"
+
+# en: "Shots in the statistics; excluded shots are shown and counted, not measured."
+msgid "targetEditor.shotsStatisticsExcludedShots"
+msgstr "Schüsse in der Statistik; ausgeschlossene Schüsse werden angezeigt und gezählt, aber nicht gemessen."
 
 # en: "Shots of {name}"
 msgid "sessionSummary.shotsOf"
@@ -5056,6 +5540,10 @@ msgstr "Quellen ({kind})"
 msgid "recordSources.table"
 msgstr "Tabelle der Quellen"
 
+# en: "Spread"
+msgid "targetEditor.spread"
+msgstr "Spannweite"
+
 # en: "Stage"
 msgid "disciplineRecord.column.stage"
 msgstr "Programmteil"
@@ -5088,6 +5576,10 @@ msgstr "stehend"
 msgid "recordFields.startPressure"
 msgstr "Startdruck"
 
+# en: "Statistics of {name}"
+msgid "targetEditor.statistics"
+msgstr "Statistik von {name}"
+
 # en: "Statistics per string, excluded shots left out ({unit})"
 msgid "sessionSummary.statsTitle"
 msgstr "Statistik je Schussreihe, ausgeschlossene Schüsse nicht gezählt ({unit})"
@@ -5103,6 +5595,10 @@ msgstr "Stahl"
 # en: "Steel"
 msgid "values.cupSteel"
 msgstr "Stahl"
+
+# en: "Step"
+msgid "targetEditor.step"
+msgstr "Schritt"
 
 # en: "Stored"
 msgid "log.stored"
@@ -5136,6 +5632,10 @@ msgstr "Bauart"
 msgid "log.resultHint"
 msgstr "Etwa Ringe oder eine Platzierung."
 
+# en: "Sum of the ring values of the included shots; decimal sum in brackets."
+msgid "targetEditor.sumRingValuesIncluded"
+msgstr "Summe der Ringwertungen der berücksichtigten Schüsse; Dezimalsumme in Klammern."
+
 # en: "Summary year"
 msgid "logSummary.summaryYear"
 msgstr "Jahr der Übersicht"
@@ -5147,6 +5647,10 @@ msgstr "Auflage"
 # en: "Surface"
 msgid "recordFields.surface"
 msgstr "Oberfläche"
+
+# en: "SW"
+msgid "targetEditor.compassSW"
+msgstr "SW"
 
 # en: "swaged"
 msgid "values.swaged"
@@ -5223,6 +5727,10 @@ msgstr "Scheibe auf dem Foto"
 
 # en: "Target sheet"
 msgid "events.targetSheet"
+msgstr "Blatt mit Zielscheibe"
+
+# en: "Target sheet"
+msgid "targetEditor.targetSheet"
 msgstr "Blatt mit Zielscheibe"
 
 # en: "Targets"
@@ -5397,6 +5905,10 @@ msgstr "Die erste Optik der aktiven Konfiguration und ihre Einschießentfernung.
 msgid "holeDetection.holeMustLeast4"
 msgstr "Das Schussloch muss mindestens 4 px breit sein"
 
+# en: "The last reference stays while there are shots."
+msgid "targetEditor.lastReferenceStaysWhile"
+msgstr "Die letzte Referenz bleibt bestehen, solange es Schüsse gibt."
+
 # en: "The light is uneven: one side of the target is much darker than another."
 msgid "photoQuality.unevenLight"
 msgstr "Das Licht ist ungleichmäßig: Eine Seite der Zielscheibe ist deutlich dunkler als eine andere."
@@ -5437,6 +5949,10 @@ msgstr "Der Kopf ist kein Kreisbogen (eine Hybrid- oder andere Form): Es wird ke
 msgid "holeDetection.photoDecodesAnotherSize"
 msgstr "Das Foto wird in einer anderen Größe dekodiert, als es angezeigt wird; die Erkennung ist dafür abgeschaltet."
 
+# en: "The photo has no scale yet."
+msgid "targetEditor.photoHasScaleYet"
+msgstr "Das Foto hat noch keinen Maßstab."
+
 # en: "The photo is dark: even its brightest part is dim."
 msgid "photoQuality.dark"
 msgstr "Das Foto ist dunkel: Selbst die hellste Stelle ist matt."
@@ -5456,6 +5972,10 @@ msgstr "Das Foto ist auf der längeren Seite nur {n} px groß."
 # en: "The photo is soft: the edges of the target are blurred."
 msgid "photoQuality.blurred"
 msgstr "Das Foto ist unscharf: Die Kanten der Zielscheibe sind verwischt."
+
+# en: "The photo point of target (0, 0). Shots stay on their holes."
+msgid "targetEditor.photoPointTarget0"
+msgstr "Der Fotopunkt der Zielscheibe (0, 0). Die Schüsse bleiben auf ihren Schusslöchern."
 
 # en: "The photograph could not be processed in this browser."
 msgid "bulletPhoto.workerFailed"
@@ -5657,6 +6177,10 @@ msgstr "Zu viele Geschosse."
 msgid "bulletPhoto.tool"
 msgstr "Werkzeug"
 
+# en: "Tool"
+msgid "targetEditor.tool"
+msgstr "Werkzeug"
+
 # en: "Total"
 msgid "events.totalHeading"
 msgstr "Summe"
@@ -5749,6 +6273,10 @@ msgstr "eingegeben"
 msgid "burnRate.typed"
 msgstr "Eingegebene Modellparameter"
 
+# en: "Undo ({shortcut})"
+msgid "targetEditor.undoShortcut"
+msgstr "Rückgängig ({shortcut})"
+
 # en: "Undo of {name} failed: {reason}"
 msgid "events.undoOfFailed"
 msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
@@ -5793,6 +6321,10 @@ msgstr "Abwählen"
 msgid "comparePicks.untickName"
 msgstr "{name} abwählen"
 
+# en: "up"
+msgid "targetEditor.up"
+msgstr "hoch"
+
 # en: "Up to {max}"
 msgid "burnRateCompare.upTo"
 msgstr "Bis zu {max}"
@@ -5831,6 +6363,10 @@ msgstr "Wert"
 
 # en: "Value"
 msgid "fieldTable.column.value"
+msgstr "Wert"
+
+# en: "Value"
+msgid "targetEditor.value"
 msgstr "Wert"
 
 # en: "Values measured from the photograph"
@@ -5896,6 +6432,10 @@ msgstr "Vivacity"
 # en: "vivacity {value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}"
 msgid "burnRate.unresolvedDetail"
 msgstr "Vivacity {value, decimal} 1/s, plus und minus {factor} mal {sigma, decimal}"
+
+# en: "W"
+msgid "targetEditor.compassW"
+msgstr "W"
 
 # en: "wadcutter"
 msgid "disciplines.rule.wadcutter"
