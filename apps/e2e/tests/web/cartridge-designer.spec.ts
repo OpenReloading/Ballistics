@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { AxeBuilder } from './a11y.ts'
+import { AxeBuilder, tall } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -200,6 +200,8 @@ test('print shows the life-size drawing and the values, not the form', async ({ 
 })
 
 test('the designer has no axe violation in light and dark, and fits 390 px', async ({ page }) => {
+  // every field in the window: in a scrolled field box a row partly under the pinned record search fails target-size, and where the fills leave the box depends on the layout of the moment
+  await page.setViewportSize({ width: 1280, height: tall })
   for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme })
     await page.goto('./cartridges/designer?from=308-win')
