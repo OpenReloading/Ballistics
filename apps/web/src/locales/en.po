@@ -130,6 +130,9 @@ msgstr "{count} selected"
 msgid "comparePicks.selectedMax"
 msgstr "{count} selected (max {max})"
 
+msgid "coreMessage.request.fileStatus"
+msgstr "{file}.json answered {status}"
+
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
 
@@ -187,8 +190,14 @@ msgstr "{n, decimal} {unit} per stage"
 msgid "construction.drivingBands"
 msgstr "{n} driving bands"
 
+msgid "coreMessage.warning.rangeIncomplete"
+msgstr "{n} of {m} range cases could not be computed ({list}); the range covers only the computed cases, and the true range can be wider."
+
 msgid "burnRateCompare.userDesign"
 msgstr "{name} (user design)"
+
+msgid "coreMessage.warning.noComparableLimit"
+msgstr "{name} has no CIP Pmax measured by transducer or piezo. Crusher values are not compared with a simulated pressure."
 
 msgid "events.noRoundCount"
 msgstr "{name} has no round count; set one on the Firearms page to add the event to it."
@@ -198,6 +207,9 @@ msgstr "{name} was not deleted: the browser refused."
 
 msgid "recordFields.burnRateOrder"
 msgstr "{order} of {total}"
+
+msgid "coreMessage.request.notFound"
+msgstr "{path} not found"
 
 msgid "events.stageScore"
 msgstr "{points} points, hit factor {hf}"
@@ -253,8 +265,14 @@ msgstr "A bullet hole is only about {n} px across in this photo."
 msgid "burnRateCompare.loadError"
 msgstr "A curve could not be loaded."
 
+msgid "coreMessage.request.failed"
+msgstr "A data file did not load or the computation failed. Check the connection and retry."
+
 msgid "powderCompare.apiSilent"
 msgstr "A data file did not load or the computation failed. Check the connection and retry."
+
+msgid "coreMessage.answer.oddSteps"
+msgstr "a ladder around the charge needs an odd number of steps"
 
 msgid "powderRecord.neighborNote"
 msgstr "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
@@ -262,8 +280,14 @@ msgstr "A neighbor is a candidate, not a substitute: it needs a new charge worku
 msgid "bulletPhoto.shadowMirrored"
 msgstr "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline."
 
+msgid "coreMessage.answer.userRecord"
+msgstr "A user record is not on the server, name a catalogue record"
+
 msgid "disciplines.column.abbreviation"
 msgstr "Abbreviation"
+
+msgid "coreMessage.code.aboveRange"
+msgstr "aboveRange"
 
 msgid "disciplines.row.actions"
 msgstr "Actions"
@@ -319,6 +343,9 @@ msgstr "All bullets"
 msgid "cartridges.all"
 msgstr "All cartridges"
 
+msgid "coreMessage.request.workersBusy"
+msgstr "all compute workers are busy"
+
 msgid "disciplines.all"
 msgstr "All disciplines"
 
@@ -364,6 +391,9 @@ msgstr "Any number"
 msgid "disciplines.rule.aperture"
 msgstr "aperture"
 
+msgid "coreMessage.code.apex"
+msgstr "apex"
+
 msgid "units.quantity.area"
 msgstr "Areas"
 
@@ -373,6 +403,9 @@ msgstr "As printed: {printed}"
 msgid "listSources.lastOn"
 msgstr "At least one source stays on"
 
+msgid "coreMessage.answer.tolerance"
+msgstr "at least one tolerance must be above 0"
+
 msgid "directoryTable.full"
 msgstr "At most {max} at once"
 
@@ -381,6 +414,9 @@ msgstr "At the ruler's scale, the diameter in the photograph is {percent, decima
 
 msgid "bulletPhoto.lengthOffRuler"
 msgstr "At the ruler's scale, the overall length in the photograph is {percent, decimal} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera."
+
+msgid "coreMessage.code.atmosphere"
+msgstr "atmosphere"
 
 msgid "values.ball"
 msgstr "ball"
@@ -442,6 +478,9 @@ msgstr "BC {model}"
 msgid "recordFields.bearingLength"
 msgstr "Bearing length"
 
+msgid "coreMessage.code.belowRange"
+msgstr "belowRange"
+
 msgid "cartridgeRecord.meaning.beltDiameter"
 msgstr "belt diameter (table III)"
 
@@ -487,6 +526,9 @@ msgstr "body diameter at l2"
 msgid "cartridgeRecord.meaning.bodyAtHead"
 msgstr "body diameter at the head"
 
+msgid "coreMessage.request.notJson"
+msgstr "Body is not valid JSON"
+
 msgid "values.bonded"
 msgstr "bonded"
 
@@ -501,6 +543,9 @@ msgstr "Bore resistance"
 
 msgid "values.boronNitride"
 msgstr "boron nitride"
+
+msgid "coreMessage.code.bracketFailed"
+msgstr "bracketFailed"
 
 msgid "values.brass"
 msgstr "Brass"
@@ -523,6 +568,9 @@ msgstr "brown"
 msgid "recordFields.build"
 msgstr "Build"
 
+msgid "coreMessage.label.bulkDensity"
+msgstr "Bulk density"
+
 msgid "recordFields.bulkDensity"
 msgstr "Bulk density"
 
@@ -543,6 +591,9 @@ msgstr "Bullet designer"
 
 msgid "cartridgeRecord.meaning.bulletDiameter"
 msgstr "bullet diameter"
+
+msgid "coreMessage.label.bulletDiameter"
+msgstr "Bullet diameter"
 
 msgid "cartridges.column.maxBulletDiameter"
 msgstr "Bullet diameter G1"
@@ -597,6 +648,12 @@ msgstr "Burn rates"
 
 msgid "powders.burnRateOrder"
 msgstr "burn-rate order {order}"
+
+msgid "coreMessage.code.busy"
+msgstr "busy"
+
+msgid "coreMessage.label.caliber"
+msgstr "Caliber"
 
 msgid "bullets.column.cal"
 msgstr "Caliber"
@@ -697,11 +754,17 @@ msgstr "Case capacity"
 msgid "cartridgeRecord.meaning.caseLength"
 msgstr "case length"
 
+msgid "coreMessage.label.caseLength"
+msgstr "Case length"
+
 msgid "cartridges.column.caseLength"
 msgstr "Case length L3"
 
 msgid "cartridges.column.type"
 msgstr "Case type"
+
+msgid "coreMessage.method.caseContact"
+msgstr "case-contact"
 
 msgid "values.caseContact"
 msgstr "case-contact"
@@ -754,6 +817,21 @@ msgstr "chamber minimum minus cartridge maximum"
 msgid "cartridgeRecord.sideNotes.chamber"
 msgstr "Chamber: {notes}"
 
+msgid "coreMessage.code.chamberVolume"
+msgstr "chamberVolume"
+
+msgid "coreMessage.answer.chargeSolver"
+msgstr "charge solver: {reason}"
+
+msgid "coreMessage.advisory.chargeTooSmall"
+msgstr "charge too small for the model"
+
+msgid "coreMessage.warning.chargeTooSmallIgnition"
+msgstr "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the ignition pressure ({hold}); results are outside the range the model was built for."
+
+msgid "coreMessage.warning.chargeTooSmall"
+msgstr "Charge too small for the model: the simulated peak mean pressure, {p}, is below {ratio} times the start pressure ({hold}); results are outside the range the model was built for."
+
 msgid "events.outOfRange"
 msgstr "Check the event: a value is out of its range."
 
@@ -796,6 +874,9 @@ msgstr "COAL, the cartridge maximum of the CIP sheet, shortest variant."
 msgid "sessionSummary.coldBore"
 msgstr "Cold bore"
 
+msgid "coreMessage.code.collinear"
+msgstr "collinear"
+
 msgid "recordSources.origin.community"
 msgstr "community"
 
@@ -828,6 +909,18 @@ msgstr "Composition"
 
 msgid "primers.column.compound"
 msgstr "Compound"
+
+msgid "coreMessage.request.tooSlow"
+msgstr "computation did not finish within {ms} ms"
+
+msgid "coreMessage.request.poolClosed"
+msgstr "compute pool closed"
+
+msgid "coreMessage.request.workerExited"
+msgstr "compute worker exited"
+
+msgid "coreMessage.request.workerFailed"
+msgstr "compute worker failed"
 
 msgid "recordSources.kind.computed"
 msgstr "computed"
@@ -931,6 +1024,9 @@ msgstr "Covers"
 msgid "recordFields.covolume"
 msgstr "Covolume"
 
+msgid "coreMessage.method.crusher"
+msgstr "crusher"
+
 msgid "values.crusher"
 msgstr "crusher"
 
@@ -999,6 +1095,9 @@ msgstr "Derived, not dimensioned"
 
 msgid "sessionSummary.device"
 msgstr "Device: {device}"
+
+msgid "coreMessage.label.diameter"
+msgstr "Diameter"
 
 msgid "recordFields.diameter"
 msgstr "Diameter"
@@ -1090,6 +1189,9 @@ msgstr "Distance"
 msgid "events.division"
 msgstr "Division"
 
+msgid "coreMessage.code.done"
+msgstr "done"
+
 msgid "values.double"
 msgstr "double"
 
@@ -1150,6 +1252,9 @@ msgstr "Empty: the event type and the day."
 msgid "events.roundsFiredHint"
 msgstr "Empty: the shots of the series, where each lists them."
 
+msgid "coreMessage.method.energy"
+msgstr "energy"
+
 msgid "values.energy"
 msgstr "energy"
 
@@ -1173,6 +1278,9 @@ msgstr "Entered in the target designer"
 
 msgid "states.error"
 msgstr "Error"
+
+msgid "coreMessage.request.error"
+msgstr "Error {status}."
 
 msgid "sessionSummary.column.es"
 msgstr "ES"
@@ -1319,6 +1427,9 @@ msgstr "Fit unresolved: the interval of the fitted vivacity ({value, decimal} 1/
 msgid "burnRate.unfit.unresolved"
 msgstr "Fit unresolved: the interval of the fitted vivacity (plus and minus {factor} standard uncertainties) reaches 0, so the powder is not placed."
 
+msgid "coreMessage.code.fitFailed"
+msgstr "fit-failed"
+
 msgid "bullets.fits"
 msgstr "Fits {name}"
 
@@ -1415,6 +1526,12 @@ msgstr "Gauge"
 msgid "values.gildingMetal"
 msgstr "gilding metal"
 
+msgid "coreMessage.schema.loadOrFactory"
+msgstr "Give a load or factory ammunition, not both."
+
+msgid "coreMessage.label.grainForm"
+msgstr "Grain form"
+
 msgid "targets.color.green"
 msgstr "green"
 
@@ -1426,6 +1543,9 @@ msgstr "groove diameter of the bore"
 
 msgid "cartridgeRecord.meaning.grooveFrontAngle"
 msgstr "groove front cone angle from the axis (table III: belt cone)"
+
+msgid "coreMessage.advisory.gyrationRadiusIgnored"
+msgstr "gyration radius ignored"
 
 msgid "disciplines.row.handloads"
 msgstr "Handloads"
@@ -1493,6 +1613,9 @@ msgstr "hybrid"
 msgid "recordFields.ignitionPressure"
 msgstr "Ignition pressure"
 
+msgid "coreMessage.code.illConditioned"
+msgstr "ill-conditioned"
+
 msgid "recordFields.impetus"
 msgstr "Impetus"
 
@@ -1501,6 +1624,9 @@ msgstr "Import JSON"
 
 msgid "sessionSummary.importNotes"
 msgstr "Import notes"
+
+msgid "coreMessage.code.imprecise"
+msgstr "imprecise"
 
 msgid "recordSources.newTab"
 msgstr "in a new tab"
@@ -1520,6 +1646,9 @@ msgstr "included angle of the h cone"
 msgid "cartridgeRecord.meaning.shoulderAngle"
 msgstr "included shoulder angle"
 
+msgid "coreMessage.code.inconsistent"
+msgstr "inconsistent"
+
 msgid "targets.row.innerTen"
 msgstr "Inner ten"
 
@@ -1529,8 +1658,20 @@ msgstr "Inner ten height"
 msgid "targets.row.innerTenRule"
 msgstr "Inner ten rule"
 
+msgid "coreMessage.code.input"
+msgstr "input"
+
+msgid "coreMessage.code.integration"
+msgstr "integration"
+
 msgid "recordFields.intendedUse"
 msgstr "Intended use"
+
+msgid "coreMessage.answer.interior"
+msgstr "interior: {reason}"
+
+msgid "coreMessage.request.internal"
+msgstr "internal server error"
 
 msgid "disciplines.international"
 msgstr "International"
@@ -1540,6 +1681,9 @@ msgstr "International"
 
 msgid "disciplineRecord.international"
 msgstr "International discipline"
+
+msgid "coreMessage.code.invalid"
+msgstr "invalid"
 
 msgid "construction.jacket"
 msgstr "jacket"
@@ -1570,6 +1714,15 @@ msgstr "L3 to the leade start (freebore)"
 
 msgid "values.lacqueredSteel"
 msgstr "Lacquered steel"
+
+msgid "coreMessage.answer.ladderOutput"
+msgstr "ladder output of {n} points is above {max}: fewer steps or a larger options.outputStep"
+
+msgid "coreMessage.request.ladderTooSlow"
+msgstr "ladder would pass {ms} ms"
+
+msgid "coreMessage.answer.ladderKind"
+msgstr "ladder.kind: a {kind} ladder runs in the workbench, not in this route"
 
 msgid "values.largePistol"
 msgstr "Large pistol"
@@ -1616,6 +1769,9 @@ msgstr "Lead-free"
 msgid "cartridgeRecord.meaning.leadeAngle"
 msgstr "leade angle"
 
+msgid "coreMessage.label.length"
+msgstr "Length"
+
 msgid "recordFields.length"
 msgstr "Length"
 
@@ -1648,6 +1804,9 @@ msgstr "Lever action"
 
 msgid "recordSources.column.license"
 msgstr "License"
+
+msgid "coreMessage.advisory.limitExceeded"
+msgstr "limit exceeded"
 
 msgid "targets.ringLine"
 msgstr "line {colour}"
@@ -1799,6 +1958,9 @@ msgstr "Magnum"
 msgid "events.major"
 msgstr "Major"
 
+msgid "coreMessage.label.maker"
+msgstr "Maker"
+
 msgid "recordSources.origin.manufacturer"
 msgstr "manufacturer"
 
@@ -1829,6 +1991,9 @@ msgstr "Manufacturer, name or size…"
 msgid "bullets.search"
 msgstr "Manufacturer, name, 168, .308 or 7.82…"
 
+msgid "coreMessage.label.mass"
+msgstr "Mass"
+
 msgid "recordFields.mass"
 msgstr "Mass"
 
@@ -1837,6 +2002,9 @@ msgstr "Mass"
 
 msgid "cases.column.mass"
 msgstr "Mass"
+
+msgid "coreMessage.answer.bulletValues"
+msgstr "mass, diameter and length are required without bullet"
 
 msgid "lists.matching"
 msgstr "matching \"{query}\""
@@ -1856,11 +2024,20 @@ msgstr "Max ({unit})"
 msgid "cartridges.column.cartridgeLength"
 msgstr "Max length L6"
 
+msgid "coreMessage.label.maxPressure"
+msgstr "Max pressure"
+
 msgid "cartridgeRecord.meaning.pmax"
 msgstr "maximum mean pressure"
 
 msgid "cartridges.column.pmaxHelp"
 msgstr "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
+
+msgid "coreMessage.code.maxTime"
+msgstr "maxTime"
+
+msgid "coreMessage.answer.outputSteps"
+msgstr "maxTime / outputStep must be at most {max}"
 
 msgid "sessionSummary.mean"
 msgstr "Mean"
@@ -1882,6 +2059,12 @@ msgstr "measured"
 
 msgid "bulletPhoto.measuredFrom"
 msgstr "Measured from a photograph ({width} × {height} px, {scale} px/mm ± {uncertainty} %, no image stored)."
+
+msgid "coreMessage.method.notStated"
+msgstr "measuring method not stated"
+
+msgid "coreMessage.method.notStatedInRecord"
+msgstr "measuring method not stated in the record"
 
 msgid "cartridgeRecord.meaning.measuringPosition"
 msgstr "measuring position"
@@ -1924,6 +2107,9 @@ msgstr "Minor"
 
 msgid "events.misses"
 msgstr "Misses"
+
+msgid "coreMessage.code.missingValues"
+msgstr "missingValues"
 
 msgid "powderRecord.modelFit"
 msgstr "Model fit"
@@ -2078,11 +2264,23 @@ msgstr "No bullets chosen."
 msgid "states.noMatch.bullets"
 msgstr "No bullets match these filters."
 
+msgid "coreMessage.advisory.noCartridge"
+msgstr "no cartridge"
+
+msgid "coreMessage.warning.noCartridge"
+msgstr "No cartridge id was given, so no CIP Pmax was checked."
+
 msgid "bulletRecord.noCartridge"
 msgstr "No cartridge matches {query}."
 
 msgid "states.noMatch.cartridges"
 msgstr "No cartridges match these filters."
+
+msgid "coreMessage.advisory.noComparableLimit"
+msgstr "no comparable limit"
+
+msgid "coreMessage.request.noWorker"
+msgstr "no compute worker could be started"
 
 msgid "cartridgeRecord.noValues"
 msgstr "No dimensions or pressures in this record"
@@ -2156,6 +2354,12 @@ msgstr "No row of {table} matches {query}."
 msgid "events.nothingToExport"
 msgstr "No saved event to export."
 
+msgid "coreMessage.answer.noValidCharge"
+msgstr "no scanned charge gives a valid run: interior {reason}"
+
+msgid "coreMessage.answer.noValidChargeField"
+msgstr "no scanned charge gives a valid run: interior {reason} ({field})"
+
 msgid "disciplineRecord.noTargets"
 msgstr "No target mapping names this discipline."
 
@@ -2168,8 +2372,14 @@ msgstr "No target sheet saved yet"
 msgid "states.noMatch.targetFaces"
 msgstr "No targets match these filters."
 
+msgid "coreMessage.code.noInformation"
+msgstr "no-information"
+
 msgid "events.noShoots"
 msgstr "No-shoots"
+
+msgid "coreMessage.code.noComparableLimit"
+msgstr "noComparableLimit"
 
 msgid "cartridgeRecord.difference"
 msgstr "nominal minimum difference of published dimensions"
@@ -2180,8 +2390,14 @@ msgstr "None"
 msgid "events.none"
 msgstr "None"
 
+msgid "coreMessage.code.nonFinite"
+msgstr "nonFinite"
+
 msgid "recordFields.noseLength"
 msgstr "Nose length"
+
+msgid "coreMessage.code.noShotStart"
+msgstr "noShotStart"
 
 msgid "burnRate.notMetallic"
 msgstr "Not a metallic-cartridge powder"
@@ -2210,6 +2426,9 @@ msgstr "Not stated"
 msgid "matchRounds.notStated"
 msgstr "Not stated"
 
+msgid "coreMessage.code.notConverged"
+msgstr "not-converged"
+
 msgid "fieldTable.column.note"
 msgstr "Note"
 
@@ -2227,6 +2446,15 @@ msgstr "Notes"
 
 msgid "firearms.column.notes"
 msgstr "Notes"
+
+msgid "coreMessage.code.notMonotone"
+msgstr "notMonotone"
+
+msgid "coreMessage.code.noValidRun"
+msgstr "noValidRun"
+
+msgid "coreMessage.code.noValue"
+msgstr "noValue"
 
 msgid "disciplines.row.number"
 msgstr "Number"
@@ -2294,6 +2522,9 @@ msgstr "Optic, zero"
 msgid "disciplines.rule.optical"
 msgstr "optical"
 
+msgid "coreMessage.answer.maxSteps"
+msgstr "options.maxSteps must be at most {max} for the charge solver"
+
 msgid "targets.color.orange"
 msgstr "orange"
 
@@ -2324,8 +2555,17 @@ msgstr "Outline, {name}"
 msgid "bulletDrawing.outline"
 msgstr "Outline, {name}"
 
+msgid "coreMessage.code.outputTooLarge"
+msgstr "outputTooLarge"
+
+msgid "coreMessage.code.outsideModel"
+msgstr "outsideModel"
+
 msgid "recordFields.computedRange"
 msgstr "Over the composition ranges: {min, decimal} to {max, decimal}."
+
+msgid "coreMessage.label.overallLength"
+msgstr "Overall length"
 
 msgid "burnRateCompare.overlay"
 msgstr "Overlay"
@@ -2342,6 +2582,9 @@ msgstr "Page not found"
 msgid "values.paint"
 msgstr "paint"
 
+msgid "coreMessage.request.idMismatch"
+msgstr "params/id must match the record id"
+
 msgid "values.partitioned"
 msgstr "partitioned"
 
@@ -2356,6 +2599,9 @@ msgstr "per load row"
 
 msgid "bullets.pickToCompare"
 msgstr "Pick 2 to {max}"
+
+msgid "coreMessage.method.piezo"
+msgstr "piezo"
 
 msgid "values.piezo"
 msgstr "piezo"
@@ -2404,6 +2650,9 @@ msgstr "Powder data is unavailable right now."
 
 msgid "page.powdersDesigner"
 msgstr "Powder designer"
+
+msgid "coreMessage.answer.powderFit"
+msgstr "powder fit: {reason}"
 
 msgid "page.powders"
 msgstr "Powders"
@@ -2522,8 +2771,14 @@ msgstr "prone"
 msgid "cartridgeRecord.meaning.proofPressure"
 msgstr "proof pressure"
 
+msgid "coreMessage.label.propellantBase"
+msgstr "Propellant base"
+
 msgid "recordFields.propellantTemperature"
 msgstr "Propellant temperature"
+
+msgid "coreMessage.answer.bulkDensity"
+msgstr "propellant.bulkDensity or powder is required for the loadRatio target"
 
 msgid "caseRecord.data"
 msgstr "Properties"
@@ -2549,6 +2804,9 @@ msgstr "Quantity"
 msgid "fieldTable.column.quantity"
 msgstr "Quantity"
 
+msgid "coreMessage.request.querySchema"
+msgstr "querystring does not match the schema"
+
 msgid "firearms.column.twistHelp"
 msgstr "R right hand, L left hand."
 
@@ -2560,6 +2818,9 @@ msgstr "radius at the shoulder start"
 
 msgid "cartridgeRecord.meaning.rimCornerRadius"
 msgstr "radius of the rim corner at the head face"
+
+msgid "coreMessage.advisory.rangeIncomplete"
+msgstr "range incomplete"
 
 msgid "page.range"
 msgstr "Range mode"
@@ -2621,11 +2882,20 @@ msgstr "Replace"
 msgid "events.replaceEvents"
 msgstr "Replace events?"
 
+msgid "coreMessage.request.bodyTooLarge"
+msgstr "request body above 64 KiB"
+
+msgid "coreMessage.request.schema"
+msgstr "request does not match the schema"
+
 msgid "matchRounds.reserve"
 msgstr "Reserve, %"
 
 msgid "units.reset"
 msgstr "Reset to preset"
+
+msgid "coreMessage.advisory.resistanceNotApplied"
+msgstr "resistance not applied"
 
 msgid "disciplines.rule.rest"
 msgstr "rest"
@@ -2783,6 +3053,9 @@ msgstr "Rule books table"
 msgid "disciplines.rules"
 msgstr "Rules"
 
+msgid "coreMessage.answer.samplingSingle"
+msgstr "sampling applies to a single run, not to a ladder"
+
 msgid "events.saveEvent"
 msgstr "Save event"
 
@@ -2891,6 +3164,9 @@ msgstr "Shape"
 msgid "targets.row.sheet"
 msgstr "Sheet"
 
+msgid "coreMessage.import.noTable"
+msgstr "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet."
+
 msgid "events.shootingLog"
 msgstr "Shooting log"
 
@@ -2963,6 +3239,24 @@ msgstr "Sights"
 msgid "bulletDrawing.simplified"
 msgstr "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
 
+msgid "coreMessage.warning.limitExceeded"
+msgstr "Simulated peak pressure {nominal} (range {low} to {high}) is above {name} {limit} ({spec}; {method})."
+
+msgid "coreMessage.warning.typedLimitExceeded"
+msgstr "Simulated peak pressure {nominal} (range {low} to {high}) is above the typed {name} {limit}."
+
+msgid "coreMessage.advisory.simulation"
+msgstr "simulation, not load data"
+
+msgid "coreMessage.warning.loadRatioHigh"
+msgstr "Simulation: load ratio {ratio} is above {max}, solid fill {limit} for this powder; the model is outside the range it was built for."
+
+msgid "coreMessage.warning.solidFillHigh"
+msgstr "Simulation: solid fill {fill} is above {limit}; the model is outside the range it was built for."
+
+msgid "coreMessage.warning.resistanceNotApplied"
+msgstr "Simulation: the parameters of {label} were fitted with a bore-resistance law this run cannot apply (missing: {list}); the results are biased."
+
 msgid "values.single"
 msgstr "single"
 
@@ -3002,8 +3296,14 @@ msgstr "soft-point"
 msgid "recordFields.solidDensity"
 msgstr "Solid density"
 
+msgid "coreMessage.advisory.solidFillHigh"
+msgstr "solid fill high"
+
 msgid "bulletCompare.notFound"
 msgstr "Some bullets were not found."
+
+msgid "coreMessage.advisory.rangeIncompleteRule"
+msgstr "Some cases of the pressure range could not be computed."
 
 msgid "page.error"
 msgstr "Something went wrong"
@@ -3056,6 +3356,12 @@ msgstr "standing"
 msgid "recordFields.startPressure"
 msgstr "Start pressure"
 
+msgid "coreMessage.advisory.startPressureNoEffect"
+msgstr "start pressure has no effect"
+
+msgid "coreMessage.advisory.startPressureHeldOnce"
+msgstr "start pressure held once"
+
 msgid "sessionSummary.statsTitle"
 msgstr "Statistics per string, excluded shots left out ({unit})"
 
@@ -3067,6 +3373,9 @@ msgstr "steel"
 
 msgid "values.cupSteel"
 msgstr "Steel"
+
+msgid "coreMessage.code.stepBudget"
+msgstr "step-budget"
 
 msgid "photoQuality.rule.fromAbove"
 msgstr "Straight from above, no slant"
@@ -3082,6 +3391,9 @@ msgstr "String statistics"
 
 msgid "recordFields.structure"
 msgstr "Structure"
+
+msgid "coreMessage.code.stuck"
+msgstr "stuck"
 
 msgid "disciplines.row.support"
 msgstr "Support"
@@ -3191,6 +3503,12 @@ msgstr "The boat tail is not a straight cone in the photograph (a rebated boat t
 msgid "bulletPhoto.tooAlike"
 msgstr "The bullet and the background are too alike in brightness to tell apart."
 
+msgid "coreMessage.seating.behindHead"
+msgstr "The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given."
+
+msgid "coreMessage.seating.noVolume"
+msgstr "The bullet below the mouth takes the whole case volume: no volume behind the bullet is given."
+
 msgid "bulletPhoto.lowContrast"
 msgstr "The bullet differs from the background by {gap} grey levels only: the outline may be rough. Use a plainer background, or one much lighter or darker than the bullet."
 
@@ -3214,6 +3532,9 @@ msgstr "The bullet's sides are ragged (about {sigma, decimal} px): a reflection,
 
 msgid "powderCompare.noComparableLimit"
 msgstr "The cartridge has no CIP limit to compare with."
+
+msgid "coreMessage.advisory.noComparableLimitRule"
+msgstr "The cartridge has no CIP Pmax measured by transducer or piezo."
 
 msgid "powders.noneHint"
 msgstr "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
@@ -3245,11 +3566,35 @@ msgstr "The disciplines of this federation"
 msgid "faceRecord.eventsCaption"
 msgstr "The events and disciplines shot on this target"
 
+msgid "coreMessage.import.notRead"
+msgstr "The file could not be read."
+
+msgid "coreMessage.answer.formatVersion"
+msgstr "The file has format version {v}; this app reads version {w}."
+
+msgid "coreMessage.import.tooLarge"
+msgstr "The file is larger than 40 MB. Split it and import the parts."
+
+msgid "coreMessage.import.notUnicode"
+msgstr "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again"
+
+msgid "coreMessage.import.notUnicodeSentence"
+msgstr "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again."
+
+msgid "coreMessage.answer.oneLoad"
+msgstr "The file must hold exactly one load record, it has {n}"
+
 msgid "sessionSummary.notRead"
 msgstr "The file was not read."
 
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
+
+msgid "coreMessage.curveFit.peakRatio"
+msgstr "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
+
+msgid "coreMessage.import.notRun"
+msgstr "The import could not run in this browser."
 
 msgid "photoQuality.unevenLight"
 msgstr "The light is uneven: one side of the target is much darker than another."
@@ -3257,11 +3602,29 @@ msgstr "The light is uneven: one side of the target is much darker than another.
 msgid "bulletCompare.tooManyText"
 msgstr "The link names {count} bullets; at most {max} compare at once."
 
+msgid "coreMessage.answer.lacksValues"
+msgstr "The load file lacks {n} values: {list}. Type them under analysis.overrides, or name catalogue records that give them."
+
+msgid "coreMessage.answer.lacksValue"
+msgstr "The load file lacks 1 value: {list}. Type them under analysis.overrides, or name catalogue records that give them."
+
+msgid "coreMessage.request.loadGone"
+msgstr "the load is no longer in this browser"
+
+msgid "coreMessage.request.longerRunSilent"
+msgstr "The longer run did not answer in {seconds} s."
+
+msgid "coreMessage.request.lotRowsSilent"
+msgstr "The lot rows did not answer in {seconds} s."
+
 msgid "bullets.column.g1Help"
 msgstr "The manufacturer's first published BC of this drag model."
 
 msgid "bullets.column.g7Help"
 msgstr "The manufacturer's first published BC of this drag model."
+
+msgid "coreMessage.request.refused"
+msgstr "The model refused the load. The error panel gives the reason."
 
 msgid "bulletPhoto.secantOgive"
 msgstr "The nose is a secant ogive: its circle cuts the shank at an angle."
@@ -3271,6 +3634,9 @@ msgstr "The nose is a tangent ogive: its circle touches the shank."
 
 msgid "bulletPhoto.noArc"
 msgstr "The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range."
+
+msgid "coreMessage.request.indexOnly"
+msgstr "the Pages catalogue holds the index only"
 
 msgid "photoQuality.dark"
 msgstr "The photo is dark: even its brightest part is dim."
@@ -3299,6 +3665,21 @@ msgstr "The round count of {name} is unchanged."
 msgid "federationRecord.ruleBooksCaption"
 msgstr "The rule books the records cite"
 
+msgid "coreMessage.request.timeLimit"
+msgstr "The run passed the time limit."
+
+msgid "coreMessage.advisory.chargeTooSmallRule"
+msgstr "The simulated peak mean pressure is below {ratio} times the hold pressure; the results are outside the range the model was built for."
+
+msgid "coreMessage.advisory.limitExceededRule"
+msgstr "The simulated peak pressure is above a CIP maximum pressure of the cartridge."
+
+msgid "coreMessage.warning.startPressureHeldOnce"
+msgstr "The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then starts against the lower bore resistance at travel 0, after which the engraving profile applies."
+
+msgid "coreMessage.warning.startPressureBelowResistance"
+msgstr "The start pressure is at or below the bore resistance at travel 0, so the shot starts when the pressure force exceeds that resistance and the start pressure has no effect."
+
 msgid "photoQuality.tilt"
 msgstr "The target is photographed at a slant of about {n} degrees."
 
@@ -3310,6 +3691,21 @@ msgstr "The targets its disciplines are shot on"
 
 msgid "matchRounds.shotsUnstated"
 msgstr "The targets of this discipline state no shot count."
+
+msgid "coreMessage.warning.gyrationRadiusWithoutTwist"
+msgstr "The twist is 0, so the bullet has no rotational energy and the radius of gyration is ignored."
+
+msgid "coreMessage.warning.limitExceededUpper"
+msgstr "The upper end of the simulated peak pressure range, {high}, is above {name} {limit} ({spec}; {method}); the nominal value is {nominal}."
+
+msgid "coreMessage.warning.typedLimitExceededUpper"
+msgstr "The upper end of the simulated peak pressure range, {high}, is above the typed {name} {limit}; the nominal value is {nominal}."
+
+msgid "coreMessage.import.unreadable"
+msgstr "The workbook cannot be read. Save it again as XLSX or CSV."
+
+msgid "coreMessage.import.noText"
+msgstr "The workbook has no cells with text. Open the right file or paste the table into a sheet."
 
 msgid "recordFields.thermochemistry"
 msgstr "Thermochemistry"
@@ -3334,6 +3730,9 @@ msgstr "Time (s)"
 
 msgid "disciplines.row.timeLimit"
 msgstr "Time limit"
+
+msgid "coreMessage.code.timeout"
+msgstr "timeout"
 
 msgid "values.tin"
 msgstr "tin"
@@ -3362,6 +3761,12 @@ msgstr "Tolerance"
 msgid "cartridgeRecord.toleranceClearance"
 msgstr "Tolerance, clearance"
 
+msgid "coreMessage.code.toleranceNotReached"
+msgstr "toleranceNotReached"
+
+msgid "coreMessage.ladder.tooBig"
+msgstr "Too big: expected number to be <={n}"
+
 msgid "bulletCompare.tooMany"
 msgstr "Too many bullets."
 
@@ -3374,8 +3779,14 @@ msgstr "Total"
 msgid "events.partTotal"
 msgstr "Total {total}"
 
+msgid "coreMessage.curveFit.sameCharge"
+msgstr "traces {list} have the same charge"
+
 msgid "powders.column.rows"
 msgstr "Training rows"
+
+msgid "coreMessage.method.transducer"
+msgstr "transducer"
 
 msgid "values.transducer"
 msgstr "transducer"
@@ -3385,6 +3796,12 @@ msgstr "Trigger weight from"
 
 msgid "values.triple"
 msgstr "triple"
+
+msgid "coreMessage.answer.truing"
+msgstr "truing: {reason}"
+
+msgid "coreMessage.answer.truingDetail"
+msgstr "truing: {reason} ({detail})"
 
 msgid "page.powdersTune"
 msgstr "Tune a powder"
@@ -3419,6 +3836,9 @@ msgstr "Type"
 msgid "burnRate.typed"
 msgstr "Typed model parameters"
 
+msgid "coreMessage.code.underdetermined"
+msgstr "underdetermined"
+
 msgid "events.undoOfFailed"
 msgstr "Undo of {name} failed: {reason}"
 
@@ -3431,6 +3851,9 @@ msgstr "Unit"
 msgid "sessionSummary.fallbackUnit"
 msgstr "Unit if the file has none"
 
+msgid "coreMessage.answer.percentOfLimit"
+msgstr "unit percentOfLimit applies to the peakPressure target only"
+
 msgid "sessionSummary.unit"
 msgstr "Unit: {units}"
 
@@ -3439,6 +3862,15 @@ msgstr "Units: {preset}"
 
 msgid "units.nameCustom"
 msgstr "Units: {preset}, custom"
+
+msgid "coreMessage.answer.unknownField"
+msgstr "Unknown field"
+
+msgid "coreMessage.code.unreachable"
+msgstr "unreachable"
+
+msgid "coreMessage.code.unresolved"
+msgstr "unresolved"
 
 msgid "comparePicks.untick"
 msgstr "Untick"
@@ -3463,6 +3895,12 @@ msgstr "Use in workbench"
 
 msgid "bulletCompare.useInWorkbenchFor"
 msgstr "Use in workbench: {name}"
+
+msgid "coreMessage.import.oddBytes"
+msgstr "UTF-16 text with an odd number of bytes"
+
+msgid "coreMessage.import.oddBytesSave"
+msgstr "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again."
 
 msgid "cartridgeRecord.value"
 msgstr "Value"
@@ -3544,6 +3982,9 @@ msgstr "Wind speed"
 
 msgid "burnRateCompare.noCurve"
 msgstr "Without a curve"
+
+msgid "coreMessage.code.yaw"
+msgstr "yaw"
 
 msgid "targets.color.yellow"
 msgstr "yellow"

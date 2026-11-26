@@ -64,15 +64,14 @@ const ownReasons: readonly MessageDescriptor[] = [
 /** A shotgun-only powder's reason, in English as the other reasons. */
 export const notMetallicReason = notMetallic.message
 
-/** A row's reason in the language of `i18n`; `t` words a message of the API or the packages, and a refusal it caught is worded here, where it is shown. */
+/** A row's reason in the language of `i18n`, with a message of the API or the packages; a refusal it caught is worded here, where it is shown. */
 export function reasonText(
   { reason, failure }: Pick<CompareRow, 'reason' | 'failure'>,
-  t: Translator['t'],
   i18n: I18n,
 ) {
-  if (failure !== undefined) return translateMessage(refusalText(failure), t)
+  if (failure !== undefined) return translateMessage(refusalText(failure), i18n)
   const own = ownReasons.find((m) => m.message === reason)
-  return own ? i18n._(own) : translateMessage(reason ?? '', t)
+  return own ? i18n._(own) : translateMessage(reason ?? '', i18n)
 }
 
 /** One powder of the Powders tab. */

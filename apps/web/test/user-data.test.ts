@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs'
 import type { UserRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
-import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { parseFiles } from '../src/lib/load-file-formats.ts'
 import { readLink, shareLink, shareProblem, tooLongText } from '../src/lib/share-link.ts'
 import {
@@ -121,7 +120,6 @@ describe('user data files', () => {
   })
 
   it('writes the path lines and the count of more problems', () => {
-    installCoreMessages()
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
     const reason = (n: number) => {
       const p = parseUserDataFile(userDataText(Array(n).fill(bad) as UserRecord[]))

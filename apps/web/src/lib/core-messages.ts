@@ -1,8 +1,12 @@
+import type { I18n } from '@lingui/core'
 import { type Diagnostic, InputError } from '@rangefoundry/statistics'
 import type { Translator } from '../i18n/translate.ts'
 import { errorText } from './error-text.ts'
 
-type Known = (text: string, t: Translator['t']) => string | undefined
+/** The language of a message: the Lingui messages, or the `t` the language module published with them for a caller not yet on `i18n`. */
+export type MessageLanguage = I18n | Translator['t']
+
+type Known = (text: string, language: MessageLanguage) => string | undefined
 
 let known: Known | undefined
 
@@ -12,8 +16,8 @@ export function setCoreMessages(translate: Known) {
 }
 
 /** English pages never load the table (`core-message-table.ts`), so the text stays as it is there. */
-export function translateMessage(text: string, t: Translator['t']): string {
-  return known?.(text, t) ?? text
+export function translateMessage(text: string, language: MessageLanguage): string {
+  return known?.(text, language) ?? text
 }
 
 type Sentence = (issue: Diagnostic<string, object>) => string | undefined

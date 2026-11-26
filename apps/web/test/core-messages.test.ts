@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs'
+import { setupI18n } from '@lingui/core'
 import { buildOpenApi } from '@rangefoundry/api/openapi'
 import { pressureMethod } from '@rangefoundry/schema'
 import { advisoryText } from '@rangefoundry/use-cases'
@@ -6,10 +7,11 @@ import { describe, expect, it } from 'vitest'
 import { limitCheck, type Warning } from '../../../packages/use-cases/dist/limits.js'
 import { missingValuesAnswer } from '../../../packages/use-cases/dist/load-file.js'
 import de from '../src/i18n/de.json'
-import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
+import { linguiOf, loadLingui } from '../src/i18n/lingui.ts'
+import { type Catalogue, translator } from '../src/i18n/translate.ts'
 import {
+  coreMessages,
   installCoreMessages,
-  messageTexts,
   type WarningCode,
   warningMessages,
 } from '../src/lib/core-message-table.ts'
@@ -17,9 +19,9 @@ import { translateMessage } from '../src/lib/core-messages.ts'
 import { linkReasonText, readLink, shareLink } from '../src/lib/share-link.ts'
 import { parseUserDataFile, reasonText, userDataText } from '../src/lib/user-data.ts'
 
-installCoreMessages()
-
 const german = translator(de as Catalogue, 'de')
+const germanLingui = await loadLingui('de')
+installCoreMessages(germanLingui, german.t)
 /** A catalogue of its own for the templates the matcher cases use: they check the matching, not de.json. */
 const own = translator(
   {
@@ -28,25 +30,42 @@ const own = translator(
     '{kind} range': 'Entfernung von {kind}',
     'prior {name}': 'Prior {name}',
     'prior {name} must be positive': 'Prior {name} zu klein',
-    stuck: 'steckt',
-    'interior: {reason}': 'Innen: {reason}',
-    unreachable: 'unerreichbar',
     'range {range} m not reached': '{range} m verfehlt',
-    'truing: {reason} ({detail})': 'Truing: {reason} ({detail})',
-    apex: 'Scheitel',
     'zero range {range} m not reached ({stop})': 'Fleck {range} m verfehlt ({stop})',
     'Enter a number for {field}.': 'Zahl für {field}.',
     Pressure: 'Druck',
     'ladder charge {charge} kg must be above 0': 'Ladung {charge} kg zu klein',
     'bullet {bullet} has no length': 'Geschoss {bullet} ohne Länge',
-    'Error {status}.': 'Fehler {status}.',
-    'Give a load or factory ammunition, not both.': 'Eine Munition genügt.',
     '→ at {path}': '→ bei {path}',
   },
   'de',
 )
-/** Every message text mapped to a marker: a message shows the marker only if a template matched it. */
-const marker = translator(Object.fromEntries(messageTexts.map((m) => [m, 'MAPPED'])), 'de')
+/** The same for the messages of the table, compiled as Lingui writes them. */
+const ownLingui = setupI18n({
+  locale: 'de',
+  messages: {
+    de: {
+      'coreMessage.code.stuck': 'steckt',
+      'coreMessage.answer.interior': ['Innen: ', ['reason']],
+      'coreMessage.code.unreachable': 'unerreichbar',
+      'coreMessage.answer.truingDetail': ['Truing: ', ['reason'], ' (', ['detail'], ')'],
+      'coreMessage.code.apex': 'Scheitel',
+      'coreMessage.request.error': ['Fehler ', ['status'], '.'],
+      'coreMessage.schema.loadOrFactory': 'Eine Munition genügt.',
+    },
+  },
+})
+installCoreMessages(ownLingui, own.t)
+/** Every message mapped to a marker: a message shows the marker only if a template matched it. */
+const words = coreMessages.filter((m) => typeof m === 'string')
+const ids = coreMessages.flatMap((m) => (typeof m === 'string' ? [] : [m.id]))
+const marker = translator(Object.fromEntries(words.map((m) => [m, 'MAPPED'])), 'de')
+const markerLingui = setupI18n({
+  locale: 'de',
+  messages: { de: Object.fromEntries(ids.map((id) => [id, 'MAPPED'])) },
+})
+installCoreMessages(markerLingui, marker.t)
+const englishLingui = linguiOf('en')
 
 const byText = (a: string, b: string) => a.localeCompare(b)
 
@@ -55,7 +74,7 @@ type Equal<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never
 describe('the message table', () => {
   it('leaves a text that no message matches as it is', () => {
     for (const text of ['Hello', 'The cartridge is fine.', '', 'range']) {
-      expect(translateMessage(text, german.t)).toBe(text)
+      expect(translateMessage(text, germanLingui)).toBe(text)
     }
   })
 
@@ -99,40 +118,40 @@ describe('the message table', () => {
 
   it('leaves a long text as it is without matching it', () => {
     const text = 'x'.repeat(1_000_000)
-    expect(translateMessage(text, german.t)).toBe(text)
+    expect(translateMessage(text, germanLingui)).toBe(text)
   })
 
   it('prefers the most specific template', () => {
-    expect(translateMessage('range must be positive', own.t)).toBe('Entfernung zu klein')
-    expect(translateMessage('qx range', own.t)).toBe('Entfernung von qx')
-    expect(translateMessage('range 12', own.t)).toBe('Entfernung 12')
-    expect(translateMessage('prior qx must be positive', own.t)).toBe('Prior qx zu klein')
+    expect(translateMessage('range must be positive', ownLingui)).toBe('Entfernung zu klein')
+    expect(translateMessage('qx range', ownLingui)).toBe('Entfernung von qx')
+    expect(translateMessage('range 12', ownLingui)).toBe('Entfernung 12')
+    expect(translateMessage('prior qx must be positive', ownLingui)).toBe('Prior qx zu klein')
   })
 
   it('fills the values: a code or a message inside a message, a label, a number, a status', () => {
-    expect(translateMessage('interior: stuck', own.t)).toBe('Innen: steckt')
-    expect(translateMessage('truing: unreachable (range 500 m not reached)', own.t)).toBe(
+    expect(translateMessage('interior: stuck', ownLingui)).toBe('Innen: steckt')
+    expect(translateMessage('truing: unreachable (range 500 m not reached)', ownLingui)).toBe(
       'Truing: unerreichbar (500 m verfehlt)',
     )
-    expect(translateMessage('zero range 5 m not reached (apex)', own.t)).toBe(
+    expect(translateMessage('zero range 5 m not reached (apex)', ownLingui)).toBe(
       'Fleck 5 m verfehlt (Scheitel)',
     )
-    expect(translateMessage('Enter a number for Qx label.', own.t)).toBe('Zahl für Qx label.')
+    expect(translateMessage('Enter a number for Qx label.', ownLingui)).toBe('Zahl für Qx label.')
     // a value that is a label of the catalogue is translated too
-    expect(translateMessage('Enter a number for Pressure.', own.t)).toBe('Zahl für Druck.')
+    expect(translateMessage('Enter a number for Pressure.', ownLingui)).toBe('Zahl für Druck.')
     // a number takes the decimal mark of the language, a name keeps its point
-    expect(translateMessage('ladder charge 0.0025 kg must be above 0', own.t)).toBe(
+    expect(translateMessage('ladder charge 0.0025 kg must be above 0', ownLingui)).toBe(
       'Ladung 0,0025 kg zu klein',
     )
-    expect(translateMessage('bullet 6.5 Creedmoor has no length', own.t)).toBe(
+    expect(translateMessage('bullet 6.5 Creedmoor has no length', ownLingui)).toBe(
       'Geschoss 6.5 Creedmoor ohne Länge',
     )
-    expect(translateMessage('Error 503.', own.t)).toBe('Fehler 503.')
+    expect(translateMessage('Error 503.', ownLingui)).toBe('Fehler 503.')
   })
 
   it('gives English text back unchanged under the English translator', () => {
     for (const text of ['interior: stuck', 'ladder charge 0.0025 kg must be above 0', 'busy']) {
-      expect(translateMessage(text, english.t)).toBe(text)
+      expect(translateMessage(text, englishLingui)).toBe(text)
     }
   })
 })
@@ -188,7 +207,7 @@ describe('reason codes', () => {
 
   it('maps each reason', () => {
     for (const reason of new Set(reasons)) {
-      expect(translateMessage(reason, marker.t), reason).toBe('MAPPED')
+      expect(translateMessage(reason, markerLingui), reason).toBe('MAPPED')
     }
   })
 })
@@ -270,12 +289,12 @@ describe('the warnings of an interior answer', () => {
     for (const keys of [all, all.slice(1)]) {
       const message = missingValuesAnswer(values(all.filter((k) => !keys.includes(k))), [])?.payload
         .message
-      expect(translateMessage(message ?? '', marker.t), message).toBe('MAPPED')
-      expect(translateMessage(message ?? '', english.t)).toBe(message)
+      expect(translateMessage(message ?? '', markerLingui), message).toBe('MAPPED')
+      expect(translateMessage(message ?? '', englishLingui)).toBe(message)
     }
     const one = missingValuesAnswer(values(all.slice(1)), [])?.payload.message ?? ''
     expect(one).toMatch(/lacks 1 value:/)
-    expect(translateMessage(one, marker.t), one).toBe('MAPPED')
+    expect(translateMessage(one, markerLingui), one).toBe('MAPPED')
   })
 
   it('writes the load ratio warning with the words of the API', () => {
@@ -294,14 +313,14 @@ describe('the warnings of an interior answer', () => {
 
   it('maps every rule of the registry', () => {
     for (const { name } of Object.values(advisoryText)) {
-      expect(translateMessage(name, marker.t), name).toBe('MAPPED')
+      expect(translateMessage(name, markerLingui), name).toBe('MAPPED')
     }
   })
 
   it('maps each message of the API and keeps English as it is', () => {
     for (const text of [...produced.map((w) => w.message), ...fromLoadFile]) {
-      expect(translateMessage(text, marker.t), text).toBe('MAPPED')
-      expect(translateMessage(text, english.t), text).toBe(text)
+      expect(translateMessage(text, markerLingui), text).toBe('MAPPED')
+      expect(translateMessage(text, englishLingui), text).toBe(text)
     }
   })
 })
@@ -324,8 +343,8 @@ describe('the request failures of the app', () => {
 
   it('maps each sentence and keeps it in English', () => {
     for (const text of sentences) {
-      expect(translateMessage(text, marker.t), text).toBe('MAPPED')
-      expect(translateMessage(text, english.t), text).toBe(text)
+      expect(translateMessage(text, markerLingui), text).toBe('MAPPED')
+      expect(translateMessage(text, englishLingui), text).toBe(text)
     }
   })
 })
@@ -494,7 +513,7 @@ function scan(sample: string): Found[] {
 
 const unmapped = (sample: string) =>
   scan(sample)
-    .filter((f) => translateMessage(f.text, marker.t) !== 'MAPPED')
+    .filter((f) => translateMessage(f.text, markerLingui) !== 'MAPPED')
     .map((f) => `${f.where}: ${f.text}`)
 
 describe('the messages of the packages', () => {
@@ -517,6 +536,7 @@ describe('the messages of the packages', () => {
   })
 
   it('keeps every message as it is in English', () => {
-    for (const f of scan('0.5')) expect(translateMessage(f.text, english.t), f.where).toBe(f.text)
+    for (const f of scan('0.5'))
+      expect(translateMessage(f.text, englishLingui), f.where).toBe(f.text)
   })
 })

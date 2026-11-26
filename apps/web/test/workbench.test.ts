@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import type { Outcome } from '../src/components/workbench-outcome.ts'
 import { peakFacts } from '../src/components/workbench-readouts.tsx'
 import de from '../src/i18n/de.json'
+import { loadLingui } from '../src/i18n/lingui.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { type Catalogue, english, type Translator, translator } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
@@ -455,7 +456,7 @@ describe('sampled band', () => {
 
 describe('in German', () => {
   const german = translator(de as Catalogue, 'de')
-  installCoreMessages()
+  beforeAll(async () => installCoreMessages(await loadLingui('de'), german.t))
   beforeEach(() => setShownLanguage('de'))
   afterEach(() => setShownLanguage('en'))
   const pressureRange = { nominalPressure: 4000e5, lowPressure: 3600e5, highPressure: 4400e5 }
