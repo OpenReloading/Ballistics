@@ -199,6 +199,10 @@ msgstr "{count, plural, one {# Schuss hinzugefügt.} other {# Schüsse hinzugef�
 msgid "sessionSummary.shotCount"
 msgstr "{count, plural, one {# Schuss} other {# Schüsse}}"
 
+# en: "{count, plural, one {# shot} other {# shots}}"
+msgid "targetEditor.countShots"
+msgstr "{count, plural, one {# Schuss} other {# Schüsse}}"
+
 # en: "{count, plural, one {# string} other {# strings}}"
 msgid "sessionSummary.stringCount"
 msgstr "{count, plural, one {# Schussreihe} other {# Schussreihen}}"
@@ -263,6 +267,14 @@ msgstr "{face}: Maßstab und Mitte aus {count, decimal} Ellipsen."
 msgid "log.fromTo"
 msgstr "{from} bis {to}"
 
+# en: "{group}, shot {n, decimal}, x {x}, y {y}"
+msgid "targetEditor.shotXY"
+msgstr "{group}, Schuss {n, decimal}, x {x}, y {y}"
+
+# en: "{hint} Point {n, decimal} of {total, decimal}. {keys}"
+msgid "targetEditor.pointOfTotal"
+msgstr "{hint} Punkt {n, decimal} von {total, decimal}. {keys}"
+
 # en: "{horizontal, decimal} {horizontalDirection}, {vertical, decimal} {verticalDirection}"
 msgid "targetEditor.clicksBoth"
 msgstr "{horizontal, decimal} {horizontalDirection}, {vertical, decimal} {verticalDirection}"
@@ -278,6 +290,10 @@ msgstr "{interval}."
 # en: "{kind} {n, decimal}"
 msgid "targetEditor.referenceLabel"
 msgstr "{kind} {n, decimal}"
+
+# en: "{kind} {n, decimal} added."
+msgid "targetEditor.referenceAdded"
+msgstr "{kind} {n, decimal} hinzugefügt."
 
 # en: "{kind}; scale {deviation} % from the mean"
 msgid "targetEditor.scaleMean"
@@ -325,6 +341,10 @@ msgstr "{level, decimal} %-Intervall {lower} bis {upper} {unit} ({df, decimal} F
 
 # en: "{low} to {high}"
 msgid "chargeTarget.pressureRangeValue"
+msgstr "{low} bis {high}"
+
+# en: "{low} to {high}"
+msgid "powderCompare.lowToHigh"
 msgstr "{low} bis {high}"
 
 # en: "{low} to {high}"
@@ -403,6 +423,10 @@ msgstr "{points} Punkte, Trefferfaktor {hf}"
 msgid "bulletDrawing.noLength"
 msgstr "{reason} Für die Zeichnung werden ein Durchmesser und eine Länge benötigt."
 
+# en: "{shown, decimal} of {total, decimal} powders, {failed, decimal} not computed"
+msgid "powderCompare.shownPowdersNotComputed"
+msgstr "{shown, decimal} von {total, decimal} Treibladungspulvern, {failed, decimal} nicht berechnet"
+
 # en: "{source} only"
 msgid "sources.only"
 msgstr "nur {source}"
@@ -418,6 +442,10 @@ msgstr "{symbol}: {meaning}"
 # en: "{title}: group"
 msgid "fieldTable.groupFilter"
 msgstr "{title}: Gruppe"
+
+# en: "{total, decimal} powders, {failed, decimal} not computed"
+msgid "powderCompare.powdersNotComputed"
+msgstr "{total, decimal} Treibladungspulver, {failed, decimal} nicht berechnet"
 
 # en: "{unit} per turn"
 msgid "firearms.perTurn"
@@ -458,6 +486,10 @@ msgstr "{year}: {entries}, {rounds}"
 # en: "% of Pmax"
 msgid "chargeTarget.percentOfPmax"
 msgstr "% von Pmax"
+
+# en: "% Pmax"
+msgid "powderCompare.percentPmax"
+msgstr "% Pmax"
 
 # en: "1 = fastest"
 msgid "recordFields.fastest"
@@ -507,8 +539,20 @@ msgstr "Eine Datendatei wurde nicht geladen oder die Berechnung ist fehlgeschlag
 msgid "targetEditor.drawnTargetShotsTarget"
 msgstr "Eine gezeichnete Zielscheibe: Schüsse in Zielscheibenkoordinaten, kein Maßstab nötig."
 
+# en: "A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one."
+msgid "targetEditor.drawnTargetPlaceShots"
+msgstr "Eine gezeichnete Zielscheibe. Setzen Sie Schüsse und klicken Sie dann dorthin, wo jeder Schuss getroffen hat. Oder fügen Sie ein Foto der Zielscheibe hinzu: auswählen, hierher ziehen oder einfügen."
+
+# en: "A drawn target. Place shots, then click where each shot hit. Or add a photo of the target."
+msgid "targetEditor.drawnTargetPlaceShots2"
+msgstr "Eine gezeichnete Zielscheibe. Setzen Sie Schüsse und klicken Sie dann dorthin, wo jeder Schuss getroffen hat. Oder fügen Sie ein Foto der Zielscheibe hinzu."
+
 # en: "A group holds at most 1000 shots."
 msgid "holeDetection.groupHoldsMost1000"
+msgstr "Ein Schussbild enthält höchstens 1000 Schüsse."
+
+# en: "A group holds at most 1000 shots."
+msgid "targetEditor.groupHoldsMost1000"
 msgstr "Ein Schussbild enthält höchstens 1000 Schüsse."
 
 # en: "A known distance on the target or the size of a target ring, marked on the photo in Calibrate."
@@ -526,6 +570,14 @@ msgstr "Ein Bereich braucht mindestens 3 Punkte"
 # en: "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline."
 msgid "bulletPhoto.shadowMirrored"
 msgstr "Ein Schatten neben dem Geschoss verbreitert eine Seite der Freistellung: Diese Seite bleibt außen vor, gemessen wird die andere Seite, an der Achse gespiegelt. Entfernen Sie den Schatten mit dem Pinsel oder fotografieren Sie in gleichmäßigem Licht, für einen genaueren Umriss."
+
+# en: "A share of Pmax needs the cartridge's CIP Pmax."
+msgid "powderCompare.sharePmaxNeedsCartridge"
+msgstr "Ein Anteil am Pmax braucht den CIP-Pmax der Patrone."
+
+# en: "A sheet holds at most 20 references."
+msgid "targetEditor.sheetHoldsMost20"
+msgstr "Ein Blatt enthält höchstens 20 Referenzen."
 
 # en: "A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields."
 msgid "targetEditor.shotPointAimOrigin"
@@ -679,6 +731,10 @@ msgstr "Alle Zündhütchen"
 msgid "listSources.all"
 msgstr "Alle Quellen"
 
+# en: "All statistics"
+msgid "targetEditor.allStatistics"
+msgstr "Alle Statistikwerte"
+
 # en: "All targets"
 msgid "targets.all"
 msgstr "Alle Scheiben"
@@ -801,6 +857,10 @@ msgstr "Laufdrall"
 
 # en: "Base"
 msgid "recordFields.base"
+msgstr "Basis"
+
+# en: "Base"
+msgid "powderCompare.base"
 msgstr "Basis"
 
 # en: "Base"
@@ -1099,6 +1159,14 @@ msgstr "Rang {order} der Abbrandgeschwindigkeit"
 msgid "chargeTarget.burnout"
 msgstr "Burnout"
 
+# en: "Burnout"
+msgid "powderCompare.burnout"
+msgstr "Burnout"
+
+# en: "Burnt at the muzzle"
+msgid "powderCompare.burntMuzzle"
+msgstr "An der Mündung verbrannt"
+
 # en: "Caliber"
 msgid "bullets.column.cal"
 msgstr "Kaliber"
@@ -1164,12 +1232,20 @@ msgid "events.cancel"
 msgstr "Abbrechen"
 
 # en: "Cancel"
+msgid "powderCompare.cancel"
+msgstr "Abbrechen"
+
+# en: "Cancel"
 msgid "log.cancel"
 msgstr "Abbrechen"
 
 # en: "Cancel ({pct, decimal} %)"
 msgid "holeDetection.cancelPercent"
 msgstr "Abbrechen ({pct, decimal} %)"
+
+# en: "Cancelled after {done, decimal} of {total, decimal} powders."
+msgid "powderCompare.cancelledAfterPowders"
+msgstr "Abgebrochen nach {done, decimal} von {total, decimal} Treibladungspulvern."
 
 # en: "Carbine"
 msgid "values.carbine"
@@ -1270,6 +1346,10 @@ msgstr "Hülse"
 # en: "Case capacity"
 msgid "units.quantity.capacity"
 msgstr "Hülsenvolumen"
+
+# en: "Case fill"
+msgid "powderCompare.caseFill"
+msgstr "Ladedichte"
 
 # en: "case length"
 msgid "cartridgeRecord.meaning.caseLength"
@@ -1379,6 +1459,10 @@ msgstr "Maßstab ändern"
 msgid "holeDetection.changeTarget"
 msgstr "Zielscheibe ändern"
 
+# en: "Charge"
+msgid "powderCompare.charge"
+msgstr "Treibladung"
+
 # en: "Charge ({unit})"
 msgid "targetEditor.chargeUnit"
 msgstr "Treibladung ({unit})"
@@ -1386,6 +1470,10 @@ msgstr "Treibladung ({unit})"
 # en: "Charge for a target"
 msgid "chargeTarget.title"
 msgstr "Treibladung für eine Zielgröße"
+
+# en: "Charge, {unit}"
+msgid "powderCompare.chargeUnit"
+msgstr "Treibladung, {unit}"
 
 # en: "Check the entry: a value is out of its range."
 msgid "log.outOfRange"
@@ -1479,17 +1567,45 @@ msgstr "Spiel {value}"
 msgid "cartridgeRecord.clearanceLine"
 msgstr "Spiel: {meaning}"
 
+# en: "Click a hole to add a shot to the active group."
+msgid "targetEditor.clickHoleAddShot"
+msgstr "Klicken Sie ein Schussloch an, um dem aktiven Schussbild einen Schuss hinzuzufügen."
+
+# en: "Click both ends of a known length."
+msgid "targetEditor.clickBothEndsKnown"
+msgstr "Beide Enden einer bekannten Länge anklicken."
+
 # en: "Click the corners of the region; click the last one again (Enter twice) to close it. {count, decimal} points. Esc cancels."
 msgid "holeDetection.clickCornersRegionClick"
 msgstr "Klicken Sie die Ecken des Bereichs; klicken Sie die letzte erneut (zweimal Eingabetaste), um ihn zu schließen. {count, decimal} Punkte. Esc bricht ab."
+
+# en: "Click the corners: top left, top right, bottom right, bottom left."
+msgid "targetEditor.clickCornersTopLeft"
+msgstr "Die Ecken anklicken: oben links, oben rechts, unten rechts, unten links."
 
 # en: "Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels."
 msgid "holeDetection.clickMiddleOneHole"
 msgstr "Klicken Sie in die Mitte eines Schusslochs ohne Aufdruck. Oder Pfeiltasten und Eingabetaste. Esc bricht ab."
 
+# en: "Click the photo point of target (0, 0). {keys}"
+msgid "targetEditor.clickPhotoPointTarget"
+msgstr "Klicken Sie den Fotopunkt der Zielscheibe (0, 0) an. {keys}"
+
+# en: "Click the point of aim of the active group. {keys}"
+msgid "targetEditor.clickPointAimActive"
+msgstr "Klicken Sie den Haltepunkt des aktiven Schussbilds an. {keys}"
+
 # en: "Click the point of aim on the target"
 msgid "targetEditor.clickPointAimTarget"
 msgstr "Klicken Sie den Haltepunkt auf der Zielscheibe an"
+
+# en: "Click the ring center, then a point on the ring."
+msgid "targetEditor.clickRingCenterThen"
+msgstr "Den Mittelpunkt des Rings anklicken, dann einen Punkt auf dem Ring."
+
+# en: "Click three points on the ring."
+msgid "targetEditor.clickThreePointsRing"
+msgstr "Drei Punkte auf dem Ring anklicken."
 
 # en: "Click two opposite corners of the region. Point {n, decimal} of 2. Or arrow keys and Enter. Esc cancels."
 msgid "holeDetection.clickTwoOppositeCorners"
@@ -1587,6 +1703,10 @@ msgstr "Zusammensetzung"
 msgid "primers.column.compound"
 msgstr "Zündsatz"
 
+# en: "Compute"
+msgid "powderCompare.compute"
+msgstr "Berechnen"
+
 # en: "computed"
 msgid "recordSources.kind.computed"
 msgstr "berechnet"
@@ -1606,6 +1726,14 @@ msgstr "Berechnet: Millers Regel bei 2800 ft/s, 59 °F, 29,92 inHg."
 # en: "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is not fitted to plastic tips."
 msgid "bullet.millerMethodPolymerTip"
 msgstr "Berechnet: Millers Regel bei 2800 ft/s, 59 °F, 29,92 inHg. Die Regel ist nicht an Kunststoffspitzen angepasst."
+
+# en: "Computing {done, decimal} of {total, decimal} powders"
+msgid "powderCompare.computingPowders"
+msgstr "{done, decimal} von {total, decimal} Treibladungspulvern berechnet"
+
+# en: "Computing powders."
+msgid "powderCompare.computingPowdersShort"
+msgstr "Treibladungspulver werden berechnet."
 
 # en: "Configuration"
 msgid "firearms.column.configuration"
@@ -1755,6 +1883,10 @@ msgstr "Dicke des Napfes"
 msgid "values.cupAndCore"
 msgstr "Mantel mit Kern"
 
+# en: "current"
+msgid "powderCompare.current"
+msgstr "aktuell"
+
 # en: "Curve values"
 msgid "powderRecord.curveValues"
 msgstr "Kurvenwerte"
@@ -1870,6 +2002,10 @@ msgstr "{name} wurde aus diesem Browser gelöscht."
 # en: "Deleted {name} from this browser."
 msgid "log.deleted"
 msgstr "{name} wurde aus diesem Browser gelöscht."
+
+# en: "Deleted {name}."
+msgid "targetEditor.deletedName"
+msgstr "{name} gelöscht."
 
 # en: "derived"
 msgid "recordSources.kind.derived"
@@ -2191,6 +2327,14 @@ msgstr "Energie, wie unter Pressures (Energies) gedruckt"
 msgid "targetEditor.enterName"
 msgstr "Geben Sie einen Namen ein."
 
+# en: "Enter a target above 0{unit}."
+msgid "chargeTarget.enterTargetAbove0"
+msgstr "Geben Sie eine Zielgröße über 0{unit} ein."
+
+# en: "Enter a target of at most {max}{unit}."
+msgid "chargeTarget.enterTargetAtMost"
+msgstr "Geben Sie eine Zielgröße von höchstens {max}{unit} ein."
+
 # en: "Enter the date."
 msgid "log.enterDate"
 msgstr "Geben Sie das Datum ein."
@@ -2202,6 +2346,10 @@ msgstr "Geben Sie zuerst die Schusslochgröße ein (Schritt 3)."
 # en: "Enter the hole size: the holes are found next."
 msgid "holeDetection.enterHoleSizeHoles"
 msgstr "Geben Sie die Schusslochgröße ein: Danach werden die Schusslöcher gesucht."
+
+# en: "Enter the known size first."
+msgid "targetEditor.enterKnownSizeFirst"
+msgstr "Geben Sie zuerst die bekannte Größe ein."
 
 # en: "Enter who confirmed the entry, or clear the day of the confirmation."
 msgid "log.enterConfirmedBy"
@@ -2238,6 +2386,10 @@ msgstr "ES"
 # en: "ES ({unit})"
 msgid "targetEditor.esUnit"
 msgstr "ES ({unit})"
+
+# en: "ES {value}"
+msgid "targetEditor.esValue"
+msgstr "ES {value}"
 
 # en: "ES, n = {n}"
 msgid "sessionSummary.esN"
@@ -2299,6 +2451,10 @@ msgstr "Ausgeschl."
 # en: "Exclude shot {n}"
 msgid "targetEditor.excludeShot"
 msgstr "Schuss {n} ausschließen"
+
+# en: "excluded"
+msgid "targetEditor.excludedShot"
+msgstr "ausgeschlossen"
 
 # en: "Excluded"
 msgid "sessionSummary.excluded"
@@ -2560,6 +2716,10 @@ msgstr "Feste Eingaben"
 msgid "recordFields.fixedInputsGroup"
 msgstr "Feste Eingaben des Modells"
 
+# en: "Flags"
+msgid "powderCompare.flags"
+msgstr "Markierungen"
+
 # en: "flake"
 msgid "values.flake"
 msgstr "Blättchenpulver"
@@ -2590,6 +2750,10 @@ msgstr "Für Werte setzen Sie zwei Punkte auf das Lineal und geben ihren Abstand
 
 # en: "Form"
 msgid "recordFields.form"
+msgstr "Form"
+
+# en: "Form"
+msgid "powderCompare.form"
 msgstr "Form"
 
 # en: "Form"
@@ -2680,6 +2844,10 @@ msgstr "Durchmesser über den Zügen"
 msgid "cartridgeRecord.meaning.grooveFrontAngle"
 msgstr "Winkel des vorderen Rillenkegels zur Achse (Tabelle III: Gürtelkegel)"
 
+# en: "Group"
+msgid "targetEditor.group"
+msgstr "Gruppe"
+
 # en: "Group {n}"
 msgid "targetEditor.groupN"
 msgstr "Schussbild {n}"
@@ -2695,6 +2863,10 @@ msgstr "Größter Schussabstand des Schussbilds über der Treibladung"
 # en: "Group name"
 msgid "targetEditor.groupName"
 msgstr "Name des Schussbilds"
+
+# en: "Group panels"
+msgid "targetEditor.groupPanels"
+msgstr "Bereiche des Schussbilds"
 
 # en: "Groups"
 msgid "targetEditor.groups"
@@ -2747,6 +2919,10 @@ msgstr "Bodenstempel"
 # en: "Hidden by the search or a filter"
 msgid "comparePicks.hiddenTitle"
 msgstr "Von der Suche oder einem Filter ausgeblendet"
+
+# en: "Hide panels"
+msgid "targetEditor.hidePanels"
+msgstr "Bereiche ausblenden"
 
 # en: "high"
 msgid "targetEditor.high"
@@ -2892,6 +3068,10 @@ msgstr "Innen-10 (X) unter den berücksichtigten Schüssen."
 msgid "workspace.inputs"
 msgstr "Eingaben"
 
+# en: "Inputs changed since these rows"
+msgid "powderCompare.inputsChangedSinceThese"
+msgstr "Eingaben seit diesen Zeilen geändert"
+
 # en: "Intended use"
 msgid "recordFields.intendedUse"
 msgstr "Verwendungszweck"
@@ -2908,6 +3088,10 @@ msgstr "International"
 msgid "disciplineRecord.international"
 msgstr "Internationale Disziplin"
 
+# en: "Its references go; the shots keep their target values."
+msgid "targetEditor.referencesGoShotsKeep"
+msgstr "Seine Referenzen entfallen; die Schüsse behalten ihre Zielscheibenwerte."
+
 # en: "jacket"
 msgid "construction.jacket"
 msgstr "Mantel"
@@ -2923,6 +3107,10 @@ msgstr "Manteldicke"
 # en: "jacketed"
 msgid "disciplines.rule.jacketed"
 msgstr "Mantelgeschoss"
+
+# en: "Key statistics"
+msgid "targetEditor.keyStatistics"
+msgstr "Kennwerte der Statistik"
 
 # en: "Key values"
 msgid "bulletCompare.keyValues"
@@ -2947,6 +3135,10 @@ msgstr "L3 bis Beginn des Übergangskegels (Freibohrung)"
 # en: "Lacquered steel"
 msgid "values.lacqueredSteel"
 msgstr "Lackierter Stahl"
+
+# en: "Ladder"
+msgid "targetEditor.ladder"
+msgstr "Ladeleiter"
 
 # en: "Ladder step"
 msgid "targetEditor.ladderStep"
@@ -3067,6 +3259,10 @@ msgstr "Unterhebelrepetierer"
 # en: "License"
 msgid "recordSources.column.license"
 msgstr "Lizenz"
+
+# en: "Line"
+msgid "targetEditor.line"
+msgstr "Linie"
 
 # en: "line {colour}"
 msgid "targets.ringLine"
@@ -3325,6 +3521,10 @@ msgid "cases.column.manufacturer"
 msgstr "Hersteller"
 
 # en: "Manufacturer"
+msgid "powderCompare.manufacturer"
+msgstr "Hersteller"
+
+# en: "Manufacturer"
 msgid "powders.column.manufacturer"
 msgstr "Hersteller"
 
@@ -3355,6 +3555,18 @@ msgstr "Ein Polygon auf dem Foto markieren"
 # en: "Mark a rectangle on the photo"
 msgid "holeDetection.markRectanglePhoto"
 msgstr "Ein Rechteck auf dem Foto markieren"
+
+# en: "Mark a reference first (Calibrate)."
+msgid "targetEditor.markReferenceFirstCalibrate"
+msgstr "Markieren Sie zuerst eine Referenz (Kalibrieren)."
+
+# en: "Mark a reference of known size (Calibrate) to place shots."
+msgid "targetEditor.markReferenceKnownSize"
+msgstr "Markieren Sie eine Referenz bekannter Größe (Kalibrieren), um Schüsse zu setzen."
+
+# en: "Mark a reference of known size (Expand, Calibrate) to place shots."
+msgid "targetEditor.markReferenceKnownSize2"
+msgstr "Markieren Sie eine Referenz bekannter Größe (Vergrößern, Kalibrieren), um Schüsse zu setzen."
 
 # en: "Mark on photo"
 msgid "targetEditor.markPhoto"
@@ -3567,6 +3779,14 @@ msgstr "Vorderlader"
 # en: "Muzzle velocity"
 msgid "chargeTarget.muzzleVelocity"
 msgstr "Mündungs­geschwindigkeit"
+
+# en: "Muzzle velocity"
+msgid "powderCompare.muzzleVelocity"
+msgstr "Mündungs­geschwindigkeit"
+
+# en: "Muzzle velocity, {unit}"
+msgid "powderCompare.muzzleVelocityUnit"
+msgstr "Mündungsgeschwindigkeit, {unit}"
 
 # en: "N"
 msgid "targetEditor.compassN"
@@ -3876,6 +4096,10 @@ msgstr "Keine angepassten Modellparameter"
 msgid "burnRate.noFit"
 msgstr "Keine angepassten Parameter: Die Anpassung an Ladetabellen braucht mindestens 10 Trainingszeilen aus mindestens 2 Patronen."
 
+# en: "No group"
+msgid "targetEditor.noGroup"
+msgstr "Kein Schussbild"
+
 # en: "No holes found from there: click the middle of a hole clear of print."
 msgid "holeDetection.noHolesFromThere"
 msgstr "Von dort aus wurden keine Schusslöcher gefunden: Klicken Sie in die Mitte eines Schusslochs ohne Aufdruck."
@@ -3887,6 +4111,10 @@ msgstr "Keine Schusslöcher gefunden: Wählen Sie ein Beispiel-Schussloch (Schri
 # en: "No holes proposed in the region."
 msgid "holeDetection.noHolesProposed"
 msgstr "Im Bereich wurden keine Schusslöcher vorgeschlagen."
+
+# en: "no limit"
+msgid "powderCompare.noLimit"
+msgstr "kein Grenzwert"
 
 # en: "No page stated"
 msgid "recordSources.noPage"
@@ -3964,6 +4192,10 @@ msgstr "nominelle Mindestdifferenz der veröffentlichten Maße"
 msgid "holeDetection.none"
 msgstr "keine"
 
+# en: "none"
+msgid "powderCompare.none"
+msgstr "keine"
+
 # en: "None"
 msgid "powderRecord.none"
 msgstr "Keine"
@@ -3995,6 +4227,14 @@ msgstr "Kein Treibladungspulver für Metallpatronen"
 # en: "Not allowed"
 msgid "disciplines.notAllowed"
 msgstr "Nicht erlaubt"
+
+# en: "Not computed: {reason}"
+msgid "powderCompare.notComputedReason"
+msgstr "Nicht berechnet: {reason}"
+
+# en: "Not deleted: the browser store refused."
+msgid "targetEditor.notDeletedStoreRefused"
+msgstr "Nicht gelöscht: Der Browserspeicher hat es abgelehnt."
 
 # en: "Not dimensioned: {parts}."
 msgid "bulletDrawing.notDimensioned"
@@ -4028,6 +4268,10 @@ msgstr "Nicht in diesem Browser"
 msgid "log.notInBrowser"
 msgstr "Nicht in diesem Browser"
 
+# en: "Not restored: the browser store refused."
+msgid "targetEditor.notRestoredStoreRefused"
+msgstr "Nicht wiederhergestellt: Der Browserspeicher hat es abgelehnt."
+
 # en: "Not saved: {reason}"
 msgid "events.notSaved"
 msgstr "Nicht gespeichert: {reason}"
@@ -4035,6 +4279,18 @@ msgstr "Nicht gespeichert: {reason}"
 # en: "Not saved: {reason}"
 msgid "log.notSaved"
 msgstr "Nicht gespeichert: {reason}"
+
+# en: "Not saved: {reason}"
+msgid "targetEditor.notSavedReason"
+msgstr "Nicht gespeichert: {reason}"
+
+# en: "Not saved: the browser store could not be read. {reason}"
+msgid "targetEditor.notSavedStoreUnread"
+msgstr "Nicht gespeichert: Der Browserspeicher konnte nicht gelesen werden. {reason}"
+
+# en: "Not saved: the browser store refused the sheet. {reason} Free browser storage or allow site storage for this page, then edit the sheet again."
+msgid "targetEditor.notSavedStoreRefused"
+msgstr "Nicht gespeichert: Der Browserspeicher hat das Blatt abgelehnt. {reason} Geben Sie Browserspeicher frei oder erlauben Sie Websitedaten für diese Seite und bearbeiten Sie das Blatt dann erneut."
 
 # en: "Not stated"
 msgid "targets.notStated"
@@ -4070,6 +4326,10 @@ msgstr "Notizen"
 
 # en: "Notes"
 msgid "log.notes"
+msgstr "Notizen"
+
+# en: "Notes"
+msgid "targetEditor.notes"
 msgstr "Notizen"
 
 # en: "Now {count, decimal} corners."
@@ -4212,6 +4472,10 @@ msgstr "Optik, Einschießentfernung"
 msgid "disciplines.rule.optical"
 msgstr "optisch"
 
+# en: "Or arrow keys and Enter. Esc cancels."
+msgid "targetEditor.arrowKeysEnterEsc"
+msgstr "Oder Pfeiltasten und Eingabetaste. Esc bricht ab."
+
 # en: "orange"
 msgid "targets.color.orange"
 msgstr "orange"
@@ -4312,6 +4576,14 @@ msgstr "Gestrichelt gezeichnete Teile sind angenommen und stammen nicht aus dem 
 msgid "chargeTarget.peakPressure"
 msgstr "Gasdruck"
 
+# en: "Peak pressure"
+msgid "powderCompare.peakPressure"
+msgstr "Gasdruck"
+
+# en: "Peak pressure, {unit}"
+msgid "powderCompare.peakPressureUnit"
+msgstr "Gasdruck, {unit}"
+
 # en: "Penalties"
 msgid "events.penalties"
 msgstr "Strafen"
@@ -4319,6 +4591,10 @@ msgstr "Strafen"
 # en: "per load row"
 msgid "recordFields.perLoadRow"
 msgstr "je Zeile der Ladetabelle"
+
+# en: "Percent of maximum"
+msgid "powderCompare.percentMaximum"
+msgstr "Prozent vom Maximum"
 
 # en: "Photo"
 msgid "targetEditor.photo"
@@ -4331,6 +4607,10 @@ msgstr "Foto von der Kamera"
 # en: "Photo guide: {rule}"
 msgid "holeDetection.photoGuide"
 msgstr "Fotoanleitung: {rule}"
+
+# en: "Photo kept in this browser. Looking for the target and the holes."
+msgid "targetEditor.photoKeptBrowserLooking"
+msgstr "Foto in diesem Browser behalten. Zielscheibe und Schusslöcher werden gesucht."
 
 # en: "Photo: add, replace or remove; contrast and darken"
 msgid "targetEditor.photoAddReplaceRemove"
@@ -4388,6 +4668,14 @@ msgstr "von Hand platzieren"
 msgid "bulletPhoto.placeScalePoints"
 msgstr "Maßstabspunkte setzen"
 
+# en: "Place shots"
+msgid "targetEditor.placeShots"
+msgstr "Schüsse setzen"
+
+# en: "Place shots, then click each hole."
+msgid "targetEditor.placeShotsThenClick"
+msgstr "Setzen Sie Schüsse und klicken Sie dann jedes Schussloch an."
+
 # en: "plated"
 msgid "values.plated"
 msgstr "galvanisch beschichtet"
@@ -4428,6 +4716,10 @@ msgstr "Polymerspitze"
 msgid "disciplines.row.positions"
 msgstr "Anschläge"
 
+# en: "Powder"
+msgid "powderCompare.powder"
+msgstr "Treibladungspulver"
+
 # en: "Powder burn rates"
 msgid "page.powdersBurnRates"
 msgstr "Abbrandgeschwindigkeit der Treibladungspulver"
@@ -4451,6 +4743,14 @@ msgstr "Treibladungspulver"
 # en: "Powders by burn rate"
 msgid "burnRateCompare.byRate"
 msgstr "Treibladungspulver nach Abbrandgeschwindigkeit"
+
+# en: "Powders for this load"
+msgid "powderCompare.powdersLoad"
+msgstr "Treibladungspulver für diese Laborierung"
+
+# en: "Powders for this load (simulation)"
+msgid "powderCompare.powdersLoadSimulation"
+msgstr "Treibladungspulver für diese Laborierung (Simulation)"
 
 # en: "Powders in the overlay"
 msgid "burnRateCompare.powders"
@@ -4491,6 +4791,14 @@ msgstr "Druckexponent ungleich 1: Die Abbrandgeschwindigkeit je Druck hängt vom
 # en: "Pressure range"
 msgid "chargeTarget.pressureRange"
 msgstr "Druckbereich"
+
+# en: "Pressure range"
+msgid "powderCompare.pressureRange"
+msgstr "Druckbereich"
+
+# en: "Pressure range, {unit}"
+msgid "powderCompare.pressureRangeUnit"
+msgstr "Druckbereich, {unit}"
 
 # en: "Primer data is unavailable right now."
 msgid "states.unavailable.primer"
@@ -4535,6 +4843,10 @@ msgstr "Liste der Wettkämpfe drucken"
 # en: "Print the open event"
 msgid "events.printOpen"
 msgstr "Den geöffneten Wettkampf drucken"
+
+# en: "Print: what Fit shows at a stated scale with a ruler, and the statistics (also {shortcut})"
+msgid "targetEditor.printWhatFitShows"
+msgstr "Drucken: was Anpassen zeigt, in einem angegebenen Maßstab mit Lineal, und die Statistik (auch {shortcut})"
 
 # en: "printed {raw}"
 msgid "cartridgeRecord.note.printed"
@@ -4720,6 +5032,10 @@ msgstr "Verhältnis der spezifischen Wärmen"
 msgid "sessionSummary.read"
 msgstr "{strings}, {shots} gelesen."
 
+# en: "Read the target as a percentage of the cartridge's CIP Pmax"
+msgid "powderCompare.readTargetPercentageCartridge"
+msgstr "Ziel als Prozentsatz des CIP-Pmax der Patrone lesen"
+
 # en: "Read the value as a percentage of the cartridge's CIP Pmax"
 msgid "chargeTarget.percentOfCipPmax"
 msgstr "Wert als Prozentsatz des CIP-Pmax der Patrone lesen"
@@ -4751,6 +5067,10 @@ msgstr "Empfohlener Drall"
 # en: "Rect."
 msgid "holeDetection.rect"
 msgstr "Rechteck"
+
+# en: "Rectangle, four corners"
+msgid "targetEditor.rectangleFourCorners"
+msgstr "Rechteck, vier Ecken"
 
 # en: "red"
 msgid "targets.color.red"
@@ -4784,6 +5104,10 @@ msgstr "Bereich aus"
 msgid "holeDetection.regionOffTargetFound"
 msgstr "Bereich aus: die im Foto gefundene Zielscheibe"
 
+# en: "Remove"
+msgid "targetEditor.remove"
+msgstr "Entfernen"
+
 # en: "Remove {label}"
 msgid "targetEditor.removeLabel"
 msgstr "{label} entfernen"
@@ -4808,6 +5132,10 @@ msgstr "Foto entfernen"
 msgid "events.removeSeries"
 msgstr "Serie {n} entfernen"
 
+# en: "Remove the photo?"
+msgid "targetEditor.removePhotoQuestion"
+msgstr "Das Foto entfernen?"
+
 # en: "Removed optic"
 msgid "firearms.removedOptic"
 msgstr "Entfernte Optik"
@@ -4828,6 +5156,10 @@ msgstr "Ersetzen"
 msgid "log.replace"
 msgstr "Ersetzen"
 
+# en: "Replace"
+msgid "targetEditor.replace"
+msgstr "Ersetzen"
+
 # en: "Replace entries?"
 msgid "log.replaceEntries"
 msgstr "Einträge ersetzen?"
@@ -4839,6 +5171,10 @@ msgstr "Wettkämpfe ersetzen?"
 # en: "Replace photo"
 msgid "targetEditor.replacePhoto"
 msgstr "Foto ersetzen"
+
+# en: "Replace the photo?"
+msgid "targetEditor.replacePhotoQuestion"
+msgstr "Das Foto ersetzen?"
 
 # en: "Reserve, %"
 msgid "matchRounds.reserve"
@@ -4862,6 +5198,10 @@ msgstr "Ergebnis"
 
 # en: "Result"
 msgid "events.column.state"
+msgstr "Ergebnis"
+
+# en: "Result"
+msgid "powderCompare.result"
 msgstr "Ergebnis"
 
 # en: "Result"
@@ -5004,6 +5344,14 @@ msgstr "Ringwertung, mit Zehnteln, wo die Scheibe sie hat; X: Innen-10. Ausgesch
 msgid "events.shotsHint"
 msgstr "Wertungen durch Leerzeichen getrennt, etwa 10 9 10."
 
+# en: "Ring, center and edge"
+msgid "targetEditor.ringCenterEdge"
+msgstr "Ring, Mittelpunkt und Rand"
+
+# en: "Ring, three points"
+msgid "targetEditor.ringThreePoints"
+msgstr "Ring, drei Punkte"
+
 # en: "Rings"
 msgid "targets.facet.rings"
 msgstr "Ringe"
@@ -5124,6 +5472,10 @@ msgstr "Eintrag speichern"
 msgid "events.saveEvent"
 msgstr "Wettkampf speichern"
 
+# en: "Saved in this browser."
+msgid "targetEditor.savedBrowser"
+msgstr "In diesem Browser gespeichert."
+
 # en: "Saved loads of another cartridge, or no saved load."
 msgid "firearms.column.notesHelp"
 msgstr "Gespeicherte Laborierungen einer anderen Patrone oder keine gespeicherte Laborierung."
@@ -5155,6 +5507,14 @@ msgstr "Maßstab aus der eingegebenen Gesamtlänge, ohne Lineal: Die Breiten set
 # en: "Score"
 msgid "targetEditor.score"
 msgstr "Wertung"
+
+# en: "score {score}"
+msgid "targetEditor.scoreValue"
+msgstr "Wertung {score}"
+
+# en: "Score {score}"
+msgid "targetEditor.scoreLine"
+msgstr "Wertung {score}"
 
 # en: "Scoring"
 msgid "faceRecord.column.scoring"
@@ -5364,6 +5724,10 @@ msgstr "Schuss: Schüsse per Klick oder Tippen zum aktiven Schussbild hinzufüge
 msgid "burnRate.unfit.shotgun"
 msgstr "Treibladungspulver für Flinten: Der Hersteller nennt nur die Verwendung in Flinten, und die App berechnet Metallpatronen."
 
+# en: "Shotgun-only powders left out: {shotgun, decimal}"
+msgid "powderCompare.shotgunOnlyPowdersLeft"
+msgstr "Ausgelassene Treibladungspulver nur für Flinten: {shotgun, decimal}"
+
 # en: "Shots"
 msgid "events.shots"
 msgstr "Schüsse"
@@ -5384,12 +5748,20 @@ msgstr "Schüsse"
 msgid "targetEditor.shots"
 msgstr "Schüsse"
 
+# en: "Shots ({count, decimal})"
+msgid "targetEditor.shotsCount"
+msgstr "Schüsse ({count, decimal})"
+
 # en: "Shots in the statistics; excluded shots are shown and counted, not measured."
 msgid "targetEditor.shotsStatisticsExcludedShots"
 msgstr "Schüsse in der Statistik; ausgeschlossene Schüsse werden angezeigt und gezählt, aber nicht gemessen."
 
 # en: "Shots of {name}"
 msgid "sessionSummary.shotsOf"
+msgstr "Schüsse von {name}"
+
+# en: "Shots of {name}"
+msgid "targetEditor.shotsOf"
 msgstr "Schüsse von {name}"
 
 # en: "Shots per event"
@@ -5415,6 +5787,10 @@ msgstr "Schulter"
 # en: "shoulder diameter at L1"
 msgid "cartridgeRecord.meaning.shoulderDiameter"
 msgstr "Schulterdurchmesser bei L1"
+
+# en: "Show panels"
+msgid "targetEditor.showPanels"
+msgstr "Bereiche einblenden"
 
 # en: "Sighters"
 msgid "disciplines.row.sighters"
@@ -5576,6 +5952,14 @@ msgstr "stehend"
 msgid "recordFields.startPressure"
 msgstr "Startdruck"
 
+# en: "Statistics"
+msgid "targetEditor.statisticsTitle"
+msgstr "Statistik"
+
+# en: "Statistics and shots"
+msgid "targetEditor.statisticsShots"
+msgstr "Statistik und Schüsse"
+
 # en: "Statistics of {name}"
 msgid "targetEditor.statistics"
 msgstr "Statistik von {name}"
@@ -5583,6 +5967,10 @@ msgstr "Statistik von {name}"
 # en: "Statistics per string, excluded shots left out ({unit})"
 msgid "sessionSummary.statsTitle"
 msgstr "Statistik je Schussreihe, ausgeschlossene Schüsse nicht gezählt ({unit})"
+
+# en: "Stats"
+msgid "targetEditor.stats"
+msgstr "Statistik"
 
 # en: "Steady, not soft"
 msgid "photoQuality.rule.steady"
@@ -5599,6 +5987,10 @@ msgstr "Stahl"
 # en: "Step"
 msgid "targetEditor.step"
 msgstr "Schritt"
+
+# en: "Stopped. {reason}"
+msgid "powderCompare.stoppedReason"
+msgstr "Angehalten. {reason}"
 
 # en: "Stored"
 msgid "log.stored"
@@ -5635,6 +6027,10 @@ msgstr "Etwa Ringe oder eine Platzierung."
 # en: "Sum of the ring values of the included shots; decimal sum in brackets."
 msgid "targetEditor.sumRingValuesIncluded"
 msgstr "Summe der Ringwertungen der berücksichtigten Schüsse; Dezimalsumme in Klammern."
+
+# en: "Summary"
+msgid "targetEditor.summary"
+msgstr "Zusammenfassung"
 
 # en: "Summary year"
 msgid "logSummary.summaryYear"
@@ -5713,6 +6109,11 @@ msgctxt "charge"
 msgid "chargeTarget.target"
 msgstr "Zielgröße"
 
+# en: "Target"
+msgctxt "charge"
+msgid "powderCompare.target"
+msgstr "Zielgröße"
+
 # en: "Target data is unavailable right now."
 msgid "states.unavailable.targetFace"
 msgstr "Die Scheibendaten sind gerade nicht verfügbar."
@@ -5725,6 +6126,10 @@ msgstr "Scheiben-Editor"
 msgid "holeDetection.targetPhoto"
 msgstr "Scheibe auf dem Foto"
 
+# en: "Target peak pressure"
+msgid "powderCompare.targetPeakPressure"
+msgstr "Ziel-Gasdruck"
+
 # en: "Target sheet"
 msgid "events.targetSheet"
 msgstr "Blatt mit Zielscheibe"
@@ -5732,6 +6137,14 @@ msgstr "Blatt mit Zielscheibe"
 # en: "Target sheet"
 msgid "targetEditor.targetSheet"
 msgstr "Blatt mit Zielscheibe"
+
+# en: "Target sheet {n, decimal}"
+msgid "targetEditor.targetSheetN"
+msgstr "Blatt mit Zielscheibe {n, decimal}"
+
+# en: "Target sheet tools"
+msgid "targetEditor.targetSheetTools"
+msgstr "Werkzeuge des Blatts mit Zielscheibe"
 
 # en: "Targets"
 msgid "disciplines.column.faces"
@@ -5889,6 +6302,10 @@ msgstr "Die Disziplinen dieses Verbands"
 msgid "faceRecord.eventsCaption"
 msgstr "Die Wettbewerbe und Disziplinen, in denen auf diese Scheibe Schüsse abgegeben werden"
 
+# en: "The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP."
+msgid "targetEditor.fileNotPhoto"
+msgstr "Die Datei ist kein Foto: JPEG, PNG, WebP, GIF, AVIF, HEIC oder BMP."
+
 # en: "The file was not read."
 msgid "sessionSummary.notRead"
 msgstr "Die Datei wurde nicht gelesen."
@@ -5945,6 +6362,10 @@ msgstr "Der Kopf ist eine tangentiale Ogive: Ihr Kreis berührt den Schaft."
 msgid "bulletPhoto.noArc"
 msgstr "Der Kopf ist kein Kreisbogen (eine Hybrid- oder andere Form): Es wird kein Ogivenradius und kein Rt/R angegeben, und die Kopflänge beginnt dort, wo der Schaft endet, innerhalb eines Bereichs."
 
+# en: "The photo could not be read."
+msgid "targetEditor.photoNotRead"
+msgstr "Das Foto konnte nicht gelesen werden."
+
 # en: "The photo decodes at another size than it is shown; detection is off for it."
 msgid "holeDetection.photoDecodesAnotherSize"
 msgstr "Das Foto wird in einer anderen Größe dekodiert, als es angezeigt wird; die Erkennung ist dafür abgeschaltet."
@@ -5972,6 +6393,10 @@ msgstr "Das Foto ist auf der längeren Seite nur {n} px groß."
 # en: "The photo is soft: the edges of the target are blurred."
 msgid "photoQuality.blurred"
 msgstr "Das Foto ist unscharf: Die Kanten der Zielscheibe sind verwischt."
+
+# en: "The photo of this sheet is not in this browser; its shots are kept."
+msgid "targetEditor.photoSheetBrowserShots"
+msgstr "Das Foto dieses Blatts befindet sich nicht in diesem Browser; seine Schüsse bleiben erhalten."
 
 # en: "The photo point of target (0, 0). Shots stay on their holes."
 msgid "targetEditor.photoPointTarget0"
@@ -6041,6 +6466,10 @@ msgstr "Die Scheibe der Sportordnung, aus dem Spiegel und den Ringlinien gefunde
 msgid "chargeTarget.toleranceNotReached"
 msgstr "Die Suche hat die geforderten Toleranzen nicht erreicht."
 
+# en: "The shots stay on a drawn target."
+msgid "targetEditor.shotsStayDrawnTarget"
+msgstr "Die Schüsse bleiben auf einer gezeichneten Zielscheibe."
+
 # en: "The simulation does not reach this high a value; over the charges tried it spans {low} to {high}."
 msgid "chargeTarget.aboveRange"
 msgstr "Die Simulation erreicht keinen so hohen Wert; über die probierten Treibladungen reicht er von {low} bis {high}."
@@ -6088,6 +6517,10 @@ msgstr "Der Wert schneidet die Zielgröße bei mehr als einer Treibladung."
 # en: "Thermochemistry"
 msgid "recordFields.thermochemistry"
 msgstr "Thermochemie"
+
+# en: "These points give no scale: three lie on one line."
+msgid "targetEditor.pointsGiveNoScale"
+msgstr "Diese Punkte ergeben keinen Maßstab: Drei liegen auf einer Linie."
 
 # en: "This browser cannot read the photograph."
 msgid "bulletPhoto.unreadable"
@@ -6269,6 +6702,10 @@ msgstr "Art"
 msgid "holeDetection.typed"
 msgstr "eingegeben"
 
+# en: "Typed charge"
+msgid "powderCompare.typedCharge"
+msgstr "Eingegebene Treibladung"
+
 # en: "Typed model parameters"
 msgid "burnRate.typed"
 msgstr "Eingegebene Modellparameter"
@@ -6313,6 +6750,10 @@ msgstr "Einheiten: {preset}"
 msgid "units.nameCustom"
 msgstr "Einheiten: {preset}, benutzerdefiniert"
 
+# en: "unknown"
+msgid "powderCompare.unknown"
+msgstr "unbekannt"
+
 # en: "Untick"
 msgid "comparePicks.untick"
 msgstr "Abwählen"
@@ -6348,6 +6789,10 @@ msgstr "In der Werkbank verwenden"
 # en: "Use in workbench: {name}"
 msgid "bulletCompare.useInWorkbenchFor"
 msgstr "In der Werkbank verwenden: {name}"
+
+# en: "Use this powder in the workbench"
+msgid "powderCompare.usePowderWorkbench"
+msgstr "Dieses Treibladungspulver in der Werkbank verwenden"
 
 # en: "Value"
 msgid "bulletPhoto.value"
@@ -6536,3 +6981,7 @@ msgstr "Ihre eigene Aufzeichnung; ob ein Verein oder eine Behörde sie anerkennt
 # en: "z1 {z}"
 msgid "powderRecord.z1"
 msgstr "z1 {z}"
+
+# en: "Zero target"
+msgid "targetEditor.zeroTarget"
+msgstr "Zielscheibe zum Einschießen"
