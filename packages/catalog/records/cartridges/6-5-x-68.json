@@ -388,7 +388,7 @@
       },
       {
         "title": "Wikipedia, 6.5×68mm",
-        "url": "https://en.wikipedia.org/w/index.php?title=6.5×68mm&oldid=1292891119",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5%C3%9768mm&oldid=1292891119",
         "retrieved": "2026-11-26",
         "license": "CC-BY-SA-4.0",
         "fields": ["defaults.primerSize", "defaults.primerMagnum"],

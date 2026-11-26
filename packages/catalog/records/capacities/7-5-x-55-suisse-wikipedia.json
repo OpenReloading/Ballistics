@@ -10,10 +10,8 @@
     "kind": "published",
     "sources": [
       {
-        "title": "Wikipedia, 7.5×55mm Swiss",
-        "url": "https://en.wikipedia.org/w/index.php?title=7.5%C3%9755mm_Swiss&oldid=1378227189",
+        "source": "wikipedia-7-5x55mm-swiss",
         "retrieved": "2026-11-18",
-        "license": "CC-BY-SA-4.0",
         "note": "Infobox, Case capacity: 4.22 cm3 (65.1 gr H2O). The article cites the C.I.P. TDCC sheet 7,5 x 55 Suisse (revision 2016-05-18), which states no case capacity."
       }
     ]
