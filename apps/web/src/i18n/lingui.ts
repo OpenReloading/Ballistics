@@ -25,13 +25,15 @@ const instances: Record<Language, I18n> = {
   de: instance('de', {}),
 }
 
-/** The app's compiled messages of each language but English: its own chunk, so English pages ship without it. */
-const catalogs = { de: () => import('../locales/de.json') }
+/** The app's compiled messages of each language but English, the views' and the message table's: their own chunks, so English pages ship without them. */
+const catalogs = {
+  de: () => Promise.all([import('../locales/de.json'), import('../locales/table/de.json')]),
+}
 
-/** Loads the app's messages of `language` into its instance and returns it; `language.ts` awaits it before showing the language. */
+/** Loads the app's messages of `language` into its instance and returns it; `language.ts` awaits it with the message table before showing the language. */
 export async function loadLingui(language: keyof typeof catalogs) {
-  const { default: catalog } = await catalogs[language]()
-  instances[language].load(language, compiled(catalog))
+  const [views, table] = await catalogs[language]()
+  instances[language].load(language, { ...compiled(views.default), ...compiled(table.default) })
   return instances[language]
 }
 

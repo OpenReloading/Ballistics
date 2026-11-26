@@ -3,7 +3,7 @@ import type { ExteriorIssue, InteriorIssue, LoadFileIssue } from '@rangefoundry/
 import type { GroupStatisticsIssue } from '@rangefoundry/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@rangefoundry/statistics'
 import type { RecordNotFoundIssue, UseCaseIssue } from '@rangefoundry/use-cases'
-import { english, type Message, msg } from '../i18n/translate.ts'
+import { english, type Message } from '../i18n/translate.ts'
 import type { Described } from './core-messages.ts'
 import { gapWords } from './resistance-gaps.ts'
 
@@ -409,111 +409,350 @@ const exteriorWords = {
 
 /** The codes interior shares with exterior and statistics take their words there. */
 const interiorWords = {
-  gasVelocityFactorNegative: msg('Gas velocity factor must not be negative.'),
-  muzzleVelocityNegative: msg('Muzzle velocity must not be negative.'),
-  chargeMassNegative: msg('Charge mass must not be negative.'),
-  projectileMassNotPositive: msg('Projectile mass must be positive.'),
-  firearmMassNotPositive: msg('Firearm mass must be positive.'),
-  loadRatioTargetNeedsBulkDensity: msg('the load ratio target needs the bulk density'),
-  bulkDensityNotPositive: msg('bulk density must be above 0'),
-  targetValueNotPositive: msg('target value must be above 0'),
-  modelLeavesBarrelBeforeWindowEnd: msg(
-    'the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction',
-  ),
-  traceWindowTooShort: msg('too few trace samples in the window'),
-  traceNoPositivePressure: msg('the trace has no positive pressure'),
-  sigmaPartial: msg('sigma: on every trace or on none'),
-  chargeNotPositive: msg('charge must be positive'),
-  noTrace: msg('at least one trace'),
-  curveFitNeedsTwoStageVivacity: msg('a curve fit needs a vivacity burn law with a two-stage form'),
-  fallFractionOutsideUnit: msg('fallFraction must lie in (0, 1)'),
-  exponentStartNotPositive: msg('exponent needs a start value above 0'),
-  transitionStartNotBelowOne: msg('transition needs a start value below 1'),
-  formSlopeStartNotPositive: msg('formSlope needs a start value above 0'),
-  curveFitParametersInvalid: msg(
-    'parameters: burnRate, formSlope, transition and exponent, each at most once',
-  ),
-  sigmaNotPositive: msg('sigma must be positive'),
-  traceSensorUnknown: msg('trace.sensor: breech, mean or base'),
-  traceInvalid: msg(
-    'trace: equal numbers of finite, strictly increasing times and finite pressures, at least 2',
-  ),
-  traceNeverFalls: msg('the trace never falls to the fall fraction of its peak after the peak'),
-  rangeWithoutWidth: msg('the range has no width'),
-  countNotPositiveInteger: msg('count must be a positive integer'),
-  burnCoefficientOrEnergyNotPositive: msg('burn coefficient and energy must be positive'),
-  noPoint: msg('at least one point'),
-  inputUncertaintyNegative: msg('{input}: standardUncertainty must be 0 or above'),
-  noHeldOutString: msg('at least one held-out string'),
-  velocitySigmaMissing: msg('velocitySigma on every point'),
-  targetPowderNotInFit: msg('the powder of the target must be one of the fit'),
-  velocitySigmaNegative: msg('velocitySigma must be 0 or above'),
-  pooledFitNoCovariance: msg('the pooled fit has no covariance'),
-  groupPriorNotPositive: msg('prior {kind} of {group}: value and sigma above 0'),
-  priorPowderNotInSessions: msg('a prior needs its powder in the sessions'),
-  sessionsBurnKindDiffers: msg('the sessions of a powder share one burn kind'),
-  barrelOrTemperatureOnPoint: msg('barrel length and temperature per session'),
-  ladderChargeOrVelocityNotPositive: msg('ladder charge and velocity positive'),
-  propellantTemperatureNotPositive: msg('propellantTemperature must be positive'),
-  barrelLengthNotPositive: msg('barrelLength must be positive'),
-  sessionWithoutLadderPoint: msg('at least one ladder point per session'),
-  rifleOrLotSigmaNotPositive: msg('rifleSigma and lotSigma must be positive'),
-  pooledFitParametersInvalid: msg(
-    'parameters: burnRate, temperatureFactor, energy, each at most once, burnRate always',
-  ),
-  priorParameterNotFitted: msg('a prior needs its parameter in parameters'),
-  burnCoefficientNotFitted: msg('the burn coefficient is always fitted'),
-  stringWithoutVelocity: msg('every string needs at least one velocity'),
-  fitNoCovariance: msg('the fit has no covariance: add rows or velocity sigmas'),
-  boreDiameterNotPositive: msg('boreDiameter must be positive'),
-  startPressureTooLow: msg(
-    'startPressure must be above the ignition pressure and the resistance at travel 0',
-  ),
-  domainMarginOutsideRange: msg('domainMargin must lie in [0, 1)'),
-  priorsNeedVelocitySigmas: msg('priors and huberThreshold need velocity sigmas'),
-  huberThresholdNotPositive: msg('huberThreshold must be positive'),
-  temperatureFactorNeedsSensitivity: msg(
-    'temperatureFactor needs the load to carry a temperature sensitivity other than 0',
-  ),
-  fitParametersInvalid: msg('parameters: {parameters}, each at most once'),
-  pressuresNeedVelocitySigmas: msg('pressures need velocity sigmas'),
-  velocitySigmaPartial: msg('velocitySigma on all points or none'),
-  pressureBasisUnknown: msg('pressureBasis must be one of {bases}'),
-  pressureWithoutBasis: msg('peakPressure and pressureBasis together'),
-  pressureWithoutSigma: msg('peakPressure and pressureSigma together'),
-  pressureSigmaNotPositive: msg('pressureSigma must be positive'),
-  ladderPressureNotPositive: msg('ladder pressure must be positive'),
-  velocitySigmaNotPositive: msg('velocitySigma must be positive'),
-  ladderVelocityNotPositive: msg('ladder velocity must be positive'),
-  ladderChargeNotPositive: msg('ladder charge must be positive'),
-  noLadderPoint: msg('at least one ladder point'),
-  heightsOrVelocitiesNotFinite: msg('heights and velocities must be finite'),
-  shotWithoutHeightOrVelocity: msg('each shot needs a height and a velocity'),
-  chargeTooFewShots: msg('each charge needs at least two shots'),
-  slopeNotFinite: msg('slope must be finite'),
-  ladderTooFewCharges: msg('a ladder needs at least three charges'),
-  ladderLowestChargeNotPositive: msg('ladder charge {charge} kg must be above 0'),
-  ladderAroundNeedsOddCount: msg('a ladder around the charge needs an odd count'),
-  ladderStepCountInvalid: msg('ladder steps must be an integer of at least 1'),
-  ladderStepNotPositive: msg('ladder step must be above 0'),
-  ladderStartNotPositive: msg('ladder start charge must be above 0'),
-  boreResistanceNeedsValues: msg('the bore resistance of the powder needs {missing}'),
-  powderWithoutInteriorModel: msg('the powder has no interior model'),
-  bulletConstructionUnknown: msg('unknown bullet construction {construction}'),
-  barrelNotPositive: msg('barrel {barrel} m must be a positive number'),
-  ladderTooFewStrings: msg('a ladder needs at least two strings'),
-  chargesEqual: msg('charges must differ'),
-  stringTooFewShots: msg('each string needs at least two shots'),
-  standardDeviationNegative: msg('standard deviation must be 0 or more'),
-  meanNotFinite: msg('mean must be finite'),
-  dynamicVivacityRangeInvalid: msg('dynamic vivacity: need 0 <= from < to <= 1'),
-  dynamicVivacityExponentNotOne: msg('dynamic vivacity: exponent must be 1'),
-  priorValueOrSigmaNotPositive: msg('prior {name}: value above 0, sigma above 0'),
-  priorValueBelowFloorOrSigmaNotPositive: msg('prior {name}: value above the floor, sigma above 0'),
-  pressureBasesMixed: msg('pressure rows use more than one basis: {rows}'),
+  gasVelocityFactorNegative: /*i18n*/ {
+    id: 'refusal.gasVelocityFactorNegative',
+    message: 'Gas velocity factor must not be negative.',
+  },
+  muzzleVelocityNegative: /*i18n*/ {
+    id: 'refusal.muzzleVelocityNegative',
+    message: 'Muzzle velocity must not be negative.',
+  },
+  chargeMassNegative: /*i18n*/ {
+    id: 'refusal.chargeMassNegative',
+    message: 'Charge mass must not be negative.',
+  },
+  projectileMassNotPositive: /*i18n*/ {
+    id: 'refusal.projectileMassNotPositive',
+    message: 'Projectile mass must be positive.',
+  },
+  firearmMassNotPositive: /*i18n*/ {
+    id: 'refusal.firearmMassNotPositive',
+    message: 'Firearm mass must be positive.',
+  },
+  loadRatioTargetNeedsBulkDensity: /*i18n*/ {
+    id: 'refusal.loadRatioTargetNeedsBulkDensity',
+    message: 'the load ratio target needs the bulk density',
+  },
+  bulkDensityNotPositive: /*i18n*/ {
+    id: 'refusal.bulkDensityNotPositive',
+    message: 'bulk density must be above 0',
+  },
+  targetValueNotPositive: /*i18n*/ {
+    id: 'refusal.targetValueNotPositive',
+    message: 'target value must be above 0',
+  },
+  modelLeavesBarrelBeforeWindowEnd: /*i18n*/ {
+    id: 'refusal.modelLeavesBarrelBeforeWindowEnd',
+    message:
+      'the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction',
+  },
+  traceWindowTooShort: /*i18n*/ {
+    id: 'refusal.traceWindowTooShort',
+    message: 'too few trace samples in the window',
+  },
+  traceNoPositivePressure: /*i18n*/ {
+    id: 'refusal.traceNoPositivePressure',
+    message: 'the trace has no positive pressure',
+  },
+  sigmaPartial: /*i18n*/ {
+    id: 'refusal.sigmaPartial',
+    message: 'sigma: on every trace or on none',
+  },
+  chargeNotPositive: /*i18n*/ {
+    id: 'refusal.chargeNotPositive',
+    message: 'charge must be positive',
+  },
+  noTrace: /*i18n*/ { id: 'refusal.noTrace', message: 'at least one trace' },
+  curveFitNeedsTwoStageVivacity: /*i18n*/ {
+    id: 'refusal.curveFitNeedsTwoStageVivacity',
+    message: 'a curve fit needs a vivacity burn law with a two-stage form',
+  },
+  fallFractionOutsideUnit: /*i18n*/ {
+    id: 'refusal.fallFractionOutsideUnit',
+    message: 'fallFraction must lie in (0, 1)',
+  },
+  exponentStartNotPositive: /*i18n*/ {
+    id: 'refusal.exponentStartNotPositive',
+    message: 'exponent needs a start value above 0',
+  },
+  transitionStartNotBelowOne: /*i18n*/ {
+    id: 'refusal.transitionStartNotBelowOne',
+    message: 'transition needs a start value below 1',
+  },
+  formSlopeStartNotPositive: /*i18n*/ {
+    id: 'refusal.formSlopeStartNotPositive',
+    message: 'formSlope needs a start value above 0',
+  },
+  curveFitParametersInvalid: /*i18n*/ {
+    id: 'refusal.curveFitParametersInvalid',
+    message: 'parameters: burnRate, formSlope, transition and exponent, each at most once',
+  },
+  sigmaNotPositive: /*i18n*/ { id: 'refusal.sigmaNotPositive', message: 'sigma must be positive' },
+  traceSensorUnknown: /*i18n*/ {
+    id: 'refusal.traceSensorUnknown',
+    message: 'trace.sensor: breech, mean or base',
+  },
+  traceInvalid: /*i18n*/ {
+    id: 'refusal.traceInvalid',
+    message:
+      'trace: equal numbers of finite, strictly increasing times and finite pressures, at least 2',
+  },
+  traceNeverFalls: /*i18n*/ {
+    id: 'refusal.traceNeverFalls',
+    message: 'the trace never falls to the fall fraction of its peak after the peak',
+  },
+  rangeWithoutWidth: /*i18n*/ {
+    id: 'refusal.rangeWithoutWidth',
+    message: 'the range has no width',
+  },
+  countNotPositiveInteger: /*i18n*/ {
+    id: 'refusal.countNotPositiveInteger',
+    message: 'count must be a positive integer',
+  },
+  burnCoefficientOrEnergyNotPositive: /*i18n*/ {
+    id: 'refusal.burnCoefficientOrEnergyNotPositive',
+    message: 'burn coefficient and energy must be positive',
+  },
+  noPoint: /*i18n*/ { id: 'refusal.noPoint', message: 'at least one point' },
+  inputUncertaintyNegative: /*i18n*/ {
+    id: 'refusal.inputUncertaintyNegative',
+    message: '{input}: standardUncertainty must be 0 or above',
+  },
+  noHeldOutString: /*i18n*/ {
+    id: 'refusal.noHeldOutString',
+    message: 'at least one held-out string',
+  },
+  velocitySigmaMissing: /*i18n*/ {
+    id: 'refusal.velocitySigmaMissing',
+    message: 'velocitySigma on every point',
+  },
+  targetPowderNotInFit: /*i18n*/ {
+    id: 'refusal.targetPowderNotInFit',
+    message: 'the powder of the target must be one of the fit',
+  },
+  velocitySigmaNegative: /*i18n*/ {
+    id: 'refusal.velocitySigmaNegative',
+    message: 'velocitySigma must be 0 or above',
+  },
+  pooledFitNoCovariance: /*i18n*/ {
+    id: 'refusal.pooledFitNoCovariance',
+    message: 'the pooled fit has no covariance',
+  },
+  groupPriorNotPositive: /*i18n*/ {
+    id: 'refusal.groupPriorNotPositive',
+    message: 'prior {kind} of {group}: value and sigma above 0',
+  },
+  priorPowderNotInSessions: /*i18n*/ {
+    id: 'refusal.priorPowderNotInSessions',
+    message: 'a prior needs its powder in the sessions',
+  },
+  sessionsBurnKindDiffers: /*i18n*/ {
+    id: 'refusal.sessionsBurnKindDiffers',
+    message: 'the sessions of a powder share one burn kind',
+  },
+  barrelOrTemperatureOnPoint: /*i18n*/ {
+    id: 'refusal.barrelOrTemperatureOnPoint',
+    message: 'barrel length and temperature per session',
+  },
+  ladderChargeOrVelocityNotPositive: /*i18n*/ {
+    id: 'refusal.ladderChargeOrVelocityNotPositive',
+    message: 'ladder charge and velocity positive',
+  },
+  propellantTemperatureNotPositive: /*i18n*/ {
+    id: 'refusal.propellantTemperatureNotPositive',
+    message: 'propellantTemperature must be positive',
+  },
+  barrelLengthNotPositive: /*i18n*/ {
+    id: 'refusal.barrelLengthNotPositive',
+    message: 'barrelLength must be positive',
+  },
+  sessionWithoutLadderPoint: /*i18n*/ {
+    id: 'refusal.sessionWithoutLadderPoint',
+    message: 'at least one ladder point per session',
+  },
+  rifleOrLotSigmaNotPositive: /*i18n*/ {
+    id: 'refusal.rifleOrLotSigmaNotPositive',
+    message: 'rifleSigma and lotSigma must be positive',
+  },
+  pooledFitParametersInvalid: /*i18n*/ {
+    id: 'refusal.pooledFitParametersInvalid',
+    message: 'parameters: burnRate, temperatureFactor, energy, each at most once, burnRate always',
+  },
+  priorParameterNotFitted: /*i18n*/ {
+    id: 'refusal.priorParameterNotFitted',
+    message: 'a prior needs its parameter in parameters',
+  },
+  burnCoefficientNotFitted: /*i18n*/ {
+    id: 'refusal.burnCoefficientNotFitted',
+    message: 'the burn coefficient is always fitted',
+  },
+  stringWithoutVelocity: /*i18n*/ {
+    id: 'refusal.stringWithoutVelocity',
+    message: 'every string needs at least one velocity',
+  },
+  fitNoCovariance: /*i18n*/ {
+    id: 'refusal.fitNoCovariance',
+    message: 'the fit has no covariance: add rows or velocity sigmas',
+  },
+  boreDiameterNotPositive: /*i18n*/ {
+    id: 'refusal.boreDiameterNotPositive',
+    message: 'boreDiameter must be positive',
+  },
+  startPressureTooLow: /*i18n*/ {
+    id: 'refusal.startPressureTooLow',
+    message: 'startPressure must be above the ignition pressure and the resistance at travel 0',
+  },
+  domainMarginOutsideRange: /*i18n*/ {
+    id: 'refusal.domainMarginOutsideRange',
+    message: 'domainMargin must lie in [0, 1)',
+  },
+  priorsNeedVelocitySigmas: /*i18n*/ {
+    id: 'refusal.priorsNeedVelocitySigmas',
+    message: 'priors and huberThreshold need velocity sigmas',
+  },
+  huberThresholdNotPositive: /*i18n*/ {
+    id: 'refusal.huberThresholdNotPositive',
+    message: 'huberThreshold must be positive',
+  },
+  temperatureFactorNeedsSensitivity: /*i18n*/ {
+    id: 'refusal.temperatureFactorNeedsSensitivity',
+    message: 'temperatureFactor needs the load to carry a temperature sensitivity other than 0',
+  },
+  fitParametersInvalid: /*i18n*/ {
+    id: 'refusal.fitParametersInvalid',
+    message: 'parameters: {parameters}, each at most once',
+  },
+  pressuresNeedVelocitySigmas: /*i18n*/ {
+    id: 'refusal.pressuresNeedVelocitySigmas',
+    message: 'pressures need velocity sigmas',
+  },
+  velocitySigmaPartial: /*i18n*/ {
+    id: 'refusal.velocitySigmaPartial',
+    message: 'velocitySigma on all points or none',
+  },
+  pressureBasisUnknown: /*i18n*/ {
+    id: 'refusal.pressureBasisUnknown',
+    message: 'pressureBasis must be one of {bases}',
+  },
+  pressureWithoutBasis: /*i18n*/ {
+    id: 'refusal.pressureWithoutBasis',
+    message: 'peakPressure and pressureBasis together',
+  },
+  pressureWithoutSigma: /*i18n*/ {
+    id: 'refusal.pressureWithoutSigma',
+    message: 'peakPressure and pressureSigma together',
+  },
+  pressureSigmaNotPositive: /*i18n*/ {
+    id: 'refusal.pressureSigmaNotPositive',
+    message: 'pressureSigma must be positive',
+  },
+  ladderPressureNotPositive: /*i18n*/ {
+    id: 'refusal.ladderPressureNotPositive',
+    message: 'ladder pressure must be positive',
+  },
+  velocitySigmaNotPositive: /*i18n*/ {
+    id: 'refusal.velocitySigmaNotPositive',
+    message: 'velocitySigma must be positive',
+  },
+  ladderVelocityNotPositive: /*i18n*/ {
+    id: 'refusal.ladderVelocityNotPositive',
+    message: 'ladder velocity must be positive',
+  },
+  ladderChargeNotPositive: /*i18n*/ {
+    id: 'refusal.ladderChargeNotPositive',
+    message: 'ladder charge must be positive',
+  },
+  noLadderPoint: /*i18n*/ { id: 'refusal.noLadderPoint', message: 'at least one ladder point' },
+  heightsOrVelocitiesNotFinite: /*i18n*/ {
+    id: 'refusal.heightsOrVelocitiesNotFinite',
+    message: 'heights and velocities must be finite',
+  },
+  shotWithoutHeightOrVelocity: /*i18n*/ {
+    id: 'refusal.shotWithoutHeightOrVelocity',
+    message: 'each shot needs a height and a velocity',
+  },
+  chargeTooFewShots: /*i18n*/ {
+    id: 'refusal.chargeTooFewShots',
+    message: 'each charge needs at least two shots',
+  },
+  slopeNotFinite: /*i18n*/ { id: 'refusal.slopeNotFinite', message: 'slope must be finite' },
+  ladderTooFewCharges: /*i18n*/ {
+    id: 'refusal.ladderTooFewCharges',
+    message: 'a ladder needs at least three charges',
+  },
+  ladderLowestChargeNotPositive: /*i18n*/ {
+    id: 'refusal.ladderLowestChargeNotPositive',
+    message: 'ladder charge {charge} kg must be above 0',
+  },
+  ladderAroundNeedsOddCount: /*i18n*/ {
+    id: 'refusal.ladderAroundNeedsOddCount',
+    message: 'a ladder around the charge needs an odd count',
+  },
+  ladderStepCountInvalid: /*i18n*/ {
+    id: 'refusal.ladderStepCountInvalid',
+    message: 'ladder steps must be an integer of at least 1',
+  },
+  ladderStepNotPositive: /*i18n*/ {
+    id: 'refusal.ladderStepNotPositive',
+    message: 'ladder step must be above 0',
+  },
+  ladderStartNotPositive: /*i18n*/ {
+    id: 'refusal.ladderStartNotPositive',
+    message: 'ladder start charge must be above 0',
+  },
+  boreResistanceNeedsValues: /*i18n*/ {
+    id: 'refusal.boreResistanceNeedsValues',
+    message: 'the bore resistance of the powder needs {missing}',
+  },
+  powderWithoutInteriorModel: /*i18n*/ {
+    id: 'refusal.powderWithoutInteriorModel',
+    message: 'the powder has no interior model',
+  },
+  bulletConstructionUnknown: /*i18n*/ {
+    id: 'refusal.bulletConstructionUnknown',
+    message: 'unknown bullet construction {construction}',
+  },
+  barrelNotPositive: /*i18n*/ {
+    id: 'refusal.barrelNotPositive',
+    message: 'barrel {barrel} m must be a positive number',
+  },
+  ladderTooFewStrings: /*i18n*/ {
+    id: 'refusal.ladderTooFewStrings',
+    message: 'a ladder needs at least two strings',
+  },
+  chargesEqual: /*i18n*/ { id: 'refusal.chargesEqual', message: 'charges must differ' },
+  stringTooFewShots: /*i18n*/ {
+    id: 'refusal.stringTooFewShots',
+    message: 'each string needs at least two shots',
+  },
+  standardDeviationNegative: /*i18n*/ {
+    id: 'refusal.standardDeviationNegative',
+    message: 'standard deviation must be 0 or more',
+  },
+  meanNotFinite: /*i18n*/ { id: 'refusal.meanNotFinite', message: 'mean must be finite' },
+  dynamicVivacityRangeInvalid: /*i18n*/ {
+    id: 'refusal.dynamicVivacityRangeInvalid',
+    message: 'dynamic vivacity: need 0 <= from < to <= 1',
+  },
+  dynamicVivacityExponentNotOne: /*i18n*/ {
+    id: 'refusal.dynamicVivacityExponentNotOne',
+    message: 'dynamic vivacity: exponent must be 1',
+  },
+  priorValueOrSigmaNotPositive: /*i18n*/ {
+    id: 'refusal.priorValueOrSigmaNotPositive',
+    message: 'prior {name}: value above 0, sigma above 0',
+  },
+  priorValueBelowFloorOrSigmaNotPositive: /*i18n*/ {
+    id: 'refusal.priorValueBelowFloorOrSigmaNotPositive',
+    message: 'prior {name}: value above the floor, sigma above 0',
+  },
+  pressureBasesMixed: /*i18n*/ {
+    id: 'refusal.pressureBasesMixed',
+    message: 'pressure rows use more than one basis: {rows}',
+  },
 } satisfies Record<
   Exclude<InteriorIssue['code'], ExteriorIssue['code'] | StatisticsIssue['code']>,
-  Message
+  Described
 >
 
 const loadFileWords = {
@@ -580,7 +819,7 @@ const disjoint = <L extends object, R extends object>(
 ) => ({ ...l, ...r })
 
 /** The words of every code. */
-export const refusalWords: Readonly<Record<string, Described | Message>> = disjoint(
+export const refusalWords: Readonly<Record<string, Described>> = disjoint(
   disjoint(
     disjoint(
       disjoint(disjoint(statisticsWords, groupStatisticsWords), exteriorWords),
@@ -611,5 +850,5 @@ function shown(name: string, v: unknown): string {
 export function refusalSentence({ code, params }: Diagnostic<string, object>): string | undefined {
   const words = Object.hasOwn(refusalWords, code) ? refusalWords[code] : undefined
   const values = Object.fromEntries(Object.entries(params).map(([k, v]) => [k, shown(k, v)]))
-  return words && english.t(typeof words === 'string' ? words : (words.message as Message), values)
+  return words && english.t(words.message as Message, values)
 }

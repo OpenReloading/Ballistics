@@ -410,23 +410,17 @@ const sentences: readonly Described[] = [
   },
 ]
 
-/** A template: a message of the table or a refusal sentence (`refusal-words.ts`), on an id or still in the old catalogue. */
-type Template = Described | Message
-
-const templates: readonly Template[] = [
+const templates: readonly Described[] = [
   ...Object.values(warningMessages).flat(),
   ...Object.values(refusalWords),
   ...sentences,
 ]
 
 /** Every message of the table: the Lingui messages of the codes and sentences and the refusal words. */
-export const coreMessages: readonly Template[] = [...codes, ...templates]
-
-const englishOf = (template: Template) =>
-  typeof template === 'string' ? template : template.message
+export const coreMessages: readonly Described[] = [...codes, ...templates]
 
 interface Pattern {
-  template: Template
+  template: Described
   /** The names of the placeholders in order of appearance. */
   names: string[]
   /** The whole text with the values captured lazily. */
@@ -437,8 +431,8 @@ interface Pattern {
 
 const escaped = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-function compile(template: Template): Pattern {
-  const english = englishOf(template)
+function compile(template: Described): Pattern {
+  const english = template.message
   const names: string[] = []
   const source = english
     .split(/(\{\w+\})/)
@@ -475,7 +469,7 @@ function withDecimalMark(text: string, t: Translator['t']): string {
 /** The longest template is under 150 characters, and the lazy groups backtrack, so a text that matches nothing costs far more than its length. */
 const maxMessageChars = 2000
 
-/** One language: its Lingui messages and its old catalogue, which words the refusal sentences and the labels of the app. */
+/** One language: its Lingui messages and its old catalogue, which words the labels of the app. */
 type Language = { i18n: I18n; t: Translator['t'] }
 
 /** The German of `text` when it is a code or an instance of a template, else undefined. */
@@ -490,9 +484,7 @@ function translated(text: string, language: Language): string | undefined {
     names.forEach((name, i) => {
       values[name] ??= value(match[i + 1] ?? '', language)
     })
-    return typeof template === 'string'
-      ? language.t(template, values)
-      : language.i18n._(template.id, values)
+    return language.i18n._(template.id, values)
   }
 }
 
@@ -509,7 +501,7 @@ function value(text: string, language: Language): string {
 
 const byLingui = new WeakMap<I18n, Language>()
 
-/** Makes `translateMessage` translate the messages of this table in the language of `i18n`; returns the translator of `catalogue`, which words the refusal words and labels and which the language module publishes. */
+/** Makes `translateMessage` translate the messages of this table in the language of `i18n`; returns the translator of `catalogue`, which words the labels and which the language module publishes. */
 export function installCoreMessages(i18n: I18n, catalogue: Catalogue, code: string): Translator {
   const shown = translator(catalogue, code)
   const language = { i18n, t: shown.t }

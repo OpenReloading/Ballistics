@@ -4,6 +4,8 @@ import { formatter } from '@lingui/format-po'
 // explicit ids only, named after their route or shared component: no id flags and no file references to keep in step
 export const format = formatter({ explicitIdAsDefault: true, origins: false })
 
+const table = ['src/lib/core-message-table.ts', 'src/lib/refusal-words.ts']
+
 // the Start routes, the views and their helpers; a view's text not yet on an id stays in src/i18n, read by scripts/i18n.mts
 export default defineConfig({
   sourceLocale: 'en',
@@ -12,7 +14,10 @@ export default defineConfig({
     {
       path: '<rootDir>/src/locales/{locale}',
       include: ['src/routes', 'src/components', 'src/lib'],
+      exclude: table,
     },
+    // the package and API messages, which English pages never read: loaded only with another language
+    { path: '<rootDir>/src/locales/table/{locale}', include: table },
   ],
   compileNamespace: 'json',
   format,
