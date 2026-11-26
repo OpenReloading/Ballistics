@@ -1,8 +1,8 @@
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { ChargeRange, ChargeTargetKind } from '@rangefoundry/ballistics'
-import { loadEnglish } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
-import { english, type LinguiSay, type Translator } from '../i18n/translate.ts'
+import type { LinguiSay, Translator } from '../i18n/translate.ts'
 import englishMessages from '../locales/en/lib/charge-target.json' with { type: 'json' }
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
 import { refusalText as thrownText, translateMessage } from './core-messages.ts'
@@ -90,15 +90,24 @@ const targetMax = 1e12
 export function targetError(
   typed: string | number,
   unit: TargetUnit,
-  t: Translator['t'],
+  i18n: I18n,
 ): string | undefined {
   const x = targetNumber(typed)
   const symbol = unit.symbol ? ` ${unit.symbol}` : ''
-  if (!(x > 0)) return t('Enter a target above 0{unit}.', { unit: symbol })
+  if (!(x > 0))
+    return i18n._({
+      id: 'chargeTarget.enterTargetAbove0',
+      message: 'Enter a target above 0{unit}.',
+      values: { unit: symbol },
+    })
   if (!Number.isFinite(unit.toSi(x)) || unit.toSi(x) > targetMax)
-    return t('Enter a target of at most {max}{unit}.', {
-      max: plainNumber(unit.fromSi(targetMax)),
-      unit: symbol,
+    return i18n._({
+      id: 'chargeTarget.enterTargetAtMost',
+      message: 'Enter a target of at most {max}{unit}.',
+      values: {
+        max: plainNumber(unit.fromSi(targetMax)),
+        unit: symbol,
+      },
     })
 }
 
@@ -265,7 +274,8 @@ export function checkedRequest<R extends { bulkDensity?: number | undefined }>(
   kind: TargetKind,
   loadRequest: () => R,
 ): { req: R } | { text: LinguiSay } {
-  if (targetError(value, unit, english.t)) return { text: (t) => targetError(value, unit, t) ?? '' }
+  if (targetError(value, unit, linguiOf('en')))
+    return { text: (_, i18n) => targetError(value, unit, i18n) ?? '' }
   let req: R
   try {
     req = loadRequest()
