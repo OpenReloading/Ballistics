@@ -1069,7 +1069,7 @@ export function PowderTune() {
   return (
     <>
       <PageBar
-        title={msg('Tune a powder')}
+        title={/*i18n*/ { id: 'page.powdersTune', message: 'Tune a powder' }}
         translated
         status={<span role="status">{tn(rows.length, '{count} charge', '{count} charges')}</span>}
         actions={<UnitsIconButton />}

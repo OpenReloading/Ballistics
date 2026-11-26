@@ -43,7 +43,7 @@ import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { resolveBullet } from '../lib/variants.ts'
-import { sayLingui } from '../lib/wording.ts'
+import { sayLingui, verbatim } from '../lib/wording.ts'
 import { description } from './bullet-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -298,15 +298,17 @@ const printRows = (
       [msg('Manufacturer'), manufacturer],
       [msg('Name'), design.name],
     ] as const
-  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
+  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label: verbatim(t(label)), text }] : [])),
   ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
     design.choices[k]
-      ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k], t, i18n) }]
+      ? [{ label: verbatim(t(choiceLabels[k][0])), text: optionLabel(design.choices[k], t, i18n) }]
       : [],
   ),
   ...designerSpecs.flatMap((s): FieldRow[] => {
     const si = design.fields[s.key]?.si
-    return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
+    return si === undefined
+      ? []
+      : [{ label: verbatim(t(s.label)), value: { quantity: s.quantity, si } }]
   }),
 ]
 
@@ -524,7 +526,7 @@ export function BulletDesigner() {
     e.computed.length > 0
       ? t('Computed from the design: {values}.', {
           values: e.computed
-            .map((r) => `${rowLabel(r, system, t, i18n)} ${rowValue(r, system, t, i18n)}`)
+            .map((r) => `${rowLabel(r, system, i18n)} ${rowValue(r, system, i18n)}`)
             .join(', '),
         })
       : ''
@@ -602,7 +604,10 @@ export function BulletDesigner() {
         {computed}
       </Text>
       <div className="print-only">
-        <FieldTable caption={msg('Values of the design')} groups={[{ rows: values }]} />
+        <FieldTable
+          caption={/*i18n*/ { id: 'designer.values', message: 'Values of the design' }}
+          groups={[{ rows: values }]}
+        />
       </div>
     </>
   )

@@ -5,7 +5,6 @@ import { Button } from '@mantine/core'
 import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import {
   type CartridgeRow,
   cartridgeCells,
@@ -39,7 +38,6 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 /** The cartridge directory: page bar with the count, search row, windowed table. */
 export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userCartridges)
@@ -115,7 +113,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
       label: /*i18n*/ { id: 'cartridges.column.type', message: 'Case type' },
       width: '6.5rem',
       value: (c) => c.caseType,
-      cell: (c) => (c.caseType ? caseTypeText(t, c.caseType) : ''),
+      cell: (c) => (c.caseType ? caseTypeText(i18n, c.caseType) : ''),
     },
     {
       key: 'maxBulletDiameter',
@@ -180,7 +178,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
       v.caseLength && `L3 ${v.caseLength} ${lengthUnit}`,
       v.cartridgeLength && `L6 ${v.cartridgeLength} ${lengthUnit}`,
       v.pmax && `${v.pmax} ${pressureUnit}`,
-      c.caseType && caseTypeText(t, c.caseType),
+      c.caseType && caseTypeText(i18n, c.caseType),
     ]
       .filter(Boolean)
       .join(' · ')

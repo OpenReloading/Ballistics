@@ -170,7 +170,7 @@ function RecordPanel({
       <div className="print-only">
         <p>{t('{name} (user design, not a catalogue record)', { name })}</p>
         <FieldTable
-          caption={msg('Values of the design')}
+          caption={/*i18n*/ { id: 'designer.values', message: 'Values of the design' }}
           groups={[{ rows: [...choices, ...values] }]}
         />
       </div>

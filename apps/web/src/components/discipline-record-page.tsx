@@ -2,7 +2,6 @@
 
 import { useLingui } from '@lingui/react'
 import { compareTargetFaces, type TargetFace, type TargetMapping } from '@rangefoundry/schema'
-import { useTranslation } from '../i18n/language.ts'
 import {
   type CaliberClassSummary,
   courseRows,
@@ -14,7 +13,7 @@ import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.
 import { matchCourse } from '../lib/match-rounds.ts'
 import { rowText } from '../lib/record-fields.ts'
 import { readItems, readRecord } from '../lib/record-reads.ts'
-import { say } from '../lib/wording.ts'
+import { sayLingui } from '../lib/wording.ts'
 import { DisciplineData, DisciplineStages, DisciplineStrip } from './discipline-record.tsx'
 import { MatchRounds } from './match-rounds.tsx'
 import { RecordPage } from './record-page.tsx'
@@ -40,7 +39,6 @@ function DisciplineRecordView({
   federations,
   classes,
 }: { d: DisciplineRecord } & Extras) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const federation = federations.find((f) => f.id === d.federation)
   const international = disciplines.find((x) => x.id === d.internationalDiscipline)
@@ -58,7 +56,7 @@ function DisciplineRecordView({
   // the sighters, series and time limits a stage's rule book gives itself
   const courseOf = (m: TargetMapping) =>
     courseRows(m)
-      .map((r) => `${say(i18n, t, r.label)}: ${rowText(r, t, i18n)}`)
+      .map((r) => `${sayLingui(i18n, r.label)}: ${rowText(r, i18n)}`)
       .join('; ')
   return (
     <RecordPage

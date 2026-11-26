@@ -1,8 +1,10 @@
 import type { Case, UserRecord } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import type { CaseSummary } from '../src/lib/api-types.ts'
 import { caseMatches, caseRows, userCaseRows } from '../src/lib/case-rows.ts'
 import { caseRowGroups, caseStrip } from '../src/lib/record-fields.ts'
+import { sayLingui } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 const summary: CaseSummary = {
@@ -74,7 +76,9 @@ it('the strip has the manufacturer, material, mass and water capacity, nothing t
 
 it('the table has the product number, headstamp, primer pocket, flash hole and annealed, as text', () => {
   const [group] = caseRowGroups(record)
-  expect(defined(group).rows.map((r) => [r.label, r.text ?? r.value?.si])).toEqual([
+  expect(
+    defined(group).rows.map((r) => [sayLingui(linguiOf('en'), r.label), r.text ?? r.value?.si]),
+  ).toEqual([
     ['Product number', 'C308'],
     ['Headstamp', 'DEMO 308 WIN'],
     ['Primer pocket', 'Boxer, large rifle'],
@@ -83,7 +87,7 @@ it('the table has the product number, headstamp, primer pocket, flash hole and a
   ])
   expect(
     defined(caseRowGroups({ ...record, headstamp: undefined, annealed: undefined })[0]).rows.map(
-      (r) => r.label,
+      (r) => sayLingui(linguiOf('en'), r.label),
     ),
   ).toEqual(['Product number', 'Primer pocket', 'Flash hole diameter'])
 })

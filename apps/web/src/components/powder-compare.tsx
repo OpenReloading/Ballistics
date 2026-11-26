@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -13,7 +14,6 @@ import {
   targetNumber,
   targetUnit,
 } from '../lib/charge-target.ts'
-import { notMetallic } from '../lib/complete-records.ts'
 import { refusalText as thrownText, translateMessage } from '../lib/core-messages.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
@@ -44,6 +44,7 @@ import {
   type CompareMessage,
   type CompareRow,
   noBulkDensity,
+  notMetallicReason,
   reasonText,
   usePowderCompare,
 } from './use-powder-compare.ts'
@@ -227,6 +228,7 @@ function PowderRow({
   onOpen: (row: CompareRow) => void
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const name = productLabel(r)
   return (
     <tr aria-current={r.id === current ? 'true' : undefined}>
@@ -251,7 +253,7 @@ function PowderRow({
           {t('Not computed: {reason}', {
             reason: r.refusal
               ? refusalText(r.refusal, 'peakPressure', system, percent, t)
-              : reasonText(r, t),
+              : reasonText(r, t, i18n),
           })}
         </td>
       )}
@@ -602,6 +604,7 @@ function useCancelOnPick(
 /** Nothing runs until Compute. */
 export function PowderCompare({ system }: { system: UnitSystem }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { loadRequest, powder, powderDesign, pickPowder, applyCharge, fields, cartridge } =
     useLoad()
   const { powderTab } = useLoad()
@@ -661,10 +664,10 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           study.mode?.kind === 'target' && study.mode.percent,
           t,
         )
-      : reasonText(r, t)
+      : reasonText(r, t, i18n)
   const csv = () => powderTableCsv(shown, target, system, t, reason)
   const { progress, running, message } = study
-  const shotgun = study.rows.filter((r) => r.reason === notMetallic).length
+  const shotgun = study.rows.filter((r) => r.reason === notMetallicReason).length
   const failed = study.rows.filter((r) => !r.values).length - shotgun
   // `loadRequest` is a new function on each change of the load, so filter and sort changes skip it
   const stale = useMemo(

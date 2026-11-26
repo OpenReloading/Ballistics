@@ -17,7 +17,7 @@ import { matchesQuery } from './lists.ts'
 import { nth } from './nth.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
 import { userRowId } from './sources.ts'
-import { verbatim, type Wording } from './wording.ts'
+import { type LinguiWording, verbatim } from './wording.ts'
 
 type Translate = Translator['t']
 
@@ -125,7 +125,7 @@ export function faceFacets(
 export const targetFaceMatches = (r: TargetFaceRow, query: string) =>
   matchesQuery([r.name, r.organization, ...r.events], query)
 
-const length = (label: Wording, mm: number | undefined, printed?: string): FieldRow[] =>
+const length = (label: LinguiWording, mm: number | undefined, printed?: string): FieldRow[] =>
   mm === undefined
     ? []
     : [
@@ -135,7 +135,7 @@ const length = (label: Wording, mm: number | undefined, printed?: string): Field
           ...(printed && { printed }),
         },
       ]
-const text = (label: Wording, value: string | undefined): FieldRow[] =>
+const text = (label: LinguiWording, value: string | undefined): FieldRow[] =>
   value === undefined ? [] : [{ label, text: value }]
 const yesNo = (t: Translate, v: boolean | undefined, unset?: string) =>
   v === undefined ? unset : v ? t('Yes') : t('No')
@@ -171,10 +171,14 @@ export function targetFaceStrip(f: Omit<Face, 'provenance'>, t: Translate): Stri
   const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
     rows[0] ? [{ icon, label, row: rows[0] }] : []
   return [
-    ...item('federation', t('Federation'), text(msg('Federation'), f.organization)),
+    ...item(
+      'federation',
+      t('Federation'),
+      text(/*i18n*/ { id: 'targets.row.federation', message: 'Federation' }, f.organization),
+    ),
     ...item('distance', t('Distance'), [
       {
-        label: msg('Distance'),
+        label: /*i18n*/ { id: 'targets.row.distance', message: 'Distance' },
         text: faceDistances(f).join(', '),
         numeric: true,
         unit: 'm',
@@ -183,14 +187,26 @@ export function targetFaceStrip(f: Omit<Face, 'provenance'>, t: Translate): Stri
     ...item(
       'diameter',
       oval ? t('Outer diameter width') : t('Outer diameter'),
-      length(msg('Outer diameter'), outer.diameter.value, outer.diameter.raw),
+      length(
+        /*i18n*/ { id: 'targets.row.outerDiameter', message: 'Outer diameter' },
+        outer.diameter.value,
+        outer.diameter.raw,
+      ),
     ),
     ...item(
       'black',
       oval ? t('Black area width') : t('Black area'),
-      length(msg('Black area'), f.blackDiameter.value, f.blackDiameter.raw),
+      length(
+        /*i18n*/ { id: 'targets.row.blackArea', message: 'Black area' },
+        f.blackDiameter.value,
+        f.blackDiameter.raw,
+      ),
     ),
-    ...item('rings', t('Rings'), text(msg('Rings'), String(f.rings.length))),
+    ...item(
+      'rings',
+      t('Rings'),
+      text(/*i18n*/ { id: 'targets.row.rings', message: 'Rings' }, String(f.rings.length)),
+    ),
   ]
 }
 
@@ -200,29 +216,44 @@ export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate
   const unset = t('Not stated')
   return [
     {
-      title: msg('Target'),
+      title: /*i18n*/ { id: 'targets.group.target', message: 'Target' },
       rows: [
-        ...length(msg('Black area height'), f.blackHeight?.value, f.blackHeight?.raw),
+        ...length(
+          /*i18n*/ { id: 'targets.row.blackAreaHeight', message: 'Black area height' },
+          f.blackHeight?.value,
+          f.blackHeight?.raw,
+        ),
         ...text(
-          msg('Inner ten rule'),
+          /*i18n*/ { id: 'targets.row.innerTenRule', message: 'Inner ten rule' },
           f.innerTen && (f.innerTen.rule ? t(innerTenRule[f.innerTen.rule]) : unset),
         ),
-        ...text(msg('Tenth-ring values'), yesNo(t, f.decimal, unset)),
-        ...text(msg('Numerals printed'), yesNo(t, f.numerals, unset)),
+        ...text(
+          /*i18n*/ { id: 'targets.row.tenthRingValues', message: 'Tenth-ring values' },
+          yesNo(t, f.decimal, unset),
+        ),
+        ...text(
+          /*i18n*/ { id: 'targets.row.numeralsPrinted', message: 'Numerals printed' },
+          yesNo(t, f.numerals, unset),
+        ),
         ...(f.paper
           ? [
               {
-                label: msg('Sheet'),
+                label: /*i18n*/ { id: 'targets.row.sheet', message: 'Sheet' },
                 text: `${f.paper.format && f.paper.format !== 'other' ? `${f.paper.format}, ` : ''}${f.paper.width.value} × ${f.paper.height.value} mm`,
                 numeric: true as const,
               },
             ]
           : []),
-        ...text(msg('Scoring centers on the sheet'), f.bulls && String(f.bulls.length)),
+        ...text(
+          /*i18n*/ { id: 'targets.row.scoringCenters', message: 'Scoring centers on the sheet' },
+          f.bulls && String(f.bulls.length),
+        ),
       ],
     },
     {
-      title: oval ? msg('Ring diameters width') : msg('Ring diameters'),
+      title: oval
+        ? /*i18n*/ { id: 'targets.group.ringDiametersWidth', message: 'Ring diameters width' }
+        : /*i18n*/ { id: 'targets.group.ringDiameters', message: 'Ring diameters' },
       rows: [
         ...f.rings.flatMap((r) => [
           ...length(ringLabel(t, r), r.diameter.value, r.diameter.raw),
@@ -232,8 +263,16 @@ export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate
             r.height?.raw,
           ),
         ]),
-        ...length(msg('Inner ten'), f.innerTen?.diameter.value, f.innerTen?.diameter.raw),
-        ...length(msg('Inner ten height'), f.innerTen?.height?.value, f.innerTen?.height?.raw),
+        ...length(
+          /*i18n*/ { id: 'targets.row.innerTen', message: 'Inner ten' },
+          f.innerTen?.diameter.value,
+          f.innerTen?.diameter.raw,
+        ),
+        ...length(
+          /*i18n*/ { id: 'targets.row.innerTenHeight', message: 'Inner ten height' },
+          f.innerTen?.height?.value,
+          f.innerTen?.height?.raw,
+        ),
       ],
     },
   ]

@@ -121,10 +121,10 @@ msgstr "{count} selected"
 msgid "comparePicks.selectedMax"
 msgstr "{count} selected (max {max})"
 
-msgid "bulletCompare.labelFrom"
+msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
 
-msgid "fieldStrip.bandFrom"
+msgid "bulletCompare.labelFrom"
 msgstr "{label} from {velocity}"
 
 msgid "fieldTable.region"
@@ -154,6 +154,9 @@ msgstr "{material} core"
 msgid "construction.materialJacket"
 msgstr "{material} jacket"
 
+msgid "recordFields.percentRange"
+msgstr "{min, decimal} to {max, decimal} %"
+
 msgid "disciplines.cover.discipline"
 msgstr "{n, decimal} {unit} for the discipline"
 
@@ -178,6 +181,9 @@ msgstr "{name} has no round count; set one on the Firearms page to add the event
 msgid "listSources.notDeleted"
 msgstr "{name} was not deleted: the browser refused."
 
+msgid "recordFields.burnRateOrder"
+msgstr "{order} of {total}"
+
 msgid "events.stageScore"
 msgstr "{points} points, hit factor {hf}"
 
@@ -190,6 +196,9 @@ msgstr "{source} only"
 msgid "fieldTable.groupFilter"
 msgstr "{title}: group"
 
+msgid "recordFields.percent"
+msgstr "{value, decimal} %"
+
 msgid "powderRecord.meanInterval"
 msgstr "{value} ({low} to {high})"
 
@@ -198,6 +207,9 @@ msgstr "{value} ({low} to {high}) {unit}"
 
 msgid "burnRate.mean"
 msgstr "{value} {unit}"
+
+msgid "recordFields.fastest"
+msgstr "1 = fastest"
 
 msgid "recordFields.turnIn"
 msgstr "1 turn in {length}"
@@ -256,6 +268,9 @@ msgstr "Air pressure"
 msgid "values.airRifle"
 msgstr "Air rifle"
 
+msgid "recordFields.aliases"
+msgstr "Aliases"
+
 msgid "fieldTable.allGroups"
 msgstr "All"
 
@@ -298,6 +313,9 @@ msgstr "Altitude"
 msgid "values.aluminum"
 msgstr "Aluminum"
 
+msgid "recordFields.annealed"
+msgstr "Annealed"
+
 msgid "disciplines.anyNumber"
 msgstr "Any number"
 
@@ -309,6 +327,9 @@ msgstr "aperture"
 
 msgid "units.quantity.area"
 msgstr "Areas"
+
+msgid "recordFields.asPrinted"
+msgstr "As printed: {printed}"
 
 msgid "listSources.lastOn"
 msgstr "At least one source stays on"
@@ -337,6 +358,9 @@ msgstr "Barrel length up to"
 msgid "units.quantity.twist"
 msgstr "Barrel twist"
 
+msgid "recordFields.base"
+msgstr "Base"
+
 msgid "powders.column.base"
 msgstr "Base"
 
@@ -361,8 +385,20 @@ msgstr "BC ({unit})"
 msgid "bulletCompare.coefficient"
 msgstr "BC {model}"
 
+msgid "recordFields.coefficient"
+msgstr "BC {model}"
+
 msgid "recordFields.bearingLength"
 msgstr "Bearing length"
+
+msgid "values.belted"
+msgstr "belted"
+
+msgid "targets.row.blackArea"
+msgstr "Black area"
+
+msgid "targets.row.blackAreaHeight"
+msgstr "Black area height"
 
 msgid "values.blackOxide"
 msgstr "black oxide"
@@ -375,6 +411,9 @@ msgstr "Boat-tail angle"
 
 msgid "values.bonded"
 msgstr "bonded"
+
+msgid "recordFields.boreResistance"
+msgstr "Bore resistance"
 
 msgid "values.boronNitride"
 msgstr "boron nitride"
@@ -396,6 +435,9 @@ msgstr "Brass, {filters}"
 
 msgid "recordFields.build"
 msgstr "Build"
+
+msgid "recordFields.bulkDensity"
+msgstr "Bulk density"
 
 msgid "bulletCompare.data"
 msgstr "Bullet data"
@@ -435,6 +477,24 @@ msgstr "Bullets ({count})"
 
 msgid "bullets.filtered"
 msgstr "Bullets, {filters}"
+
+msgid "recordFields.burnFormA"
+msgstr "Burn form a"
+
+msgid "recordFields.burnFormM"
+msgstr "Burn form m"
+
+msgid "recordFields.burnFormQ"
+msgstr "Burn form q"
+
+msgid "recordFields.burnFormZ1"
+msgstr "Burn form z1"
+
+msgid "recordFields.burnFormGroup"
+msgstr "Burn form, two-stage"
+
+msgid "recordFields.burnRate"
+msgstr "Burn rate"
 
 msgid "powderRecord.burnRateTable"
 msgstr "Burn rate"
@@ -616,11 +676,14 @@ msgstr "Compare the others"
 msgid "log.column.event"
 msgstr "Competition event"
 
+msgid "page.events"
+msgstr "Competition events"
+
 msgid "events.title"
 msgstr "Competition events"
 
-msgid "page.events"
-msgstr "Competition events"
+msgid "recordFields.composition"
+msgstr "Composition"
 
 msgid "primers.column.compound"
 msgstr "Compound"
@@ -718,8 +781,17 @@ msgstr "Course of fire"
 msgid "recordSources.column.covers"
 msgstr "Covers"
 
+msgid "recordFields.covolume"
+msgstr "Covolume"
+
 msgid "values.crusher"
 msgstr "crusher"
+
+msgid "recordFields.cupMaterial"
+msgstr "Cup material"
+
+msgid "recordFields.cupThickness"
+msgstr "Cup thickness"
 
 msgid "values.cupAndCore"
 msgstr "cup-and-core"
@@ -832,6 +904,9 @@ msgstr "Distance"
 msgid "targets.facet.dist"
 msgstr "Distance"
 
+msgid "targets.row.distance"
+msgstr "Distance"
+
 msgid "disciplines.column.distance"
 msgstr "Distance"
 
@@ -910,8 +985,14 @@ msgstr "Empty: the shots of the series, where each lists them."
 msgid "values.energy"
 msgstr "energy"
 
+msgid "recordFields.energy"
+msgstr "Energy"
+
 msgid "units.quantity.energy"
 msgstr "Energy"
+
+msgid "recordFields.energyRatio"
+msgstr "Energy ratio"
 
 msgid "sourceLink.entry.range"
 msgstr "Entered at the range"
@@ -977,6 +1058,9 @@ msgstr "Federation"
 msgid "targets.facet.org"
 msgstr "Federation"
 
+msgid "targets.row.federation"
+msgstr "Federation"
+
 msgid "disciplines.column.federation"
 msgstr "Federation"
 
@@ -1037,20 +1121,50 @@ msgstr "Fits {name}"
 msgid "recordSources.kind.fitted"
 msgstr "fitted"
 
+msgid "recordFields.fittedFilter"
+msgstr "Fitted"
+
+msgid "recordFields.fittedGroup"
+msgstr "Fitted (simulated, with {k, decimal} standard uncertainties)"
+
+msgid "recordFields.energyRatioMedianNote"
+msgstr "Fitted energy over thermochemistry energy (impetus over gamma minus 1); median of the {powders} powders with thermochemistry {median}. Below 1 is expected: the fit also carries the losses the model leaves out."
+
+msgid "recordFields.energyRatioNote"
+msgstr "Fitted energy over thermochemistry energy (impetus over gamma minus 1). Below 1 is expected: the fit also carries the losses the model leaves out."
+
 msgid "powderRecord.fittedCurve"
 msgstr "Fitted M3 curve"
+
+msgid "recordFields.fittedNote"
+msgstr "Fitted: plus and minus {k, decimal} standard uncertainties, a lower bound (the rows of one load table are correlated)."
 
 msgid "bullets.fitting"
 msgstr "fitting {name}"
 
+msgid "recordFields.fixedInputsFilter"
+msgstr "Fixed inputs"
+
+msgid "recordFields.fixedInputsGroup"
+msgstr "Fixed model inputs"
+
 msgid "values.flake"
 msgstr "flake"
+
+msgid "recordFields.flameTemperature"
+msgstr "Flame temperature"
+
+msgid "recordFields.flashHole"
+msgstr "Flash hole diameter"
 
 msgid "values.flat"
 msgstr "flat"
 
 msgid "values.flatNose"
 msgstr "flat-nose"
+
+msgid "recordFields.form"
+msgstr "Form"
 
 msgid "powders.column.form"
 msgstr "Form"
@@ -1100,6 +1214,9 @@ msgstr "Handloads"
 msgid "recordActions.hashCopied"
 msgstr "Hash copied"
 
+msgid "recordFields.headstamp"
+msgstr "Headstamp"
+
 msgid "comparePicks.hiddenTitle"
 msgstr "Hidden by the search or a filter"
 
@@ -1133,6 +1250,12 @@ msgstr "Homepage"
 msgid "values.hybrid"
 msgstr "hybrid"
 
+msgid "recordFields.ignitionPressure"
+msgstr "Ignition pressure"
+
+msgid "recordFields.impetus"
+msgstr "Impetus"
+
 msgid "events.importJson"
 msgstr "Import JSON"
 
@@ -1144,6 +1267,18 @@ msgstr "In the discipline list"
 
 msgid "federationRecord.inDisciplineList"
 msgstr "In the discipline list"
+
+msgid "targets.row.innerTen"
+msgstr "Inner ten"
+
+msgid "targets.row.innerTenHeight"
+msgstr "Inner ten height"
+
+msgid "targets.row.innerTenRule"
+msgstr "Inner ten rule"
+
+msgid "recordFields.intendedUse"
+msgstr "Intended use"
 
 msgid "disciplines.international"
 msgstr "International"
@@ -1256,6 +1391,9 @@ msgstr "Line {line}"
 msgid "recordActions.linkCopied"
 msgstr "Link copied"
 
+msgid "recordFields.listedFor"
+msgstr "Listed by the manufacturer for"
+
 msgid "events.load"
 msgstr "Load"
 
@@ -1288,6 +1426,9 @@ msgstr "Loading cartridges"
 
 msgid "states.loading.curves"
 msgstr "Loading curves"
+
+msgid "recordFields.loadingDensity"
+msgstr "Loading density"
 
 msgid "states.loading.discipline"
 msgstr "Loading discipline"
@@ -1379,6 +1520,9 @@ msgstr "Long gun"
 msgid "disciplines.row.maxMagnification"
 msgstr "Magnification up to"
 
+msgid "recordFields.magnum"
+msgstr "Magnum"
+
 msgid "primers.column.magnum"
 msgstr "Magnum"
 
@@ -1387,6 +1531,9 @@ msgstr "Major"
 
 msgid "recordSources.origin.manufacturer"
 msgstr "manufacturer"
+
+msgid "recordFields.manufacturer"
+msgstr "Manufacturer"
 
 msgid "bullets.column.manufacturer"
 msgstr "Manufacturer"
@@ -1423,6 +1570,9 @@ msgstr "Mass"
 
 msgid "lists.matching"
 msgstr "matching \"{query}\""
+
+msgid "recordFields.material"
+msgstr "Material"
 
 msgid "cases.column.material"
 msgstr "Material"
@@ -1495,6 +1645,9 @@ msgstr "Model output from fitted M3 parameters, not manufacturer data."
 
 msgid "powderRecord.modelParameters"
 msgstr "Model parameters"
+
+msgid "recordFields.molarMass"
+msgstr "Molar mass"
 
 msgid "values.moly"
 msgstr "moly"
@@ -1745,6 +1898,9 @@ msgstr "Number"
 msgid "federationRecord.column.number"
 msgstr "Number"
 
+msgid "targets.row.numeralsPrinted"
+msgstr "Numerals printed"
+
 msgid "page.offline"
 msgstr "Offline"
 
@@ -1793,6 +1949,9 @@ msgstr "original"
 msgid "values.other"
 msgstr "other"
 
+msgid "targets.row.outerDiameter"
+msgstr "Outer diameter"
+
 msgid "targets.column.outer"
 msgstr "Outer diameter"
 
@@ -1801,6 +1960,9 @@ msgstr "Outline, {name}"
 
 msgid "bulletDrawing.outline"
 msgstr "Outline, {name}"
+
+msgid "recordFields.computedRange"
+msgstr "Over the composition ranges: {min, decimal} to {max, decimal}."
 
 msgid "burnRateCompare.overlay"
 msgstr "Overlay"
@@ -1825,6 +1987,9 @@ msgstr "Parts drawn dashed are assumed, not from the record."
 
 msgid "events.penalties"
 msgstr "Penalties"
+
+msgid "recordFields.perLoadRow"
+msgstr "per load row"
 
 msgid "bullets.pickToCompare"
 msgstr "Pick 2 to {max}"
@@ -1901,6 +2066,9 @@ msgstr "Preset"
 msgid "units.quantity.pressure"
 msgstr "Pressure"
 
+msgid "recordFields.pressureExponent"
+msgstr "Pressure exponent"
+
 msgid "burnRate.exponentReason"
 msgstr "Pressure exponent {exponent, decimal}, not 1: the burn rate per pressure depends on the pressure, so there is no single curve."
 
@@ -1910,11 +2078,17 @@ msgstr "Pressure exponent other than 1: the burn rate per pressure depends on th
 msgid "states.unavailable.primer"
 msgstr "Primer data is unavailable right now."
 
+msgid "recordFields.primerPocket"
+msgstr "Primer pocket"
+
 msgid "page.primers"
 msgstr "Primers"
 
 msgid "primers.filtered"
 msgstr "Primers, {filters}"
+
+msgid "recordFields.primingCompound"
+msgstr "Priming compound"
 
 msgid "recordActions.print"
 msgstr "Print"
@@ -1967,11 +2141,17 @@ msgstr "Procedurals"
 msgid "bulletRecord.product"
 msgstr "Product {number}"
 
+msgid "recordFields.productNumber"
+msgstr "Product number"
+
 msgid "primers.column.number"
 msgstr "Product number"
 
 msgid "disciplines.rule.prone"
 msgstr "prone"
+
+msgid "recordFields.propellantTemperature"
+msgstr "Propellant temperature"
 
 msgid "caseRecord.data"
 msgstr "Properties"
@@ -2009,11 +2189,20 @@ msgstr "Range, distance"
 msgid "sources.rangefoundry"
 msgstr "RangeFoundry"
 
+msgid "recordFields.gamma"
+msgstr "Ratio of specific heats"
+
+msgid "values.rebated"
+msgstr "rebated"
+
 msgid "values.rebatedBoatTail"
 msgstr "rebated-boat-tail"
 
 msgid "recordFields.recommendedTwist"
 msgstr "Recommended twist"
+
+msgid "recordFields.referencePressure"
+msgstr "Reference pressure"
 
 msgid "disciplines.rule.reflex"
 msgstr "reflex"
@@ -2075,10 +2264,25 @@ msgstr "Revolver"
 msgid "values.rifle"
 msgstr "Rifle"
 
+msgid "values.rimless"
+msgstr "rimless"
+
+msgid "values.rimmed"
+msgstr "rimmed"
+
+msgid "targets.group.ringDiameters"
+msgstr "Ring diameters"
+
+msgid "targets.group.ringDiametersWidth"
+msgstr "Ring diameters width"
+
 msgid "events.shotsHint"
 msgstr "Ring values separated by spaces, such as 10 9 10."
 
 msgid "targets.facet.rings"
+msgstr "Rings"
+
+msgid "targets.row.rings"
 msgstr "Rings"
 
 msgid "faceRecord.rings"
@@ -2144,6 +2348,9 @@ msgstr "Saved loads of another cartridge, or no saved load."
 msgid "faceRecord.column.scoring"
 msgstr "Scoring"
 
+msgid "targets.row.scoringCenters"
+msgstr "Scoring centers on the sheet"
+
 msgid "bullets.column.sd"
 msgstr "SD"
 
@@ -2168,6 +2375,9 @@ msgstr "section {section}, {page}"
 msgid "bullet.sectionalDensity"
 msgstr "Sectional density"
 
+msgid "recordFields.sectionalDensity"
+msgstr "Sectional density"
+
 msgid "bullets.column.sdHelp"
 msgstr "Sectional density, computed: mass over diameter squared."
 
@@ -2179,6 +2389,9 @@ msgstr "Select {name}"
 
 msgid "disciplines.rule.semiAutomatic"
 msgstr "semi automatic"
+
+msgid "values.semiRimmed"
+msgstr "semi-rimmed"
 
 msgid "events.seriesHeading"
 msgstr "Series"
@@ -2198,8 +2411,14 @@ msgstr "Service rifle"
 msgid "page.session"
 msgstr "Session summary"
 
+msgid "recordFields.startPressureNote"
+msgstr "Set per load row by the barrel length and the bullet construction."
+
 msgid "recordFields.shape"
 msgstr "Shape"
+
+msgid "targets.row.sheet"
+msgstr "Sheet"
 
 msgid "events.shootingLog"
 msgstr "Shooting log"
@@ -2294,6 +2513,9 @@ msgstr "smallest"
 msgid "values.softPoint"
 msgstr "soft-point"
 
+msgid "recordFields.solidDensity"
+msgstr "Solid density"
+
 msgid "bulletCompare.notFound"
 msgstr "Some bullets were not found."
 
@@ -2345,11 +2567,17 @@ msgstr "Stages"
 msgid "disciplines.rule.standing"
 msgstr "standing"
 
+msgid "recordFields.startPressure"
+msgstr "Start pressure"
+
 msgid "values.steel"
 msgstr "steel"
 
 msgid "values.cupSteel"
 msgstr "Steel"
+
+msgid "recordFields.boreResistanceNote"
+msgstr "Stress; groove oversize {oversize, decimal} per percent, engraving {engraving, decimal} of the start pressure."
 
 msgid "recordFields.structure"
 msgstr "Structure"
@@ -2385,6 +2613,9 @@ msgid "values.tangent"
 msgstr "tangent"
 
 msgid "disciplines.facet.face"
+msgstr "Target"
+
+msgid "targets.group.target"
 msgstr "Target"
 
 msgid "disciplineRecord.column.target"
@@ -2434,6 +2665,9 @@ msgstr "Technical drawing of the bullet, full section about the axis, base at th
 
 msgid "units.quantity.temperature"
 msgstr "Temperature"
+
+msgid "targets.row.tenthRingValues"
+msgstr "Tenth-ring values"
 
 msgid "recordSources.terms"
 msgstr "Terms"
@@ -2491,6 +2725,9 @@ msgstr "The targets its disciplines are shot on"
 
 msgid "matchRounds.shotsUnstated"
 msgstr "The targets of this discipline state no shot count."
+
+msgid "recordFields.thermochemistry"
+msgstr "Thermochemistry"
 
 msgid "bulletCompare.invalid"
 msgstr "This link is not valid."
@@ -2579,6 +2816,9 @@ msgstr "Twist"
 msgid "bullet.millerTwist"
 msgstr "Twist for Sg 1.5"
 
+msgid "recordFields.type"
+msgstr "Type"
+
 msgid "bullets.column.type"
 msgstr "Type"
 
@@ -2636,6 +2876,9 @@ msgstr "Values missing: no burn values"
 msgid "bulletRecord.valuesMissing"
 msgstr "Values missing: the record only names the bullet"
 
+msgid "designer.values"
+msgstr "Values of the design"
+
 msgid "burnRateCompare.valuesTable"
 msgstr "Values table"
 
@@ -2651,6 +2894,9 @@ msgstr "Variants table"
 msgid "units.quantity.velocity"
 msgstr "Velocity"
 
+msgid "recordFields.vivacity"
+msgstr "Vivacity"
+
 msgid "burnRate.unresolvedDetail"
 msgstr "vivacity {value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}"
 
@@ -2659,6 +2905,9 @@ msgstr "wadcutter"
 
 msgid "states.warning"
 msgstr "Warning"
+
+msgid "recordFields.waterCapacity"
+msgstr "Water capacity"
 
 msgid "cases.column.capacity"
 msgstr "Water capacity"

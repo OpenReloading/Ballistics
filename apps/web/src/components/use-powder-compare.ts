@@ -1,5 +1,6 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
 import type { Powder } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -42,7 +43,6 @@ export const noBulkDensity = msg('No bulk density in the record')
 
 /** The sentences of this tab's rows; a row's other reasons are messages of the API and the packages. */
 const ownReasons: readonly Message[] = [
-  notMetallic,
   noModel,
   apiSilent,
   noRecord,
@@ -50,12 +50,17 @@ const ownReasons: readonly Message[] = [
   noComparableLimitText,
 ]
 
-/** A row's reason in the language of `t`; a refusal it caught is worded here, where it is shown. */
+/** A shotgun-only powder's reason, in English as the other reasons. */
+export const notMetallicReason = notMetallic.message
+
+/** A row's reason in the language of `t` and `i18n`; a refusal it caught is worded here, where it is shown. */
 export function reasonText(
   { reason, failure }: Pick<CompareRow, 'reason' | 'failure'>,
   t: Translator['t'],
+  i18n: I18n,
 ) {
   if (failure !== undefined) return translateMessage(refusalText(failure), t)
+  if (reason === notMetallicReason) return i18n._(notMetallic)
   const own = ownReasons.find((m) => m === reason)
   return own ? t(own) : translateMessage(reason ?? '', t)
 }
@@ -230,7 +235,7 @@ async function powderRow(
   head: RowHead,
   s: PowderSummary,
 ): Promise<CompareRow | undefined> {
-  if (shotgunOnly(s)) return { ...head, reason: notMetallic }
+  if (shotgunOnly(s)) return { ...head, reason: notMetallicReason }
   if (!s.interior) return { ...head, reason: noModel }
   const fetched = await recordFor(head, s.id, cx.batch)
   if ('row' in fetched) return fetched.row
@@ -256,7 +261,7 @@ function skipped(
   s: PowderSummary,
   noLimit: ChargeTargetRefusal | undefined,
 ): CompareRow {
-  if (shotgunOnly(s)) return { ...head, reason: notMetallic }
+  if (shotgunOnly(s)) return { ...head, reason: notMetallicReason }
   if (!s.interior) return { ...head, reason: noModel }
   return { ...head, reason: noLimit?.message ?? noComparableLimitText, refusal: noLimit }
 }

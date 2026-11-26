@@ -14,7 +14,6 @@ import {
 } from '../lib/manufacturers.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { ballisticCoefficientRows, bulletDataGroups, bulletStrip } from '../lib/record-fields.ts'
-import type { Wording } from '../lib/wording.ts'
 import { BulletCartridges } from './bullet-cartridges.tsx'
 import { BulletDrawing } from './bullet-drawing.tsx'
 import { ByLengthUnit } from './by-length-unit.tsx'
@@ -53,7 +52,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
       message: 'Values missing: the record only names the bullet',
     },
   ]
-  const badges: Wording[] = named.filter((x): x is MessageDescriptor => !!x)
+  const badges: MessageDescriptor[] = named.filter((x): x is MessageDescriptor => !!x)
   const coefficientsTitle = /*i18n*/ {
     id: 'bulletRecord.coefficients',
     message: 'Ballistic coefficients',

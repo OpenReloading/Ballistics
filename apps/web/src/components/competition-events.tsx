@@ -1297,7 +1297,7 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
   return (
     <>
       <PageBar
-        title={msg('Competition events')}
+        title={/*i18n*/ { id: 'page.events', message: 'Competition events' }}
         translated
         status={
           data && (

@@ -3,7 +3,6 @@ import type { Bullet } from '@rangefoundry/schema'
 import { bulletProfile } from '@rangefoundry/svg-drawings/bullet'
 import { expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { type Translator, translator } from '../src/i18n/translate.ts'
 import {
   compareGroups,
   differenceMarks,
@@ -19,11 +18,11 @@ import {
   parseCompareIds,
 } from '../src/lib/compare-ids.ts'
 import { presetUnits } from '../src/lib/units.ts'
-import { say as sayIn, type Wording } from '../src/lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 /** A wording in English, or in the language of `t` where it has no Lingui id. */
-const say = (t: Translator['t'], w: Wording) => sayIn(linguiOf('en'), t, w)
+const say = (w: LinguiWording) => sayLingui(linguiOf('en'), w)
 
 it('parses ids: trimmed, deduplicated, at most four, only record id characters', () => {
   expect(parseCompareIds('a-1, b-2,,a-1')).toEqual({ status: 'ok', ids: ['a-1', 'b-2'] })
@@ -73,8 +72,6 @@ const record = (over: Partial<Bullet>): Bullet =>
     ...over,
   }) as Bullet
 
-const english = translator().t
-
 it('merges the data tables: the key values first, then the record groups, values in the preset, a missing one undefined', () => {
   const a = record({
     length: { value: 31.5 },
@@ -87,8 +84,8 @@ it('merges the data tables: the key values first, then the record groups, values
   const b = record({ id: 'y', noseLength: { value: 15 } } as Partial<Bullet>)
   const us = compareGroups([a, b], presetUnits('us'))
   // Size and the coefficients give up every row to Key values, Computed its sectional density
-  expect(us.map((g) => say(english, g.title))).toEqual(['Key values', 'Shape', 'Twist', 'Computed'])
-  expect(defined(us[0]).rows.map((r) => say(english, r.label))).toEqual([
+  expect(us.map((g) => say(g.title))).toEqual(['Key values', 'Shape', 'Twist', 'Computed'])
+  expect(defined(us[0]).rows.map((r) => say(r.label))).toEqual([
     'Mass',
     'Diameter',
     'Length',
@@ -97,9 +94,7 @@ it('merges the data tables: the key values first, then the record groups, values
     'Sectional density',
   ])
   const row = (title: string, label: string) =>
-    us
-      .find((g) => say(english, g.title) === title)
-      ?.rows.find((r) => say(english, r.label) === label)
+    us.find((g) => say(g.title) === title)?.rows.find((r) => say(r.label) === label)
   expect(row('Key values', 'Diameter')).toEqual({
     label: { id: 'recordFields.diameter', message: 'Diameter' },
     symbol: 'd',
@@ -113,7 +108,7 @@ it('merges the data tables: the key values first, then the record groups, values
   expect(row('Key values', 'BC G7')?.values).toEqual(['0.260', undefined])
   expect(row('Key values', 'BC G1')?.values).toEqual(['0.507', undefined])
   const metric = compareGroups([a], presetUnits('metric-grams'))
-  expect(defined(metric[0]).rows.map((r) => [say(english, r.label), r.values[0], r.unit])).toEqual([
+  expect(defined(metric[0]).rows.map((r) => [say(r.label), r.values[0], r.unit])).toEqual([
     ['Mass', '10.89', 'g'],
     ['Diameter', '7.82', 'mm'],
     ['Length', '31.50', 'mm'],
@@ -133,9 +128,9 @@ it('keeps a repeated label once per repeat', () => {
   // the first G1 is a key value, the second stays with the coefficients
   const groups = compareGroups([b], presetUnits('us'))
   expect(groups.at(-1)?.rows.map((r) => r.values[0])).toEqual(['0.490'])
-  expect(
-    groups[0]?.rows.filter((r) => say(english, r.label) === 'BC G1').map((r) => r.values[0]),
-  ).toEqual(['0.507'])
+  expect(groups[0]?.rows.filter((r) => say(r.label) === 'BC G1').map((r) => r.values[0])).toEqual([
+    '0.507',
+  ])
 })
 
 it("takes each bullet's first G1 into the key values with its band: one band, one row", () => {
@@ -154,7 +149,7 @@ it("takes each bullet's first G1 into the key values with its band: one band, on
     ballisticCoefficients: [{ dragModel: 'G1', value: 0.47, minVelocity: { value: 500 } }],
   } as Partial<Bullet>)
   const groups = compareGroups([banded, single, twin], presetUnits('metric-grams'))
-  const g1 = groups[0]?.rows.filter((r) => say(english, r.label) === 'BC G1')
+  const g1 = groups[0]?.rows.filter((r) => say(r.label) === 'BC G1')
   // a band compares only with the same band: the banded and the unbanded first G1 are two rows
   expect(g1?.map((r) => [r.from, r.values])).toEqual([
     ['600 m/s', ['0.500', undefined, undefined]],
@@ -162,7 +157,7 @@ it("takes each bullet's first G1 into the key values with its band: one band, on
     ['500 m/s', ['0.480', undefined, '0.470']],
   ])
   // the 500 m/s band moved whole: no row of it is left with n/a for the third bullet
-  expect(groups.some((g) => say(english, g.title) === 'Ballistic coefficients')).toBe(false)
+  expect(groups.some((g) => say(g.title) === 'Ballistic coefficients')).toBe(false)
 })
 
 it('gives each value after the first its difference to the first, as shown', () => {
@@ -229,9 +224,9 @@ it('shows the values and the marks of a row in the language of the translator', 
   const a = record({ recommendedTwist: { value: 254 } } as Partial<Bullet>)
   const b = record({ id: 'y', recommendedTwist: { value: 203.2 } } as Partial<Bullet>)
   const twist = defined(
-    compareGroups([a, b], presetUnits('us'), english, german)
-      .find((g) => sayIn(german, english, g.title) === 'Drall')
-      ?.rows.find((r) => sayIn(german, english, r.label) === 'Empfohlener Drall'),
+    compareGroups([a, b], presetUnits('us'), german)
+      .find((g) => sayLingui(german, g.title) === 'Drall')
+      ?.rows.find((r) => sayLingui(german, r.label) === 'Empfohlener Drall'),
   )
   expect(twist.values).toEqual(['1 Umdrehung auf 10.0', '1 Umdrehung auf 8.0'])
   expect(differenceMarks(twist.values, turnPrefixOf(german))).toEqual(['max', 'min'])

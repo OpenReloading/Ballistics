@@ -928,7 +928,7 @@ export function ShootingLog() {
   return (
     <>
       <PageBar
-        title={msg('Shooting log')}
+        title={/*i18n*/ { id: 'page.firearmsLog', message: 'Shooting log' }}
         translated
         status={
           data && (

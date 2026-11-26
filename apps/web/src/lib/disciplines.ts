@@ -12,7 +12,7 @@ import {
 } from '@rangefoundry/schema'
 import { linguiOf } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
-import { english, type Translator } from '../i18n/translate.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { categoryWord } from './face-words.ts'
@@ -21,7 +21,7 @@ import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type FieldRow, type StripItem, titleFromKebab } from './record-fields.ts'
 import { metersPerYard, type Quantity } from './units.ts'
-import { say, verbatim, type Wording } from './wording.ts'
+import { type LinguiWording, sayLingui, verbatim } from './wording.ts'
 
 /** A discipline record as the API answers it: its sources resolved. */
 export type DisciplineRecord = Omit<Discipline, 'provenance'> & {
@@ -302,7 +302,7 @@ const coverWords = {
   shot: /*i18n*/ { id: 'disciplines.cover.shot', message: '{n, decimal} {unit} per shot' },
 }
 
-const sighterWords = (included: boolean | undefined): Wording[] =>
+const sighterWords = (included: boolean | undefined): LinguiWording[] =>
   included === undefined
     ? []
     : [
@@ -347,7 +347,7 @@ export function courseRows(
       ]
       return {
         label: /*i18n*/ { id: 'disciplines.row.timeLimit', message: 'Time limit' },
-        text: words.map((w) => say(linguiOf('en'), english.t, w)).join(', '),
+        text: words.map((w) => sayLingui(linguiOf('en'), w)).join(', '),
         words,
         numeric: true,
         ...(t.duration.raw && { printed: t.duration.raw }),
