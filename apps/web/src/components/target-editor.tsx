@@ -89,7 +89,7 @@ import {
   storedRecords,
 } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { photoGuide } from '../lib/docs-url.ts'
@@ -3121,6 +3121,9 @@ export function TargetEditor({
   /** The translator of this render, for the save callbacks that outlive it. */
   const tNow = useRef(t)
   tNow.current = t
+  /** The Lingui instance of this render, read the same way. */
+  const i18nNow = useRef(i18n)
+  i18nNow.current = i18n
   /** The save of the last edit while it waits for the debounce. */
   const pendingSave = useRef<(() => void) & { record?: () => WaitingRecord }>(undefined)
   /** Saves started and not yet landed, by sheet id: copied too when the page goes. */
@@ -3270,7 +3273,7 @@ export function TargetEditor({
       load,
       bulletDiameter,
       newDistance.current,
-      linguiOf(t.language),
+      i18nNow.current,
       charges ? step : undefined,
     )
     const data = face
