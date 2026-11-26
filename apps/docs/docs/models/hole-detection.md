@@ -334,6 +334,19 @@ Code: `packages/target-recognition/src/learned-detector.ts`, `learnedDetector`, 
 
 Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a chain, share a cluster id. Each proposal's diameter is $D_\mathrm{px}$; a working image over $2 \times 10^6$ pixels is refused.
 
+### Model file
+
+`hole-model` 0.1.0 is a heatmap net of 197,153 parameters, trained from random weights by `training/hole-model` and exported to ONNX opset 17. The file is `apps/web/public/models/hole-model-0.1.0.onnx` (792,640 bytes), licensed CC0-1.0 and served at <https://openreloading.github.io/Ballistics/next/models/hole-model-0.1.0.onnx>; its manifest is `hole-model-0.1.0.json` beside it. The service worker neither precaches nor stores it, and no script bundle holds it.
+
+- Input: RGB in 0 to 1 with the expected hole at 16 px, width and height multiples of 16. Output: one heatmap channel at stride 2.
+- Training photos: 3,000 synthetic and 638 real third-party target photos with unchecked labels. Target kinds are not counted for this model.
+- Threshold 0.45, the best F1 score on the validation photos. The `sure` value 0.9 is not set from scores, so most peaks stay maybes.
+- Validation, 136 real target photos with 938 holes: recall 0.904, precision 0.882, corrections median 0.5, 90th percentile 3.5, maximum 16.
+- Test, 300 synthetic target photos with 1,476 holes: recall 0.731, precision 0.936, corrections median 1, 90th percentile 4, maximum 9.
+- Largest output difference between PyTorch and ONNX Runtime: $2.7 \times 10^{-7}$.
+
+The accuracy gate on the holdout photos has not run on this model, so its manifest has no holdout scores. The classical detector stays the default, and the app neither downloads nor runs this model.
+
 ### Photo quality
 
 The target search also checks the photo, resized to 2000 px on its longer side, for what makes holes hard to find, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the run on an added photo applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right. Taking a photo that passes these checks: [Taking a photo the app can score](../photo-guide.md). Where the app has a docs site, the Photo panel links that page and each note links the rule of it that matches its problem (`guideRule`): framing and no edge found to One target, all of it; tilt to Straight from above; contrast, brightness, glare and uneven light to Even light; hole size to Close enough; sharpness to Steady.

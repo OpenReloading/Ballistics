@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "hole-model",
+  "version": "0.1.0",
+  "file": {
+    "name": "hole-model-0.1.0.onnx",
+    "url": "https://openreloading.github.io/Ballistics/next/models/hole-model-0.1.0.onnx",
+    "sha256": "43631bba97d43f2cc838dab83ec024a24f39c0ef687a7d8b1cf0763cbbf8a023",
+    "bytes": 792640
+  },
+  "runtime": {
+    "package": "onnxruntime-web",
+    "version": "1.31.1",
+    "wasmPaths": "/models/ort/",
+    "opset": 17
+  },
+  "input": { "holePx": 16, "channels": "rgb", "range": [0, 1], "sizeMultiple": 16 },
+  "output": { "stride": 2, "channels": 1, "threshold": 0.45, "sure": 0.9 },
+  "license": {
+    "model": "CC0-1.0",
+    "training": {
+      "classes": { "own": 0, "third-party": 638, "synthetic": 3000 },
+      "kinds": {}
+    }
+  },
+  "measured": {
+    "synthetic": { "photos": 300, "median": 1, "p90": 4, "max": 9 },
+    "holdout": null,
+    "parity": 2.7e-7
+  }
+}

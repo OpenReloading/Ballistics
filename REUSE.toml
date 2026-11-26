@@ -31,6 +31,12 @@ path = [
 SPDX-FileCopyrightText = "2026 RangeFoundry contributors"
 SPDX-License-Identifier = "MIT"
 
+# Hole detection model weights (apps/docs/docs/models/hole-detection.md, Model file).
+[[annotations]]
+path = "apps/web/public/models/hole-model-*.onnx"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
 # Inter fonts and their license text (apps/web/src/platform/fonts/OFL.txt).
 [[annotations]]
 path = [

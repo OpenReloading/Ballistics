@@ -8,6 +8,11 @@ Bundesverwaltungsamt (BVA), the shooting sport federations or the C.I.P.
 
 ---
 
+The hole detection model files (apps/web/public/models/hole-model-*.onnx) are dedicated to
+the public domain under CC0 1.0 Universal (LICENSES/CC0-1.0.txt).
+
+---
+
 The Ballistics logo files below are copied from the RangeFoundry Artwork repository,
 https://github.com/OpenReloading/Artwork, folder ballistics/, commit
 09bfdbb14e9d33cf34b75483f5b51196705e4841, under the MIT License that follows.
