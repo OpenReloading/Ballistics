@@ -40,7 +40,10 @@ it('ends a waiting request when the worker fails and starts a new worker on the 
   expect(await pending).toEqual({
     kind: 'error',
     id: 1,
-    message: 'The photograph could not be processed in this browser.',
+    message: {
+      id: 'bulletPhoto.workerFailed',
+      message: 'The photograph could not be processed in this browser.',
+    },
   })
   expect(first?.terminated).toBe(true)
   expect(onError).toHaveBeenCalledOnce()

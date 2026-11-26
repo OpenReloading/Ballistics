@@ -1,8 +1,9 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { type Message, msg } from '../i18n/translate.ts'
+import type { Message } from '../i18n/translate.ts'
 import { type Design, evaluate } from '../lib/bullet-designer.ts'
 import { paintDisc, type Scale, type ScaleSpan, scaleOf } from '../lib/bullet-photo.ts'
 import { tintBox, tintOf } from '../lib/bullet-photo-canvas.ts'
@@ -26,15 +27,36 @@ import type { Wording } from '../lib/wording.ts'
 /** The longer side of the working image, px: a larger photograph is shrunk to it while it is read. */
 const workLong = 2400
 
-/** The ruler's distance between two placed points; `label` is a message the field translates. */
-export const distanceSpec = (label: Message): FieldSpec => ({
-  key: label,
-  label,
+/** The ruler's distance between two placed points; each field gives it its label. */
+export const distanceSpec: FieldSpec = {
+  key: 'distance',
+  label: '',
   quantity: 'length',
   positive: true,
-})
+}
 
 const empty: FieldValue = { text: '', si: undefined }
+
+const texts = {
+  workerFailed: /*i18n*/ {
+    id: 'bulletPhoto.workerFailed',
+    message: 'The photograph could not be processed in this browser.',
+  },
+  cutting: /*i18n*/ { id: 'bulletPhoto.cutting', message: 'Cutting out the bullet…' },
+  unreadable: /*i18n*/ {
+    id: 'bulletPhoto.unreadable',
+    message: 'This browser cannot read the photograph.',
+  },
+  reading: /*i18n*/ { id: 'bulletPhoto.reading', message: 'Reading the photograph…' },
+  notAnImage: /*i18n*/ {
+    id: 'bulletPhoto.notAnImage',
+    message: 'This file is not an image this browser can read.',
+  },
+  makingSample: /*i18n*/ {
+    id: 'bulletPhoto.makingSample',
+    message: 'Making the sample photograph…',
+  },
+}
 
 type Without<T> = T extends unknown ? Omit<T, 'id'> : never
 
@@ -57,7 +79,7 @@ export function useWorker(onError: (message: Wording) => void) {
         const fail = () => {
           w.terminate()
           if (worker.current === w) worker.current = undefined
-          const message = msg('The photograph could not be processed in this browser.')
+          const message = texts.workerFailed
           for (const [id, resolve] of waiting.current) resolve({ kind: 'error', id, message })
           waiting.current.clear()
           onError(message)
@@ -112,7 +134,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const [warnings, setWarnings] = useState<Wording[]>([])
   /** The width the cut-out's edge is spread over, px; 0 once the cut-out is corrected by hand. */
   const [spread, setSpread] = useState(0)
-  const [busy, setBusy] = useState<Message>()
+  const [busy, setBusy] = useState<MessageDescriptor>()
   /** English, a message where the tool wrote it, translated where it is shown. */
   const [failure, setFailure] = useState<Wording>()
   const ask = useWorker(setFailure)
@@ -135,7 +157,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const cutOut = useCallback(
     async (exclude: Point[]) => {
       if (!(size && tint.current)) return
-      setBusy(msg('Cutting out the bullet…'))
+      setBusy(texts.cutting)
       const asked = strokes.current
       const r = await ask({ kind: 'segment', exclude })
       setBusy(undefined)
@@ -198,7 +220,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     const data = canvas
       .getContext('2d', { willReadFrequently: true })
       ?.getImageData(0, 0, canvas.width, canvas.height)
-    if (!data) return setFailure(msg('This browser cannot read the photograph.'))
+    if (!data) return setFailure(texts.unreadable)
     const buffer = data.data.buffer as ArrayBuffer
     const r = await ask(
       { kind: 'load', width: canvas.width, height: canvas.height, data: buffer },
@@ -215,14 +237,11 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     setSpread(0)
     setPoints(span ? [span.a, span.b] : [])
     setKnown([empty, empty])
-    setDistances([
-      span ? fieldOf(system, distanceSpec(msg('Distance A to B')), toSi('length', span.mm)) : empty,
-      empty,
-    ])
+    setDistances([span ? fieldOf(system, distanceSpec, toSi('length', span.mm)) : empty, empty])
     setSize({ width: canvas.width, height: canvas.height })
   }
 
-  const run = async (busyText: Message, work: () => Promise<void>) => {
+  const run = async (busyText: MessageDescriptor, work: () => Promise<void>) => {
     setFailure(undefined)
     setBusy(busyText)
     try {
@@ -236,16 +255,15 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   /** Reads a photograph file, shrunk to the working size. */
   const read = (file: File | null) =>
     file &&
-    run(msg('Reading the photograph…'), async () => {
-      const bitmap = await createImageBitmap(file).catch(() => {
-        throw new Error(msg('This file is not an image this browser can read.'))
-      })
+    run(texts.reading, async () => {
+      const bitmap = await createImageBitmap(file).catch(() => undefined)
+      if (!bitmap) return setFailure(texts.notAnImage)
       const k = Math.min(1, workLong / Math.max(bitmap.width, bitmap.height))
       const canvas = document.createElement('canvas')
       canvas.width = Math.round(bitmap.width * k)
       canvas.height = Math.round(bitmap.height * k)
       const g = canvas.getContext('2d')
-      if (!g) throw new Error(msg('This browser cannot read the photograph.'))
+      if (!g) return setFailure(texts.unreadable)
       g.imageSmoothingQuality = 'high'
       g.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
       bitmap.close()
@@ -254,7 +272,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
 
   /** The synthetic sample photograph, with its ruler span placed. */
   const sample = () =>
-    run(msg('Making the sample photograph…'), async () => {
+    run(texts.makingSample, async () => {
       const { image, span } = samplePhoto()
       const canvas = document.createElement('canvas')
       canvas.width = image.width

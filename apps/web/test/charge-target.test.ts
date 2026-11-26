@@ -1,6 +1,7 @@
+import { setupI18n } from '@lingui/core'
 import { describe, expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import {
   answerOf,
   chargeTargetBody,
@@ -182,8 +183,11 @@ describe('the answer kept for a language change', () => {
     if (out.kind !== 'refused') throw new Error('expected a refusal')
     const shown = out.text(english.t, en)
     expect(shown).toBe('The search did not reach its tolerance.')
-    const own = translator({ 'The search did not reach its tolerance.': 'Verfehlt.' }, 'de')
-    expect(out.text(own.t, en)).toBe('Verfehlt.')
+    const own = setupI18n({
+      locale: 'de',
+      messages: { de: { 'chargeTarget.toleranceNotReached': 'Verfehlt.' } },
+    })
+    expect(out.text(english.t, own)).toBe('Verfehlt.')
     expect(out.text(english.t, en)).toBe(shown)
   })
 
