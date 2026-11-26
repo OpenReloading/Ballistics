@@ -18,6 +18,12 @@ path = ["**/*.api.md", "tools/test/fixtures/markdown-meaning.md"]
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
 SPDX-License-Identifier = "AGPL-3.0-only"
 
+# The design tokens, which other projects use (packages/design-tokens/LICENSE).
+[[annotations]]
+path = "packages/design-tokens/**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "MIT"
+
 # Catalog records (NOTICE, packages/catalog/LICENSE).
 [[annotations]]
 path = "packages/catalog/records/**"
