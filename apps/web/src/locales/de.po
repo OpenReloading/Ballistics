@@ -27,6 +27,14 @@ msgstr "{added, decimal} Einträge hinzugefügt, {equal, decimal} schon in diese
 msgid "events.imported"
 msgstr "{added} Wettkämpfe hinzugefügt, {equal} schon in diesem Browser, {replaced} ersetzt."
 
+# en: "{count, decimal} proposed, {maybe, decimal} maybe"
+msgid "holeDetection.proposedMaybe"
+msgstr "{count, decimal} vorgeschlagen, {maybe, decimal} vielleicht"
+
+# en: "{count, decimal} proposed, {maybe, decimal} maybe: accept them to add shots."
+msgid "holeDetection.proposedMaybeAcceptThem"
+msgstr "{count, decimal} vorgeschlagen, {maybe, decimal} vielleicht: übernehmen Sie sie, um Schüsse hinzuzufügen."
+
 # en: "{count, plural, one {{shown} of # brass} other {{shown} of # brass}}"
 msgid "lists.countShown.cases"
 msgstr "{count, plural, one {{shown} von # Hülse} other {{shown} von # Hülsen}}"
@@ -70,6 +78,10 @@ msgstr "{count, plural, one {{shown} von # Zündhütchen} other {{shown} von # Z
 # en: "{count, plural, one {{shown} of # target} other {{shown} of # targets}}"
 msgid "lists.countShown.faces"
 msgstr "{count, plural, one {{shown} von # Scheibe} other {{shown} von # Scheiben}}"
+
+# en: "{count, plural, one {# area to place by hand (dashed box).} other {# areas to place by hand (dashed box).}}"
+msgid "holeDetection.areasByHand"
+msgstr "{count, plural, one {# Bereich von Hand zu platzieren (gestrichelter Rahmen).} other {# Bereiche von Hand zu platzieren (gestrichelter Rahmen).}}"
 
 # en: "{count, plural, one {# brass} other {# brass}}"
 msgid "lists.count.cases"
@@ -159,6 +171,10 @@ msgstr "{count, plural, one {# Datensatz einer anderen Art ausgelassen; der Impo
 msgid "log.otherKinds"
 msgstr "{count, plural, one {# Datensatz einer anderen Art ausgelassen; der Import eines Datei-Menüs liest ihn.} other {# Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie.}}"
 
+# en: "{count, plural, one {# reference} other {# references}}"
+msgid "holeDetection.referenceCount"
+msgstr "{count, plural, one {# Referenz} other {# Referenzen}}"
+
 # en: "{count, plural, one {# ring} other {# rings}}"
 msgid "targets.rings"
 msgstr "{count, plural, one {# Ring} other {# Ringe}}"
@@ -174,6 +190,10 @@ msgstr "{count, plural, one {# Schuss abgegeben} other {# Schuss abgegeben}}"
 # en: "{count, plural, one {# round} other {# rounds}}"
 msgid "log.roundTotal"
 msgstr "{count, plural, one {# Schuss abgegeben} other {# Schuss abgegeben}}"
+
+# en: "{count, plural, one {# shot added.} other {# shots added.}}"
+msgid "holeDetection.shotsAdded"
+msgstr "{count, plural, one {# Schuss hinzugefügt.} other {# Schüsse hinzugefügt.}}"
 
 # en: "{count, plural, one {# shot} other {# shots}}"
 msgid "sessionSummary.shotCount"
@@ -223,6 +243,18 @@ msgstr "{count} ausgewählt"
 msgid "comparePicks.selectedMax"
 msgstr "{count} ausgewählt (höchstens {max})"
 
+# en: "{face} ({outer}): {event}, {distance}"
+msgid "holeDetection.faceChoice"
+msgstr "{face} ({outer}): {event}, {distance}"
+
+# en: "{face}: scale and center from {count, decimal} ellipses (one ellipse, the center is approximate under tilt)."
+msgid "holeDetection.scaleCenterEllipsesOne"
+msgstr "{face}: Maßstab und Mitte aus {count, decimal} Ellipsen (eine Ellipse, die Mitte ist bei Neigung nur angenähert)."
+
+# en: "{face}: scale and center from {count, decimal} ellipses."
+msgid "holeDetection.scaleCenterEllipses"
+msgstr "{face}: Maßstab und Mitte aus {count, decimal} Ellipsen."
+
 # en: "{from} to {to}"
 msgid "log.fromTo"
 msgstr "{from} bis {to}"
@@ -258,6 +290,10 @@ msgstr "{label}, aufsteigend"
 # en: "{label}, Z to A"
 msgid "directoryTable.zToA"
 msgstr "{label}, Z bis A"
+
+# en: "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it."
+msgid "holeDetection.doubleClickEnterAccepts"
+msgstr "{label}. Doppelklick oder Eingabetaste übernimmt ihn, Ziehen oder Pfeiltasten verschieben ihn, Entf löscht ihn."
 
 # en: "{low} to {high}"
 msgid "chargeTarget.pressureRangeValue"
@@ -326,6 +362,10 @@ msgstr "{name} wurde nicht gelöscht: Der Browser hat es abgelehnt."
 # en: "{order} of {total}"
 msgid "recordFields.burnRateOrder"
 msgstr "{order} von {total}"
+
+# en: "{pct, decimal} %"
+msgid "holeDetection.percent"
+msgstr "{pct, decimal} %"
 
 # en: "{points} points, hit factor {hf}"
 msgid "events.stageScore"
@@ -431,9 +471,21 @@ msgstr "Eine Kurve konnte nicht geladen werden."
 msgid "powderCompare.apiSilent"
 msgstr "Eine Datendatei wurde nicht geladen oder die Berechnung ist fehlgeschlagen. Prüfen Sie die Verbindung und versuchen Sie es erneut."
 
+# en: "A group holds at most 1000 shots."
+msgid "holeDetection.groupHoldsMost1000"
+msgstr "Ein Schussbild enthält höchstens 1000 Schüsse."
+
+# en: "A known distance on the target or the size of a target ring, marked on the photo in Calibrate."
+msgid "holeDetection.knownDistanceTargetSize"
+msgstr "Eine bekannte Entfernung auf der Zielscheibe oder die Größe eines Scheibenrings, auf dem Foto unter „Kalibrieren“ markiert."
+
 # en: "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
 msgid "powderRecord.neighborNote"
 msgstr "Ein Nachbar ist ein Kandidat, kein Ersatz: Er braucht eine neue Ladungsentwicklung, bevor er dieses Treibladungspulver ersetzt."
+
+# en: "A region needs at least 3 points"
+msgid "holeDetection.regionNeedsLeast3"
+msgstr "Ein Bereich braucht mindestens 3 Punkte"
 
 # en: "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline."
 msgid "bulletPhoto.shadowMirrored"
@@ -442,6 +494,14 @@ msgstr "Ein Schatten neben dem Geschoss verbreitert eine Seite der Freistellung:
 # en: "Abbreviation"
 msgid "disciplines.column.abbreviation"
 msgstr "Abkürzung"
+
+# en: "Accept maybes ({count, decimal})"
+msgid "holeDetection.acceptMaybes"
+msgstr "Vielleicht-Vorschläge übernehmen ({count, decimal})"
+
+# en: "Accept sure ({count, decimal})"
+msgid "holeDetection.acceptSure"
+msgstr "Sichere übernehmen ({count, decimal})"
 
 # en: "Actions"
 msgid "disciplines.row.actions"
@@ -607,6 +667,10 @@ msgstr "Diopter"
 msgid "chargeTarget.apply"
 msgstr "Übernehmen"
 
+# en: "Area {n, decimal} to place by hand: about {count, decimal} holes of area joined (touching holes or dark print); detection does not count it."
+msgid "holeDetection.areaPlaceHandAbout"
+msgstr "Bereich {n, decimal} von Hand zu platzieren: etwa {count, decimal} Schusslöcher als eine Fläche verbunden (sich berührende Schusslöcher oder dunkler Aufdruck); die Erkennung zählt ihn nicht."
+
 # en: "Areas"
 msgid "units.quantity.area"
 msgstr "Flächen"
@@ -638,6 +702,10 @@ msgstr "Beim Maßstab des Lineals weicht die Gesamtlänge auf dem Foto um {perce
 # en: "Axis direction, degrees from the photograph's x axis"
 msgid "bulletPhoto.axisDirection"
 msgstr "Achsrichtung, Grad zur x-Achse des Fotos"
+
+# en: "Back"
+msgid "holeDetection.back"
+msgstr "Zurück"
 
 # en: "ball"
 msgid "values.ball"
@@ -855,6 +923,10 @@ msgstr "Aufbau"
 msgid "recordFields.bulkDensity"
 msgstr "Schüttgewicht"
 
+# en: "bullet"
+msgid "holeDetection.bullet"
+msgstr "Geschoss"
+
 # en: "Bullet data"
 msgid "bulletCompare.data"
 msgstr "Geschossdaten"
@@ -971,12 +1043,20 @@ msgstr "Kaliber"
 msgid "cartridges.column.cal"
 msgstr "Kaliber"
 
+# en: "Caliber"
+msgid "holeDetection.caliber"
+msgstr "Kaliber"
+
 # en: "Caliber {caliber}"
 msgid "bulletRecord.caliber"
 msgstr "Kaliber {caliber}"
 
 # en: "Caliber class"
 msgid "disciplines.facet.class"
+msgstr "Kaliberklasse"
+
+# en: "Caliber class"
+msgid "holeDetection.caliberClass"
 msgstr "Kaliberklasse"
 
 # en: "Caliber classes"
@@ -991,6 +1071,10 @@ msgstr "Kaliberklassen"
 msgid "disciplines.row.caliberClassBasis"
 msgstr "Kaliberklassen aus"
 
+# en: "Calibrate"
+msgid "holeDetection.calibrate"
+msgstr "Kalibrieren"
+
 # en: "Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out."
 msgid "bulletPhoto.caliperHelp"
 msgstr "Maße vom Messschieber ergeben den Maßstab ohne Lineal und prüfen ihn mit Lineal. Zusammen zeigen sie ein schräg liegendes Geschoss oder einen Schatten in der Freistellung."
@@ -1002,6 +1086,10 @@ msgstr "Abbrechen"
 # en: "Cancel"
 msgid "log.cancel"
 msgstr "Abbrechen"
+
+# en: "Cancel ({pct, decimal} %)"
+msgid "holeDetection.cancelPercent"
+msgstr "Abbrechen ({pct, decimal} %)"
 
 # en: "Carbine"
 msgid "values.carbine"
@@ -1183,6 +1271,26 @@ msgstr "Mindestmaß des Patronenlagers minus Höchstmaß der Patrone"
 msgid "cartridgeRecord.sideNotes.chamber"
 msgstr "Patronenlager: {notes}"
 
+# en: "change"
+msgid "holeDetection.change"
+msgstr "ändern"
+
+# en: "Change the hole size"
+msgid "holeDetection.changeHoleSize"
+msgstr "Schusslochgröße ändern"
+
+# en: "Change the holes"
+msgid "holeDetection.changeHoles"
+msgstr "Schusslöcher ändern"
+
+# en: "Change the scale"
+msgid "holeDetection.changeScale"
+msgstr "Maßstab ändern"
+
+# en: "Change the target"
+msgid "holeDetection.changeTarget"
+msgstr "Zielscheibe ändern"
+
 # en: "Charge for a target"
 msgid "chargeTarget.title"
 msgstr "Treibladung für eine Zielgröße"
@@ -1194,6 +1302,10 @@ msgstr "Prüfen Sie den Eintrag: Ein Wert liegt außerhalb seines Bereichs."
 # en: "Check the event: a value is out of its range."
 msgid "events.outOfRange"
 msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
+
+# en: "Choose"
+msgid "holeDetection.choose"
+msgstr "Wählen"
 
 # en: "Choose a photograph of the bullet beside a ruler, or try the sample. It is never uploaded."
 msgid "bulletPhoto.chooseHelp"
@@ -1219,6 +1331,10 @@ msgstr "Chronograph-Datei"
 msgid "comparePicks.clear"
 msgstr "Leeren"
 
+# en: "Clear"
+msgid "holeDetection.clear"
+msgstr "Leeren"
+
 # en: "Clear all"
 msgid "facetFilters.clear"
 msgstr "Alle zurücksetzen"
@@ -1226,6 +1342,14 @@ msgstr "Alle zurücksetzen"
 # en: "Clear filters"
 msgid "states.clearFilters"
 msgstr "Filter zurücksetzen"
+
+# en: "Clear proposals"
+msgid "holeDetection.clearProposals"
+msgstr "Vorschläge leeren"
+
+# en: "Clear proposals and areas to place by hand"
+msgid "holeDetection.clearProposalsAreasPlace"
+msgstr "Vorschläge und von Hand zu platzierende Bereiche leeren"
 
 # en: "Clear search"
 msgid "directoryTable.clearSearch"
@@ -1246,6 +1370,18 @@ msgstr "Spiel {value}"
 # en: "Clearance: {meaning}"
 msgid "cartridgeRecord.clearanceLine"
 msgstr "Spiel: {meaning}"
+
+# en: "Click the corners of the region; click the last one again (Enter twice) to close it. {count, decimal} points. Esc cancels."
+msgid "holeDetection.clickCornersRegionClick"
+msgstr "Klicken Sie die Ecken des Bereichs; klicken Sie die letzte erneut (zweimal Eingabetaste), um ihn zu schließen. {count, decimal} Punkte. Esc bricht ab."
+
+# en: "Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels."
+msgid "holeDetection.clickMiddleOneHole"
+msgstr "Klicken Sie in die Mitte eines Schusslochs ohne Aufdruck. Oder Pfeiltasten und Eingabetaste. Esc bricht ab."
+
+# en: "Click two opposite corners of the region. Point {n, decimal} of 2. Or arrow keys and Enter. Esc cancels."
+msgid "holeDetection.clickTwoOppositeCorners"
+msgstr "Klicken Sie zwei gegenüberliegende Ecken des Bereichs. Punkt {n, decimal} von 2. Oder Pfeiltasten und Eingabetaste. Esc bricht ab."
 
 # en: "Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first."
 msgid "bulletPhoto.scaleHelp"
@@ -1591,6 +1727,30 @@ msgstr "Abgeleitet aus dem Bereich oder dem Messring, den die Sportordnung angib
 msgid "cartridgeRecord.derived"
 msgstr "Abgeleitet, nicht bemaßt"
 
+# en: "Detect"
+msgid "holeDetection.detect"
+msgstr "Erkennen"
+
+# en: "Detect anyway"
+msgid "holeDetection.detectAnyway"
+msgstr "Trotzdem erkennen"
+
+# en: "Detect holes"
+msgid "holeDetection.detectHoles"
+msgstr "Schusslöcher erkennen"
+
+# en: "Detection cancelled."
+msgid "holeDetection.detectionCancelled"
+msgstr "Erkennung abgebrochen."
+
+# en: "Detection steps"
+msgid "holeDetection.detectionSteps"
+msgstr "Erkennungsschritte"
+
+# en: "Detection waits. Detect anyway runs it on this photo; check every proposed hole."
+msgid "holeDetection.detectionWaitsDetectAnyway"
+msgstr "Die Erkennung wartet. „Trotzdem erkennen“ führt sie für dieses Foto aus; prüfen Sie jedes vorgeschlagene Schussloch."
+
 # en: "Device: {device}"
 msgid "sessionSummary.device"
 msgstr "Gerät: {device}"
@@ -1859,6 +2019,14 @@ msgstr "Energie, wie unter Pressures (Energies) gedruckt"
 msgid "log.enterDate"
 msgstr "Geben Sie das Datum ein."
 
+# en: "Enter the hole size first (step 3)."
+msgid "holeDetection.enterHoleSizeFirst"
+msgstr "Geben Sie zuerst die Schusslochgröße ein (Schritt 3)."
+
+# en: "Enter the hole size: the holes are found next."
+msgid "holeDetection.enterHoleSizeHoles"
+msgstr "Geben Sie die Schusslochgröße ein: Danach werden die Schusslöcher gesucht."
+
 # en: "Enter who confirmed the entry, or clear the day of the confirmation."
 msgid "log.enterConfirmedBy"
 msgstr "Geben Sie ein, wer den Eintrag bestätigt hat, oder leeren Sie den Tag der Bestätigung."
@@ -1935,6 +2103,10 @@ msgstr "Wettbewerbe ({count})"
 # en: "Events table"
 msgid "faceRecord.eventsTable"
 msgstr "Tabelle der Wettbewerbe"
+
+# en: "Example"
+msgid "holeDetection.example"
+msgstr "Beispiel"
 
 # en: "Excluded"
 msgid "sessionSummary.excluded"
@@ -2072,9 +2244,25 @@ msgstr "Die Patronen filtern"
 msgid "chargeTarget.findCharge"
 msgstr "Treibladung suchen"
 
+# en: "Find target"
+msgid "holeDetection.findTarget"
+msgstr "Scheibe suchen"
+
 # en: "Find the axis again"
 msgid "bulletPhoto.findAxisAgain"
 msgstr "Achse neu finden"
+
+# en: "Find the holes like the example hole."
+msgid "holeDetection.findHolesLikeExample"
+msgstr "Die Schusslöcher wie das Beispiel-Schussloch finden."
+
+# en: "Find the holes on the target or in the region; the photo stays in this browser."
+msgid "holeDetection.findHolesTargetRegion"
+msgstr "Die Schusslöcher auf der Zielscheibe oder im Bereich finden; das Foto bleibt in diesem Browser."
+
+# en: "Find the target first: no black area is known."
+msgid "holeDetection.findTargetFirstBlack"
+msgstr "Suchen Sie zuerst die Scheibe: Es ist kein Spiegel bekannt."
 
 # en: "Firearm"
 msgid "disciplines.row.firearm"
@@ -2336,6 +2524,14 @@ msgstr "Die Kamera ruhig halten oder abstützen, auf die Zielscheibe fokussieren
 msgid "faceRecord.scoredBy.center"
 msgstr "Lochmitte"
 
+# en: "Hole detection"
+msgid "holeDetection.title"
+msgstr "Schusslocherkennung"
+
+# en: "Hole detection failed in this browser."
+msgid "holeDetection.holeDetectionFailedBrowser"
+msgstr "Die Schusslocherkennung ist in diesem Browser fehlgeschlagen."
+
 # en: "Hole edge"
 msgid "faceRecord.scoredBy.touch"
 msgstr "Lochrand"
@@ -2343,6 +2539,10 @@ msgstr "Lochrand"
 # en: "Hole edge, outward"
 msgid "faceRecord.scoredBy.outward"
 msgstr "Lochrand, nach außen gemessen"
+
+# en: "Holes"
+msgid "holeDetection.holes"
+msgstr "Schusslöcher"
 
 # en: "hollow point"
 msgid "disciplines.rule.hollowPoint"
@@ -2548,6 +2748,10 @@ msgstr "Bleifrei"
 msgid "cartridgeRecord.meaning.leadeAngle"
 msgstr "Winkel des Übergangskegels"
 
+# en: "learned"
+msgid "holeDetection.learned"
+msgstr "gelernt"
+
 # en: "Length"
 msgid "recordFields.length"
 msgstr "Länge"
@@ -2619,6 +2823,10 @@ msgstr "Laborierung"
 # en: "Load"
 msgid "log.load"
 msgstr "Laborierung"
+
+# en: "Load a photo first."
+msgid "holeDetection.loadPhotoFirst"
+msgstr "Laden Sie zuerst ein Foto."
 
 # en: "Load example"
 msgid "sessionSummary.loadExample"
@@ -2856,6 +3064,18 @@ msgstr "Hersteller, Name oder Größe…"
 msgid "bullets.search"
 msgstr "Hersteller, Name, 168, .308 oder 7,82…"
 
+# en: "Mark a polygon on the photo"
+msgid "holeDetection.markPolygonPhoto"
+msgstr "Ein Polygon auf dem Foto markieren"
+
+# en: "Mark a rectangle on the photo"
+msgid "holeDetection.markRectanglePhoto"
+msgstr "Ein Rechteck auf dem Foto markieren"
+
+# en: "marker"
+msgid "holeDetection.marker"
+msgstr "Markierung"
+
 # en: "Mass"
 msgid "recordFields.mass"
 msgstr "Masse"
@@ -2899,6 +3119,14 @@ msgstr "Maximaler mittlerer Druck"
 # en: "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
 msgid "cartridges.column.pmaxHelp"
 msgstr "Größter mittlerer Druck laut CIP-Datenblatt, höchste Variante, nach dem Verfahren des Datenblatts."
+
+# en: "maybe"
+msgid "holeDetection.maybe"
+msgstr "vielleicht"
+
+# en: "maybe {pct, decimal} %"
+msgid "holeDetection.maybePercent"
+msgstr "vielleicht {pct, decimal} %"
 
 # en: "Mean"
 msgid "sessionSummary.mean"
@@ -3019,6 +3247,10 @@ msgstr "Monolith"
 # en: "Month"
 msgid "logSummary.month"
 msgstr "Monat"
+
+# en: "More than one target fits these rings: choose one in Target."
+msgid "holeDetection.moreThanOneTarget"
+msgstr "Mehr als eine Scheibe passt zu diesen Ringen: Wählen Sie die Zielscheibe unter Scheibe."
 
 # en: "Move closer so the target fills more of the frame, or use the full resolution of the camera."
 msgid "photoQuality.fix.moveCloser"
@@ -3172,6 +3404,10 @@ msgstr "Neues Treibladungspulver"
 msgid "targets.new"
 msgstr "Neue Scheibe"
 
+# en: "Next"
+msgid "holeDetection.next"
+msgstr "Weiter"
+
 # en: "Nickel plated brass"
 msgid "values.nickelPlatedBrass"
 msgstr "Vernickelte Messinghülse"
@@ -3219,6 +3455,10 @@ msgstr "Keine Geschosse ausgewählt."
 # en: "No bullets match these filters."
 msgid "states.noMatch.bullets"
 msgstr "Keine Geschosse entsprechen diesen Filtern."
+
+# en: "No canvas to read the photo."
+msgid "holeDetection.noCanvas"
+msgstr "Es gibt keine Zeichenfläche, um das Foto zu lesen."
 
 # en: "No cartridge matches {query}."
 msgid "bulletRecord.noCartridge"
@@ -3324,6 +3564,18 @@ msgstr "Keine angepassten Modellparameter"
 msgid "burnRate.noFit"
 msgstr "Keine angepassten Parameter: Die Anpassung an Ladetabellen braucht mindestens 10 Trainingszeilen aus mindestens 2 Patronen."
 
+# en: "No holes found from there: click the middle of a hole clear of print."
+msgid "holeDetection.noHolesFromThere"
+msgstr "Von dort aus wurden keine Schusslöcher gefunden: Klicken Sie in die Mitte eines Schusslochs ohne Aufdruck."
+
+# en: "No holes found: pick one example hole (step 3)."
+msgid "holeDetection.noHolesPickOne"
+msgstr "Keine Schusslöcher gefunden: Wählen Sie ein Beispiel-Schussloch (Schritt 3)."
+
+# en: "No holes proposed in the region."
+msgid "holeDetection.noHolesProposed"
+msgstr "Im Bereich wurden keine Schusslöcher vorgeschlagen."
+
 # en: "No page stated"
 msgid "recordSources.noPage"
 msgstr "Keine Seite angegeben"
@@ -3364,6 +3616,10 @@ msgstr "Kein gespeicherter Wettkampf zum Exportieren."
 msgid "bulletPhoto.noScale"
 msgstr "Noch kein Maßstab."
 
+# en: "No target fits the rings found (dashed): choose a target, type the black diameter or set the scale."
+msgid "holeDetection.noTargetFitsRings"
+msgstr "Keine Scheibe passt zu den gefundenen Ringen (gestrichelt): Wählen Sie eine Scheibe, geben Sie den Spiegeldurchmesser ein oder stellen Sie den Maßstab ein."
+
 # en: "No target mapping names this discipline."
 msgid "disciplineRecord.noTargets"
 msgstr "Keine Zuordnung enthält den Namen dieser Disziplin."
@@ -3392,6 +3648,10 @@ msgstr "No-Shoots"
 msgid "cartridgeRecord.difference"
 msgstr "nominelle Mindestdifferenz der veröffentlichten Maße"
 
+# en: "none"
+msgid "holeDetection.none"
+msgstr "keine"
+
 # en: "None"
 msgid "powderRecord.none"
 msgstr "Keine"
@@ -3403,6 +3663,10 @@ msgstr "Keine"
 # en: "None"
 msgid "log.none"
 msgstr "Keine"
+
+# en: "None marked."
+msgid "holeDetection.noneMarked"
+msgstr "Keine markiert."
 
 # en: "Nose length"
 msgid "recordFields.noseLength"
@@ -3491,6 +3755,10 @@ msgstr "Notizen"
 # en: "Notes"
 msgid "log.notes"
 msgstr "Notizen"
+
+# en: "Now {count, decimal} corners."
+msgid "holeDetection.nowCorners"
+msgstr "Jetzt {count, decimal} Ecken."
 
 # en: "Number"
 msgid "disciplines.row.number"
@@ -3692,6 +3960,10 @@ msgstr "Strafen"
 msgid "recordFields.perLoadRow"
 msgstr "je Zeile der Ladetabelle"
 
+# en: "Photo guide: {rule}"
+msgid "holeDetection.photoGuide"
+msgstr "Fotoanleitung: {rule}"
+
 # en: "Photograph messages"
 msgid "bulletPhoto.messages"
 msgstr "Meldungen zum Foto"
@@ -3703,6 +3975,10 @@ msgstr "Foto des Geschosses"
 # en: "Pick 2 to {max}"
 msgid "bullets.pickToCompare"
 msgstr "2 bis {max} auswählen"
+
+# en: "Pick one hole"
+msgid "holeDetection.pickOneHole"
+msgstr "Ein Schussloch wählen"
 
 # en: "piezo"
 msgid "values.piezo"
@@ -3724,6 +4000,10 @@ msgstr "Ort"
 msgid "log.column.place"
 msgstr "Ort"
 
+# en: "place by hand"
+msgid "holeDetection.placeHand"
+msgstr "von Hand platzieren"
+
 # en: "Place scale points"
 msgid "bulletPhoto.placeScalePoints"
 msgstr "Maßstabspunkte setzen"
@@ -3743,6 +4023,10 @@ msgstr "Pmax"
 # en: "Points"
 msgid "events.points"
 msgstr "Punkte"
+
+# en: "Polygon"
+msgid "holeDetection.polygon"
+msgstr "Polygon"
 
 # en: "polymer coat"
 msgid "values.polymerCoat"
@@ -3964,6 +4248,18 @@ msgstr "Eigenschaften"
 msgid "primerRecord.data"
 msgstr "Eigenschaften"
 
+# en: "Proposal {n, decimal}, confidence {pct, decimal} %"
+msgid "holeDetection.proposalConfidence"
+msgstr "Vorschlag {n, decimal}, Konfidenz {pct, decimal} %"
+
+# en: "Proposal {n, decimal}, confidence {pct, decimal} %, one of {count, decimal} in a cluster"
+msgid "holeDetection.proposalConfidenceOneCluster"
+msgstr "Vorschlag {n, decimal}, Konfidenz {pct, decimal} %, einer von {count, decimal} in einer Häufung"
+
+# en: "Proposals are dashed; none counts until accepted. On the photo, double-click or Enter accepts one, drag or arrow keys move it, Delete removes it."
+msgid "holeDetection.proposalsDashedNoneCounts"
+msgstr "Vorschläge sind gestrichelt; keiner zählt, bis er übernommen wird. Auf dem Foto übernimmt Doppelklick oder Eingabetaste einen, Ziehen oder Pfeiltasten verschieben ihn, Entf löscht ihn."
+
 # en: "public"
 msgid "recordSources.origin.public"
 msgstr "öffentlich"
@@ -3983,6 +4279,10 @@ msgstr "Größe"
 # en: "Quantity"
 msgid "fieldTable.column.quantity"
 msgstr "Größe"
+
+# en: "Quarter turn"
+msgid "holeDetection.quarterTurn"
+msgstr "Vierteldrehung"
 
 # en: "R right hand, L left hand."
 msgid "firearms.column.twistHelp"
@@ -4060,6 +4360,10 @@ msgstr "Bootsheck mit Absatz"
 msgid "recordFields.recommendedTwist"
 msgstr "Empfohlener Drall"
 
+# en: "Rect."
+msgid "holeDetection.rect"
+msgstr "Rechteck"
+
 # en: "red"
 msgid "targets.color.red"
 msgstr "rot"
@@ -4071,6 +4375,18 @@ msgstr "Referenzdruck"
 # en: "reflex"
 msgid "disciplines.rule.reflex"
 msgstr "Leuchtpunkt"
+
+# en: "Region"
+msgid "holeDetection.region"
+msgstr "Bereich"
+
+# en: "Region off"
+msgid "holeDetection.regionOff"
+msgstr "Bereich aus"
+
+# en: "Region off: the target found in the photo"
+msgid "holeDetection.regionOffTargetFound"
+msgstr "Bereich aus: die im Foto gefundene Zielscheibe"
 
 # en: "Remove {name}"
 msgid "bulletCompare.remove"
@@ -4180,6 +4496,10 @@ msgstr "Abgerufen"
 msgid "states.retry"
 msgstr "Erneut versuchen"
 
+# en: "Review"
+msgid "holeDetection.review"
+msgstr "Prüfen"
+
 # en: "Revised"
 msgid "cartridgeRecord.revised"
 msgstr "Überarbeitet"
@@ -4271,6 +4591,10 @@ msgstr "Ringe"
 # en: "Rings"
 msgid "targets.column.rings"
 msgstr "Ringe"
+
+# en: "Rotate"
+msgid "holeDetection.rotate"
+msgstr "Drehen"
 
 # en: "Round count of {name}: {count, decimal}."
 msgid "log.roundCount"
@@ -4372,9 +4696,17 @@ msgstr "Wettkampf speichern"
 msgid "firearms.column.notesHelp"
 msgstr "Gespeicherte Laborierungen einer anderen Patrone oder keine gespeicherte Laborierung."
 
+# en: "Scale"
+msgid "holeDetection.scale"
+msgstr "Maßstab"
+
 # en: "Scale {scale} px/mm, uncertainty {uncertainty} %."
 msgid "bulletPhoto.scaleValue"
 msgstr "Maßstab {scale} px/mm, Unsicherheit {uncertainty} %."
+
+# en: "Scale and center from the black area (approximate under tilt)."
+msgid "holeDetection.scaleCenterBlackArea"
+msgstr "Maßstab und Mitte aus dem Spiegel (bei Neigung nur angenähert)."
 
 # en: "Scale from the diameter and overall length entered, no ruler: their check catches a bullet turned towards the camera only beyond 2 % apart (about 11 degrees); a maker's product image may not be to scale."
 msgid "bulletPhoto.basis.both"
@@ -4503,6 +4835,10 @@ msgstr "Sitzungsübersicht"
 # en: "Set per load row by the barrel length and the bullet construction."
 msgid "recordFields.startPressureNote"
 msgstr "Je Zeile der Ladetabelle durch die Lauflänge und den Geschossaufbau festgelegt."
+
+# en: "Set the scale first (step 2)."
+msgid "holeDetection.setScaleFirstStep"
+msgstr "Stellen Sie zuerst den Maßstab ein (Schritt 2)."
 
 # en: "Shape"
 msgid "recordFields.shape"
@@ -4635,6 +4971,10 @@ msgstr "Einzellader"
 # en: "sitting"
 msgid "disciplines.rule.sitting"
 msgstr "sitzend"
+
+# en: "size"
+msgid "holeDetection.size"
+msgstr "Größe"
 
 # en: "Size"
 msgid "recordFields.size"
@@ -4772,6 +5112,10 @@ msgstr "Gespeichert"
 msgid "photoQuality.rule.fromAbove"
 msgstr "Gerade von oben, nicht schräg"
 
+# en: "Straighten the photo if needed, then set the scale (step 2)."
+msgid "holeDetection.straightenPhotoIfNeeded"
+msgstr "Richten Sie das Foto bei Bedarf gerade und stellen Sie dann den Maßstab ein (Schritt 2)."
+
 # en: "Stress; groove oversize {oversize, decimal} per percent, engraving {engraving, decimal} of the start pressure."
 msgid "recordFields.boreResistanceNote"
 msgstr "Beanspruchung; Übermaß der Züge {oversize, decimal} je Prozent, Einpressen {engraving, decimal} des Startdrucks."
@@ -4853,6 +5197,10 @@ msgid "federationRecord.column.target"
 msgstr "Scheibe"
 
 # en: "Target"
+msgid "holeDetection.target"
+msgstr "Scheibe"
+
+# en: "Target"
 msgid "faceRecord.drawing"
 msgstr "Scheibe"
 
@@ -4868,6 +5216,10 @@ msgstr "Die Scheibendaten sind gerade nicht verfügbar."
 # en: "Target designer"
 msgid "page.targetsDesigner"
 msgstr "Scheiben-Editor"
+
+# en: "Target on the photo"
+msgid "holeDetection.targetPhoto"
+msgstr "Scheibe auf dem Foto"
 
 # en: "Target sheet"
 msgid "events.targetSheet"
@@ -5041,6 +5393,10 @@ msgstr "Die Schusswaffen dieses Browsers konnten nicht gelesen werden."
 msgid "firearms.column.opticHelp"
 msgstr "Die erste Optik der aktiven Konfiguration und ihre Einschießentfernung."
 
+# en: "The hole must be at least 4 px across"
+msgid "holeDetection.holeMustLeast4"
+msgstr "Das Schussloch muss mindestens 4 px breit sein"
+
 # en: "The light is uneven: one side of the target is much darker than another."
 msgid "photoQuality.unevenLight"
 msgstr "Das Licht ist ungleichmäßig: Eine Seite der Zielscheibe ist deutlich dunkler als eine andere."
@@ -5077,9 +5433,21 @@ msgstr "Der Kopf ist eine tangentiale Ogive: Ihr Kreis berührt den Schaft."
 msgid "bulletPhoto.noArc"
 msgstr "Der Kopf ist kein Kreisbogen (eine Hybrid- oder andere Form): Es wird kein Ogivenradius und kein Rt/R angegeben, und die Kopflänge beginnt dort, wo der Schaft endet, innerhalb eines Bereichs."
 
+# en: "The photo decodes at another size than it is shown; detection is off for it."
+msgid "holeDetection.photoDecodesAnotherSize"
+msgstr "Das Foto wird in einer anderen Größe dekodiert, als es angezeigt wird; die Erkennung ist dafür abgeschaltet."
+
 # en: "The photo is dark: even its brightest part is dim."
 msgid "photoQuality.dark"
 msgstr "Das Foto ist dunkel: Selbst die hellste Stelle ist matt."
+
+# en: "The photo is not in this browser."
+msgid "holeDetection.photoNotInBrowser"
+msgstr "Das Foto ist nicht in diesem Browser."
+
+# en: "The photo is not loaded."
+msgid "holeDetection.photoNotLoaded"
+msgstr "Das Foto ist nicht geladen."
 
 # en: "The photo is only {n} px on its longer side."
 msgid "photoQuality.photoPixels"
@@ -5117,6 +5485,14 @@ msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
 msgid "log.readFailed"
 msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
 
+# en: "The region is too large for holes this small; mark a smaller region"
+msgid "holeDetection.regionTooLargeHoles"
+msgstr "Der Bereich ist für so kleine Schusslöcher zu groß; markieren Sie einen kleineren Bereich"
+
+# en: "The rings may be those of the {face}: choose it in Target to use it."
+msgid "holeDetection.ringsMayThoseChoose"
+msgstr "Die Ringe könnten die der Scheibe {face} sein: Wählen Sie sie unter Scheibe, um sie zu verwenden."
+
 # en: "The round count of {name} holds this entry already."
 msgid "log.roundCountHasEntry"
 msgstr "Die Schusszahl von {name} enthält diesen Eintrag schon."
@@ -5136,6 +5512,10 @@ msgstr "Die Schusszahl von {name} bleibt unverändert."
 # en: "The rule books the records cite"
 msgid "federationRecord.ruleBooksCaption"
 msgstr "Die Sportordnungen, auf die sich die Datensätze beziehen"
+
+# en: "The rule-book target, found from the black area and the ring lines. It sets the scale and center and scores the group. If several fit, choose one; without a fit, targets are ranked by how well their rings match."
+msgid "holeDetection.ruleBookTargetFound"
+msgstr "Die Scheibe der Sportordnung, aus dem Spiegel und den Ringlinien gefunden. Sie legt Maßstab und Mitte fest und wertet das Schussbild. Passen mehrere, wählen Sie eine; ohne Passung werden die Scheiben danach gereiht, wie gut ihre Ringe übereinstimmen."
 
 # en: "The search did not reach its tolerance."
 msgid "chargeTarget.toleranceNotReached"
@@ -5173,6 +5553,10 @@ msgstr "Die Scheiben und Programmteile dieser Disziplin"
 msgid "federationRecord.targetsCaption"
 msgstr "Die Scheiben, auf die in seinen Disziplinen Schüsse abgegeben werden"
 
+# en: "The targets need the network: set the scale by hand (step 2)."
+msgid "holeDetection.targetsNeedNetworkSet"
+msgstr "Die Scheiben brauchen das Netzwerk: Stellen Sie den Maßstab von Hand ein (Schritt 2)."
+
 # en: "The targets of this discipline state no shot count."
 msgid "matchRounds.shotsUnstated"
 msgstr "Die Zielscheiben dieser Disziplin nennen keine Schusszahl."
@@ -5200,6 +5584,10 @@ msgstr "Dieser Link ist ungültig."
 # en: "This page needs JavaScript."
 msgid "recordView.needsJavaScript"
 msgstr "Diese Seite braucht JavaScript."
+
+# en: "This target does not fit the ellipses found."
+msgid "holeDetection.targetNotFitEllipses"
+msgstr "Diese Scheibe passt nicht zu den gefundenen Ellipsen."
 
 # en: "Throat and leade"
 msgid "cartridgeRecord.group.throat"
@@ -5301,6 +5689,10 @@ msgstr "dreibasig"
 msgid "bulletPhoto.trySample"
 msgstr "Beispiel ausprobieren"
 
+# en: "Try a smaller photo or another browser."
+msgid "holeDetection.trySmallerPhotoAnother"
+msgstr "Versuchen Sie ein kleineres Foto oder einen anderen Browser."
+
 # en: "Tune a powder"
 msgid "page.powdersTune"
 msgstr "Treibladungspulver abstimmen"
@@ -5316,6 +5708,14 @@ msgstr "Wolfram"
 # en: "tungsten disulfide"
 msgid "values.tungstenDisulfide"
 msgstr "Wolframdisulfid"
+
+# en: "Turn left 90 degrees"
+msgid "holeDetection.turnLeft90Degrees"
+msgstr "90 Grad nach links drehen"
+
+# en: "Turn right 90 degrees"
+msgid "holeDetection.turnRight90Degrees"
+msgstr "90 Grad nach rechts drehen"
 
 # en: "Twist"
 msgid "recordFields.twist"
@@ -5340,6 +5740,10 @@ msgstr "Art"
 # en: "Type"
 msgid "bullets.column.type"
 msgstr "Art"
+
+# en: "typed"
+msgid "holeDetection.typed"
+msgstr "eingegeben"
 
 # en: "Typed model parameters"
 msgid "burnRate.typed"
@@ -5516,6 +5920,10 @@ msgstr "Wasser bis zum Hülsenmund, laut Hersteller."
 # en: "wax lube"
 msgid "values.waxLube"
 msgstr "Wachsschmierung"
+
+# en: "Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group."
+msgid "holeDetection.whereLookRectangleTwo"
+msgstr "Wo gesucht wird: ein Rechteck (zwei gegenüberliegende Ecken) oder ein Polygon; ohne Angabe: die im Foto gefundene Zielscheibe. Wird mit dem Schussbild gespeichert."
 
 # en: "white"
 msgid "targets.color.white"
