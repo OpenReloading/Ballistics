@@ -1,5 +1,6 @@
 /** What a photograph's measurements become in the bullet designer (`apps/docs/docs/models/bullet-photo.md`). */
 
+import type { I18n } from '@lingui/core'
 import { fixedNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { type Design, type DesignerSpec, designerSpecs } from './bullet-designer.ts'
@@ -100,6 +101,7 @@ export function photoText(
   photo: NonNullable<Design['photo']>,
   system: UnitSystem,
   t: Translator['t'],
+  i18n: I18n,
 ): string[] {
   const basis = basisNote(photo.scaleBasis)
   const values = designerSpecs.flatMap((s) => {
@@ -111,18 +113,26 @@ export function photoText(
       : []
   })
   return [
-    t(
-      'Measured from a photograph ({width} × {height} px, {scale} px/mm ± {uncertainty} %, no image stored).',
-      {
+    i18n._({
+      id: 'bulletPhoto.measuredFrom',
+      message:
+        'Measured from a photograph ({width} × {height} px, {scale} px/mm ± {uncertainty} %, no image stored).',
+      values: {
         width: photo.width,
         height: photo.height,
         scale: fixedNumber(photo.pxPerMm, 2),
         uncertainty: fixedNumber(100 * photo.relativeStandardUncertainty, 2),
       },
-    ),
-    ...(basis ? [t(basis)] : []),
+    }),
+    ...(basis ? [i18n._(basis)] : []),
     ...(values.length > 0
-      ? [t('Values with standard uncertainty: {values}.', { values: values.join('; ') })]
+      ? [
+          i18n._({
+            id: 'bulletPhoto.valuesWithUncertainty',
+            message: 'Values with standard uncertainty: {values}.',
+            values: { values: values.join('; ') },
+          }),
+        ]
       : []),
   ]
 }

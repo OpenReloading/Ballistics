@@ -41,4 +41,4 @@ export type WorkerReply =
       hints: Wording[]
       unusable?: Wording
     }
-  | { kind: 'error'; id: number; message: string }
+  | { kind: 'error'; id: number; message: Wording }

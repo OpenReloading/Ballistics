@@ -44,7 +44,7 @@ function stateMessages(p: PhotoState, t: Translator['t'], i18n: I18n): MessageEn
   const empty = p.cut && !outlined && !p.busy
   return [
     // a failure is a message of the tool, else the browser's own text, which shows as written
-    ...(p.failure ? [{ severity: 'error', text: t(p.failure as Message) } as const] : []),
+    ...(p.failure ? [{ severity: 'error', text: say(i18n, t, p.failure) } as const] : []),
     ...p.warnings.map((w) => ({ severity: 'warning', text: say(i18n, t, w) }) as const),
     ...(p.found?.unusable
       ? [{ severity: 'error', text: say(i18n, t, p.found.unusable) } as const]

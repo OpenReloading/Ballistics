@@ -1,7 +1,7 @@
 /** Says what the photo makes hard for detection, never that a detection is right (`apps/docs/docs/models/hole-detection.md`, Photo quality). */
+import type { MessageDescriptor } from '@lingui/core'
 import { fromSi, type TargetFace } from '@rangefoundry/schema'
 import { clamp, grayGrid, shareInside } from '@rangefoundry/target-recognition'
-import { type Message, msg } from '../i18n/translate.ts'
 import type { Ellipse } from './ellipse.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
@@ -20,15 +20,32 @@ type QualityProblem =
 
 /** The rules of the photo guide (`apps/docs/docs/photo-guide.md`): the anchor of the heading and its name. */
 const rules = {
-  target: { anchor: '2-one-target-all-of-it', name: msg('One target, all of it') },
-  above: { anchor: '3-straight-from-above-no-slant', name: msg('Straight from above, no slant') },
-  light: { anchor: '4-even-light-no-reflection', name: msg('Even light, no reflection') },
-  close: { anchor: '5-close-enough', name: msg('Close enough') },
-  steady: { anchor: '6-steady-not-soft', name: msg('Steady, not soft') },
+  target: {
+    anchor: '2-one-target-all-of-it',
+    name: /*i18n*/ { id: 'photoQuality.rule.oneTarget', message: 'One target, all of it' },
+  },
+  above: {
+    anchor: '3-straight-from-above-no-slant',
+    name: /*i18n*/ { id: 'photoQuality.rule.fromAbove', message: 'Straight from above, no slant' },
+  },
+  light: {
+    anchor: '4-even-light-no-reflection',
+    name: /*i18n*/ { id: 'photoQuality.rule.evenLight', message: 'Even light, no reflection' },
+  },
+  close: {
+    anchor: '5-close-enough',
+    name: /*i18n*/ { id: 'photoQuality.rule.closeEnough', message: 'Close enough' },
+  },
+  steady: {
+    anchor: '6-steady-not-soft',
+    name: /*i18n*/ { id: 'photoQuality.rule.steady', message: 'Steady, not soft' },
+  },
 } as const
 
 /** The rule of the photo guide that says how to retake a photo with the problem. */
-export const guideRule: Readonly<Record<QualityProblem, { anchor: string; name: Message }>> = {
+export const guideRule: Readonly<
+  Record<QualityProblem, { anchor: string; name: MessageDescriptor }>
+> = {
   face: rules.target,
   framing: rules.target,
   tilt: rules.above,
@@ -46,12 +63,10 @@ type QualityLevel = 'fair' | 'bad'
 export type QualityIssue = {
   problem: QualityProblem
   level: QualityLevel
-  /** What the photo shows, one sentence; a catalogue message, `{n}` is `n`. */
-  text: Message
-  /** The number `text` names (degrees, px), absent when it names none. */
-  n?: number
+  /** What the photo shows, one sentence, with the number it names (degrees, px). */
+  text: MessageDescriptor
   /** What to change when retaking it, one sentence. */
-  fix: Message
+  fix: MessageDescriptor
 }
 
 /** The photo may show only the center or cut the rings, so only the presence of a black zone is used, never a ring, size or extent. */
@@ -324,13 +339,23 @@ function edgeSharpness(image: RgbaImage, hole: number): number | undefined {
   return widths.length >= 20 ? median(widths) : undefined
 }
 
+const moreLight = /*i18n*/ {
+  id: 'photoQuality.fix.moreLight',
+  message: 'Retake with more light on the target and without a photo filter.',
+}
+
+const moveCloser = /*i18n*/ {
+  id: 'photoQuality.fix.moveCloser',
+  message:
+    'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+}
+
 type Add = (
   problem: keyof typeof limits,
   value: number,
-  text: Message,
-  fix: Message,
+  text: MessageDescriptor,
+  fix: MessageDescriptor,
   limit?: readonly [number, number],
-  n?: number,
 ) => void
 
 /** Contrast or brightness, glare and uneven light. */
@@ -343,16 +368,26 @@ function lightIssues(
     add(
       'contrast',
       m.contrast,
-      msg('The black area and the paper are close in brightness.'),
-      msg('Retake with more light on the target and without a photo filter.'),
+      /*i18n*/ {
+        id: 'photoQuality.lowContrast',
+        message: 'The black area and the paper are close in brightness.',
+      },
+      moreLight,
     )
   else if (layout?.dark === true)
     // the target has a black zone and the photo may be filled with it: judge the black itself
     add(
       'contrast',
       m.dark,
-      msg('The black zones of the target look grey.'),
-      msg('Retake with less light on the target, without a reflection and without a photo filter.'),
+      /*i18n*/ {
+        id: 'photoQuality.greyBlack',
+        message: 'The black zones of the target look grey.',
+      },
+      /*i18n*/ {
+        id: 'photoQuality.fix.lessLight',
+        message:
+          'Retake with less light on the target, without a reflection and without a photo filter.',
+      },
       [110, 150],
     )
   // a dark photo may show a black zone alone, so only a target without one makes this a bad level
@@ -360,24 +395,35 @@ function lightIssues(
     add(
       'exposure',
       m.exposure,
-      msg('The photo is dark: even its brightest part is dim.'),
-      msg('Retake with more light on the target and without a photo filter.'),
+      /*i18n*/ {
+        id: 'photoQuality.dark',
+        message: 'The photo is dark: even its brightest part is dim.',
+      },
+      moreLight,
       layout?.dark === false ? limits.exposure : [limits.exposure[0], 0],
     )
   add(
     'glare',
     m.glare,
-    msg('A bright reflection covers part of the paper.'),
-    msg(
-      'Retake with the light from the side, or turn the sheet a little to move the reflection off the target.',
-    ),
+    /*i18n*/ { id: 'photoQuality.glare', message: 'A bright reflection covers part of the paper.' },
+    /*i18n*/ {
+      id: 'photoQuality.fix.sideLight',
+      message:
+        'Retake with the light from the side, or turn the sheet a little to move the reflection off the target.',
+    },
   )
   if (m.shadow !== undefined)
     add(
       'shadow',
       m.shadow,
-      msg('The light is uneven: one side of the target is much darker than another.'),
-      msg('Retake in an even light with no shadow of your hand or phone on the sheet.'),
+      /*i18n*/ {
+        id: 'photoQuality.unevenLight',
+        message: 'The light is uneven: one side of the target is much darker than another.',
+      },
+      /*i18n*/ {
+        id: 'photoQuality.fix.evenLight',
+        message: 'Retake in an even light with no shadow of your hand or phone on the sheet.',
+      },
     )
 }
 
@@ -389,18 +435,30 @@ function shapeIssues(add: Add, black: Ellipse, image: RgbaImage, layout: TargetL
     add(
       'tilt',
       tilt,
-      msg('The target is photographed at a slant of about {n} degrees.'),
-      msg('Retake from straight above, with the camera parallel to the paper.'),
+      /*i18n*/ {
+        id: 'photoQuality.tilt',
+        message: 'The target is photographed at a slant of about {n} degrees.',
+        values: { n: Math.round(tilt) },
+      },
+      /*i18n*/ {
+        id: 'photoQuality.fix.fromAbove',
+        message: 'Retake from straight above, with the camera parallel to the paper.',
+      },
       limits.tilt,
-      Math.round(tilt),
     )
   }
   if (!layout)
     add(
       'framing',
       framed,
-      msg('The black area of the target is cut off by the edge of the photo.'),
-      msg('Retake with the whole target and some paper around it in the frame.'),
+      /*i18n*/ {
+        id: 'photoQuality.cutOff',
+        message: 'The black area of the target is cut off by the edge of the photo.',
+      },
+      /*i18n*/ {
+        id: 'photoQuality.fix.wholeTarget',
+        message: 'Retake with the whole target and some paper around it in the frame.',
+      },
     )
 }
 
@@ -411,13 +469,12 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
   const add: Add = (
     problem: keyof typeof limits,
     value: number,
-    text: Message,
-    fix: Message,
+    text: MessageDescriptor,
+    fix: MessageDescriptor,
     limit: readonly [number, number] = limits[problem],
-    n?: number,
   ) => {
     const level = levelOf(value, limit)
-    if (level) issues.push({ problem, level, text, fix, ...(n !== undefined && { n }) })
+    if (level) issues.push({ problem, level, text, fix })
   }
   const long = Math.max(image.width, image.height)
   const s = Math.max(1, Math.ceil(long / GRID))
@@ -430,41 +487,55 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
     add(
       'blur',
       width / hole,
-      msg('The photo is soft: the edges of the target are blurred.'),
-      msg('Hold the camera steady or rest it on something, let it focus on the target and retake.'),
+      /*i18n*/ {
+        id: 'photoQuality.blurred',
+        message: 'The photo is soft: the edges of the target are blurred.',
+      },
+      /*i18n*/ {
+        id: 'photoQuality.fix.steady',
+        message:
+          'Hold the camera steady or rest it on something, let it focus on the target and retake.',
+      },
     )
   if (black) {
     const px = hole / scale
     add(
       'resolution',
       px,
-      msg('A bullet hole is only about {n} px across in this photo.'),
-      msg(
-        'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
-      ),
+      /*i18n*/ {
+        id: 'photoQuality.holePixels',
+        message: 'A bullet hole is only about {n} px across in this photo.',
+        values: { n: Math.max(1, Math.round(px)) },
+      },
+      moveCloser,
       limits.resolution,
-      Math.max(1, Math.round(px)),
     )
   } else {
     if (width === undefined)
       issues.push({
         problem: 'face',
         level: 'bad',
-        text: msg('No edge of a target or a hole was found in this photo.'),
-        fix: msg(
-          'Retake with the target in the frame, in even light and held steady, or set the scale by hand.',
-        ),
+        text: /*i18n*/ {
+          id: 'photoQuality.noEdge',
+          message: 'No edge of a target or a hole was found in this photo.',
+        },
+        fix: /*i18n*/ {
+          id: 'photoQuality.fix.noEdge',
+          message:
+            'Retake with the target in the frame, in even light and held steady, or set the scale by hand.',
+        },
       })
     const longPhoto = long / scale
     add(
       'resolution',
       longPhoto / 80,
-      msg('The photo is only {n} px on its longer side.'),
-      msg(
-        'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
-      ),
+      /*i18n*/ {
+        id: 'photoQuality.photoPixels',
+        message: 'The photo is only {n} px on its longer side.',
+        values: { n: Math.round(longPhoto) },
+      },
+      moveCloser,
       limits.resolution,
-      Math.round(longPhoto),
     )
   }
   lightIssues(add, m, layout)

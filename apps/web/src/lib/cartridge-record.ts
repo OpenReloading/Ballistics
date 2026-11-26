@@ -166,15 +166,23 @@ export const meaningText = (meaning: string, i18n: I18n) => {
   return known ? i18n._(known) : meaning
 }
 
-/** The row groups of the Dimensions table by their English labels (see `meaningMessages`). */
-const groupMessages = byMessage([
-  /*i18n*/ { id: 'cartridgeRecord.group.head', message: 'Head, rim and groove' },
-  /*i18n*/ { id: 'cartridgeRecord.group.body', message: 'Body' },
-  /*i18n*/ { id: 'cartridgeRecord.group.shoulder', message: 'Shoulder' },
-  /*i18n*/ { id: 'cartridgeRecord.group.neck', message: 'Neck and length' },
-  /*i18n*/ { id: 'cartridgeRecord.group.throat', message: 'Throat and leade' },
-  /*i18n*/ { id: 'cartridgeRecord.group.other', message: 'Other' },
-])
+/** The row groups of the Dimensions table by their English labels; a designer group without its message fails the typecheck. */
+const groupMessages = new Map<string, MessageDescriptor>(
+  Object.entries({
+    'Head, rim and groove': /*i18n*/ {
+      id: 'cartridgeRecord.group.head',
+      message: 'Head, rim and groove',
+    },
+    Body: /*i18n*/ { id: 'cartridgeRecord.group.body', message: 'Body' },
+    Shoulder: /*i18n*/ { id: 'cartridgeRecord.group.shoulder', message: 'Shoulder' },
+    'Neck and length': /*i18n*/ { id: 'cartridgeRecord.group.neck', message: 'Neck and length' },
+    'Throat and leade': /*i18n*/ {
+      id: 'cartridgeRecord.group.throat',
+      message: 'Throat and leade',
+    },
+    Other: /*i18n*/ { id: 'cartridgeRecord.group.other', message: 'Other' },
+  } satisfies Record<(typeof groups)[Group] | 'Other', MessageDescriptor>),
+)
 
 /** The label of a row group (`rowGroups`) in the language of `i18n`. */
 export const groupLabel = (label: string, i18n: I18n = english) => {

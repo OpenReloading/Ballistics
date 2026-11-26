@@ -1,5 +1,5 @@
 /** Keeps the posted image (nothing leaves the browser) so the page stays responsive on a large photograph (`apps/docs/docs/models/bullet-photo.md`). */
-import { msg } from '../i18n/translate.ts'
+import type { Message } from '../i18n/translate.ts'
 import { segmentPhoto } from './bullet-photo-colour.ts'
 import { measureOutline } from './bullet-photo-measure.ts'
 import { fitOutline } from './bullet-photo-outline.ts'
@@ -45,7 +45,10 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       photo = { width: q.width, height: q.height, data: new Uint8ClampedArray(q.data) }
       post({ kind: 'loaded', id: q.id })
     } else if (q.kind === 'segment') {
-      if (!photo) throw new Error(msg('No photograph is loaded.'))
+      if (!photo) {
+        const message = /*i18n*/ { id: 'bulletPhoto.noPhoto', message: 'No photograph is loaded.' }
+        return post({ kind: 'error', id: q.id, message })
+      }
       const s = segmentPhoto(photo, q.exclude)
       post(
         {
@@ -61,6 +64,6 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       post(measure(q))
     }
   } catch (err) {
-    post({ kind: 'error', id: q.id, message: errorText(err) })
+    post({ kind: 'error', id: q.id, message: errorText(err) as Message })
   }
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { ActionIcon, Anchor, Button, NativeSelect } from '@mantine/core'
 import {
   fromSi,
@@ -963,12 +964,13 @@ function chosenFace(group: ShotGroup | undefined, choices: FaceChoice[]) {
 /** The photo's quality problems, each with what to change when retaking it; `held` says the run waits. */
 function QualityNotes({ issues, held }: { issues: readonly QualityIssue[]; held: boolean }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!issues.length) return null
   return (
     <div className="quality-notes">
       {issues.map((i) => (
         <Message key={i.problem} severity={i.level === 'bad' ? 'warning' : 'info'}>
-          {t(i.text, { n: i.n ?? 0 })} {t(i.fix)}
+          {i18n._(i.text)} {i18n._(i.fix)}
           {photoGuide && (
             <>
               {' '}
@@ -977,7 +979,7 @@ function QualityNotes({ issues, held }: { issues: readonly QualityIssue[]; held:
                 target="_blank"
                 rel="noopener"
               >
-                {t('Photo guide: {rule}', { rule: t(guideRule[i.problem].name) })}
+                {t('Photo guide: {rule}', { rule: i18n._(guideRule[i.problem].name) })}
               </Anchor>
             </>
           )}
