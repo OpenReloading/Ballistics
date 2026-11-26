@@ -28,10 +28,11 @@ const instances: Record<Language, I18n> = {
 /** The app's compiled messages of each language but English: its own chunk, so English pages ship without it. */
 const catalogs = { de: () => import('../locales/de.json') }
 
-/** Loads the app's messages of `language` into its instance; `language.ts` awaits it before showing the language. */
+/** Loads the app's messages of `language` into its instance and returns it; `language.ts` awaits it before showing the language. */
 export async function loadLingui(language: keyof typeof catalogs) {
   const { default: catalog } = await catalogs[language]()
   instances[language].load(language, compiled(catalog))
+  return instances[language]
 }
 
 /** The `formats` of an `i18n._` plural: its `#` ungrouped, as the own messages show a number. */

@@ -80,15 +80,10 @@ export function extract(source: string, file = 'source'): string[] {
   return found
 }
 
-/** The codes and templates of `src/lib/core-message-table.json`, the warning sentences that `src/lib/core-message-table.ts` marks and the refusal words of `src/lib/refusal-words.ts`. */
+/** The refusal words of `src/lib/refusal-words.ts`, the templates of the message table not yet on Lingui ids. */
 export function tableMessages(root: string): string[] {
-  const { codes, templates } = JSON.parse(
-    readFileSync(path.join(root, 'src/lib/core-message-table.json'), 'utf8'),
-  ) as { codes: string[]; templates: Record<string, string[]> }
-  const marked = ['src/lib/core-message-table.ts', 'src/lib/refusal-words.ts'].flatMap((file) =>
-    extract(readFileSync(path.join(root, file), 'utf8'), file),
-  )
-  return [...codes, ...Object.values(templates).flat(), ...marked]
+  const file = 'src/lib/refusal-words.ts'
+  return extract(readFileSync(path.join(root, file), 'utf8'), file)
 }
 
 /** The distinct messages of every source under `src/` and of the message table, sorted. */

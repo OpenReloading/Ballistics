@@ -254,7 +254,7 @@ function PowderRow({
           {t('Not computed: {reason}', {
             reason: r.refusal
               ? refusalText(r.refusal, 'peakPressure', system, percent, t)
-              : reasonText(r, t, i18n),
+              : reasonText(r, i18n),
           })}
         </td>
       )}
@@ -665,7 +665,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           study.mode?.kind === 'target' && study.mode.percent,
           t,
         )
-      : reasonText(r, t, i18n)
+      : reasonText(r, i18n)
   const csv = () => powderTableCsv(shown, target, system, t, reason)
   const { progress, running, message } = study
   const shotgun = study.rows.filter((r) => r.reason === notMetallicReason).length

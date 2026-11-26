@@ -247,28 +247,20 @@ describe('the catalogue lint', () => {
     ])
   })
 
-  it('counts the warning sentences and refusal words the two files mark as texts of the table', () => {
+  it('counts the refusal words the file marks as texts of the table', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'i18n-'))
     try {
       mkdirSync(path.join(root, 'src/lib'), { recursive: true })
       writeFileSync(
-        path.join(root, 'src/lib/core-message-table.json'),
-        JSON.stringify({ codes: ['busy'], templates: { truing: ['range {n}'] } }),
-      )
-      writeFileSync(
-        path.join(root, 'src/lib/core-message-table.ts'),
-        "import { msg } from '../i18n/translate.ts'\nexport const w = [msg('A seeded warning.')]\n",
-      )
-      writeFileSync(
         path.join(root, 'src/lib/refusal-words.ts'),
-        "import { msg } from '../i18n/translate.ts'\nexport const r = { x: msg('A seeded refusal.') }\n",
+        "import { msg } from '../i18n/translate.ts'\nexport const r = { x: msg('A seeded refusal.'), y: msg('A seeded rule.') }\n",
       )
       writeFileSync(
         path.join(root, 'src/lib/safety.ts'),
         "import { msg } from '../i18n/translate.ts'\nexport const safety = { binding: msg('A seeded safety line.') }\n",
       )
       const table = tableMessages(root)
-      expect(table).toEqual(['busy', 'range {n}', 'A seeded warning.', 'A seeded refusal.'])
+      expect(table).toEqual(['A seeded refusal.', 'A seeded rule.'])
       // the lines of the Safety notice need German too
       expect(problems(['A seeded safety line.'], {}, 'de', requiredMessages(root))).toEqual([
         'untranslated: A seeded safety line.',
@@ -276,16 +268,11 @@ describe('the catalogue lint', () => {
       expect(
         problems(
           table,
-          {
-            busy: 'besetzt',
-            'range {n}': 'Entfernung {n}',
-            'A seeded warning.': 'A seeded warning.',
-            'A seeded refusal.': 'Eine gesetzte Ablehnung.',
-          },
+          { 'A seeded refusal.': 'Eine gesetzte Ablehnung.', 'A seeded rule.': 'A seeded rule.' },
           'de',
           table,
         ),
-      ).toEqual(['left English: A seeded warning.'])
+      ).toEqual(['left English: A seeded rule.'])
     } finally {
       rmSync(root, { recursive: true, force: true })
     }

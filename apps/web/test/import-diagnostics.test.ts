@@ -1,8 +1,10 @@
 import type { TableKind, TableReadDiagnostic } from '@rangefoundry/importers'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
+import { loadLingui } from '../src/i18n/lingui.ts'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import { recordOf } from '../src/lib/candidates.ts'
+import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { parseCsrLoad } from '../src/lib/grt-load-file.ts'
 import { kindRefusalText, tableReadText, tableReasonText } from '../src/lib/import-diagnostics.ts'
 import { type BuildView, type ImportReply, importWorker } from '../src/lib/import-entry.ts'
@@ -77,6 +79,12 @@ describe('the reasons of a table import in words', () => {
 })
 
 const german = translator(de as Catalogue, 'de')
+
+it('words a field label the importers give in German', async () => {
+  const { t: shown } = installCoreMessages(await loadLingui('de'), de as Catalogue, 'de')
+  const b = await built(['Name,Max pressure (bar)', 'C0,0'], 'cartridge')
+  expect(tableReasonText(b.rejected[0]?.reason ?? fail(), shown)).toMatch(/^Höchstdruck 0 /)
+})
 
 const tableReads: TableReadDiagnostic[] = [
   { code: 'noTwoColumns', params: {} },
