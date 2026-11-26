@@ -374,6 +374,10 @@
       "value": 66.32
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -382,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page70.pdf",
         "sha256": "af54e4518d1195fd999938dc9729f6f5d5ac3abdb11cd9f57e522b39a68d6bf4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 9.3×64mm Brenneke",
+        "url": "https://en.wikipedia.org/w/index.php?title=9.3×64mm_Brenneke&oldid=1380511386",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

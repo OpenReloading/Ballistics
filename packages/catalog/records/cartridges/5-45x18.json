@@ -337,6 +337,9 @@
       "footnotes": ["3"]
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -345,6 +348,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page2.pdf",
         "sha256": "45fed0bc1e14cf635837a2afa41b78bed670ba9f9a0ab30294389ec516a1f4ae",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 5.45×18mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=5.45×18mm&oldid=1203594836",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or Boxer small pistol."
       }
     ]
   }

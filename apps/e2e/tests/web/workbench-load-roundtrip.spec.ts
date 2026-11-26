@@ -41,13 +41,10 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
-  // the fixture load's brass gives the capacity, flagged as the record's
+  // the fixture load names no case: the generic brass case gives the cartridge's default capacity
   const capacity = form.getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).toHaveValue('')
   await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
-  await expect(capacity).toHaveAccessibleDescription(
-    /From the brass record Demo Cases 308 Win\. Brass Demo: 3\.6 g water\./,
-  )
   // a typed value no record gives
   await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.45')
   await form.getByRole('textbox', { name: /^Bore diameter/ }).fill('7.70')
@@ -70,7 +67,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   expect(overrides).not.toHaveProperty('bulletMass')
   expect(data.charge).toEqual({ value: 2.45 })
   expect(data.cartridge).toBe('catalogue:308-win')
-  expect(data.case).toEqual({ record: 'catalogue:demo-case-308-brass' })
+  expect(data).not.toHaveProperty('case')
   expect(data).not.toHaveProperty('capacity')
 
   await page.goto('./workbench')
@@ -78,12 +75,12 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
   await expect.poll(values).toEqual(before)
-  // the brass is chosen again and gives the capacity
+  // the generic brass case gives the capacity again
   await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
   await openKeeping(page)
   await expect(page.getByRole('combobox', { name: 'Brass record' })).toHaveAttribute(
     'placeholder',
-    /308 Win\. Brass Demo/,
+    'Brass case 308 Win.',
   )
   await expect(page.locator('.file-state')).toContainText('Saved')
   await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)

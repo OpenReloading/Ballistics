@@ -376,6 +376,9 @@
       "value": 29.52
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -384,6 +387,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/6-mm-rem-230315-en.pdf",
         "sha256": "f2b2f388669a4c0b14f2721808c47a732de87f568f47bfd33f5a9fdade582414",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6mm Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=6mm_Remington&oldid=1380356808",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

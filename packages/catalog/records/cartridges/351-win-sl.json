@@ -246,6 +246,9 @@
       "value": 61.61
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -254,6 +257,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/351-win-sl-en.pdf",
         "sha256": "c46cbe2af819969975a9097ce63f8fcc12fc2ab7867c2addcc1cd03ae43dbefb",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .351 Winchester Self-Loading",
+        "url": "https://en.wikipedia.org/w/index.php?title=.351_Winchester_Self-Loading&oldid=1335364039",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

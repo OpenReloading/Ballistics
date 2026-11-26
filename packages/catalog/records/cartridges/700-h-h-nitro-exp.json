@@ -214,6 +214,10 @@
       "value": 246.35
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -222,6 +226,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page131.pdf",
         "sha256": "5f9e9db50ee55553e406dbd5dd1ca713be0b404e695759b275193f450a9c89f2",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .700 Nitro Express",
+        "url": "https://en.wikipedia.org/w/index.php?title=.700_Nitro_Express&oldid=1358591818",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Boxer; Magnum Large Rifle."
       }
     ]
   }

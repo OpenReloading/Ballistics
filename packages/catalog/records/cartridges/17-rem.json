@@ -369,6 +369,9 @@
       "value": 14.8
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page77.pdf",
         "sha256": "e5211b4793025d535291cf237acfa05a5ebd3b478aa6c2d3fedd15d8d4d273cb",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .17 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.17_Remington&oldid=1357005088",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

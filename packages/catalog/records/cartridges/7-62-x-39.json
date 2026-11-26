@@ -362,7 +362,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:7-62-x-39-wikipedia"
+    "capacity": "catalogue:7-62-x-39-wikipedia",
+    "primerSize": "large-rifle"
   },
   "provenance": {
     "kind": "published",
@@ -372,6 +373,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/7-62-x-39-en.pdf",
         "sha256": "05b0d184b75dd101fdf37bea790ff3f52b4d47cdc6a85484cf5378d34f97cffd",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.62×39mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.62×39mm&oldid=1386860400",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Boxer large rifle (brass); Berdan (steel case)."
       }
     ]
   }

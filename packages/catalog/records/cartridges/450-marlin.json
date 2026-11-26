@@ -258,6 +258,9 @@
       "value": 104.25
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -266,6 +269,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page34.pdf",
         "sha256": "2f58cf2f6c4f592c36b28993416182fee6cfeeee1cfb7d4b7618d893dec57ba2",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .450 Marlin",
+        "url": "https://en.wikipedia.org/w/index.php?title=.450_Marlin&oldid=1371849595",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

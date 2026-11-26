@@ -234,6 +234,9 @@
       "value": 124.29
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -242,6 +245,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page91.pdf",
         "sha256": "4538610ac69254425b5b346f9bfe0c57533b64f5b0eec29051e9d263b7037ef0",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .50 Action Express",
+        "url": "https://en.wikipedia.org/w/index.php?title=.50_Action_Express&oldid=1371997058",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

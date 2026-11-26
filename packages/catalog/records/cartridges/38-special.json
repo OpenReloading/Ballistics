@@ -224,7 +224,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:38-special-wikipedia"
+    "capacity": "catalogue:38-special-wikipedia",
+    "primerSize": "small-pistol"
   },
   "provenance": {
     "kind": "published",
@@ -234,6 +235,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page57.pdf",
         "sha256": "bdb36dd6f72d67da0ccd7c014880301f764e4a7be153305b066fee6c20f70110",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-38-special",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

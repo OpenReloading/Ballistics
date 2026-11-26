@@ -343,6 +343,9 @@
       "note": "Present on the official CIP sheet at import; not yet checked by hand."
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -351,6 +354,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/7-62-x-54-r-en.pdf",
         "sha256": "4a9e923b1a7fc10bbc2b9b73fb083874312a024d2ca1f820dadf82bb2977de61",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.62×54mmR",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.62×54mmR&oldid=1378142008",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or boxer large rifle."
       }
     ]
   }

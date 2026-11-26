@@ -61,7 +61,7 @@ describe('toApiLoad', () => {
     const given = new Set(Object.keys(values))
     // the saved load stores the typed keys only: with everything given it holds none
     expect(toLoad(parts({ given })).analysis?.overrides).toBeUndefined()
-    const file = toApiLoad(parts({ given }), {})
+    const file = toApiLoad(parts({ given }), { cartridge: 'catalogue:308-win' })
     expect(Object.keys(file.analysis?.overrides ?? {})).toHaveLength(Object.keys(values).length - 1)
     expect(loadSchema.safeParse(file).success).toBe(true)
     const { status, body } = await runFile(file)
@@ -93,7 +93,13 @@ describe('toApiLoad', () => {
       'gamma',
       'vivacity',
     ])
-    expect((await runFile(toApiLoad(parts({ given, powder: undefined }), {}))).status).toBe(200)
+    expect(
+      (
+        await runFile(
+          toApiLoad(parts({ given, powder: undefined }), { cartridge: 'catalogue:308-win' }),
+        )
+      ).status,
+    ).toBe(200)
   })
 
   it('leaves out what the API cannot read: a user reference, the firearm, the capacity, sessions and a seating ladder', () => {

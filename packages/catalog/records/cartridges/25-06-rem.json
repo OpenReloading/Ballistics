@@ -375,6 +375,9 @@
       "value": 33.02
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page92.pdf",
         "sha256": "d6c8975ef1e2ce245cc9bdb019a574236e3b19f5a5d604edeabdb1115eb5fea7",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .25-06 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.25-06_Remington&oldid=1312178506",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

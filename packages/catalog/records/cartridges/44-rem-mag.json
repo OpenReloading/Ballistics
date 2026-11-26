@@ -224,7 +224,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:44-rem-mag-wikipedia"
+    "capacity": "catalogue:44-rem-mag-wikipedia",
+    "primerSize": "large-pistol"
   },
   "provenance": {
     "kind": "published",
@@ -234,6 +235,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/44-rem-mag-200922-en.pdf",
         "sha256": "c8a1e41834079cbe7e8a5d33ddab92ea4c47d008b0f7df4a556ed8a2f97dd5ca",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-44-magnum",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

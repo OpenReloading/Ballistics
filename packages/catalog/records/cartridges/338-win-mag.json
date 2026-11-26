@@ -376,6 +376,10 @@
       "value": 56.95
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -384,6 +388,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page22.pdf",
         "sha256": "feb8ad1ec37cd8f139d08aaa1fb6a72497050f0a8315ca4b1c89da08698f13a7",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .338 Winchester Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.338_Winchester_Magnum&oldid=1358944042",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

@@ -351,6 +351,9 @@
       "value": 46.92
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -359,6 +362,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page14.pdf",
         "sha256": "ea99270ec2de63584a7a42b9fa1dba71042854ce21e398c0783e8aede1789bf5",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.65×21mm Parabellum",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.65×21mm_Parabellum&oldid=1363156061",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or Boxer Small pistol."
       }
     ]
   }

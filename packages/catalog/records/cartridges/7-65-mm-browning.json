@@ -236,6 +236,9 @@
       "value": 47.37
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -244,6 +247,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page12.pdf",
         "sha256": "15d7a80c0e2f2bf916d4fe499f709cb8190a2db15360211406181552237ade89",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32 ACP",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32_ACP&oldid=1363105882",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

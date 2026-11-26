@@ -330,6 +330,9 @@
       "value": 24.77
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -338,6 +341,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page36.pdf",
         "sha256": "86e96f8e0a97e841cc42b5c365b2a57a76f6bc58e219fb016c24784f5039c52d",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .22 Remington Jet",
+        "url": "https://en.wikipedia.org/w/index.php?title=.22_Remington_Jet&oldid=1388085979",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

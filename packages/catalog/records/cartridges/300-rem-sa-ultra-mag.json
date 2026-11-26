@@ -354,6 +354,10 @@
       "value": 47.32
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -362,6 +366,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page118.pdf",
         "sha256": "af12297b7ef8919eb68e1f6f1635f7ef43f09e19e762aac07e594a84f4f0e524",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .300 Remington Short Action Ultra Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Remington_Short_Action_Ultra_Magnum&oldid=1283801692",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

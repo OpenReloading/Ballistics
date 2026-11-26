@@ -51,6 +51,11 @@ it('fails the whole list when one page fails, and so the detail routes of the bu
   expect(await staticIds(listAllBullets, 'bullet')).toEqual([{ id: 'b-0' }, { id: 'b-1' }])
 })
 
+it('gives a kind without records one page that no record has, as the export needs one per route', async () => {
+  serve(0)
+  expect(await staticIds(listAllBullets, 'bullet')).toEqual([{ id: 'no-record' }])
+})
+
 it('cuts the cartridge pages only with PRERENDER=sample', async () => {
   serve(1684)
   vi.stubEnv('PRERENDER', 'sample')

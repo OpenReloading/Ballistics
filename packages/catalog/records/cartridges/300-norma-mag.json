@@ -354,6 +354,10 @@
       "value": 47.51
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -362,6 +366,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/300-norma-mag-en.pdf",
         "sha256": "97e685cd4e45ff8752ff747b266bb67a94eeeb3b43a6ea76b6b5d56532b8714f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .300 Norma Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Norma_Magnum&oldid=1382920646",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

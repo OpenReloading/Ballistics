@@ -374,6 +374,9 @@
       "value": 70.16
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -382,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page143.pdf",
         "sha256": "51193423f02368a9b59eb4cf216418cee71247d94bac40c7b86d4cfddda32da7",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .375 Ruger",
+        "url": "https://en.wikipedia.org/w/index.php?title=.375_Ruger&oldid=1383683589",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

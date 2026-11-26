@@ -377,7 +377,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:7-5-x-55-suisse-wikipedia"
+    "capacity": "catalogue:7-5-x-55-suisse-wikipedia",
+    "primerSize": "large-rifle"
   },
   "provenance": {
     "kind": "published",
@@ -387,6 +388,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/7-5-x-55-suisse-en.pdf",
         "sha256": "b60efcf5163989276f8d5b4cbc8c17175080466d839910cb7f1a192c8ca3ebb1",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.5×55mm Swiss",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.5×55mm_Swiss&oldid=1378227189",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or boxer large rifle."
       }
     ]
   }

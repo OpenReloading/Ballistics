@@ -9,7 +9,7 @@ const names: Record<string, string> = {
   'cartridges catalogue:308-win': '308 Win.',
   'bullets user:5b0f1a2e-3c4d-4e5f-8a9b-0c1d2e3f4a5b': 'Demo 168 gr HPBT',
   'powders catalogue:demo-powder-dp40': 'DP40',
-  'primers catalogue:demo-primer-large-rifle': 'Large Rifle Demo',
+  'primers catalogue:example-primer-lr': 'Large Rifle Example',
 }
 const nameOf = (kind: ComponentKind, ref: string) => names[`${kind} ${ref}`]
 const summary = (load: Partial<Load>, f = nameOf) =>
@@ -20,14 +20,14 @@ const full: Partial<Load> = {
   bullet: 'user:5b0f1a2e-3c4d-4e5f-8a9b-0c1d2e3f4a5b',
   powder: 'catalogue:demo-powder-dp40',
   charge: { value: 2.9 },
-  primer: { record: 'catalogue:demo-primer-large-rifle' },
+  primer: { record: 'catalogue:example-primer-lr' },
   seating: { by: 'overallLength', value: { value: 71.12 } },
 }
 
 it('names the cartridge and bullet, then the powder with its charge, the primer and the COAL', () => {
   expect(summary(full)).toEqual([
     '308 Win., Demo 168 gr HPBT',
-    'DP40 2.90 g, Large Rifle Demo, COAL 71.12 mm',
+    'DP40 2.90 g, Large Rifle Example, COAL 71.12 mm',
   ])
 })
 
@@ -73,7 +73,7 @@ it('asks for the names of the references only, by the kind of their records', ()
     ['cartridges', 'catalogue:308-win'],
     ['bullets', 'user:5b0f1a2e-3c4d-4e5f-8a9b-0c1d2e3f4a5b'],
     ['powders', 'catalogue:demo-powder-dp40'],
-    ['primers', 'catalogue:demo-primer-large-rifle'],
+    ['primers', 'catalogue:example-primer-lr'],
   ])
   expect(componentRefs({ origin: 'user' } as Load)).toEqual([])
 })

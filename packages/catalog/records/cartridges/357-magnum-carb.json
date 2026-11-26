@@ -112,6 +112,10 @@
       "value": 62.57
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -120,6 +124,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/357-magnum-carb-en.pdf",
         "sha256": "565a5d657a86eea1fe7795c03ccfb0a8dffc1411046d73f9afb6e2d46b5b82a1",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-357-magnum",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Small pistol magnum."
       }
     ]
   }

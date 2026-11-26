@@ -373,6 +373,10 @@
       "value": 63.78
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page25.pdf",
         "sha256": "907d3ac8f9cce6f015e7bfeee2a70ca893fdb0321babc5e22328580b45b343d8",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .350 Remington Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.350_Remington_Magnum&oldid=1285194388",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

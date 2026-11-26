@@ -28,8 +28,6 @@ export const sampleIds: Record<string, readonly string[]> = {
   ],
   bullet: ['demo-bullet-168', 'demo-bullet-150'],
   powder: ['demo-powder-dp40'],
-  case: ['demo-case-308-brass'],
-  primer: ['demo-primer-large-rifle', 'demo-primer-small-pistol-lead-free'],
   // a large precision face and a small one
   'target-face': ['issf-25m-precision-50m-pistol', 'bdmp-nr6'],
   // a pistol discipline on two faces and a long gun one

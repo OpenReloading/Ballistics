@@ -315,6 +315,9 @@
       "value": 48.28
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -323,6 +326,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page81.pdf",
         "sha256": "f8ccdd146549e0e1c50e468ba7d2b9d82ea63df4dac2a9b73dee8efe65926b7c",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32-20 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32-20_Winchester&oldid=1368987343",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

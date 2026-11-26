@@ -373,6 +373,10 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page4.pdf",
         "sha256": "01d924c75145b4e6b7ca87599a17f22263e6739bb8838ac018fcbc552f63c2c3",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm Shooting Times Westerner",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm_Shooting_Times_Westerner&oldid=1318983248",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

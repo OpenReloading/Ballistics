@@ -358,6 +358,9 @@
       "value": 62.57
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -366,6 +369,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page53.pdf",
         "sha256": "fda160039b3a3796f5f27b24ceb32b44859b8ec863f191b8faf3ae4174a8a48f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .357 SIG",
+        "url": "https://en.wikipedia.org/w/index.php?title=.357_SIG&oldid=1380166553",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

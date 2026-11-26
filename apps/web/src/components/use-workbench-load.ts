@@ -36,6 +36,7 @@ import { type SetStateAction, useCallback, useEffect, useMemo, useRef, useState 
 import { flushSync } from 'react-dom'
 import { putRecords, storedRecord, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { english, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
 import type {
@@ -73,6 +74,7 @@ import {
 } from '../lib/field-spec.ts'
 import type { FigureView } from '../lib/figure-views.ts'
 import { gunValues, sightOptions, storedOf } from '../lib/firearm.ts'
+import { genericPrimer } from '../lib/generic-primer.ts'
 import {
   cartridgeClass,
   type DefaultSources,
@@ -175,6 +177,7 @@ import {
   readDefaults,
   type WorkbenchDefaults,
 } from '../lib/workbench-defaults.ts'
+import englishMessages from '../locales/en/components/use-workbench-load.json' with { type: 'json' }
 import type { FileMenuHandle } from './file-menu.tsx'
 import type { ChartView } from './interior-chart.tsx'
 import { usePrintEvents } from './print.ts'
@@ -224,6 +227,12 @@ import {
 import { type ResultTab, resultTabs } from './workbench-results.tsx'
 import type { WorkspaceHandle } from './workspace.tsx'
 
+loadEnglish(englishMessages)
+
+/** A case or primer record of an opened load that the catalogue no longer holds, in the File menu's note. */
+const replacedCase = /*i18n*/ { id: 'workbench.replacedCase', message: 'brass {id}' }
+const replacedPrimer = /*i18n*/ { id: 'workbench.replacedPrimer', message: 'primer {id}' }
+
 const interiorSpec = (key: string) =>
   interiorFields.find((s) => s.key === key) as (typeof interiorFields)[number]
 
@@ -263,6 +272,10 @@ type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined 
 type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
 type Asked = Partial<Record<Kind, { id: string; failed?: true }>>
 type Groove = { id: string; z?: number | undefined; record?: CartridgeDetail }
+
+/** The generic primer of the chosen catalogue cartridge, once its record is read. */
+const primerDefaultOf = (cartridge: CartridgeChoice | undefined, groove: Groove | undefined) =>
+  genericPrimer(cartridge && groove?.id === cartridge.id ? groove.record : undefined)
 
 /** Groove diameter Z, m, bore area Q, m2, which an empty Bore area takes first, and its CIP table. */
 function grooveValues(cartridge: CartridgeChoice | undefined, groove: Groove | undefined) {
@@ -499,6 +512,15 @@ function nextPanelOf(next: number, hasVolume: boolean): InputPanel | undefined {
 
 const refOf = (record: { id: string } | undefined) => record && catalogueRef(record.id)
 
+/** No record and no design is chosen. */
+const noneChosen = (...chosen: unknown[]) => !chosen.some(Boolean)
+
+/** The File menu's request for the cartridge an opened load named none of, while none is chosen. */
+const cartridgeNoteOf = (openedBare: boolean, noCartridge: boolean, t: Translator['t']) =>
+  openedBare && noCartridge
+    ? t('This load has no cartridge: choose one to run and save it.')
+    : undefined
+
 /** What a run still needs, in the order of the cards; the first open one is next. */
 function todoOf(a: {
   cartridge: CartridgeChoice | undefined
@@ -512,7 +534,7 @@ function todoOf(a: {
   const { cartridge, cartridgeDesign, has, t } = a
   return [
     {
-      label: msg('Cartridge (optional)'),
+      label: msg('Cartridge'),
       done: !!(cartridge || cartridgeDesign),
       value:
         cartridge?.name ??
@@ -1508,6 +1530,8 @@ export function useWorkbenchState() {
   const [cartridge, setCartridgeRecord] = useState<CartridgeChoice | undefined>(undefined)
   /** It fills what its resolved values give: no limits, class or capacity record of its base. */
   const [cartridgeDesign, setCartridgeDesign] = useState<UserCartridgeView>()
+  /** The opened load names no cartridge: the File menu asks for one until it is chosen. */
+  const [openedBare, setOpenedBare] = useState(false)
   /** A catalogue cartridge replaces the design. */
   const setCartridge = (c: CartridgeChoice | undefined) => {
     setCartridgeRecord(c)
@@ -2029,6 +2053,8 @@ export function useWorkbenchState() {
     setAsked((a) => (a[k]?.id === id ? { ...a, [k]: { id, failed: true } } : a))
   /** The record ids of the link the schema refuses, left out of the load (`droppedIds`). */
   const [dropped, setDropped] = useState<string[]>([])
+  /** The primer and case records an opened load names that the catalogue no longer holds: the generic ones of the cartridge stand in. */
+  const [standIns, setStandIns] = useState<string[]>([])
   /** What a link carried of its bullet and powder records, with their ids. */
   const [linked, setLinked] = useState<{
     bullet?: LinkedBullet | undefined
@@ -2060,6 +2086,7 @@ export function useWorkbenchState() {
     powderTab.open(undefined)
     setAsked({})
     setDropped([])
+    setStandIns([])
     setLinked({})
     setByHand(false)
     running.current?.abort()
@@ -2101,6 +2128,7 @@ export function useWorkbenchState() {
     setCaseChoice(undefined)
     setPrimerChoice(undefined)
     setOwnCaseChoice(undefined)
+    setOpenedBare(false)
     openingCapacity.current = undefined
     measuredFromGroup.current = false
     setGunFields({ firearmMass: emptyStep })
@@ -2361,9 +2389,12 @@ export function useWorkbenchState() {
       { name },
     )
 
-  /** Why no run can start: a refused typed spec, else a powder without burn values (not for a Powders tab row, `as`). */
+  const noCartridge = noneChosen(cartridge, cartridgeDesign)
+  /** Why no run can start: no cartridge, a refused typed spec, else a powder without burn values (not for a Powders tab row, `as`). */
   const refusal = (as: unknown) =>
-    specError() ?? (as || !burnless ? undefined : burnlessText(burnless))
+    (noCartridge ? t('Choose the cartridge.') : undefined) ??
+    specError() ??
+    (as || !burnless ? undefined : burnlessText(burnless))
   /** Taken once, not from this render: a run pressed after a seated volume was written and before it was drawn sends it (#870) and its seating (#938, #970); the Powders tab's rows (`as`) read their batch's start render, so a batch simulates one load. */
   const runValues = (as: unknown): RunValues =>
     as
@@ -2372,6 +2403,11 @@ export function useWorkbenchState() {
 
   /** Validates and sends; false when a field is invalid (it then gets focus). */
   function run() {
+    if (noCartridge) {
+      setStatus(t('Choose the cartridge.'))
+      workspace.current?.showInputs()
+      return false
+    }
     if (burnless) {
       setStatus(burnlessText(burnless))
       return false
@@ -2954,8 +2990,32 @@ export function useWorkbenchState() {
     const target = ref ? parseRef(ref) : undefined
     const cartridgeId = forCartridge && parseRef(forCartridge)?.id
     if (!target || !cartridgeId) return
-    if (target.scope === 'catalogue') setCaseChoice({ cartridge: cartridgeId, id: target.id })
-    else setOwnCaseChoice({ cartridge: cartridgeId, id: target.id })
+    if (target.scope !== 'catalogue')
+      return setOwnCaseChoice({ cartridge: cartridgeId, id: target.id })
+    setCaseChoice({ cartridge: cartridgeId, id: target.id })
+    whenGone('cases', target.id, () => {
+      setCaseChoice((c) => (c?.id === target.id ? undefined : c))
+      return i18n._(replacedCase.id, target, { message: replacedCase.message })
+    })
+  }
+
+  /** A catalogue primer of an opened load. */
+  function openPrimer(id: string | undefined) {
+    setPrimerChoice(id)
+    if (!id) return
+    whenGone('primers', id, () => {
+      setPrimerChoice((c) => (c === id ? undefined : c))
+      return i18n._(replacedPrimer.id, { id }, { message: replacedPrimer.message })
+    })
+  }
+
+  /** Clears a record the catalogue no longer holds and notes it; offline the choice stays, as nothing tells it is gone. */
+  function whenGone(kind: 'cases' | 'primers', id: string, clear: () => string) {
+    void fetchRecord(kind, id)
+      .catch(() => true)
+      .then((found) => {
+        if (found === undefined) setStandIns((r) => [...r, clear()])
+      })
   }
 
   /** A catalogue case product chosen in the figure replaces a group of the user's cases. */
@@ -3031,6 +3091,7 @@ export function useWorkbenchState() {
     const { query, typed, sessions } = fromLoad(d)
     const cartridgeId = catalogueIdIn(d.cartridge)
     if (cartridgeId) query.set('cartridge', cartridgeId)
+    setOpenedBare(d.cartridge === undefined)
     const firearmKey = userFirearmOf(d.firearm)
     if (firearmKey) query.set('firearm', firearmKey)
     fill(query)
@@ -3042,7 +3103,7 @@ export function useWorkbenchState() {
     if (userCartridge) openCartridgeDesign(userCartridge)
     if (d.capacity) openCapacity(d.capacity, d.cartridge)
     openCase(d.case?.record, d.cartridge)
-    setPrimerChoice(catalogueIdIn(d.primer?.record))
+    openPrimer(catalogueIdIn(d.primer?.record))
     openBullet(d.bullet, !typed.has('bulletMass'))
     openPowder(d.powder, typed)
     setNotes(d.note ?? '')
@@ -3106,6 +3167,7 @@ export function useWorkbenchState() {
   const unresolved = (['cartridge', 'bullet', 'powder', 'capacity'] as const).flatMap((k) =>
     asked[k]?.failed ? [unresolvedText[k](asked[k].id)] : [],
   )
+  const cartridgeNote = cartridgeNoteOf(openedBare, noCartridge, t)
 
   /** A field's value with the display decimals, for the record lines; undefined when not valid. */
   const shown = (key: string, q: Parameters<typeof formatQuantity>[0]) => {
@@ -3600,6 +3662,8 @@ export function useWorkbenchState() {
     caseId: chosenCase,
     setCaseChoice: chooseCase,
     primerId: primerChoice,
+    primerDefault: primerDefaultOf(cartridge, groove),
+    standIns,
     setPrimerChoice,
     ownCases: cartridgeCases,
     ownCaseId: chosenOwnCase,
@@ -3678,6 +3742,7 @@ export function useWorkbenchState() {
     takeSeated,
     trajectory,
     unresolved,
+    cartridgeNote,
     dropped,
     workspace,
   }

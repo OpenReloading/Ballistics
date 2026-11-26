@@ -369,6 +369,9 @@
       "value": 35.16
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page22.pdf",
         "sha256": "3c16d2be1254d25a9a3a815e987022fd18d6e2109bd670ff7b6a21ee80853102",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.5×54mm Mannlicher–Schönauer",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5×54mm_Mannlicher–Schönauer&oldid=1379793861",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Rifle."
       }
     ]
   }

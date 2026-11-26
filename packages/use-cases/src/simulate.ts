@@ -342,6 +342,21 @@ function ladderKindRefusal(ladder: NonNullable<Load['analysis']>['ladder']) {
     : undefined
 }
 
+/** A load file without a cartridge: the run needs one, so the answer names the field. */
+function noCartridgeRefusal(record: Load, path: Path) {
+  return record.cartridge === undefined
+    ? {
+        status: 422 as const,
+        payload: {
+          ...unprocessable,
+          message: 'The load has no cartridge: choose a cartridge record to simulate it.',
+          field: [...path, 'cartridge'].join('.'),
+          notice,
+        },
+      }
+    : undefined
+}
+
 /** An empty bore area takes the cartridge record's, as the workbench fills it, with the record's land diameter as the bore. */
 function fillBoreArea(
   load: InteriorLoad,
@@ -411,6 +426,8 @@ export async function simulate(
   const refusal = ladderKindRefusal(ladder)
   if (refusal) return refusal
   const { cartridge, bullet, powder, powderLabel } = loadFileRecords(context.catalogue, record)
+  const bare = noCartridgeRefusal(record, path)
+  if (bare) return bare
   fillBoreArea(load, cartridge, values)
   // the temperature sensitivity of the powder record, its own or the default of its grain form, as the workbench adds it to a run
   takeSensitivity(load, powder)

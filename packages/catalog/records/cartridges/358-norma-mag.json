@@ -367,6 +367,10 @@
       "value": 64.27
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -375,6 +379,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page26.pdf",
         "sha256": "a230223ac397dfdac5afbdb8d7eb2f0c0ee7f56c21d5311bfcd290c46da710bd",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .358 Norma Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.358_Norma_Magnum&oldid=1367313877",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

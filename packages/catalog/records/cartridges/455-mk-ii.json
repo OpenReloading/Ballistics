@@ -216,6 +216,9 @@
       "value": 103.68
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -224,6 +227,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page87.pdf",
         "sha256": "2366e6bf6e7f8cfcf0ab4d2b32ac31ecf898d1b1f5d318f87aaccdf7bb77020f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .455 Webley",
+        "url": "https://en.wikipedia.org/w/index.php?title=.455_Webley&oldid=1368405372",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol (Small pistol in modern Fiocchi loadings)."
       }
     ]
   }

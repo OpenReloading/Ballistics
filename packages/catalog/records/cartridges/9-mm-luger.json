@@ -235,7 +235,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:9-mm-luger-wikipedia"
+    "capacity": "catalogue:9-mm-luger-wikipedia",
+    "primerSize": "small-pistol"
   },
   "provenance": {
     "kind": "published",
@@ -245,6 +246,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page28.pdf",
         "sha256": "56ea1d072640095b2cbebcbc31e0baf1f82eb77da8340efcad0819eeda7c112d",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 9×19mm Parabellum",
+        "url": "https://en.wikipedia.org/w/index.php?title=9×19mm_Parabellum&oldid=1385278941",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or boxer small pistol."
       }
     ]
   }

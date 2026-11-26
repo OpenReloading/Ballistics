@@ -310,6 +310,9 @@
       "value": 63.77
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -318,6 +321,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page86.pdf",
         "sha256": "065786d5f1b496875e322e0d1e9fe8ebcad56eb82f71cfa81137616174d28f75",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .35 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.35_Winchester&oldid=1339063413",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: large rifle."
       }
     ]
   }

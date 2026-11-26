@@ -251,6 +251,9 @@
       "value": 48.29
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -259,6 +262,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page13.pdf",
         "sha256": "e684f177673a22c9ea110b7c56981fc7d56315f765fbc7fae7dd140d6394560f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.65×20mm Long",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.65×20mm_Long&oldid=1380037056",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

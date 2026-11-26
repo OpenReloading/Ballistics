@@ -375,6 +375,9 @@
       "value": 24.83
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page81.pdf",
         "sha256": "de8eb3531cb1a9f081de823eb876895720d1873e6fea0d14227c3aaff067d843",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .22 PPC",
+        "url": "https://en.wikipedia.org/w/index.php?title=.22_PPC&oldid=1260199312",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small Rifle."
       }
     ]
   }

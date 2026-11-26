@@ -19,11 +19,13 @@ export interface UsedWater<T extends Recorded = Recorded> {
   record?: T
 }
 
-/** Water in g: the measured value, else the capacity record chosen, else the case record's stated capacity, else the cartridge's first capacity record. */
+/** Water in g: the measured value, else the capacity record chosen, else the case record's stated capacity, else the cartridge's default capacity record (the generic brass case), else its first capacity record. */
 export function usedWater<T extends Recorded>(o: {
   measured?: number | undefined
   capacities: readonly T[]
   capacityId?: string | undefined
+  /** The cartridge's default capacity record (`defaultCapacity`). */
+  cartridgeDefault?: T | undefined
   stated?: number | undefined
   /** A case record is chosen but not read yet: its capacity is not known, so no other record stands in for it. */
   pendingCase?: boolean | undefined
@@ -31,7 +33,8 @@ export function usedWater<T extends Recorded>(o: {
   if (o.measured !== undefined) return { grams: o.measured, source: 'measured' }
   const chosen = o.capacities.find((c) => c.id === o.capacityId)
   const capacity =
-    chosen ?? (o.stated === undefined && !o.pendingCase ? o.capacities[0] : undefined)
+    chosen ??
+    (o.stated === undefined && !o.pendingCase ? (o.cartridgeDefault ?? o.capacities[0]) : undefined)
   const water = loadWaterCapacity({
     capacity,
     case: o.stated === undefined ? undefined : { waterCapacity: { value: o.stated } },

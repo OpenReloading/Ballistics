@@ -362,6 +362,9 @@
       "value": 47.17
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -370,6 +373,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/7.pdf",
         "sha256": "dba1faa513ceb8a585718f6149fd896ceca2349f139240b6657d0bcac884c535",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.5×54mm French",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.5×54mm_French&oldid=1380371591",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or Boxer Large rifle."
       }
     ]
   }

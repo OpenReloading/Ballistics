@@ -373,6 +373,9 @@
       "value": 52.17
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +384,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page6.pdf",
         "sha256": "8d5ab3b50bbfdaa00ed4a8a915688ea8dfbc9c4240cac2593a719a10dc2b6b22",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 8mm Remington Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=8mm_Remington_Magnum&oldid=1354917198",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Rifle."
       }
     ]
   }

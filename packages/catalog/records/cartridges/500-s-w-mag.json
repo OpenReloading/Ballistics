@@ -249,6 +249,9 @@
       "value": 123.37
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -257,6 +260,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/500-s-w-mag-en.pdf",
         "sha256": "3ec821a7d4e475a1fc9372f73b8433681ee292baa364e4a2150321a938cda822",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .500 S&W Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.500_S%26W_Magnum&oldid=1371858917",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle (formerly large pistol)."
       }
     ]
   }

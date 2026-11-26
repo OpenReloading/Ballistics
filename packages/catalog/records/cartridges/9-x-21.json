@@ -234,6 +234,9 @@
       "value": 62.57
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -242,6 +245,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page20.pdf",
         "sha256": "a288cb14a61324bdbb62258c2e5d99aefb02138ca5754f32f65d1f55d490d97f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 9×21mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=9×21mm&oldid=1327723604",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

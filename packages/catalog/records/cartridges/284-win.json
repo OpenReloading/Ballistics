@@ -369,6 +369,9 @@
       "value": 40.12
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/284-win-201110-en.pdf",
         "sha256": "b5041a4ce3eab87c8d5381e7ce58bcc930a4ad351cad73ceb067f5a4d8c34ac0",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .284 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.284_Winchester&oldid=1375275110",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

@@ -286,6 +286,9 @@
       "note": "Present on the official CIP sheet at import; not yet checked by hand."
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -294,6 +297,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page10.pdf",
         "sha256": "2a7dcdd3e042298ea0d0cff3e595eed5f7b578b6cafa3e49e7cd0bf3976bcd45",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.62×38mmR",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.62×38mmR&oldid=1316173032",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or boxer small pistol."
       }
     ]
   }

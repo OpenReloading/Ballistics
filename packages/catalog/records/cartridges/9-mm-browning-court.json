@@ -241,7 +241,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:9-mm-browning-court-wikipedia"
+    "capacity": "catalogue:9-mm-browning-court-wikipedia",
+    "primerSize": "small-pistol"
   },
   "provenance": {
     "kind": "published",
@@ -251,6 +252,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page24.pdf",
         "sha256": "20667c9649a7f8808675346bacc19086ab23ec31ad6eb3157de2b2273b3710aa",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-380-acp",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

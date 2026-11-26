@@ -373,6 +373,9 @@
       "value": 34.71
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +384,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page1.pdf",
         "sha256": "ddfa0b787398dd7757155fdf0ddf95b76b3298145629f738e7a86865d281956a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.5mm Remington Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5mm_Remington_Magnum&oldid=1368987398",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

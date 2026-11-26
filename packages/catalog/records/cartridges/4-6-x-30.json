@@ -394,6 +394,9 @@
       "value": 16.52
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -402,6 +405,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/4-6x30-suhl-eng-250317.pdf",
         "sha256": "8f66867363c70a960cc62cf3c5223a678d42f1094c37e2211c5c29ec19b72229",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, HK 4.6×30mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=HK_4.6×30mm&oldid=1347648528",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Boxer small rifle."
       }
     ]
   }

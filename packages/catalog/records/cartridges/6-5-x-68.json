@@ -373,6 +373,10 @@
       "value": 34.52
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page30.pdf",
         "sha256": "d7f722db065d64c5c553284cfee5dc9a9992907c9a4925a63f245732ba0ff454",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.5×68mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5×68mm&oldid=1292891119",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

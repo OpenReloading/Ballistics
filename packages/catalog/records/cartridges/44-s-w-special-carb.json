@@ -112,6 +112,9 @@
       "value": 90.65
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -120,6 +123,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page75.pdf",
         "sha256": "21c35627d12ccea0c9980739bf5f26e1b4cb51b8be50b7d0cc3f63c180cd0318",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-44-special",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

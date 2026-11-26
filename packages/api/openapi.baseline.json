@@ -1751,6 +1751,10 @@
                             "shotshell"
                           ],
                           "description": "The primer size of a load that names no primer record."
+                        },
+                        "primerMagnum": {
+                          "type": "boolean",
+                          "description": "Whether the source of `primerSize` calls for a magnum primer of that size."
                         }
                       },
                       "additionalProperties": false
@@ -25722,6 +25726,7 @@
                     "saved": "2026-01-01T00:00:00.000Z",
                     "data": {
                       "origin": "user",
+                      "cartridge": "catalogue:308-win",
                       "charge": {
                         "value": 2.8
                       },

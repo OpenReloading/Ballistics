@@ -1247,6 +1247,10 @@ msgstr "In der Datei der Laborierung fehlen {n} Werte: {list}. Geben Sie sie unt
 msgid "coreMessage.answer.lacksValue"
 msgstr "In der Datei der Laborierung fehlt 1 Wert: {list}. Geben Sie ihn unter analysis.overrides ein oder geben Sie die Namen von Katalogdatensätzen an, die ihn liefern."
 
+# en: "The load has no cartridge: choose a cartridge record to simulate it."
+msgid "coreMessage.answer.noCartridge"
+msgstr "Die Laborierung hat keine Patrone: Wählen Sie einen Patronen-Datensatz, um sie zu simulieren."
+
 # en: "the load is no longer in this browser"
 msgid "coreMessage.request.loadGone"
 msgstr "Die Laborierung ist nicht mehr in diesem Browser"
