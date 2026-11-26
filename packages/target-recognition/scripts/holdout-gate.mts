@@ -1,6 +1,15 @@
 // The accuracy gate (apps/docs/docs/models/hole-detection.md, "Accuracy gate"), local only: node scripts/holdout-gate.mts freeze|score ...
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  closeSync,
+  constants,
+  existsSync,
+  ftruncateSync,
+  openSync,
+  readFileSync,
+  writeFileSync,
+  writeSync,
+} from 'node:fs'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 import { nth } from '@rangefoundry/statistics'
@@ -92,11 +101,18 @@ function frozenSet({ photos, labels, freeze: path }: GatePaths): {
 
 /** Counts this look in the photo folder and returns its number. */
 function nextLook(photos: string): number {
-  const file = join(photos, LOOKS)
-  const look = (existsSync(file) ? Number.parseInt(readFileSync(file, 'utf8'), 10) : 0) + 1
-  if (!Number.isSafeInteger(look)) throw new Error('The look counter is not a number')
-  writeFileSync(file, `${look}\n`)
-  return look
+  // one descriptor for the read and the write, so no other file can come between them
+  const fd = openSync(join(photos, LOOKS), constants.O_RDWR | constants.O_CREAT)
+  try {
+    const text = readFileSync(fd, 'utf8')
+    const look = (text === '' ? 0 : Number.parseInt(text, 10)) + 1
+    if (!Number.isSafeInteger(look)) throw new Error('The look counter is not a number')
+    ftruncateSync(fd)
+    writeSync(fd, `${look}\n`, 0)
+    return look
+  } finally {
+    closeSync(fd)
+  }
 }
 
 /** The photo as an RGBA buffer, EXIF rotation applied as a label tool shows it. */
