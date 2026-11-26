@@ -1,11 +1,18 @@
+import { I18nProvider } from '@lingui/react'
+import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { ErrorView } from '../src/components/workbench-readouts.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
+
+/** Rendered under the English Lingui instance the components read. */
+const markup = (node: ReactNode) =>
+  renderToStaticMarkup(<I18nProvider i18n={linguiOf('en')}>{node}</I18nProvider>)
 
 const notice = 'simulation, not load data'
 
 it('a schema error lists each issue with the notice', () => {
-  const html = renderToStaticMarkup(
+  const html = markup(
     <ErrorView
       outcome={{
         kind: 'error',
@@ -33,7 +40,7 @@ it.each([
   ['maxTime', 'did not reach the muzzle'],
   ['input', 'A value is outside the model&#x27;s range'],
 ])('an invalid run with reason %s says what is wrong in words', (reason, text) => {
-  const html = renderToStaticMarkup(
+  const html = markup(
     <ErrorView
       outcome={{
         kind: 'error',
@@ -49,7 +56,7 @@ it.each([
 })
 
 it('an unknown reason keeps the message of the answer', () => {
-  const html = renderToStaticMarkup(
+  const html = markup(
     <ErrorView
       outcome={{
         kind: 'error',

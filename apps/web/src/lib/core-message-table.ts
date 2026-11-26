@@ -1,12 +1,9 @@
 import type { I18n } from '@lingui/core'
 import { type Catalogue, type Message, type Translator, translator } from '../i18n/translate.ts'
-import { setCoreMessages } from './core-messages.ts'
+import { type Described, setCoreMessages } from './core-messages.ts'
 import { refusalWords } from './refusal-words.ts'
 
 // Package and API message templates (apps/docs/docs/translating.md); only a non-English language loads them
-
-/** A message of the table: its Lingui id and its English text, with `{name}` where a value stands. */
-type Described = { readonly id: string; readonly message: string }
 
 /** The `code` of a warning of an interior answer (`Warning['code']` of the API). */
 export type WarningCode =
@@ -413,7 +410,7 @@ const sentences: readonly Described[] = [
   },
 ]
 
-/** A template: a message of the table, or a refusal sentence of the old catalogue (`refusal-words.ts`). */
+/** A template: a message of the table or a refusal sentence (`refusal-words.ts`), on an id or still in the old catalogue. */
 type Template = Described | Message
 
 const templates: readonly Template[] = [

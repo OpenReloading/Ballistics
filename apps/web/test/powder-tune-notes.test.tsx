@@ -1,10 +1,17 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { PowderFit } from '@rangefoundry/ballistics'
+import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TuneNotes } from '../src/components/powder-tune.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import { fixtureInterior } from './fixtures/load.ts'
+
+/** Rendered under the English Lingui instance the components read. */
+const markup = (node: ReactNode) =>
+  renderToStaticMarkup(<I18nProvider i18n={linguiOf('en')}>{node}</I18nProvider>)
 
 const saved = 'user:0b5f7a2e-3c1d-4e8f-9a6b-2d4c8e1f7a30'
 const strings = [{ charge: 0.0025, shots: [{ velocity: { value: 800 } }] }]
@@ -17,7 +24,7 @@ const fitted = {
 } as unknown as { kind: 'fit'; id: number; fit: PowderFit; band: [] }
 
 const text = (props: Parameters<typeof TuneNotes>[0]) =>
-  renderToStaticMarkup(
+  markup(
     <MantineProvider>
       <TuneNotes {...props} />
     </MantineProvider>,

@@ -920,6 +920,7 @@ function LoadField({ name: key }: { name: string }) {
     outcome,
   } = useLoad()
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const spec = interiorFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
   const gun = firearmList.find((f) => f.id === firearm)?.data
@@ -990,7 +991,7 @@ function LoadField({ name: key }: { name: string }) {
           fieldError(spec, fields[key], s, t) ??
           burnFormError(siValues(fields), key, t) ??
           // a message a run set, as the engraving values needing each other
-          (typeof props.error === 'string' ? translateMessage(props.error, t) : undefined))
+          (typeof props.error === 'string' ? translateMessage(props.error, i18n) : undefined))
       }
       flag={seatingFlag(key, seated, previewed, fields, t)}
       action={

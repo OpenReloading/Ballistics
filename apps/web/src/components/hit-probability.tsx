@@ -1,4 +1,5 @@
 'use client'
+import { useLingui } from '@lingui/react'
 
 import { NativeSelect } from '@mantine/core'
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
@@ -95,6 +96,7 @@ export function HitProbability({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const specs = useMemo(() => fieldSpecs(bulletDiameter), [bulletDiameter])
   const [fields, setFields] = useState<Fields>(() => initialFields(specs, system))
   useFieldUnits(specs, system, (update) => setFields((f) => update(f)))
@@ -205,7 +207,7 @@ export function HitProbability({
       {load.status === 'error' && (
         <p role="alert">
           {t('The target could not be read: {reason}', {
-            reason: translateMessage(load.message, t),
+            reason: translateMessage(load.message, i18n),
           })}
         </p>
       )}

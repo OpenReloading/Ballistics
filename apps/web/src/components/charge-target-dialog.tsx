@@ -1,4 +1,5 @@
 'use client'
+import { useLingui } from '@lingui/react'
 
 import { Button, Group, NumberInput, Select, Stack, Text } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
@@ -38,6 +39,7 @@ function requestKey(loadRequest: () => { body: object; bulkDensity?: number | un
 /** Posts the load of the fields as Run does; Apply writes the charge into the field. */
 export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClose: () => void }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system, cartridge, loadRequest, applyCharge, powderDesign, typedSpecFields } = useLoad()
   const [kind, setKind] = useState<TargetKind>('peakPressure')
   const [percent, setPercent] = useState(false)
@@ -216,7 +218,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
               .filter((w) => w.code !== 'noCartridge')
               .map((w) => (
                 <Text key={w.message} size="xs">
-                  {translateMessage(w.message, t)}
+                  {translateMessage(w.message, i18n)}
                 </Text>
               ))}
             <Group justify="flex-end" gap="xs">

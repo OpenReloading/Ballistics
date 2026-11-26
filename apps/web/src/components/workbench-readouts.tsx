@@ -1,5 +1,6 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Popover, UnstyledButton } from '@mantine/core'
 import { type FreeRecoil, freeRecoil } from '@rangefoundry/ballistics'
@@ -89,42 +90,44 @@ function errorHeadline(
   status: number,
   b: Pick<ErrorBody, 'reason' | 'message'>,
   t: Translator['t'],
+  i18n: I18n,
 ) {
   const sentence = status === 422 && b.reason ? invalidRunText[b.reason] : undefined
   if (sentence) return t(sentence)
-  return b.message ? translateMessage(b.message, t) : t('HTTP {status}', { status })
+  return b.message ? translateMessage(b.message, i18n) : t('HTTP {status}', { status })
 }
 
 export function ErrorView({ outcome }: { outcome: Extract<Outcome, { kind: 'error' }> }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const b = outcome.body
   if (outcome.status === 502 || !b) return <p>{t(outcome.offline ? needsNetwork : notReached)}</p>
   return (
     <>
-      {b.notice && <p>{t('Notice: {notice}', { notice: translateMessage(b.notice, t) })}</p>}
+      {b.notice && <p>{t('Notice: {notice}', { notice: translateMessage(b.notice, i18n) })}</p>}
       {outcome.status === 400 && b.issues ? (
         <>
           <p>{t('The request does not match the schema:')}</p>
           <ul>
             {b.issues.map((i) => (
               <li key={`${i.path.join('.')} ${i.message}`}>
-                {i.path.join('.')}: {translateMessage(i.message, t)}
+                {i.path.join('.')}: {translateMessage(i.message, i18n)}
               </li>
             ))}
           </ul>
         </>
       ) : (
-        <p>{errorHeadline(outcome.status, b, t)}</p>
+        <p>{errorHeadline(outcome.status, b, t, i18n)}</p>
       )}
       {outcome.status === 422 && (b.reason || b.field) && (
         <p>
           {b.reason && b.field
             ? t('Reason: {reason}; field: {field}', {
-                reason: translateMessage(b.reason, t),
+                reason: translateMessage(b.reason, i18n),
                 field: b.field,
               })
             : b.reason
-              ? t('Reason: {reason}', { reason: translateMessage(b.reason, t) })
+              ? t('Reason: {reason}', { reason: translateMessage(b.reason, i18n) })
               : t('field: {field}', { field: b.field ?? '' })}
         </p>
       )}
@@ -543,10 +546,10 @@ const limitColumns = [
 ]
 
 /** Why a limit was not compared: a known reason in words, else the API's own text. */
-function notComparedReason(reason: string | undefined, t: Translator['t']) {
+function notComparedReason(reason: string | undefined, t: Translator['t'], i18n: I18n) {
   if (!reason) return t('not compared')
   const known = reasonText[reason]
-  return known ? t(known) : translateMessage(reason, t)
+  return known ? t(known) : translateMessage(reason, i18n)
 }
 
 /** On a bar from 0 with its nominal and the compared limit (`pressureLimit`, as the chart's limit line); nothing without that limit. */
@@ -618,6 +621,7 @@ export function LimitsView({
   printed?: boolean
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const resolved = body.resolved?.cartridge
   if (!body.limits || body.limits.length === 0)
     return (
@@ -651,7 +655,7 @@ export function LimitsView({
             <td data-label={heads[4]}>
               {l.compared
                 ? t('yes')
-                : t('no: {reason}', { reason: notComparedReason(l.reason, t) })}
+                : t('no: {reason}', { reason: notComparedReason(l.reason, t, i18n) })}
             </td>
             <td data-label={heads[5]}>{yesNo(l.exceeded, t)}</td>
             <td data-label={heads[6]}>{yesNo(l.nominalExceeded, t)}</td>
@@ -751,6 +755,7 @@ export function LadderStrip({
   select: (i: number) => void
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   // the selected step in view in a strip that scrolls sideways
   const cells = useRef<HTMLDivElement>(null)
   const [selectedStep, runId] = [ok?.selected, ok?.id]
@@ -813,7 +818,7 @@ export function LadderStrip({
               {s.error &&
                 flagView(
                   t('model: {reason}', {
-                    reason: s.error.reason ? translateMessage(s.error.reason, t) : t('invalid'),
+                    reason: s.error.reason ? translateMessage(s.error.reason, i18n) : t('invalid'),
                   }),
                 )}
             </label>
@@ -920,6 +925,7 @@ function LadderRow({
   resultSpan,
 }: LadderRowProps) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const current = !which && ok && s.n - 1 === ok.selected
   return (
     <tr aria-current={current ? 'true' : undefined} data-lot={which}>
@@ -953,7 +959,7 @@ function LadderRow({
       ) : (
         <td data-label={t('Result')} colSpan={resultSpan}>
           {t('Not computed: {reason}', {
-            reason: s.error ? translateMessage(s.error.message, t) : '',
+            reason: s.error ? translateMessage(s.error.message, i18n) : '',
           })}
         </td>
       )}

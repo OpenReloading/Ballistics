@@ -1,4 +1,5 @@
 'use client'
+import { useLingui } from '@lingui/react'
 
 import { Button, NumberInput, Text } from '@mantine/core'
 import dynamic from 'next/dynamic'
@@ -72,9 +73,10 @@ export function LotChartBlock({
 /** The fields of the lot rows, the status of their request and the chart. */
 export function LotPanel({ lot, system }: { lot: LotRows; system: UnitSystem }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const first = lot.error
   const failed =
-    lot.message && t('Lot rows failed: {message}', { message: translateMessage(lot.message, t) })
+    lot.message && t('Lot rows failed: {message}', { message: translateMessage(lot.message, i18n) })
   const text = first ?? (lot.pending ? t('Lot rows pending') : failed)
   return (
     <section className="lot-rows" aria-labelledby="lot-rows-title">

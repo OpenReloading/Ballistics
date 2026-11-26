@@ -1075,6 +1075,7 @@ export function TrajectoryForm({
   ref?: Ref<TrajectoryHandle> | undefined
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { choice: unitChoice, system, ready } = useUnits()
   const names = useManufacturerNames()
   const form = useForm<Fields>({
@@ -1180,7 +1181,7 @@ export function TrajectoryForm({
   const message = attempt.kind === 'error' ? refusalText(attempt.error) : ''
   const [alerted] = useDebouncedValue(message, 1000)
   const alert = alerted && alerted === message && (
-    <ErrorNote>{translateMessage(message, t)}</ErrorNote>
+    <ErrorNote>{translateMessage(message, i18n)}</ErrorNote>
   )
 
   const field = (spec: FieldSpec) => (
