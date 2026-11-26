@@ -44,7 +44,8 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 - Commits are signed (SSH or GPG key).
 - Branches: `main` is the only long-lived branch. Branch from it as `<type>/<issue>-<slug>` (for example `fix/123-powder-search`) and open the pull request against `main`.
 - Pull requests are squash-merged into `main`. The title becomes the commit on `main` and the changelog line; the `PR title` check enforces its format.
-- Reference the issue in the description (`Closes #123`).
+- Fill in every section of the pull request template and reference the issue in it (`Closes #123`).
+- A contribution is licensed under the license of the files it changes ([License](README.md#license)). There is no contributor license agreement (CLA).
 
 ## Releases
 
