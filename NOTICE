@@ -8,8 +8,10 @@ Bundesverwaltungsamt (BVA), the shooting sport federations or the C.I.P.
 
 ---
 
-The hole detection model files (apps/web/public/models/hole-model-*.onnx) are dedicated to
-the public domain under CC0 1.0 Universal (LICENSES/CC0-1.0.txt).
+The hole detection model files (apps/web/public/models/hole-model-*.onnx) are licensed under
+CC BY-SA 4.0 (LICENSES/CC-BY-SA-4.0.txt). They are trained on 3,000 synthetic target photos
+and 638 third-party target photos. The third-party photos are credited in aggregate, as the
+authors of the third-party training photos; no photo, file name, source or author is listed.
 
 ---
 
