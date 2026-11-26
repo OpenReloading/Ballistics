@@ -38,7 +38,7 @@ export type GatePaths = { photos: string; labels: string; freeze: string }
 /** One detector's corrections over the scored photos, overall and per kind, and whether they meet the default bar. */
 export type DetectorScores = {
   overall: CorrectionStats | null
-  kinds: Record<string, CorrectionStats>
+  kinds: Record<string, CorrectionStats | { photos: number }>
   meetsBar: boolean | null
 }
 
@@ -54,20 +54,45 @@ export type GateResult = {
 
 const BAR = { median: 1, p90: 3 }
 const LOOKS = '.gate-looks'
+// the docs' minimum for a 90th percentile; a smaller kind's figures would show single photos
+const KIND_MIN = 20
 
 const sha256 = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex')
 const hash = z.string().regex(/^[0-9a-f]{64}$/)
 const freezeFile = z.strictObject({ labels: hash, photos: z.record(z.string(), hash) })
 
-const readLabels = (path: string) => labelSet.parse(JSON.parse(readFileSync(path, 'utf8')))
+/** The text's JSON checked against the schema; the error gives the count of problems, never a key or a snippet, since keys are photo names. */
+function parsed<T>(schema: z.ZodType<T>, text: string, file: string): T {
+  let json: unknown
+  try {
+    json = JSON.parse(text)
+  } catch {
+    throw new Error(`The ${file} is not JSON`)
+  }
+  const result = schema.safeParse(json)
+  if (!result.success)
+    throw new Error(`The ${file} has ${result.error.issues.length} invalid fields`)
+  return result.data
+}
+
+/** The photo's bytes; the error gives the photo's position in the label set, not its name. */
+function readPhoto(photos: string, name: string, position: number): Buffer {
+  try {
+    return readFileSync(join(photos, name))
+  } catch (error) {
+    const code = error instanceof Error && 'code' in error ? String(error.code) : 'unknown'
+    throw new Error(`Photo ${position} of the label set cannot be read (${code})`)
+  }
+}
 
 /** Writes the SHA-256 of the label set file and of every photo it lists; refuses an existing freeze file. */
 export function freeze({ photos, labels, freeze: out }: GatePaths): void {
-  const set = readLabels(labels)
+  const labelBytes = readFileSync(labels)
+  const set = parsed(labelSet, labelBytes.toString('utf8'), 'label set file')
   const frozen = {
-    labels: sha256(readFileSync(labels)),
+    labels: sha256(labelBytes),
     photos: Object.fromEntries(
-      Object.keys(set.photos).map((name) => [name, sha256(readFileSync(join(photos, name)))]),
+      Object.keys(set.photos).map((name, i) => [name, sha256(readPhoto(photos, name, i + 1))]),
     ),
   }
   writeFileSync(out, `${JSON.stringify(frozen, null, 2)}\n`, { flag: 'wx' })
@@ -79,19 +104,19 @@ function frozenSet({ photos, labels, freeze: path }: GatePaths): {
   bytes: Buffer
 }[] {
   if (!existsSync(path)) throw new Error('No freeze file: write one before any model runs')
-  const frozen = freezeFile.parse(JSON.parse(readFileSync(path, 'utf8')))
+  const frozen = parsed(freezeFile, readFileSync(path, 'utf8'), 'freeze file')
   const labelBytes = readFileSync(labels)
   if (sha256(labelBytes) !== frozen.labels)
     throw new Error('The label set file differs from the freeze file')
-  const set = labelSet.parse(JSON.parse(labelBytes.toString('utf8')))
+  const set = parsed(labelSet, labelBytes.toString('utf8'), 'label set file')
   const names = Object.keys(set.photos)
   if (
     names.length !== Object.keys(frozen.photos).length ||
     names.some((n) => !(n in frozen.photos))
   )
     throw new Error('The label set lists other photos than the freeze file')
-  return Object.entries(set.photos).map(([name, photo]) => {
-    const bytes = readFileSync(join(photos, name))
+  return Object.entries(set.photos).map(([name, photo], i) => {
+    const bytes = readPhoto(photos, name, i + 1)
     const h = sha256(bytes)
     if (h !== frozen.photos[name]) throw new Error('A photo differs from the freeze file')
     if (h !== photo.sha256) throw new Error('A photo differs from its label')
@@ -171,20 +196,23 @@ export async function gate(
   }
 }
 
-/** The corrections overall and per kind, kinds in name order. */
+/** The corrections overall and per kind, kinds in name order; a kind below `KIND_MIN` photos gives only its count. */
 function scoresOf(rows: { kind: string; count: number }[]): DetectorScores {
   const overall = rows.length > 0 ? correctionStats(rows.map((r) => r.count)) : null
   const kinds = [...new Set(rows.map((r) => r.kind))].toSorted()
   return {
     overall,
     kinds: Object.fromEntries(
-      kinds.map((k) => [k, correctionStats(rows.filter((r) => r.kind === k).map((r) => r.count))]),
+      kinds.map((k) => {
+        const counts = rows.filter((r) => r.kind === k).map((r) => r.count)
+        return [k, counts.length >= KIND_MIN ? correctionStats(counts) : { photos: counts.length }]
+      }),
     ),
     meetsBar: overall && overall.median <= BAR.median && (overall.p90 ?? overall.max) <= BAR.p90,
   }
 }
 
-/** A run function on onnxruntime-web, the app's runtime, single-threaded in Node. */
+/** A run function on onnxruntime-web, single-threaded in Node. */
 export async function onnxRun(model: Uint8Array): Promise<RunModel> {
   ort.env.wasm.numThreads = 1
   const session = await ort.InferenceSession.create(model)
