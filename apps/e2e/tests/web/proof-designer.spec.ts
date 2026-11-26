@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { AxeBuilder } from './a11y.ts'
+import { AxeBuilder, tall } from './a11y.ts'
 import { storeUnits } from './units.ts'
 
 // proof only: target-size of the designer at scroll offsets of the fields' scroll box around the one the fills leave
@@ -9,8 +9,10 @@ test.beforeEach(({ page }) => storeUnits(page))
 const field = (page: Page, label: string, unit = 'mm') =>
   page.getByRole('textbox', { name: `${label} (${unit})`, exact: true })
 
-test('designer target-size by the scroll of the fields', async ({ page }) => {
+for (const height of [720, tall])
+test(`designer target-size by the scroll of the fields, window ${height} px`, async ({ page }) => {
   test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1280, height })
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('./cartridges/designer?from=308-win')
   await expect(field(page, 'Cartridge L3')).toHaveValue('51.18')
@@ -31,6 +33,9 @@ test('designer target-size by the scroll of the fields', async ({ page }) => {
     return 'document'
   })
   const box = page.locator('[data-proof-scroller]')
+  const fits = await page
+    .locator('.designer .workspace-inputs')
+    .evaluate((el) => `${el.scrollHeight} ${el.clientHeight}`)
   const at = await box.evaluate((el) => el.scrollTop)
   const start = await page
     .locator('.designer-start')
@@ -45,5 +50,5 @@ test('designer target-size by the scroll of the fields', async ({ page }) => {
       `${d}: ${violations.flatMap((v) => v.nodes.map((n) => `${n.target} ${n.html.slice(0, 120)} ${JSON.stringify(n.any.map((c) => c.data))}`)).join(' | ')}`,
     )
   }
-  expect({ scroller, at, start, results }).toEqual({})
+  expect({ fits, scroller, at, start, results }).toEqual({})
 })
