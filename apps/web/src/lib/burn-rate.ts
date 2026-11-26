@@ -3,12 +3,15 @@
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@rangefoundry/ballistics'
 import { type Powder, toSi } from '@rangefoundry/schema'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
+import englishMessages from '../locales/en/lib/burn-rate.json' with { type: 'json' }
 import type { PowderSummary } from './api-types.ts'
 import { notMetallic, shotgunOnly } from './complete-records.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
+
+loadEnglish(englishMessages)
 
 /** Dash pattern per color slot of the burn-rate charts: identity is not carried by color alone. */
 export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '6 2 1 2'] as const

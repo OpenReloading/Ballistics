@@ -1,11 +1,15 @@
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { ChargeRange, ChargeTargetKind } from '@rangefoundry/ballistics'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
 import { english, type LinguiSay, type Translator } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/lib/charge-target.json' with { type: 'json' }
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
 import { refusalText as thrownText, translateMessage } from './core-messages.ts'
 import { interiorFields } from './interior-input.ts'
 import { type UnitSystem, withUnit } from './units.ts'
+
+loadEnglish(englishMessages)
 
 /** Targets of `POST /interior/charge-target`. */
 export type TargetKind = ChargeTargetKind

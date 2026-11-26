@@ -4,12 +4,16 @@ import { useLingui } from '@lingui/react'
 import type { Provenance } from '@rangefoundry/schema'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { say, type Wording } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/record-page.json' with { type: 'json' }
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
 import { RecordActions } from './record-actions.tsx'
 import { provenanceKinds, Sources } from './sources.tsx'
 import { MutedBadge } from './standard-badge.tsx'
+
+loadEnglish(englishMessages)
 
 /** From 62em a fixed grid of figure, values and the side column over the sources; on a phone one column in document order. */
 export function RecordPage({

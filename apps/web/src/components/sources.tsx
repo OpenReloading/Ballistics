@@ -6,13 +6,16 @@ import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@manti
 import { isWebLink, type Provenance, type Source } from '@rangefoundry/schema'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { ungrouped } from '../i18n/lingui.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { fieldLabel } from '../lib/field-labels.ts'
+import englishMessages from '../locales/en/components/sources.json' with { type: 'json' }
 import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
 import { CopyHash } from './record-actions.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { SourceLink, sourceTitle } from './source-link.tsx'
+
+loadEnglish(englishMessages)
 
 /** A record note without its notice: a page carries one model note at most, prints none. */
 const note = (text: string) => text.replaceAll(', not load data', '')

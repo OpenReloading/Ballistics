@@ -8,8 +8,9 @@ import {
   type QuantityValue,
   toSi,
 } from '@rangefoundry/schema'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, localizeDecimals } from '../i18n/number.ts'
+import englishMessages from '../locales/en/lib/record-fields.json' with { type: 'json' }
 import { computedBulletRows } from './bullet.ts'
 import {
   cupWording,
@@ -31,6 +32,8 @@ import {
   withUnit,
 } from './units.ts'
 import { type LinguiWording, sayLingui, verbatim } from './wording.ts'
+
+loadEnglish(englishMessages)
 
 export { titleFromKebab }
 

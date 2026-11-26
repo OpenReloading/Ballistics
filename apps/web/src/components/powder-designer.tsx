@@ -14,6 +14,7 @@ import { FlaskConical, Plus, X } from 'lucide-react'
 import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { fieldError, specText } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
@@ -44,6 +45,7 @@ import { tunePowderHref } from '../lib/tune-href.ts'
 import { namedKey } from '../lib/user-data.ts'
 import { userRef } from '../lib/variants.ts'
 import { sayLingui, verbatim } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/powder-designer.json' with { type: 'json' }
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
@@ -56,6 +58,8 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useKeptDraft } from './use-kept-draft.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 import { Workspace } from './workspace.tsx'
+
+loadEnglish(englishMessages)
 
 /** The key of the empty draft: nothing to keep before the first edit. */
 const blankKey = namedKey(fileData(newDesign()), '')

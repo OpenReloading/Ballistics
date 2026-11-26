@@ -3,11 +3,15 @@
 import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { useState } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { bandNote, describeCurve, type FittedPowder, modelCaption } from '../lib/burn-rate.ts'
+import englishMessages from '../locales/en/components/vivacity-panel.json' with { type: 'json' }
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
+
+loadEnglish(englishMessages)
 
 /** The curve values sit behind the Curve values button in the title row and print open. */
 export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: number | undefined }) {

@@ -3,8 +3,12 @@
 import { useLingui } from '@lingui/react'
 import { NumberInput, SimpleGrid } from '@mantine/core'
 import { useState } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { type MatchCourse, matchRounds } from '../lib/match-rounds.ts'
+import englishMessages from '../locales/en/components/match-rounds.json' with { type: 'json' }
 import { Panel } from './panel.tsx'
+
+loadEnglish(englishMessages)
 
 /** A field's number, `undefined` while empty. */
 const typed = (v: number | string) => (typeof v === 'number' ? v : undefined)

@@ -1,7 +1,11 @@
+import { loadEnglish } from '../i18n/lingui.ts'
 import type { Message } from '../i18n/translate.ts'
 import { sections } from '../lib/sections.ts'
+import englishMessages from '../locales/en/components/page-not-found.json' with { type: 'json' }
 import { NotFoundState } from './offline-state.tsx'
 import { PageBar } from './page-bar.tsx'
+
+loadEnglish(englishMessages)
 
 /** The page of an address with nothing behind it: the 404 page, and a record page whose data file is missing. */
 export function PageNotFound() {

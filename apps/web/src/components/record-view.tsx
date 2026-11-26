@@ -2,10 +2,14 @@
 
 import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/record-view.json' with { type: 'json' }
 import { PageBar } from './page-bar.tsx'
 import { PageNotFound } from './page-not-found.tsx'
 import { DataError, type DataKind, type Loadable, Loading } from './states.tsx'
 import { type RecordState, useRead, useRecord } from './use-record.ts'
+
+loadEnglish(englishMessages)
 
 /** The page while its data is read: the record's name under the page bar, the failure with Retry, or the not-found page. */
 function Pending({

@@ -11,6 +11,7 @@ import { Camera } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { localizeDecimals } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -44,6 +45,7 @@ import { rawWording } from '../lib/record-values.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { resolveBullet } from '../lib/variants.ts'
 import { sayLingui, verbatim } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/bullet-designer.json' with { type: 'json' }
 import { description } from './bullet-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -62,6 +64,8 @@ import { useDesigner } from './use-designer.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
 import { Workspace } from './workspace.tsx'
+
+loadEnglish(englishMessages)
 
 /** The photo tool, fetched when it is first opened: its image maths and the sample stay out of the designer's first load. */
 const BulletPhoto = dynamic(() => import('./bullet-photo.tsx').then((m) => m.BulletPhoto), {

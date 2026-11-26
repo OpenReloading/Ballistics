@@ -19,6 +19,7 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, localizeNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -52,6 +53,7 @@ import type { FieldRow } from '../lib/record-fields.ts'
 import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { resolveCartridge } from '../lib/variants.ts'
 import { verbatim } from '../lib/wording.ts'
+import englishMessages from '../locales/en/components/cartridge-designer.json' with { type: 'json' }
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -65,6 +67,8 @@ import { EmptyNote, Loading } from './states.tsx'
 import { UnitsIconButton, useFieldUnits } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
 import { Workspace } from './workspace.tsx'
+
+loadEnglish(englishMessages)
 
 const SeatingPreview = dynamic(
   () => import('./seating-preview.tsx').then((m) => m.SeatingPreview),

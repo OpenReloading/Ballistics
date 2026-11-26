@@ -6,6 +6,7 @@ import { toSi } from '@rangefoundry/schema'
 import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { type CaseRow, caseMatches, userCaseRows } from '../lib/case-rows.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
@@ -21,11 +22,14 @@ import {
 } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, waterVolume } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/case-list.json' with { type: 'json' }
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+
+loadEnglish(englishMessages)
 
 /** The user's groups are Mine rows, opened in the case group editor, whose cartridge names come from `cartridgeNames` by cartridge id. */
 export function CaseList({

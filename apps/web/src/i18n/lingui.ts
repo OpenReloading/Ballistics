@@ -1,6 +1,5 @@
 import { type Formatter, type I18n, type Messages, setupI18n } from '@lingui/core'
 import { uiMessages } from '@rangefoundry/ui'
-import en from '../locales/en.json' with { type: 'json' }
 import type { Language } from './language.ts'
 
 /** A compiled catalog's messages: a JSON import types their tokens as arrays, not the tuples Lingui reads. */
@@ -21,8 +20,13 @@ const instance = (locale: Language, messages: Messages) =>
 
 // one instance per language: activating a shared one changes boundaries that hydrate later (React #418)
 const instances: Record<Language, I18n> = {
-  en: instance('en', compiled(en)),
+  en: instance('en', {}),
   de: instance('de', {}),
+}
+
+/** Adds compiled English: each module with messages loads its own (a worker's, the module that shows them), so a page carries only the English it shows. In place, as `load` emits a change that would re-render the tree while a route's modules evaluate. */
+export const loadEnglish = (...catalogs: { messages: object }[]) => {
+  for (const catalog of catalogs) Object.assign(instances.en.messages, compiled(catalog))
 }
 
 /** The app's compiled messages of each language but English, the views' and the message table's: their own chunks, so English pages ship without them. */

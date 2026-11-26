@@ -3,6 +3,7 @@
 import { useLingui } from '@lingui/react'
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { countryName } from '../lib/countries.ts'
 import {
   type DisciplineRow,
@@ -20,11 +21,14 @@ import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { countText, filterText, matchingText } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
+import englishMessages from '../locales/en/components/discipline-list.json' with { type: 'json' }
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
 import { HomepageLink } from './homepage-link.tsx'
 import { EmptyList } from './states.tsx'
+
+loadEnglish(englishMessages)
 
 /** Disciplines and federations are rule-book records only: the catalogue is the lists' one source. */
 const ruleBookSources: readonly Origin[] = ['rangefoundry']

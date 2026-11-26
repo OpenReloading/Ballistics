@@ -24,6 +24,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { putRecords, storedRecord, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -59,6 +60,7 @@ import {
 } from '../lib/tune-strings.ts'
 import { formatQuantity, type Quantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { catalogueIdOf, userRef } from '../lib/variants.ts'
+import englishMessages from '../locales/en/components/powder-tune.json' with { type: 'json' }
 import { offerUndo } from './confirm.tsx'
 import { PageBar } from './page-bar.tsx'
 import { TuneChart } from './powder-tune-chart.tsx'
@@ -66,6 +68,8 @@ import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote, Message } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useHandCurve, usePowderFit } from './use-powder-fit.ts'
+
+loadEnglish(englishMessages)
 
 /** The stored sessions `ids` that are valid session records, in order; a missing one is left out. */
 async function readSessions(ids: string[]) {

@@ -1,8 +1,12 @@
 /** List sources: RangeFoundry records and the user records of the browser. */
 import type { I18n, MessageDescriptor } from '@lingui/core'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/sources.json' with { type: 'json' }
 import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 import type { UserBulletView, UserCartridgeView } from './variants.ts'
+
+loadEnglish(englishMessages)
 
 export const origins = ['rangefoundry', 'user'] as const
 export type Origin = (typeof origins)[number]

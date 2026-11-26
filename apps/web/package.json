@@ -4,18 +4,19 @@
   "private": true,
   "license": "ISC",
   "scripts": {
-    "dev": "lingui compile --strict && next dev",
+    "dev": "pnpm run lingui:compile && next dev",
     "prebuild": "node -e \"fs.rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\"",
-    "build": "lingui compile --strict && next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/service-worker.mts",
-    "build:start": "pnpm run prerender-list && lingui compile --strict && vite build",
+    "build": "pnpm run lingui:compile && next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/service-worker.mts",
+    "build:start": "pnpm run prerender-list && pnpm run lingui:compile && vite build",
     "start": "next start",
-    "typecheck": "lingui check sync --clean --overwrite && lingui compile --strict && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lingui-outdated.mts && next typegen && tsc --noEmit && tsc --noEmit -p tsconfig.start.json",
+    "typecheck": "lingui check sync --clean --overwrite && pnpm run lingui:compile && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lingui-outdated.mts && next typegen && tsc --noEmit && tsc --noEmit -p tsconfig.start.json",
     "check-weight": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-weight.mts",
     "prerender-list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/prerender-list.mts",
     "i18n": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/i18n.mts",
+    "lingui:compile": "lingui compile --strict && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/english-catalogs.mts",
     "lingui:de": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/de-to-lingui.mts",
-    "test": "lingui compile --strict && vitest run --dir test",
-    "test:coverage": "lingui compile --strict && vitest run --dir test --coverage"
+    "test": "pnpm run lingui:compile && vitest run --dir test",
+    "test:coverage": "pnpm run lingui:compile && vitest run --dir test --coverage"
   },
   "dependencies": {
     "@lingui/core": "6.12.0",
