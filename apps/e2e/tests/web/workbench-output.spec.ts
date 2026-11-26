@@ -165,7 +165,9 @@ test('in German the pressure range keeps its gap and the Powder card its lot', a
   if (!box || !lot) throw new Error('no powder card')
   expect(lot.x + lot.width).toBeLessThanOrEqual(box.x + box.width)
   await openKeeping(page, 'Laborierung')
-  await expect(page.getByPlaceholder('Zündhütchen', { exact: true })).toBeVisible()
+  await expect(
+    loadForm(page, 'Laborierung').getByRole('combobox', { name: 'Zündhütchen', exact: true }),
+  ).toBeVisible()
 })
 
 /** A tab of the results: on the phone behind the Results tab, maybe in the More menu. */
