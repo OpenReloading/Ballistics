@@ -35,6 +35,12 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(import.meta.dirname, '../..'),
   // the images are two SVG logos, served as files: no optimizer, so the image needs no sharp
   images: { unoptimized: true },
+  turbopack: {
+    // as vite.config.mts: the ONNX Runtime Web build that loads its WASM files from `wasmPaths`, so .next/static holds none
+    resolveAlias: {
+      'onnxruntime-web/wasm': './node_modules/onnxruntime-web/dist/ort.wasm.min.mjs',
+    },
+  },
   experimental: {
     // `'use cache'` of `src/lib/api.ts` without Cache Components
     useCache: true,

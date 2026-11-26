@@ -46,6 +46,7 @@
     "jsqr": "1.4.0",
     "lucide-react": "1.73.0",
     "next": "16.4.6",
+    "onnxruntime-web": "1.31.1",
     "react": "catalog:",
     "react-dom": "catalog:",
     "uqr": "0.1.3",

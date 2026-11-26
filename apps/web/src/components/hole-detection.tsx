@@ -39,6 +39,7 @@ import {
   caliberClassesOf,
   ownCartridges,
 } from '../lib/caliber-candidates.ts'
+import { devModelFolder } from '../lib/dev-model.ts'
 import { photoGuide } from '../lib/docs-url.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -281,7 +282,7 @@ export function useHoleDetection({
       if (worker.current !== w) return
       failed(e.message)
     }
-    w.postMessage(request)
+    w.postMessage(request.kind === 'face' ? request : { ...request, model: devModelFolder() })
   }
 
   const failed = (error?: unknown) => {

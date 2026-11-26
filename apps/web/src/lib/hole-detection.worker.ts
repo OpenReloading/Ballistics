@@ -6,7 +6,6 @@ import {
   faceLabel,
   findFace,
   type HoleDetectionInput,
-  holeDetector,
   onPhoto,
   type ProposalRequest,
   type Proposals,
@@ -14,6 +13,8 @@ import {
 } from '@rangefoundry/target-recognition'
 import { errorText } from './error-text.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
+import { folderDetector } from './hole-model.ts'
+import { openOnnxModel } from './onnx-model.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
 
@@ -148,7 +149,12 @@ async function handleDetect(
     minContrast: r.minContrast,
     onProgress: (done: number) => post({ kind: 'progress', done: 0.2 + 0.8 * done }),
   }
-  const found = await holeDetector.propose(requestOf(r, input, toWork))
+  const detector = await folderDetector(r.model, {
+    fetch: (url) => fetch(url),
+    open: openOnnxModel,
+    report: (error) => console.error('The hole model did not load; the classical detector runs.', error),
+  })
+  const found = await detector.propose(requestOf(r, input, toWork))
   return toPhotoPx(found, k, x0, y0)
 }
 

@@ -334,6 +334,20 @@ Code: `packages/target-recognition/src/learned-detector.ts`, `learnedDetector`, 
 
 Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a chain, share a cluster id. Each proposal's diameter is $D_\mathrm{px}$; a working image over $2 \times 10^6$ pixels is refused.
 
+### Learned detector in the app
+
+The detection worker of the web app runs the learned detector through ONNX Runtime Web on single-thread WebAssembly (no WebGPU): threads need cross-origin isolation, which a static host does not send. No model ships with the app yet. For development, the `localStorage` key `holeModelFolder` holds the URL of a folder (absolute, or relative to the page) with:
+
+- `manifest.json`, a manifest as above;
+- the model file under the manifest's `file.name`;
+- the runtime's `ort-wasm-simd-threaded.mjs` and `ort-wasm-simd-threaded.wasm` from `onnxruntime-web/dist` of the version the app pins, in the manifest's `runtime.wasmPaths` resolved against the folder (`./` for the folder itself).
+
+A folder on another origin needs CORS headers. Without the key the classical detector answers, with the same progress steps. When the manifest, the model or the runtime does not load, the worker logs the error to the console and the classical detector answers.
+
+The runtime and the model stay out of the offline layer's precache: the app imports `onnxruntime-web/wasm` through an alias to the package's build that loads its WASM files from `wasmPaths`, and both builds fail when their output holds a `.wasm` or `.onnx` file (the Start build's client output, the service worker's precache list of the export).
+
+Code: `apps/web/src/lib/hole-model.ts`, `folderDetector`; `apps/web/src/lib/onnx-model.ts`, `openOnnxModel`.
+
 ### Photo quality
 
 The target search also checks the photo, resized to 2000 px on its longer side, for what makes holes hard to find, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the run on an added photo applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right. Taking a photo that passes these checks: [Taking a photo the app can score](../photo-guide.md). Where the app has a docs site, the Photo panel links that page and each note links the rule of it that matches its problem (`guideRule`): framing and no edge found to One target, all of it; tilt to Straight from above; contrast, brightness, glare and uneven light to Even light; hole size to Close enough; sharpness to Steady.

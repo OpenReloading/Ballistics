@@ -30,6 +30,8 @@ type Search = {
   /** Expected hole diameter, m. */
   holeDiameter: number
   minContrast: number
+  /** The development model folder (`devModelFolder`); absent: the classical detector. */
+  model?: string | undefined
 }
 
 export type WorkerRequest =
