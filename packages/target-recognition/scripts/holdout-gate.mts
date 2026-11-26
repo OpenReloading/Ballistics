@@ -81,6 +81,7 @@ function readPhoto(photos: string, name: string, position: number): Buffer {
     return readFileSync(join(photos, name))
   } catch (error) {
     const code = error instanceof Error && 'code' in error ? String(error.code) : 'unknown'
+    // oxlint-disable-next-line preserve-caught-error -- the cause's message holds the photo's name
     throw new Error(`Photo ${position} of the label set cannot be read (${code})`)
   }
 }

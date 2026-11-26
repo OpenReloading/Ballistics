@@ -144,7 +144,7 @@ const FIRST_LOOK = {
   },
 }
 
-describe('holdout gate', () => {
+describe('holdout gate score', () => {
   it('prints the aggregates of each detector against the default bar and counts each look', async () => {
     const folder = await frozenFolder()
     const first = await gate(folder, { near: near(), far: far() })
@@ -179,13 +179,55 @@ describe('holdout gate', () => {
       },
     })
   })
+})
 
+describe('holdout gate freeze file', () => {
   it('refuses to overwrite a freeze file', async () => {
     const folder = await frozenFolder()
     const before = readFileSync(folder.freeze, 'utf8')
     appendFileSync(folder.labels, ' ')
     expect(() => freeze(folder)).toThrow('EEXIST')
     expect(readFileSync(folder.freeze, 'utf8')).toBe(before)
+  })
+
+  it('refuses to score without a freeze file', async () => {
+    const folder = await frozenFolder()
+    rmSync(folder.freeze)
+    await expect(gate(folder, { near: near() })).rejects.toThrow('No freeze file')
+  })
+
+  it('refuses to score when the freeze file lists other photos', async () => {
+    const folder = await emptyFolder(['grid'])
+    const frozen: { labels: string; photos: Record<string, string> } = JSON.parse(
+      readFileSync(folder.freeze, 'utf8'),
+    )
+    frozen.photos['extra.png'] = frozen.labels
+    writeFileSync(folder.freeze, JSON.stringify(frozen))
+    await expect(gate(folder, { d: proposing([]) })).rejects.toThrow(
+      'The label set lists other photos than the freeze file',
+    )
+  })
+
+  it('refuses to score when a label set byte changed', async () => {
+    const folder = await frozenFolder()
+    appendFileSync(folder.labels, ' ')
+    await expect(gate(folder, { near: near() })).rejects.toThrow(
+      'The label set file differs from the freeze file',
+    )
+  })
+})
+
+describe('holdout gate photos', () => {
+  it('refuses to score when a photo byte changed', async () => {
+    const folder = await frozenFolder()
+    const photo = join(folder.photos, folder.names[1])
+    const bytes = readFileSync(photo)
+    const at = bytes.length - 3
+    bytes.writeUInt8(bytes.readUInt8(at) ^ 1, at)
+    writeFileSync(photo, bytes)
+    await expect(gate(folder, { near: near() })).rejects.toThrow(
+      'A photo differs from the freeze file',
+    )
   })
 
   it('refuses to score when a photo differs from its label', async () => {
@@ -205,18 +247,6 @@ describe('holdout gate', () => {
     )
   })
 
-  it('refuses to score when the freeze file lists other photos', async () => {
-    const folder = await emptyFolder(['grid'])
-    const frozen: { labels: string; photos: Record<string, string> } = JSON.parse(
-      readFileSync(folder.freeze, 'utf8'),
-    )
-    frozen.photos['extra.png'] = frozen.labels
-    writeFileSync(folder.freeze, JSON.stringify(frozen))
-    await expect(gate(folder, { d: proposing([]) })).rejects.toThrow(
-      'The label set lists other photos than the freeze file',
-    )
-  })
-
   it('names the position of a missing photo, not its name', async () => {
     const folder = await emptyFolder(['grid', 'grid'])
     const [, b] = folder.names
@@ -225,31 +255,5 @@ describe('holdout gate', () => {
     await expect(gate(folder, { d: proposing([]) })).rejects.toThrow(
       /^Photo 2 of the label set cannot be read \(ENOENT\)$/,
     )
-  })
-
-  it('refuses to score when a label set byte changed', async () => {
-    const folder = await frozenFolder()
-    appendFileSync(folder.labels, ' ')
-    await expect(gate(folder, { near: near() })).rejects.toThrow(
-      'The label set file differs from the freeze file',
-    )
-  })
-
-  it('refuses to score when a photo byte changed', async () => {
-    const folder = await frozenFolder()
-    const photo = join(folder.photos, folder.names[1])
-    const bytes = readFileSync(photo)
-    const at = bytes.length - 3
-    bytes.writeUInt8(bytes.readUInt8(at) ^ 1, at)
-    writeFileSync(photo, bytes)
-    await expect(gate(folder, { near: near() })).rejects.toThrow(
-      'A photo differs from the freeze file',
-    )
-  })
-
-  it('refuses to score without a freeze file', async () => {
-    const folder = await frozenFolder()
-    rmSync(folder.freeze)
-    await expect(gate(folder, { near: near() })).rejects.toThrow('No freeze file')
   })
 })
