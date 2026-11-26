@@ -12,7 +12,6 @@ loadEnglish(englishMessages)
 
 /** The display unit tables and unit formatting of `@rangefoundry/locale-format` in the language shown, with the app's factors and unit-field text. */
 export {
-  localePreset,
   type PresetId,
   parseUnitChoice,
   presetFromLink,

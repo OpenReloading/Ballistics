@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  localePreset,
   type PresetId,
   parseUnitChoice,
   presetFromLink,
@@ -91,15 +90,12 @@ describe('presets', () => {
     expect(units.mass).toBe(unitsOf.mass.gr)
   })
 
-  it('maps old links and locales', () => {
+  it('maps old links', () => {
     expect(presetFromLink('metric')).toBe('metric-grams')
     expect(presetFromLink('imperial')).toBe('us')
     expect(presetFromLink('metric-grains')).toBe('metric-grains')
     expect(presetFromLink('x')).toBeUndefined()
     expect(presetFromLink(null)).toBeUndefined()
-    expect(localePreset('en-US')).toBe('us')
-    expect(localePreset('de-DE')).toBe('metric-grains')
-    expect(localePreset('en')).toBe('metric-grains')
     expect(Object.keys(presetUnitIds)).toEqual(ids)
   })
 })
