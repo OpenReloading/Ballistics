@@ -1,5 +1,5 @@
 import type { I18n } from '@lingui/core'
-import type { Message, Translator } from '../i18n/translate.ts'
+import { type Catalogue, type Message, type Translator, translator } from '../i18n/translate.ts'
 import { setCoreMessages } from './core-messages.ts'
 import { refusalWords } from './refusal-words.ts'
 
@@ -513,13 +513,15 @@ function value(text: string, language: Language): string {
 const byLingui = new WeakMap<I18n, Language>()
 const byT = new WeakMap<Translator['t'], Language>()
 
-/** Makes `translateMessage` translate the messages of this table in the language of `i18n`, whose old catalogue `t` words. */
-export function installCoreMessages(i18n: I18n, t: Translator['t']) {
-  const language = { i18n, t }
+/** Makes `translateMessage` translate the messages of this table in the language of `i18n`; returns the translator of `catalogue`, which words the refusal words and labels and which the language module publishes, so a caller's `t` finds its language. */
+export function installCoreMessages(i18n: I18n, catalogue: Catalogue, code: string): Translator {
+  const shown = translator(catalogue, code)
+  const language = { i18n, t: shown.t }
   byLingui.set(i18n, language)
-  byT.set(t, language)
+  byT.set(shown.t, language)
   setCoreMessages((text, shown) => {
     const language = typeof shown === 'function' ? byT.get(shown) : byLingui.get(shown)
     return language && translated(text, language)
   })
+  return shown
 }

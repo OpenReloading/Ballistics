@@ -66,9 +66,7 @@ async function show(code: Language) {
       loadMessages(),
       loadLingui(code),
     ])
-    const shown = translator(catalogue, code)
-    // the same `t` the pages get, so `translateMessage` finds the language of a caller's `t`
-    table.installCoreMessages(lingui, shown.t)
+    const shown = table.installCoreMessages(lingui, catalogue, code)
     if (current.chosen === code) publish({ chosen: code, ...shown })
   } catch {
     // offline and never opened in this language: the text stays English, the choice stays stored

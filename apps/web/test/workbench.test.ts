@@ -455,8 +455,10 @@ describe('sampled band', () => {
 })
 
 describe('in German', () => {
-  const german = translator(de as Catalogue, 'de')
-  beforeAll(async () => installCoreMessages(await loadLingui('de'), german.t))
+  let german = english
+  beforeAll(async () => {
+    german = installCoreMessages(await loadLingui('de'), de as Catalogue, 'de')
+  })
   beforeEach(() => setShownLanguage('de'))
   afterEach(() => setShownLanguage('en'))
   const pressureRange = { nominalPressure: 4000e5, lowPressure: 3600e5, highPressure: 4400e5 }

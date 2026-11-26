@@ -8,7 +8,7 @@ import { limitCheck, type Warning } from '../../../packages/use-cases/dist/limit
 import { missingValuesAnswer } from '../../../packages/use-cases/dist/load-file.js'
 import de from '../src/i18n/de.json'
 import { linguiOf, loadLingui } from '../src/i18n/lingui.ts'
-import { type Catalogue, translator } from '../src/i18n/translate.ts'
+import type { Catalogue } from '../src/i18n/translate.ts'
 import {
   coreMessages,
   installCoreMessages,
@@ -19,11 +19,26 @@ import { translateMessage } from '../src/lib/core-messages.ts'
 import { linkReasonText, readLink, shareLink } from '../src/lib/share-link.ts'
 import { parseUserDataFile, reasonText, userDataText } from '../src/lib/user-data.ts'
 
-const german = translator(de as Catalogue, 'de')
 const germanLingui = await loadLingui('de')
-installCoreMessages(germanLingui, german.t)
-/** A catalogue of its own for the templates the matcher cases use: they check the matching, not de.json. */
-const own = translator(
+const german = installCoreMessages(germanLingui, de as Catalogue, 'de')
+/** Messages of their own for the templates the matcher cases use, compiled as Lingui writes them: they check the matching, not the catalogs. */
+const ownLingui = setupI18n({
+  locale: 'de',
+  messages: {
+    de: {
+      'coreMessage.code.stuck': 'steckt',
+      'coreMessage.answer.interior': ['Innen: ', ['reason']],
+      'coreMessage.code.unreachable': 'unerreichbar',
+      'coreMessage.answer.truingDetail': ['Truing: ', ['reason'], ' (', ['detail'], ')'],
+      'coreMessage.code.apex': 'Scheitel',
+      'coreMessage.request.error': ['Fehler ', ['status'], '.'],
+      'coreMessage.schema.loadOrFactory': 'Eine Munition genügt.',
+    },
+  },
+})
+/** The same for the refusal words and the label, which the old catalogue words. */
+const own = installCoreMessages(
+  ownLingui,
   {
     'range must be positive': 'Entfernung zu klein',
     'range {range}': 'Entfernung {range}',
@@ -40,31 +55,14 @@ const own = translator(
   },
   'de',
 )
-/** The same for the messages of the table, compiled as Lingui writes them. */
-const ownLingui = setupI18n({
-  locale: 'de',
-  messages: {
-    de: {
-      'coreMessage.code.stuck': 'steckt',
-      'coreMessage.answer.interior': ['Innen: ', ['reason']],
-      'coreMessage.code.unreachable': 'unerreichbar',
-      'coreMessage.answer.truingDetail': ['Truing: ', ['reason'], ' (', ['detail'], ')'],
-      'coreMessage.code.apex': 'Scheitel',
-      'coreMessage.request.error': ['Fehler ', ['status'], '.'],
-      'coreMessage.schema.loadOrFactory': 'Eine Munition genügt.',
-    },
-  },
-})
-installCoreMessages(ownLingui, own.t)
 /** Every message mapped to a marker: a message shows the marker only if a template matched it. */
 const words = coreMessages.filter((m) => typeof m === 'string')
 const ids = coreMessages.flatMap((m) => (typeof m === 'string' ? [] : [m.id]))
-const marker = translator(Object.fromEntries(words.map((m) => [m, 'MAPPED'])), 'de')
 const markerLingui = setupI18n({
   locale: 'de',
   messages: { de: Object.fromEntries(ids.map((id) => [id, 'MAPPED'])) },
 })
-installCoreMessages(markerLingui, marker.t)
+installCoreMessages(markerLingui, Object.fromEntries(words.map((m) => [m, 'MAPPED'])), 'de')
 const englishLingui = linguiOf('en')
 
 const byText = (a: string, b: string) => a.localeCompare(b)
