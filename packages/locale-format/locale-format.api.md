@@ -35,9 +35,6 @@ export type LengthKind = 'travel' | 'diameter';
 export function lengthText(kind: LengthKind, system: UnitSystem, si: number, language: string): string;
 
 // @public
-export function localePreset(locale: string): PresetId;
-
-// @public
 export function localizeDecimals(text: string, language: string): string;
 
 // @public

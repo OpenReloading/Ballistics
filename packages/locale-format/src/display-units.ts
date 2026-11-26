@@ -292,8 +292,3 @@ export function presetFromLink(u: string | null): PresetId | undefined {
   if (u === 'imperial') return 'us'
   return isPreset(u) ? u : undefined
 }
-
-/** The default preset of a locale: US customary in the US, else metric with grains. */
-export function localePreset(locale: string): PresetId {
-  return /-US\b/i.test(locale) ? 'us' : 'metric-grains'
-}
