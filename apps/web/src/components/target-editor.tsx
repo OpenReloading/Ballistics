@@ -89,7 +89,7 @@ import {
   storedRecords,
 } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { loadEnglish } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { photoGuide } from '../lib/docs-url.ts'
@@ -3266,7 +3266,13 @@ export function TargetEditor({
     flush()
     // the units and the language may be read after the mount that calls this, so the refs hold the current ones
     const t = tNow.current
-    const empty = blank(load, bulletDiameter, newDistance.current, i18n, charges ? step : undefined)
+    const empty = blank(
+      load,
+      bulletDiameter,
+      newDistance.current,
+      linguiOf(t.language),
+      charges ? step : undefined,
+    )
     const data = face
       ? {
           ...empty,
