@@ -152,7 +152,8 @@ async function handleDetect(
   const detector = await folderDetector(r.model, {
     fetch: (url) => fetch(url),
     open: openOnnxModel,
-    report: (error) => console.error('The hole model did not load; the classical detector runs.', error),
+    report: (error) =>
+      console.error('The hole model did not load; the classical detector runs.', error),
   })
   const found = await detector.propose(requestOf(r, input, toWork))
   return toPhotoPx(found, k, x0, y0)
