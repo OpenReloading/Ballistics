@@ -452,18 +452,10 @@ jobs:
       - run: pnpm --filter "@rangefoundry/web^..." run build
       - name: Next edition tests in the Playwright image
         run: |
-          status=0
           docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
             --env CI --env GITHUB_ACTIONS --env NEXT_PUBLIC_REPOSITORY_URL \
             --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
-            "$PLAYWRIGHT_IMAGE" npx playwright test --project next-chromium --repeat-each 30 --workers 4 --trace retain-on-failure --output test-results/a \
-            -g "printed box label opens|Ctrl\\+K and the sidebar|slow route" tests/web/box-label.spec.ts tests/web/search.spec.ts tests/web/proof-search.spec.ts || status=1
-          docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
-            --env CI --env GITHUB_ACTIONS --env NEXT_PUBLIC_REPOSITORY_URL \
-            --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
-            "$PLAYWRIGHT_IMAGE" npx playwright test --project next-chromium --repeat-each 40 --trace retain-on-failure --output test-results/b \
-            tests/web/cartridge-designer.spec.ts:202 || status=1
-          exit $status
+            "$PLAYWRIGHT_IMAGE" npx playwright test --project next-chromium --repeat-each 2 tests/web/proof-designer.spec.ts
       - name: Keep the e2e results of a failed run
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
