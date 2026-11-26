@@ -22,6 +22,12 @@ msgstr "{added, decimal} entries added, {equal, decimal} already in this browser
 msgid "events.imported"
 msgstr "{added} events added, {equal} already in this browser, {replaced} replaced."
 
+msgid "holeDetection.proposedMaybe"
+msgstr "{count, decimal} proposed, {maybe, decimal} maybe"
+
+msgid "holeDetection.proposedMaybeAcceptThem"
+msgstr "{count, decimal} proposed, {maybe, decimal} maybe: accept them to add shots."
+
 msgid "lists.countShown.cases"
 msgstr "{count, plural, one {{shown} of # brass} other {{shown} of # brass}}"
 
@@ -54,6 +60,9 @@ msgstr "{count, plural, one {{shown} of # primer} other {{shown} of # primers}}"
 
 msgid "lists.countShown.faces"
 msgstr "{count, plural, one {{shown} of # target} other {{shown} of # targets}}"
+
+msgid "holeDetection.areasByHand"
+msgstr "{count, plural, one {# area to place by hand (dashed box).} other {# areas to place by hand (dashed box).}}"
 
 msgid "lists.count.cases"
 msgstr "{count, plural, one {# brass} other {# brass}}"
@@ -121,6 +130,9 @@ msgstr "{count, plural, one {# record of another kind left out; Import of a File
 msgid "log.otherKinds"
 msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
 
+msgid "holeDetection.referenceCount"
+msgstr "{count, plural, one {# reference} other {# references}}"
+
 msgid "targets.rings"
 msgstr "{count, plural, one {# ring} other {# rings}}"
 
@@ -132,6 +144,9 @@ msgstr "{count, plural, one {# round} other {# rounds}}"
 
 msgid "log.roundTotal"
 msgstr "{count, plural, one {# round} other {# rounds}}"
+
+msgid "holeDetection.shotsAdded"
+msgstr "{count, plural, one {# shot added.} other {# shots added.}}"
 
 msgid "sessionSummary.shotCount"
 msgstr "{count, plural, one {# shot} other {# shots}}"
@@ -169,6 +184,15 @@ msgstr "{count} selected"
 msgid "comparePicks.selectedMax"
 msgstr "{count} selected (max {max})"
 
+msgid "holeDetection.faceChoice"
+msgstr "{face} ({outer}): {event}, {distance}"
+
+msgid "holeDetection.scaleCenterEllipsesOne"
+msgstr "{face}: scale and center from {count, decimal} ellipses (one ellipse, the center is approximate under tilt)."
+
+msgid "holeDetection.scaleCenterEllipses"
+msgstr "{face}: scale and center from {count, decimal} ellipses."
+
 msgid "log.fromTo"
 msgstr "{from} to {to}"
 
@@ -195,6 +219,9 @@ msgstr "{label}, low to high"
 
 msgid "directoryTable.zToA"
 msgstr "{label}, Z to A"
+
+msgid "holeDetection.doubleClickEnterAccepts"
+msgstr "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it."
 
 msgid "chargeTarget.pressureRangeValue"
 msgstr "{low} to {high}"
@@ -246,6 +273,9 @@ msgstr "{name} was not deleted: the browser refused."
 
 msgid "recordFields.burnRateOrder"
 msgstr "{order} of {total}"
+
+msgid "holeDetection.percent"
+msgstr "{pct, decimal} %"
 
 msgid "events.stageScore"
 msgstr "{points} points, hit factor {hf}"
@@ -325,14 +355,29 @@ msgstr "A curve could not be loaded."
 msgid "powderCompare.apiSilent"
 msgstr "A data file did not load or the computation failed. Check the connection and retry."
 
+msgid "holeDetection.groupHoldsMost1000"
+msgstr "A group holds at most 1000 shots."
+
+msgid "holeDetection.knownDistanceTargetSize"
+msgstr "A known distance on the target or the size of a target ring, marked on the photo in Calibrate."
+
 msgid "powderRecord.neighborNote"
 msgstr "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
+
+msgid "holeDetection.regionNeedsLeast3"
+msgstr "A region needs at least 3 points"
 
 msgid "bulletPhoto.shadowMirrored"
 msgstr "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline."
 
 msgid "disciplines.column.abbreviation"
 msgstr "Abbreviation"
+
+msgid "holeDetection.acceptMaybes"
+msgstr "Accept maybes ({count, decimal})"
+
+msgid "holeDetection.acceptSure"
+msgstr "Accept sure ({count, decimal})"
 
 msgid "disciplines.row.actions"
 msgstr "Actions"
@@ -457,6 +502,9 @@ msgstr "aperture"
 msgid "chargeTarget.apply"
 msgstr "Apply"
 
+msgid "holeDetection.areaPlaceHandAbout"
+msgstr "Area {n, decimal} to place by hand: about {count, decimal} holes of area joined (touching holes or dark print); detection does not count it."
+
 msgid "units.quantity.area"
 msgstr "Areas"
 
@@ -480,6 +528,9 @@ msgstr "At the ruler's scale, the overall length in the photograph is {percent, 
 
 msgid "bulletPhoto.axisDirection"
 msgstr "Axis direction, degrees from the photograph's x axis"
+
+msgid "holeDetection.back"
+msgstr "Back"
 
 msgid "values.ball"
 msgstr "ball"
@@ -643,6 +694,9 @@ msgstr "Build"
 msgid "recordFields.bulkDensity"
 msgstr "Bulk density"
 
+msgid "holeDetection.bullet"
+msgstr "bullet"
+
 msgid "bulletCompare.data"
 msgstr "Bullet data"
 
@@ -730,10 +784,16 @@ msgstr "Caliber"
 msgid "cartridges.column.cal"
 msgstr "Caliber"
 
+msgid "holeDetection.caliber"
+msgstr "Caliber"
+
 msgid "bulletRecord.caliber"
 msgstr "Caliber {caliber}"
 
 msgid "disciplines.facet.class"
+msgstr "Caliber class"
+
+msgid "holeDetection.caliberClass"
 msgstr "Caliber class"
 
 msgid "disciplines.row.caliberClasses"
@@ -745,6 +805,9 @@ msgstr "Caliber classes"
 msgid "disciplines.row.caliberClassBasis"
 msgstr "Caliber classes from"
 
+msgid "holeDetection.calibrate"
+msgstr "Calibrate"
+
 msgid "bulletPhoto.caliperHelp"
 msgstr "Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out."
 
@@ -753,6 +816,9 @@ msgstr "Cancel"
 
 msgid "log.cancel"
 msgstr "Cancel"
+
+msgid "holeDetection.cancelPercent"
+msgstr "Cancel ({pct, decimal} %)"
 
 msgid "values.carbine"
 msgstr "Carbine"
@@ -889,6 +955,21 @@ msgstr "chamber minimum minus cartridge maximum"
 msgid "cartridgeRecord.sideNotes.chamber"
 msgstr "Chamber: {notes}"
 
+msgid "holeDetection.change"
+msgstr "change"
+
+msgid "holeDetection.changeHoleSize"
+msgstr "Change the hole size"
+
+msgid "holeDetection.changeHoles"
+msgstr "Change the holes"
+
+msgid "holeDetection.changeScale"
+msgstr "Change the scale"
+
+msgid "holeDetection.changeTarget"
+msgstr "Change the target"
+
 msgid "chargeTarget.title"
 msgstr "Charge for a target"
 
@@ -897,6 +978,9 @@ msgstr "Check the entry: a value is out of its range."
 
 msgid "events.outOfRange"
 msgstr "Check the event: a value is out of its range."
+
+msgid "holeDetection.choose"
+msgstr "Choose"
 
 msgid "bulletPhoto.chooseHelp"
 msgstr "Choose a photograph of the bullet beside a ruler, or try the sample. It is never uploaded."
@@ -916,11 +1000,20 @@ msgstr "Chronograph file"
 msgid "comparePicks.clear"
 msgstr "Clear"
 
+msgid "holeDetection.clear"
+msgstr "Clear"
+
 msgid "facetFilters.clear"
 msgstr "Clear all"
 
 msgid "states.clearFilters"
 msgstr "Clear filters"
+
+msgid "holeDetection.clearProposals"
+msgstr "Clear proposals"
+
+msgid "holeDetection.clearProposalsAreasPlace"
+msgstr "Clear proposals and areas to place by hand"
 
 msgid "directoryTable.clearSearch"
 msgstr "Clear search"
@@ -936,6 +1029,15 @@ msgstr "Clearance {value}"
 
 msgid "cartridgeRecord.clearanceLine"
 msgstr "Clearance: {meaning}"
+
+msgid "holeDetection.clickCornersRegionClick"
+msgstr "Click the corners of the region; click the last one again (Enter twice) to close it. {count, decimal} points. Esc cancels."
+
+msgid "holeDetection.clickMiddleOneHole"
+msgstr "Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels."
+
+msgid "holeDetection.clickTwoOppositeCorners"
+msgstr "Click two opposite corners of the region. Point {n, decimal} of 2. Or arrow keys and Enter. Esc cancels."
 
 msgid "bulletPhoto.scaleHelp"
 msgstr "Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first."
@@ -1195,6 +1297,24 @@ msgstr "Derived from the range or gauge the rule book states"
 msgid "cartridgeRecord.derived"
 msgstr "Derived, not dimensioned"
 
+msgid "holeDetection.detect"
+msgstr "Detect"
+
+msgid "holeDetection.detectAnyway"
+msgstr "Detect anyway"
+
+msgid "holeDetection.detectHoles"
+msgstr "Detect holes"
+
+msgid "holeDetection.detectionCancelled"
+msgstr "Detection cancelled."
+
+msgid "holeDetection.detectionSteps"
+msgstr "Detection steps"
+
+msgid "holeDetection.detectionWaitsDetectAnyway"
+msgstr "Detection waits. Detect anyway runs it on this photo; check every proposed hole."
+
 msgid "sessionSummary.device"
 msgstr "Device: {device}"
 
@@ -1396,6 +1516,12 @@ msgstr "energy, as printed under Pressures (Energies)"
 msgid "log.enterDate"
 msgstr "Enter the date."
 
+msgid "holeDetection.enterHoleSizeFirst"
+msgstr "Enter the hole size first (step 3)."
+
+msgid "holeDetection.enterHoleSizeHoles"
+msgstr "Enter the hole size: the holes are found next."
+
 msgid "log.enterConfirmedBy"
 msgstr "Enter who confirmed the entry, or clear the day of the confirmation."
 
@@ -1453,6 +1579,9 @@ msgstr "Events ({count})"
 
 msgid "faceRecord.eventsTable"
 msgstr "Events table"
+
+msgid "holeDetection.example"
+msgstr "Example"
 
 msgid "sessionSummary.excluded"
 msgstr "Excluded"
@@ -1556,8 +1685,20 @@ msgstr "Filter the cartridges"
 msgid "chargeTarget.findCharge"
 msgstr "Find charge"
 
+msgid "holeDetection.findTarget"
+msgstr "Find target"
+
 msgid "bulletPhoto.findAxisAgain"
 msgstr "Find the axis again"
+
+msgid "holeDetection.findHolesLikeExample"
+msgstr "Find the holes like the example hole."
+
+msgid "holeDetection.findHolesTargetRegion"
+msgstr "Find the holes on the target or in the region; the photo stays in this browser."
+
+msgid "holeDetection.findTargetFirstBlack"
+msgstr "Find the target first: no black area is known."
 
 msgid "disciplines.row.firearm"
 msgstr "Firearm"
@@ -1754,11 +1895,20 @@ msgstr "Hold the camera steady or rest it on something, let it focus on the targ
 msgid "faceRecord.scoredBy.center"
 msgstr "Hole center"
 
+msgid "holeDetection.title"
+msgstr "Hole detection"
+
+msgid "holeDetection.holeDetectionFailedBrowser"
+msgstr "Hole detection failed in this browser."
+
 msgid "faceRecord.scoredBy.touch"
 msgstr "Hole edge"
 
 msgid "faceRecord.scoredBy.outward"
 msgstr "Hole edge, outward"
+
+msgid "holeDetection.holes"
+msgstr "Holes"
 
 msgid "disciplines.rule.hollowPoint"
 msgstr "hollow point"
@@ -1913,6 +2063,9 @@ msgstr "Lead-free"
 msgid "cartridgeRecord.meaning.leadeAngle"
 msgstr "leade angle"
 
+msgid "holeDetection.learned"
+msgstr "learned"
+
 msgid "recordFields.length"
 msgstr "Length"
 
@@ -1966,6 +2119,9 @@ msgstr "Load"
 
 msgid "log.load"
 msgstr "Load"
+
+msgid "holeDetection.loadPhotoFirst"
+msgstr "Load a photo first."
 
 msgid "sessionSummary.loadExample"
 msgstr "Load example"
@@ -2144,6 +2300,15 @@ msgstr "Manufacturer, name or size…"
 msgid "bullets.search"
 msgstr "Manufacturer, name, 168, .308 or 7.82…"
 
+msgid "holeDetection.markPolygonPhoto"
+msgstr "Mark a polygon on the photo"
+
+msgid "holeDetection.markRectanglePhoto"
+msgstr "Mark a rectangle on the photo"
+
+msgid "holeDetection.marker"
+msgstr "marker"
+
 msgid "recordFields.mass"
 msgstr "Mass"
 
@@ -2176,6 +2341,12 @@ msgstr "maximum mean pressure"
 
 msgid "cartridges.column.pmaxHelp"
 msgstr "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
+
+msgid "holeDetection.maybe"
+msgstr "maybe"
+
+msgid "holeDetection.maybePercent"
+msgstr "maybe {pct, decimal} %"
 
 msgid "sessionSummary.mean"
 msgstr "Mean"
@@ -2266,6 +2437,9 @@ msgstr "monolithic"
 
 msgid "logSummary.month"
 msgstr "Month"
+
+msgid "holeDetection.moreThanOneTarget"
+msgstr "More than one target fits these rings: choose one in Target."
 
 msgid "photoQuality.fix.moveCloser"
 msgstr "Move closer so the target fills more of the frame, or use the full resolution of the camera."
@@ -2381,6 +2555,9 @@ msgstr "New powder"
 msgid "targets.new"
 msgstr "New target"
 
+msgid "holeDetection.next"
+msgstr "Next"
+
 msgid "values.nickelPlatedBrass"
 msgstr "Nickel plated brass"
 
@@ -2416,6 +2593,9 @@ msgstr "No bullets chosen."
 
 msgid "states.noMatch.bullets"
 msgstr "No bullets match these filters."
+
+msgid "holeDetection.noCanvas"
+msgstr "No canvas to read the photo."
 
 msgid "bulletRecord.noCartridge"
 msgstr "No cartridge matches {query}."
@@ -2495,6 +2675,15 @@ msgstr "No fitted model parameters"
 msgid "burnRate.noFit"
 msgstr "No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges."
 
+msgid "holeDetection.noHolesFromThere"
+msgstr "No holes found from there: click the middle of a hole clear of print."
+
+msgid "holeDetection.noHolesPickOne"
+msgstr "No holes found: pick one example hole (step 3)."
+
+msgid "holeDetection.noHolesProposed"
+msgstr "No holes proposed in the region."
+
 msgid "recordSources.noPage"
 msgstr "No page stated"
 
@@ -2525,6 +2714,9 @@ msgstr "No saved event to export."
 msgid "bulletPhoto.noScale"
 msgstr "No scale yet."
 
+msgid "holeDetection.noTargetFitsRings"
+msgstr "No target fits the rings found (dashed): choose a target, type the black diameter or set the scale."
+
 msgid "disciplineRecord.noTargets"
 msgstr "No target mapping names this discipline."
 
@@ -2546,6 +2738,9 @@ msgstr "No-shoots"
 msgid "cartridgeRecord.difference"
 msgstr "nominal minimum difference of published dimensions"
 
+msgid "holeDetection.none"
+msgstr "none"
+
 msgid "powderRecord.none"
 msgstr "None"
 
@@ -2554,6 +2749,9 @@ msgstr "None"
 
 msgid "log.none"
 msgstr "None"
+
+msgid "holeDetection.noneMarked"
+msgstr "None marked."
 
 msgid "recordFields.noseLength"
 msgstr "Nose length"
@@ -2620,6 +2818,9 @@ msgstr "Notes"
 
 msgid "log.notes"
 msgstr "Notes"
+
+msgid "holeDetection.nowCorners"
+msgstr "Now {count, decimal} corners."
 
 msgid "disciplines.row.number"
 msgstr "Number"
@@ -2771,6 +2972,9 @@ msgstr "Penalties"
 msgid "recordFields.perLoadRow"
 msgstr "per load row"
 
+msgid "holeDetection.photoGuide"
+msgstr "Photo guide: {rule}"
+
 msgid "bulletPhoto.messages"
 msgstr "Photograph messages"
 
@@ -2779,6 +2983,9 @@ msgstr "Photograph of the bullet"
 
 msgid "bullets.pickToCompare"
 msgstr "Pick 2 to {max}"
+
+msgid "holeDetection.pickOneHole"
+msgstr "Pick one hole"
 
 msgid "values.piezo"
 msgstr "piezo"
@@ -2795,6 +3002,9 @@ msgstr "Place"
 msgid "log.column.place"
 msgstr "Place"
 
+msgid "holeDetection.placeHand"
+msgstr "place by hand"
+
 msgid "bulletPhoto.placeScalePoints"
 msgstr "Place scale points"
 
@@ -2809,6 +3019,9 @@ msgstr "Pmax"
 
 msgid "events.points"
 msgstr "Points"
+
+msgid "holeDetection.polygon"
+msgstr "Polygon"
 
 msgid "values.polymerCoat"
 msgstr "polymer coat"
@@ -2975,6 +3188,15 @@ msgstr "Properties"
 msgid "primerRecord.data"
 msgstr "Properties"
 
+msgid "holeDetection.proposalConfidence"
+msgstr "Proposal {n, decimal}, confidence {pct, decimal} %"
+
+msgid "holeDetection.proposalConfidenceOneCluster"
+msgstr "Proposal {n, decimal}, confidence {pct, decimal} %, one of {count, decimal} in a cluster"
+
+msgid "holeDetection.proposalsDashedNoneCounts"
+msgstr "Proposals are dashed; none counts until accepted. On the photo, double-click or Enter accepts one, drag or arrow keys move it, Delete removes it."
+
 msgid "recordSources.origin.public"
 msgstr "public"
 
@@ -2989,6 +3211,9 @@ msgstr "Quantity"
 
 msgid "fieldTable.column.quantity"
 msgstr "Quantity"
+
+msgid "holeDetection.quarterTurn"
+msgstr "Quarter turn"
 
 msgid "firearms.column.twistHelp"
 msgstr "R right hand, L left hand."
@@ -3047,6 +3272,9 @@ msgstr "rebated-boat-tail"
 msgid "recordFields.recommendedTwist"
 msgstr "Recommended twist"
 
+msgid "holeDetection.rect"
+msgstr "Rect."
+
 msgid "targets.color.red"
 msgstr "red"
 
@@ -3055,6 +3283,15 @@ msgstr "Reference pressure"
 
 msgid "disciplines.rule.reflex"
 msgstr "reflex"
+
+msgid "holeDetection.region"
+msgstr "Region"
+
+msgid "holeDetection.regionOff"
+msgstr "Region off"
+
+msgid "holeDetection.regionOffTargetFound"
+msgstr "Region off: the target found in the photo"
 
 msgid "bulletCompare.remove"
 msgstr "Remove {name}"
@@ -3137,6 +3374,9 @@ msgstr "Retrieved"
 msgid "states.retry"
 msgstr "Retry"
 
+msgid "holeDetection.review"
+msgstr "Review"
+
 msgid "cartridgeRecord.revised"
 msgstr "Revised"
 
@@ -3205,6 +3445,9 @@ msgstr "Rings"
 
 msgid "targets.column.rings"
 msgstr "Rings"
+
+msgid "holeDetection.rotate"
+msgstr "Rotate"
 
 msgid "log.roundCount"
 msgstr "Round count of {name}: {count, decimal}."
@@ -3281,8 +3524,14 @@ msgstr "Save event"
 msgid "firearms.column.notesHelp"
 msgstr "Saved loads of another cartridge, or no saved load."
 
+msgid "holeDetection.scale"
+msgstr "Scale"
+
 msgid "bulletPhoto.scaleValue"
 msgstr "Scale {scale} px/mm, uncertainty {uncertainty} %."
+
+msgid "holeDetection.scaleCenterBlackArea"
+msgstr "Scale and center from the black area (approximate under tilt)."
 
 msgid "bulletPhoto.basis.both"
 msgstr "Scale from the diameter and overall length entered, no ruler: their check catches a bullet turned towards the camera only beyond 2 % apart (about 11 degrees); a maker's product image may not be to scale."
@@ -3379,6 +3628,9 @@ msgstr "Session summary"
 
 msgid "recordFields.startPressureNote"
 msgstr "Set per load row by the barrel length and the bullet construction."
+
+msgid "holeDetection.setScaleFirstStep"
+msgstr "Set the scale first (step 2)."
 
 msgid "recordFields.shape"
 msgstr "Shape"
@@ -3478,6 +3730,9 @@ msgstr "single shot"
 
 msgid "disciplines.rule.sitting"
 msgstr "sitting"
+
+msgid "holeDetection.size"
+msgstr "size"
 
 msgid "recordFields.size"
 msgstr "Size"
@@ -3581,6 +3836,9 @@ msgstr "Stored"
 msgid "photoQuality.rule.fromAbove"
 msgstr "Straight from above, no slant"
 
+msgid "holeDetection.straightenPhotoIfNeeded"
+msgstr "Straighten the photo if needed, then set the scale (step 2)."
+
 msgid "recordFields.boreResistanceNote"
 msgstr "Stress; groove oversize {oversize, decimal} per percent, engraving {engraving, decimal} of the start pressure."
 
@@ -3641,6 +3899,9 @@ msgstr "Target"
 msgid "federationRecord.column.target"
 msgstr "Target"
 
+msgid "holeDetection.target"
+msgstr "Target"
+
 msgid "faceRecord.drawing"
 msgstr "Target"
 
@@ -3653,6 +3914,9 @@ msgstr "Target data is unavailable right now."
 
 msgid "page.targetsDesigner"
 msgstr "Target designer"
+
+msgid "holeDetection.targetPhoto"
+msgstr "Target on the photo"
 
 msgid "events.targetSheet"
 msgstr "Target sheet"
@@ -3783,6 +4047,9 @@ msgstr "The firearms of this browser could not be read."
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
 
+msgid "holeDetection.holeMustLeast4"
+msgstr "The hole must be at least 4 px across"
+
 msgid "photoQuality.unevenLight"
 msgstr "The light is uneven: one side of the target is much darker than another."
 
@@ -3810,8 +4077,17 @@ msgstr "The nose is a tangent ogive: its circle touches the shank."
 msgid "bulletPhoto.noArc"
 msgstr "The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range."
 
+msgid "holeDetection.photoDecodesAnotherSize"
+msgstr "The photo decodes at another size than it is shown; detection is off for it."
+
 msgid "photoQuality.dark"
 msgstr "The photo is dark: even its brightest part is dim."
+
+msgid "holeDetection.photoNotInBrowser"
+msgstr "The photo is not in this browser."
+
+msgid "holeDetection.photoNotLoaded"
+msgstr "The photo is not loaded."
 
 msgid "photoQuality.photoPixels"
 msgstr "The photo is only {n} px on its longer side."
@@ -3840,6 +4116,12 @@ msgstr "The records of this browser could not be read."
 msgid "log.readFailed"
 msgstr "The records of this browser could not be read."
 
+msgid "holeDetection.regionTooLargeHoles"
+msgstr "The region is too large for holes this small; mark a smaller region"
+
+msgid "holeDetection.ringsMayThoseChoose"
+msgstr "The rings may be those of the {face}: choose it in Target to use it."
+
 msgid "log.roundCountHasEntry"
 msgstr "The round count of {name} holds this entry already."
 
@@ -3854,6 +4136,9 @@ msgstr "The round count of {name} is unchanged."
 
 msgid "federationRecord.ruleBooksCaption"
 msgstr "The rule books the records cite"
+
+msgid "holeDetection.ruleBookTargetFound"
+msgstr "The rule-book target, found from the black area and the ring lines. It sets the scale and center and scores the group. If several fit, choose one; without a fit, targets are ranked by how well their rings match."
 
 msgid "chargeTarget.toleranceNotReached"
 msgstr "The search did not reach its tolerance."
@@ -3882,6 +4167,9 @@ msgstr "The targets and stages of this discipline"
 msgid "federationRecord.targetsCaption"
 msgstr "The targets its disciplines are shot on"
 
+msgid "holeDetection.targetsNeedNetworkSet"
+msgstr "The targets need the network: set the scale by hand (step 2)."
+
 msgid "matchRounds.shotsUnstated"
 msgstr "The targets of this discipline state no shot count."
 
@@ -3902,6 +4190,9 @@ msgstr "This link is not valid."
 
 msgid "recordView.needsJavaScript"
 msgstr "This page needs JavaScript."
+
+msgid "holeDetection.targetNotFitEllipses"
+msgstr "This target does not fit the ellipses found."
 
 msgid "cartridgeRecord.group.throat"
 msgstr "Throat and leade"
@@ -3978,6 +4269,9 @@ msgstr "triple"
 msgid "bulletPhoto.trySample"
 msgstr "Try a sample"
 
+msgid "holeDetection.trySmallerPhotoAnother"
+msgstr "Try a smaller photo or another browser."
+
 msgid "page.powdersTune"
 msgstr "Tune a powder"
 
@@ -3989,6 +4283,12 @@ msgstr "tungsten"
 
 msgid "values.tungstenDisulfide"
 msgstr "tungsten disulfide"
+
+msgid "holeDetection.turnLeft90Degrees"
+msgstr "Turn left 90 degrees"
+
+msgid "holeDetection.turnRight90Degrees"
+msgstr "Turn right 90 degrees"
 
 msgid "recordFields.twist"
 msgstr "Twist"
@@ -4007,6 +4307,9 @@ msgstr "Type"
 
 msgid "bullets.column.type"
 msgstr "Type"
+
+msgid "holeDetection.typed"
+msgstr "typed"
 
 msgid "burnRate.typed"
 msgstr "Typed model parameters"
@@ -4139,6 +4442,9 @@ msgstr "Water to the case mouth, as the manufacturer states."
 
 msgid "values.waxLube"
 msgstr "wax lube"
+
+msgid "holeDetection.whereLookRectangleTwo"
+msgstr "Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group."
 
 msgid "targets.color.white"
 msgstr "white"
