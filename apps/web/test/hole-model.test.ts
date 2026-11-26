@@ -134,8 +134,8 @@ describe('servedDetector', () => {
     ['size', 'abcd', 'hole-model-0.1.0.onnx: 4 bytes, the manifest names 3'],
     [
       'SHA-256',
-      'abd',
-      'hole-model-0.1.0.onnx: SHA-256 a52d159f262b2c6ddb724a61840befc36eb30c88877a4030b65cbe86298449c9, the manifest names ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
+      'xyz',
+      'hole-model-0.1.0.onnx: SHA-256 3608bca1e44ea6c4d268eb6db02260269892c0b42b86bbf1e77a6fa16c3c9282, the manifest names ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
     ],
   ])(
     'falls back to the classical detector before opening a model of another %s',
