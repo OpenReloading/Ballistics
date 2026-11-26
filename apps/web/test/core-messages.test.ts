@@ -88,7 +88,7 @@ describe('the message table', () => {
     ] as const) {
       if (read?.ok !== false) throw new Error('not refused')
       expect(read.reason).toMatch(/\nand 997 more problems$/)
-      shown(read.reason, german)
+      shown(read.reason, { ...german, i18n: germanLingui })
     }
   })
 
@@ -109,7 +109,7 @@ describe('the message table', () => {
     if (read.ok) throw new Error('not refused')
     const rule = 'Give a load or factory ammunition, not both.'
     expect(read.reason).toContain(`✖ ${rule}`)
-    const shown = reasonText(read.reason, own)
+    const shown = reasonText(read.reason, { ...own, i18n: ownLingui })
     expect(shown).toContain('✖ Eine Munition genügt.')
     expect(shown).toContain('→ bei records[0].data')
   })

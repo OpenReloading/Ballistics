@@ -1,5 +1,6 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'
 import { ChevronDown, ChevronUp } from 'lucide-react'
@@ -253,7 +254,7 @@ function PowderRow({
         <td data-label={t('Result')} colSpan={columns.length - 2}>
           {t('Not computed: {reason}', {
             reason: r.refusal
-              ? refusalText(r.refusal, 'peakPressure', system, percent, t)
+              ? refusalText(r.refusal, 'peakPressure', system, percent, t, i18n)
               : reasonText(r, i18n),
           })}
         </td>
@@ -455,6 +456,7 @@ function statusText(
     stale: boolean
   },
   t: Translator['t'],
+  i18n: I18n,
 ) {
   let head: string | undefined
   if (o.running && o.progress)
@@ -476,7 +478,7 @@ function statusText(
     o.shotgun > 0 && !o.running
       ? t('Shotgun-only powders left out: {shotgun}', { shotgun: o.shotgun })
       : undefined,
-    o.message && messageText(o.message, t),
+    o.message && messageText(o.message, t, i18n),
     o.targetShown,
     o.stale ? t('Inputs changed since these rows') : undefined,
   ].filter(Boolean)
@@ -484,7 +486,7 @@ function statusText(
 }
 
 /** The line after a batch that stopped early or failed. */
-function messageText(message: CompareMessage, t: Translator['t']) {
+function messageText(message: CompareMessage, t: Translator['t'], i18n: I18n) {
   if (message.kind === 'stopped')
     return t('Stopped. {reason}', { reason: t(noComparableLimitText) })
   if (message.kind === 'cancelled')
@@ -492,7 +494,7 @@ function messageText(message: CompareMessage, t: Translator['t']) {
       done: message.done,
       total: message.total,
     })
-  return translateMessage(thrownText(message.error), t)
+  return translateMessage(thrownText(message.error), i18n)
 }
 
 /** Whether the row's charge is not the typed one (to a part in a billion). */
@@ -664,6 +666,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           system,
           study.mode?.kind === 'target' && study.mode.percent,
           t,
+          i18n,
         )
       : reasonText(r, i18n)
   const csv = () => powderTableCsv(shown, target, system, t, reason)
@@ -688,6 +691,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       stale,
     },
     t,
+    i18n,
   )
   const open = (r: CompareRow) => {
     pickPowder(r.id)

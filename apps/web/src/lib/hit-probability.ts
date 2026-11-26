@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
 import type { TargetFace } from '@rangefoundry/schema'
 import { toSi } from '@rangefoundry/schema'
@@ -27,10 +28,10 @@ const hitWords = {
 const isHitCode = (code: string): code is HitIssue['code'] => Object.hasOwn(hitWords, code)
 
 /** Why the hit probability failed, in the language shown: its refusal, else the error's text. */
-export function hitFailureText(e: unknown, t: Translator['t']): string {
+export function hitFailureText(e: unknown, t: Translator['t'], i18n: I18n): string {
   if (e instanceof InputError && e.issue && isHitCode(e.issue.code))
     return t(hitWords[e.issue.code])
-  return translateMessage(refusalText(e), t)
+  return translateMessage(refusalText(e), i18n)
 }
 
 /** `hole` diameter in m; each ring grown by the hole's radius, as `scoreShot` counts a touched ring; an oval keeps its height. */

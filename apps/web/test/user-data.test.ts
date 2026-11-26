@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import type { UserRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 import { parseFiles } from '../src/lib/load-file-formats.ts'
 import { readLink, shareLink, shareProblem, tooLongText } from '../src/lib/share-link.ts'
@@ -124,7 +125,7 @@ describe('user data files', () => {
     const reason = (n: number) => {
       const p = parseUserDataFile(userDataText(Array(n).fill(bad) as UserRecord[]))
       if (p.ok) throw new Error('not refused')
-      return reasonText(p.reason, english)
+      return reasonText(p.reason, { ...english, i18n: linguiOf('en') })
     }
     const en5 = reason(5)
     expect(en5).toMatch(/^ {2}→ at records\[0\]\.data\.overrides\.mass\.value$/m)

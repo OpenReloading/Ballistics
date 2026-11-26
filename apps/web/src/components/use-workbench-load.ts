@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { useForm } from '@mantine/form'
 import { useMediaQuery } from '@mantine/hooks'
 import {
@@ -1447,7 +1449,8 @@ const statusLineOf = (
   outcome: Outcome | undefined,
   system: UnitSystem,
   t: Translator['t'],
-) => statusText(status, outcome && resultLineOf(outcome, system, t), t)
+  i18n: I18n,
+) => statusText(status, outcome && resultLineOf(outcome, system, t), t, i18n)
 
 /** The note on the bullet: a record a cartridge change cleared, else one below the firearm's groove. */
 function bulletNoteOf(
@@ -1478,6 +1481,7 @@ function bulletNoteOf(
 export function useWorkbenchState() {
   const { choice, system } = useUnits()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   // a record fetched on mount arrives after the stored units apply: its fill reads the current ones
   const unitsNow = useRef(system)
   unitsNow.current = system
@@ -2516,7 +2520,7 @@ export function useWorkbenchState() {
       if ((firearmMoreFields as readonly string[]).includes(err.field)) setMore('firearm')
     }
     setOutcome(undefined)
-    setStatus({ say: (t) => translateMessage(refusalText(err), t) })
+    setStatus({ say: (_, i18n) => translateMessage(refusalText(err), i18n) })
   }
 
   /** Shows the first step with a result and starts the request for its sampled band. */
@@ -2677,7 +2681,7 @@ export function useWorkbenchState() {
     const failed = failedRun(steps, res, json)
     setOutcome(failed.outcome)
     const message = failed.text
-    setStatus({ say: (t) => translateMessage(message, t) })
+    setStatus({ say: (_, i18n) => translateMessage(message, i18n) })
   }
 
   /** A request that never got an answer: the API is unreachable, or the browser is offline. */
@@ -3665,7 +3669,7 @@ export function useWorkbenchState() {
     showChart,
     sight,
     suggestions,
-    status: statusLineOf(status, outcome, system, t),
+    status: statusLineOf(status, outcome, system, t, i18n),
     stepError,
     stepsDraft,
     storedTick,

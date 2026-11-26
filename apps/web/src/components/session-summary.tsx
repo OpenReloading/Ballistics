@@ -190,7 +190,7 @@ export function SessionSummary() {
             title={i18n._({ id: 'sessionSummary.notRead', message: 'The file was not read.' })}
             onRetry={() => readFile(file.current, unit)}
           >
-            {chronoErrorText(error, t)}
+            {chronoErrorText(error, t, i18n)}
           </ErrorNote>
         )}
         {read ? (

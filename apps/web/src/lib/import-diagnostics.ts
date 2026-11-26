@@ -1,4 +1,5 @@
 /** The worker gives fields as column labels (`labelled` in `import-entry.ts`), so this module carries no importer code. */
+import type { I18n } from '@lingui/core'
 import type {
   KindDiagnostic,
   TableDiagnostic,
@@ -9,7 +10,6 @@ import type { Diagnostic } from '@rangefoundry/statistics'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
-import { labelText } from './label-text.ts'
 
 /** A table row the user record schema refuses, with the schema's reason. */
 export type InvalidRecordDiagnostic = Diagnostic<'invalidRecord', { reason: string }>
@@ -46,22 +46,23 @@ const tableMessages: Record<TableDiagnostic['code'] | InvalidRecordDiagnostic['c
 }
 
 /** Numbers in the language's decimal mark, other text as the file has it. */
-function shown(name: string, v: string | number | readonly string[], t: Translator['t']) {
-  const word = (s: string) => labelText(s, t)
+function shown(name: string, v: string | number | readonly string[], i18n: I18n) {
+  const word = (s: string) => translateMessage(s, i18n)
   if (typeof v === 'number') return v
   if (typeof v !== 'string') return name === 'symbols' ? v.join(', ') : v.map(word).join(', ')
   if (name === 'field') return word(v)
-  return name === 'reason' ? translateMessage(v, t) : v
+  return name === 'reason' ? translateMessage(v, i18n) : v
 }
 
-const shownParams = (params: TableDiagnostic['params'], t: Translator['t']) =>
-  Object.fromEntries(Object.entries(params).map(([k, v]) => [k, shown(k, v, t)]))
+const shownParams = (params: TableDiagnostic['params'], i18n: I18n) =>
+  Object.fromEntries(Object.entries(params).map(([k, v]) => [k, shown(k, v, i18n)]))
 
 /** Why a table row is rejected or warned, in the language of `t`. */
 export const tableReasonText = (
   d: TableDiagnostic | InvalidRecordDiagnostic,
   t: Translator['t'],
-): string => t(tableMessages[d.code], shownParams(d.params, t))
+  i18n: I18n,
+): string => t(tableMessages[d.code], shownParams(d.params, i18n))
 
 const tableReadMessages: Record<TableReadDiagnostic['code'], Message> = {
   noTwoColumns: msg('The rows have no table of two columns or more.'),
@@ -82,10 +83,14 @@ const tableReadMessages: Record<TableReadDiagnostic['code'], Message> = {
 }
 
 /** Why a file holds no table, in the language of `t`; a refusal the app wrote itself is English text. */
-export const tableReadText = (r: TableReadDiagnostic | string, t: Translator['t']): string =>
+export const tableReadText = (
+  r: TableReadDiagnostic | string,
+  t: Translator['t'],
+  i18n: I18n,
+): string =>
   typeof r === 'string'
-    ? translateMessage(r, t)
-    : t(tableReadMessages[r.code], shownParams(r.params, t))
+    ? translateMessage(r, i18n)
+    : t(tableReadMessages[r.code], shownParams(r.params, i18n))
 
 export const kindLabels: Record<TableKind, Message> = {
   bullet: msg('bullets'),

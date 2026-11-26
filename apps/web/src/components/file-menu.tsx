@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
 import {
   type EmbeddedFile,
@@ -134,13 +136,16 @@ const kindNames: Record<UserRecordKind, Message> = {
 }
 
 /** A line of the status, written when it is shown so that a change of language reaches it. */
-type Said = (tr: Translator) => string
+type Said = (tr: Shown) => string
+
+/** The language shown, with its Lingui messages for a message of the packages. */
+type Shown = Translator & { i18n: I18n }
 
 /** The setter of a status line: a state setter would call a `Said` as an update, so it is wrapped. */
 const lineSetter = (set: Dispatch<SetStateAction<Said | undefined>>) => (said?: Said) =>
   set(said && (() => said))
 
-const shownLine = (said: Said | undefined, tr: Translator) => (said ? said(tr) : '')
+const shownLine = (said: Said | undefined, tr: Shown) => (said ? said(tr) : '')
 
 /** A line that is one fixed message. */
 const plain =
@@ -387,8 +392,8 @@ async function openSharedLink<K extends UserRecordKind>(
   window.history.replaceState(window.history.state, '', window.location.href.split('#')[0])
   if (!p.ok) {
     const { reason } = p
-    return page.say(({ t, tn }) =>
-      t('Shared link not opened: {reason}', { reason: linkReasonText(reason, { t, tn }) }),
+    return page.say(({ t, ...tr }) =>
+      t('Shared link not opened: {reason}', { reason: linkReasonText(reason, { t, ...tr }) }),
     )
   }
   const r = p.records.find((x): x is Of<K> => x.kind === kind)
@@ -483,8 +488,11 @@ async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
       : await readLoadFile(new TextEncoder().encode(text))
   if (!parsed.ok) {
     const { reason } = parsed
-    const problem: Said = ({ t, tn }) =>
-      t('{file} not opened: {reason}', { file: file.name, reason: reasonText(reason, { t, tn }) })
+    const problem: Said = ({ t, ...tr }) =>
+      t('{file} not opened: {reason}', {
+        file: file.name,
+        reason: reasonText(reason, { t, ...tr }),
+      })
     return { problem }
   }
   const mine = parsed.records.filter((r): r is Of<K> => r.kind === kind)
@@ -737,6 +745,7 @@ function ImportReport({
   onReplace: () => void
 }) {
   const tr = useTranslation()
+  const { i18n } = useLingui()
   const { t } = tr
   const said = report.said(tr)
   return (
@@ -749,7 +758,7 @@ function ImportReport({
           {report.skipped.map((s) => (
             <li key={s.name}>
               <strong>{s.name}</strong>:{' '}
-              <span className="file-reason">{reasonText(s.reason, tr)}</span>
+              <span className="file-reason">{reasonText(s.reason, { ...tr, i18n })}</span>
             </li>
           ))}
         </ul>
@@ -946,6 +955,7 @@ function FileMenuOf<K extends UserRecordKind>({
   const known = useRef<string | undefined>(undefined)
   const [saved, setSaved] = useState<{ file: string; json: string }>()
   const tr = useTranslation()
+  const { i18n } = useLingui()
   const { t } = tr
   /** The status line and the failure (announced as an alert), written in the language shown. */
   const [lineSaid, setLineSaid] = useState<Said>()
@@ -954,8 +964,8 @@ function FileMenuOf<K extends UserRecordKind>({
   const setFailure = lineSetter(setFailureSaid)
   /** The failure shown is a refused save's `problem`, cleared when the problem changes. */
   const problemSaid = useRefusal(problem, setFailure)
-  const message = shownLine(lineSaid, tr)
-  const failure = shownLine(failureSaid, tr)
+  const message = shownLine(lineSaid, { ...tr, i18n })
+  const failure = shownLine(failureSaid, { ...tr, i18n })
   const [folder, setFolder] = useState<{ handle: FileSystemDirectoryHandle; allowed: boolean }>()
   const [report, setReport] = useState<Report>()
   const [tables, setTables] = useState<TablesEntry>()
@@ -1141,7 +1151,9 @@ function FileMenuOf<K extends UserRecordKind>({
     const checked = checkedUserDataText(await withMakers(record), await photosOf([record]))
     if (!checked.ok) {
       const { reason } = checked
-      setFailure(({ t, tn }) => t('Not saved: {reason}', { reason: reasonText(reason, { t, tn }) }))
+      setFailure(({ t, ...tr }) =>
+        t('Not saved: {reason}', { reason: reasonText(reason, { t, ...tr }) }),
+      )
       return
     }
     return { recordId, record, text: checked.text }
@@ -1267,8 +1279,8 @@ function FileMenuOf<K extends UserRecordKind>({
     if (problem) return setFailure(({ t }) => t('Not shared: {reason}', { reason: problem }))
     const refused = shareProblem(current())
     if (refused)
-      return setFailure(({ t, tn }) =>
-        t('Not shared: {reason}', { reason: reasonText(refused, { t, tn }) }),
+      return setFailure(({ t, ...tr }) =>
+        t('Not shared: {reason}', { reason: reasonText(refused, { t, ...tr }) }),
       )
     const page = window.location.origin + window.location.pathname
     const link = await shareLink(await withMakers(current()), page)
@@ -1289,7 +1301,9 @@ function FileMenuOf<K extends UserRecordKind>({
     const checked = checkedUserDataText([{ ...current(), data: apiData }])
     if (checked.ok) return checked.text
     const { reason } = checked
-    setFailure(({ t, tn }) => t('Not written: {reason}', { reason: reasonText(reason, { t, tn }) }))
+    setFailure(({ t, ...tr }) =>
+      t('Not written: {reason}', { reason: reasonText(reason, { t, ...tr }) }),
+    )
   }
 
   async function remove(records: Of<K>[], question: string) {
@@ -1413,8 +1427,8 @@ function FileMenuOf<K extends UserRecordKind>({
     const checked = exportAllText(records, await photosOf(records), invalid)
     if (!checked.ok) {
       const { reason } = checked
-      setFailure(({ t, tn }) =>
-        t('Not exported: {reason}', { reason: reasonText(reason, { t, tn }) }),
+      setFailure(({ t, ...tr }) =>
+        t('Not exported: {reason}', { reason: reasonText(reason, { t, ...tr }) }),
       )
       return false
     }

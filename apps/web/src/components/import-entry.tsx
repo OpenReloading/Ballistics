@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   Badge,
   Button,
@@ -96,18 +98,16 @@ export const folded = (e: Entry) =>
   e.card.tier === 'high' &&
   e.kind === e.card.kind
 
-const label = (text: string, t: Translator['t']) => translateMessage(text, t)
-
 /** The Import entry's status line: how many files are read and the reason of each refused one. */
-export function readStatus(files: Entry[], t: Translator['t']) {
+export function readStatus(files: Entry[], t: Translator['t'], i18n: I18n) {
   if (!files.length) return ''
   const read = files.filter((e) => e.card || e.failure)
   const refused = read.flatMap((e) => {
     const c = e.card
     const reason = e.failure
-      ? label(e.failure, t)
+      ? translateMessage(e.failure, i18n)
       : c && 'refusal' in c
-        ? tableReadText(c.refusal, t)
+        ? tableReadText(c.refusal, t, i18n)
         : c && 'header' in c && !e.kind
           ? verdict(e, t).text
           : undefined
@@ -140,6 +140,7 @@ function ColumnRow({
   actions: CardActions
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const header = e.card.header[i] ?? ''
   const spec = fieldSpecs[e.kind].find((f) => f.key === m.field)
   return (
@@ -157,7 +158,10 @@ function ColumnRow({
         aria-label={t('Field of column {header}', { header })}
         data={[
           { value: '', label: t('Not imported') },
-          ...fieldSpecs[e.kind].map((f) => ({ value: f.key, label: label(f.label, t) })),
+          ...fieldSpecs[e.kind].map((f) => ({
+            value: f.key,
+            label: translateMessage(f.label, i18n),
+          })),
         ]}
         value={m.field ?? ''}
         onChange={(ev) =>
@@ -212,6 +216,7 @@ function ColumnRow({
 
 function Report({ b }: { b: BuildView }) {
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const more = b.counts.rejected - b.rejected.length
   return (
     <Stack gap={4}>
@@ -237,7 +242,7 @@ function Report({ b }: { b: BuildView }) {
               {t('Row {row}, {column}: {reason}', {
                 row: r.row,
                 column: r.column,
-                reason: tableReasonText(r.reason, t),
+                reason: tableReasonText(r.reason, t, i18n),
               })}
             </li>
           ))}
@@ -248,7 +253,7 @@ function Report({ b }: { b: BuildView }) {
         <Text size="xs" c="dimmed">
           {t('First warning, row {row}: {reason}', {
             row: b.firstWarning.row,
-            reason: tableReasonText(b.firstWarning.reason, t),
+            reason: tableReasonText(b.firstWarning.reason, t, i18n),
           })}
         </Text>
       )}
@@ -275,13 +280,17 @@ function heldText(kinds: Extract<CardView, { records: number }>['kinds'], tn: Tr
 /** A refused file's reason, with the load-file format that refused it, or a load file's records and what was not read. */
 function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   if ('refusal' in c)
     return (
       <>
         <Text size="sm" c="var(--error-text)" className="import-refusal">
           {c.format === undefined
-            ? tableReadText(c.refusal, t)
-            : t('{format}: {reason}', { format: c.format, reason: tableReadText(c.refusal, t) })}
+            ? tableReadText(c.refusal, t, i18n)
+            : t('{format}: {reason}', {
+                format: c.format,
+                reason: tableReadText(c.refusal, t, i18n),
+              })}
         </Text>
         {c.detail && (
           <Text size="xs">
@@ -368,6 +377,7 @@ export function FileCard({
   actions: CardActions
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [name, setName] = useState('')
   const v = verdict(e, t)
   const c = e.card
@@ -402,7 +412,7 @@ export function FileCard({
         </Group>
         {e.failure && (
           <Text size="sm" c="var(--error-text)">
-            {label(e.failure, t)}
+            {translateMessage(e.failure, i18n)}
           </Text>
         )}
         {c && !('header' in c) && <ReadNote c={c} />}
@@ -513,6 +523,7 @@ export function ImportEntry({
   onClose: () => void
 }) {
   const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const worker = useRef<Worker | undefined>(undefined)
   const nextId = useRef(1)
   const [files, setFiles] = useState<Entry[]>([])
@@ -731,7 +742,7 @@ export function ImportEntry({
           </Text>
         </Group>
         <p className="visually-hidden" role="status">
-          {readStatus(files, t)}
+          {readStatus(files, t, i18n)}
         </p>
         {files.map((e) => (
           <FileCard key={e.id} e={e} shared={shared} actions={actions} />

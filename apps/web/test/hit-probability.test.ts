@@ -2,9 +2,12 @@ import type { TrajectoryPoint } from '@rangefoundry/ballistics'
 import type { TargetFace } from '@rangefoundry/schema'
 import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 import { faceZones, hitFailureText, impactSensitivity } from '../src/lib/hit-probability.ts'
 import { defined } from './defined.ts'
+
+const en = linguiOf('en')
 
 const mm = (value: number) => ({ value })
 const face = {
@@ -18,8 +21,8 @@ const face = {
 describe('hitFailureText', () => {
   it('words a refusal of the hit probability, and passes any other error as its text', () => {
     const zones = new InputError({ code: 'zones', params: {} })
-    expect(hitFailureText(zones, english.t)).toBe('a face needs at least one zone')
-    expect(hitFailureText(new Error('offline'), english.t)).toBe('offline')
+    expect(hitFailureText(zones, english.t, en)).toBe('a face needs at least one zone')
+    expect(hitFailureText(new Error('offline'), english.t, en)).toBe('offline')
   })
 })
 

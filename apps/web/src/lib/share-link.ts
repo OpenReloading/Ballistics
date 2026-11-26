@@ -7,7 +7,7 @@ import {
   userRefFields,
 } from '@rangefoundry/schema'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { type ParsedUserFile, reasonOf, reasonText } from './user-data.ts'
+import { type ParsedUserFile, reasonOf, reasonText, type Wording } from './user-data.ts'
 
 /** Longest share link, `maxShareLinkChars` of the schema. */
 export const maxLinkChars = maxShareLinkChars
@@ -20,7 +20,7 @@ const longLink = msg(
 const ownReasons: readonly Message[] = [damagedLink, longLink]
 
 /** A `reason` of a share link that was not opened, in the language of `t`. */
-export function linkReasonText(reason: string, tr: Pick<Translator, 't' | 'tn'>) {
+export function linkReasonText(reason: string, tr: Wording) {
   const own = ownReasons.find((m) => m === reason)
   return own ? tr.t(own) : reasonText(reason, tr)
 }

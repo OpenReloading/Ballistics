@@ -1,4 +1,5 @@
 /** The warnings and refusals of the chronograph readers in words, loaded where they are shown. */
+import type { I18n } from '@lingui/core'
 import { type ChronoDiagnostic, type CommaRemedy, ReaderError } from '@rangefoundry/importers'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -123,11 +124,11 @@ export function chronoDiagnosticText(d: ChronoDiagnostic, t: Translator['t']): s
 }
 
 /** Why a chronograph file was not read, in the language of `t`: a chronograph or file reader's refusal, `chrono.ts`'s own, or another error's message. */
-export function chronoErrorText(error: unknown, t: Translator['t']): string {
+export function chronoErrorText(error: unknown, t: Translator['t'], i18n: I18n): string {
   const d = error instanceof ReaderError ? error.diagnostic : undefined
   if (d && isChronoDiagnostic(d)) return chronoDiagnosticText(d, t)
   if (d && isFileDiagnostic(d)) return fileDiagnosticText(d, t)
   const text = errorText(error)
   const own = chronoOwnMessages.find((m) => m === text)
-  return own ? t(own, { formats }) : translateMessage(text, t)
+  return own ? t(own, { formats }) : translateMessage(text, i18n)
 }

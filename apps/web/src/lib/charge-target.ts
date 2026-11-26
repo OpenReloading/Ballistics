@@ -1,6 +1,7 @@
+import type { I18n } from '@lingui/core'
 import type { ChargeRange, ChargeTargetKind } from '@rangefoundry/ballistics'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
-import { english, type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
+import { english, type LinguiSay, type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
 import { refusalText as thrownText, translateMessage } from './core-messages.ts'
 import { interiorFields } from './interior-input.ts'
@@ -150,6 +151,7 @@ export function refusalText(
   system: UnitSystem,
   percent: boolean,
   t: Translator['t'],
+  i18n: I18n,
 ): string {
   const { reason, reachable, failure } = refusal
   if ((reason === 'belowRange' || reason === 'aboveRange') && reachable) {
@@ -175,7 +177,7 @@ export function refusalText(
   }
   // the load is the problem, not the target
   if (reason === 'noValidRun' && failure) {
-    const why = translateMessage(failure.reason, t)
+    const why = translateMessage(failure.reason, i18n)
     return failure.field
       ? t('The simulation gives no valid run for this load. Reason: {reason}; field: {field}.', {
           reason: why,
@@ -196,15 +198,15 @@ export function refusalText(
   const known = reason && reasons[reason]
   if (known) return t(known)
   return refusal.message
-    ? translateMessage(refusal.message, t)
+    ? translateMessage(refusal.message, i18n)
     : t('The charge could not be found.')
 }
 
 /** What the dialog keeps of an answer: the text is written in the language shown, not the one it came in. */
 export type Outcome =
   | { kind: 'found'; body: ChargeTargetResponse }
-  | { kind: 'refused'; text: Say }
-  | { kind: 'failed'; text: Say }
+  | { kind: 'refused'; text: LinguiSay }
+  | { kind: 'failed'; text: LinguiSay }
 
 /** The load request to post, or the text that says why not: a bad value, an unbuilt load, no bulk density. */
 export function checkedRequest<R extends { bulkDensity?: number | undefined }>(
@@ -212,13 +214,13 @@ export function checkedRequest<R extends { bulkDensity?: number | undefined }>(
   unit: ReturnType<typeof targetUnit>,
   kind: TargetKind,
   loadRequest: () => R,
-): { req: R } | { text: Say } {
+): { req: R } | { text: LinguiSay } {
   if (targetError(value, unit, english.t)) return { text: (t) => targetError(value, unit, t) ?? '' }
   let req: R
   try {
     req = loadRequest()
   } catch (err) {
-    return { text: (t) => translateMessage(thrownText(err), t) }
+    return { text: (_, i18n) => translateMessage(thrownText(err), i18n) }
   }
   if (kind === 'loadRatio' && req.bulkDensity === undefined)
     return { text: (t) => t('The load ratio needs a powder with a bulk density.') }
@@ -237,8 +239,8 @@ export function answerOf(
   if (res.status === 422 && json)
     return {
       kind: 'refused',
-      text: (t) => refusalText(json as ChargeTargetRefusal, kind, system, asPercent, t),
+      text: (t, i18n) => refusalText(json as ChargeTargetRefusal, kind, system, asPercent, t, i18n),
     }
   const message = (json as ChargeTargetRefusal | undefined)?.message ?? `Error ${res.status}.`
-  return { kind: 'failed', text: (t) => translateMessage(message, t) }
+  return { kind: 'failed', text: (_, i18n) => translateMessage(message, i18n) }
 }

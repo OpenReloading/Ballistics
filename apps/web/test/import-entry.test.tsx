@@ -1,3 +1,4 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { UserRecord } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -13,6 +14,7 @@ import {
   readStatus,
   splitImport,
 } from '../src/components/import-entry.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 import {
   type BuildView,
@@ -29,6 +31,8 @@ import {
 import { type LoadFileFormat, loadFileFormats } from '../src/lib/load-file-formats.ts'
 import { maxFileBytes, userDataText } from '../src/lib/user-data.ts'
 import { defined } from './defined.ts'
+
+const en = linguiOf('en')
 
 const csv = (rows: string[]) =>
   new TextEncoder().encode(['Name,Maker,Diameter (mm),Weight (gr),BC G1', ...rows].join('\n'))
@@ -223,7 +227,11 @@ it('drops a saved mapping of another shape and still offers the suggested kind',
 })
 
 const html = (node: React.ReactNode) =>
-  renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+  renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>{node}</MantineProvider>
+    </I18nProvider>,
+  )
 
 /** The tab stops of rendered markup: each enabled button, input and select, a radio group once. */
 function tabStops(markup: string) {
@@ -293,7 +301,7 @@ it('folds a high-tier card to 2 tab stops and opens every control of it unfolded
 
 it('says how many files are read and the reason of each refused one', () => {
   const { t } = english
-  expect(readStatus([], t)).toBe('')
+  expect(readStatus([], t, en)).toBe('')
   const files: Entry[] = [
     entry,
     {
@@ -307,7 +315,7 @@ it('says how many files are read and the reason of each refused one', () => {
     { ...entry, id: 3, name: 'odd.csv', kind: undefined },
     { id: 4, name: 'later.csv', source: '', touched: false, busy: true },
   ]
-  expect(readStatus(files, t)).toBe(
+  expect(readStatus(files, t, en)).toBe(
     '3 of 4 files read. notes.txt: no table odd.csv: Refused: no kind',
   )
 })

@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Checkbox, NativeSelect, TextInput } from '@mantine/core'
 import type { RangeStringFit, TrajectoryInput, TruingPlan } from '@rangefoundry/ballistics'
 import type { Truing } from '@rangefoundry/schema'
@@ -176,6 +177,7 @@ const countText = (what: string, lines: ParameterLine[], t: Translator['t']) =>
 /** The nominal shot is the Trajectory tab's; a fit is stored only on request, with the strings, in the chosen firearm configuration, nothing else kept (`apps/docs/docs/models/exterior-truing-strings.md`). */
 export function TruingSession({ nominal, system }: { nominal: TruingNominal; system: UnitSystem }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [rows, setRows] = useState<TruingRow[]>(startRows)
   const [chrono, setChrono] = useState<TruingChrono>(blankChrono)
   const [dispersion, setDispersion] = useState('')
@@ -354,13 +356,13 @@ export function TruingSession({ nominal, system }: { nominal: TruingNominal; sys
       </p>
       {planned && 'problem' in planned && (
         <p role="alert" className="error-text">
-          {t('Plan: {problem}', { problem: planned.problem(t) })}
+          {t('Plan: {problem}', { problem: planned.problem(t, i18n) })}
         </p>
       )}
       {planLines && <Statuses lines={planLines} fit={false} />}
       {fitted && 'problem' in fitted && (
         <p role="alert" className="error-text">
-          {t('Fit: {problem}', { problem: fitted.problem(t) })}
+          {t('Fit: {problem}', { problem: fitted.problem(t, i18n) })}
         </p>
       )}
       {fitted && 'answer' in fitted && fitLines && (

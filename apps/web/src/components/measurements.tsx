@@ -1,4 +1,5 @@
 'use client'
+import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 
 import { Anchor, Button } from '@mantine/core'
@@ -9,7 +10,7 @@ import Link from '@/platform/link.tsx'
 import { storedRecord, updateRecord } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { msg, type Say, type Translator } from '../i18n/translate.ts'
+import { type LinguiSay, msg, type Translator } from '../i18n/translate.ts'
 import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
 import { chronoFailureSay } from '../lib/chrono-failure.ts'
 import { translateMessage } from '../lib/core-messages.ts'
@@ -188,13 +189,13 @@ async function readSession(
 }
 
 /** A file that was not read: too many sessions for the load, else why, worded where it is shown. */
-type Failure = { file: string; tooMany: true } | { file: string; say: Say }
+type Failure = { file: string; tooMany: true } | { file: string; say: LinguiSay }
 
 /** The reason `f` gives for its file, in the language of `t`. */
-const failureText = (f: Failure, t: Translator['t']) =>
+const failureText = (f: Failure, t: Translator['t'], i18n: I18n) =>
   'tooMany' in f
     ? t('{file}: a load keeps {max} sessions at most.', { file: f.file, max: maxSessions })
-    : `${f.file}: ${f.say(t)}`
+    : `${f.file}: ${f.say(t, i18n)}`
 
 /** `text` of a statistic when there is one, else nothing. */
 const when = <T,>(x: T | undefined, text: (x: T) => string) => (x === undefined ? '' : text(x))
@@ -515,7 +516,7 @@ export function Measurements({
       </p>
       {failures.length > 0 && (
         <ErrorNote title={t('The file was not read.')}>
-          {failures.map((f) => failureText(f, t)).join(' ')}
+          {failures.map((f) => failureText(f, t, i18n)).join(' ')}
         </ErrorNote>
       )}
       {sessions.length === 0 && (

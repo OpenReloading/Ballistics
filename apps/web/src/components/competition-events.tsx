@@ -927,7 +927,7 @@ async function offerRounds(id: string, e: CompetitionEvent, i18n: I18n) {
 /** The new events, and after one question those that differ from the browser's; the report line, a throw with the reason when the file is refused. */
 async function importEvents(f: File, tr: Translator, i18n: I18n) {
   const parsed = parseUserDataFile(await f.text())
-  if (!parsed.ok) throw new Error(reasonText(parsed.reason, tr))
+  if (!parsed.ok) throw new Error(reasonText(parsed.reason, { ...tr, i18n }))
   const incoming = eventRecords(parsed.records)
   const stored = await storedRecords()
   const plan = planImport(incoming, stored.records, stored.invalid)

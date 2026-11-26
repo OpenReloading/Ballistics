@@ -269,8 +269,9 @@ export function warningLines(
   ok: Extract<Outcome, { kind: 'ok' }>,
   system: UnitSystem,
   t: Translator['t'],
+  i18n: I18n,
 ) {
-  return [...shownWarnings(ok.body, system, t), ...derived(ok, t).own]
+  return [...shownWarnings(ok.body, system, t, i18n), ...derived(ok, t).own]
 }
 
 /** The cartridge's name when the powder record lists the cartridges its manufacturer names and this one is not among them; a powder without a list says nothing. */

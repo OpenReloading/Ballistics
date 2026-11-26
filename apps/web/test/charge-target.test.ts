@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english, translator } from '../src/i18n/translate.ts'
 import {
   answerOf,
@@ -9,6 +10,8 @@ import {
   targetUnit,
 } from '../src/lib/charge-target.ts'
 import { presetUnits } from '../src/lib/units.ts'
+
+const en = linguiOf('en')
 
 const si = presetUnits('metric-grams')
 const us = presetUnits('us')
@@ -64,6 +67,7 @@ describe('refusalText', () => {
       si,
       false,
       english.t,
+      en,
     )
     expect(text).toContain('does not reach this high a value')
     expect(text).toContain('it spans 200 bar at 1.00 g to 4000 bar at 4.00 g')
@@ -80,6 +84,7 @@ describe('refusalText', () => {
       si,
       false,
       english.t,
+      en,
     )
     expect(text).toContain('spans 200 bar at 4.00 g to 4000 bar at 2.00 g')
   })
@@ -91,19 +96,29 @@ describe('refusalText', () => {
       si,
       true,
       english.t,
+      en,
     )
     expect(text).toContain('spans 5.0 % of Pmax at 1.00 g to 100.0 % of Pmax at 4.00 g')
   })
 
   it('words the other reasons and falls back to the message', () => {
     expect(
-      refusalText({ statusCode: 422, reason: 'notMonotone' }, 'barrelTime', si, false, english.t),
+      refusalText(
+        { statusCode: 422, reason: 'notMonotone' },
+        'barrelTime',
+        si,
+        false,
+        english.t,
+        en,
+      ),
     ).toMatch(/more than one charge/)
     expect(
-      refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false, english.t),
+      refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false, english.t, en),
     ).toBe('boom')
     const several = { statusCode: 422, reason: 'severalLimits' }
-    expect(refusalText(several, 'peakPressure', si, true, english.t)).toMatch(/limit per variant/)
+    expect(refusalText(several, 'peakPressure', si, true, english.t, en)).toMatch(
+      /limit per variant/,
+    )
   })
 
   it('names the failing run of the load for noValidRun, not the target', () => {
@@ -117,6 +132,7 @@ describe('refusalText', () => {
       si,
       false,
       english.t,
+      en,
     )
     expect(text).toBe(
       'The simulation gives no valid run for this load. Reason: input; field: Ignition pressure.',
@@ -127,11 +143,18 @@ describe('refusalText', () => {
       failure: { reason: 'input', field },
     })
     // a field without a workbench label keeps the model's name
-    expect(refusalText(refusal('heat'), 'peakPressure', si, false, english.t)).toContain(
+    expect(refusalText(refusal('heat'), 'peakPressure', si, false, english.t, en)).toContain(
       'field: heat.',
     )
     expect(
-      refusalText({ statusCode: 422, reason: 'noValidRun' }, 'barrelTime', si, false, english.t),
+      refusalText(
+        { statusCode: 422, reason: 'noValidRun' },
+        'barrelTime',
+        si,
+        false,
+        english.t,
+        en,
+      ),
     ).toMatch(/No charge in the range/)
   })
 })
@@ -157,11 +180,11 @@ describe('the answer kept for a language change', () => {
   it('writes a refusal in the language it is shown in, not the one it came in', () => {
     const out = refused()
     if (out.kind !== 'refused') throw new Error('expected a refusal')
-    const en = out.text(english.t)
-    expect(en).toBe('The search did not reach its tolerance.')
+    const shown = out.text(english.t, en)
+    expect(shown).toBe('The search did not reach its tolerance.')
     const own = translator({ 'The search did not reach its tolerance.': 'Verfehlt.' }, 'de')
-    expect(out.text(own.t)).toBe('Verfehlt.')
-    expect(out.text(english.t)).toBe(en)
+    expect(out.text(own.t, en)).toBe('Verfehlt.')
+    expect(out.text(english.t, en)).toBe(shown)
   })
 
   it('writes a value error under the language shown, from the stored value', () => {
@@ -172,12 +195,12 @@ describe('the answer kept for a language change', () => {
       () => ({}) as { bulkDensity?: number },
     )
     if (!('text' in checked)) throw new Error('expected an error')
-    expect(checked.text(english.t)).toBe('Enter a target above 0.')
+    expect(checked.text(english.t, en)).toBe('Enter a target above 0.')
   })
 
   it('writes a failed answer from the API message in the language shown', () => {
     const out = answerOf(new Response(null, { status: 500 }), undefined, 'peakPressure', si, false)
     if (out.kind !== 'failed') throw new Error('expected a failure')
-    expect(out.text(english.t)).toBe('Error 500.')
+    expect(out.text(english.t, en)).toBe('Error 500.')
   })
 })
