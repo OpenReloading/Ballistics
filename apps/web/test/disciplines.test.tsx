@@ -96,12 +96,8 @@ it('shows the distance in the unit of the rule book and filters by either unit o
   expect(shownBy({ dist: ['25yd'] })).toEqual(bdmp25)
   expect(shownBy({ dist: ['25m'] })).toEqual(expect.arrayContaining(bdmp25))
   expect(
-    disciplineStrip(
-      defined(records.find((d) => d.id === bothIds[0])),
-      linguiOf('en'),
-      translator().t,
-      'BDMP',
-    )[1]?.row,
+    disciplineStrip(defined(records.find((d) => d.id === bothIds[0])), linguiOf('en'), 'BDMP')[1]
+      ?.row,
   ).toMatchObject({
     text: expect.stringMatching(/^\d+ m \/ \d+ yd$/),
   })
@@ -139,9 +135,7 @@ it('renders the discipline list: one row per discipline linking its page, no fed
 
 it('gives the strip, the number, section, page and caliber classes, and the rule book with its page', () => {
   const { t } = translator()
-  expect(
-    disciplineStrip(pistol, linguiOf('en'), t, 'DSB').map((i) => [i.label, i.row.text]),
-  ).toEqual([
+  expect(disciplineStrip(pistol, linguiOf('en'), 'DSB').map((i) => [i.label, i.row.text])).toEqual([
     ['Federation', 'DSB'],
     ['Distance', '25 m'],
   ])

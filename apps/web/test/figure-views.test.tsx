@@ -1,8 +1,10 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { FigureModel } from '@rangefoundry/svg-drawings/cartridge'
 import { chamberOf, coalRange, previewDrawn } from '@rangefoundry/svg-drawings/seating'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { figureViewBuilder } from '../src/lib/figure-views.ts'
 import { defined, missing } from './defined.ts'
@@ -110,9 +112,11 @@ describe('hiding the dimensions keeps the outline in place', () => {
     const screen = (view: 'cartridge' | 'chamber' | 'combined') =>
       (
         renderToStaticMarkup(
-          <MantineProvider>
-            <CartridgeDrawing spec={spec} view={view} />
-          </MantineProvider>,
+          <I18nProvider i18n={linguiOf('en')}>
+            <MantineProvider>
+              <CartridgeDrawing spec={spec} view={view} />
+            </MantineProvider>
+          </I18nProvider>,
         ).match(/<svg [^>]*screen-only[\s\S]*?<\/svg>/) as RegExpMatchArray
       )[0]
     expect(screen('cartridge')).toBe(screen('combined'))

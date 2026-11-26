@@ -1,3 +1,5 @@
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { SegmentedControl, Tooltip } from '@mantine/core'
 import { angleText, face, fitEm, type LengthUnit, lengthText } from '@rangefoundry/svg-drawings'
 import {
@@ -292,7 +294,7 @@ function described(
 }
 
 /** The region values in words: "head R1 0.02 mm; ...", the conflicts apart. */
-function regionWords(list: Region[], unit: LengthUnit, t: Translator['t']) {
+function regionWords(list: Region[], unit: LengthUnit, t: Translator['t'], i18n: I18n) {
   const all = list.flatMap(({ name, values }) => values.map((v) => ({ name, ...v })))
   const words = (want: (x: number) => boolean) =>
     list
@@ -307,14 +309,20 @@ function regionWords(list: Region[], unit: LengthUnit, t: Translator['t']) {
       .join('; ')
   const conflicts = all.some((v) => v.value < 0)
   const own = t('{difference} (chamber minimum minus cartridge maximum): {values}', {
-    difference: differenceText(t),
+    difference: differenceText(i18n),
     values: words((x) => x >= 0) || t('none'),
   })
-  return `${own}${conflicts ? `; ${conflictText(t)}: ${words((x) => x < 0)}` : ''}`
+  return `${own}${conflicts ? `; ${conflictText(i18n)}: ${words((x) => x < 0)}` : ''}`
 }
 
 /** One description of every view of a figure. */
-function description(drawn: Drawn, list: Region[], unit: LengthUnit, t: Translator['t']) {
+function description(
+  drawn: Drawn,
+  list: Region[],
+  unit: LengthUnit,
+  t: Translator['t'],
+  i18n: I18n,
+) {
   const sides = drawn.map(({ side, p }) => {
     const { dimensions, angles, radii } = p.annotation
     const values = [
@@ -346,7 +354,7 @@ function description(drawn: Drawn, list: Region[], unit: LengthUnit, t: Translat
       : list.length
         ? [
             t('Combined view: both outlines and the gap between them, no dimensions; {regions}.', {
-              regions: regionWords(list, unit, t),
+              regions: regionWords(list, unit, t, i18n),
             }),
           ]
         : [t('Combined view: both outlines and the gap between them, no dimensions.')]
@@ -581,8 +589,9 @@ function Outline({
   reserve?: { model: FigureModel; tallest: number } | undefined
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const title = `${heading ?? t('Outline, {name}', { name: `${spec.standard} ${spec.name}` })}${variant === undefined ? '' : ` (${variant})`}`
-  const desc = description(drawn, differences ?? [], unit, t)
+  const desc = description(drawn, differences ?? [], unit, t, i18n)
   // the record's Combined view: no switch of its own and no print drawing
   const combined = print === undefined
   const switchable = differences !== undefined && !combined

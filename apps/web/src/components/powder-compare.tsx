@@ -137,11 +137,12 @@ function SortHead({
 /** The case fill of a row; the reason it is unknown is the title. */
 function FillCell({ ratio }: { ratio: number | undefined }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <td
       data-label={t('Case fill')}
       className="num"
-      title={ratio === undefined ? t(noBulkDensity) : undefined}
+      title={ratio === undefined ? i18n._(noBulkDensity) : undefined}
     >
       {ratio === undefined ? (
         <>

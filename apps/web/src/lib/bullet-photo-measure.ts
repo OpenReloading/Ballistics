@@ -1,7 +1,6 @@
 /** Dimensions with standard uncertainties from a photographed outline (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 import { fromSi, type UserBullet } from '@rangefoundry/schema'
 import { median1 } from '@rangefoundry/target-recognition'
-import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'
 import { edgeUncertainty, type Outline, sideTapers } from './bullet-photo-outline.ts'
 import type { ScaleBasis } from './bullet-photo-scale.ts'
@@ -282,7 +281,10 @@ function boatTailOf(o: Outline, s: Shank, put: Put, m: BulletMeasurement) {
   }
   if (fit.sigma > 1)
     m.notes.push(
-      msg('The boat tail is not a straight cone in the photograph (a rebated boat tail?).'),
+      /*i18n*/ {
+        id: 'bulletPhoto.rebatedBoatTail',
+        message: 'The boat tail is not a straight cone in the photograph (a rebated boat tail?).',
+      },
     )
   return { z: end([r0, k, s.rRef]), u }
 }
@@ -370,7 +372,12 @@ function cannelureOf(o: Outline, s: Shank, put: Put) {
 export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
   const m: BulletMeasurement = { values: {}, baseType: 'flat', notes: [] }
   if (o.z.length < 20) {
-    m.notes.push(msg('The bullet is too short in the photograph to measure.'))
+    m.notes.push(
+      /*i18n*/ {
+        id: 'bulletPhoto.tooShort',
+        message: 'The bullet is too short in the photograph to measure.',
+      },
+    )
     return m
   }
   // a spread edge adds its position's uncertainty to every length, twice over for a width
@@ -396,8 +403,14 @@ export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
     put('bearingLength', nose.z - bt.z, Math.hypot(nose.u, bt.u))
     m.notes.push(
       m.ogiveForm === 'tangent'
-        ? msg('The nose is a tangent ogive: its circle touches the shank.')
-        : msg('The nose is a secant ogive: its circle cuts the shank at an angle.'),
+        ? /*i18n*/ {
+            id: 'bulletPhoto.tangentOgive',
+            message: 'The nose is a tangent ogive: its circle touches the shank.',
+          }
+        : /*i18n*/ {
+            id: 'bulletPhoto.secantOgive',
+            message: 'The nose is a secant ogive: its circle cuts the shank at an angle.',
+          },
     )
   } else {
     // no circle: the nose starts between where the shank leaves 3 px and 0.5 px of the full width
@@ -417,9 +430,11 @@ export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
     put('bearingLength', start - bt.z, Math.hypot(half, bt.u))
     put('meplatDiameter', 2 * median1(o.r.slice(-3)), 2 * edgeUncertainty)
     m.notes.push(
-      msg(
-        'The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range.',
-      ),
+      /*i18n*/ {
+        id: 'bulletPhoto.noArc',
+        message:
+          'The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range.',
+      },
     )
   }
   cannelureOf(o, s, put)

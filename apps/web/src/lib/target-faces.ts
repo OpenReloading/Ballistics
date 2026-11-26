@@ -1,4 +1,5 @@
 /** The target face list's rows and search, and a face record's value groups and event rows. */
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import {
   compareDisciplines,
   compareNames,
@@ -8,7 +9,6 @@ import {
   toSi,
   type UserRecord,
 } from '@rangefoundry/schema'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'
 import { colourWord } from './face-words.ts'
@@ -17,9 +17,7 @@ import { matchesQuery } from './lists.ts'
 import { nth } from './nth.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
 import { userRowId } from './sources.ts'
-import { type LinguiWording, verbatim } from './wording.ts'
-
-type Translate = Translator['t']
+import type { LinguiWording } from './wording.ts'
 
 /** One row of the target face list, `origin` `user` a face design of the browser. Lengths in mm, distances in m. */
 export type TargetFaceRow = {
@@ -137,48 +135,62 @@ const length = (label: LinguiWording, mm: number | undefined, printed?: string):
       ]
 const text = (label: LinguiWording, value: string | undefined): FieldRow[] =>
   value === undefined ? [] : [{ label, text: value }]
-const yesNo = (t: Translate, v: boolean | undefined, unset?: string) =>
-  v === undefined ? unset : v ? t('Yes') : t('No')
+const yesNo = (i18n: I18n, v: boolean | undefined, unset?: string) =>
+  v === undefined
+    ? unset
+    : v
+      ? i18n._({ id: 'targets.yes', message: 'Yes' })
+      : i18n._({ id: 'targets.no', message: 'No' })
 
-const innerTenRule: Record<'touch' | 'cover', Message> = {
-  touch: msg('Counts when touched'),
-  cover: msg('Counts when covered'),
+const innerTenRule: Record<'touch' | 'cover', MessageDescriptor> = {
+  touch: /*i18n*/ { id: 'targets.innerTenRule.touch', message: 'Counts when touched' },
+  cover: /*i18n*/ { id: 'targets.innerTenRule.cover', message: 'Counts when covered' },
 }
 
 /** A ring's recorded colors after its label: " (black, line white)". */
-const ringColours = (t: Translate, r: TargetFace['rings'][number]) => {
+const ringColours = (i18n: I18n, r: TargetFace['rings'][number]) => {
   const parts = [
-    r.fill && colourWord(t, r.fill),
-    r.line && t('line {colour}', { colour: colourWord(t, r.line) }),
+    r.fill && colourWord(i18n, r.fill),
+    r.line &&
+      i18n._({
+        id: 'targets.ringLine',
+        message: 'line {colour}',
+        values: { colour: colourWord(i18n, r.line) },
+      }),
   ].filter(Boolean)
   return parts.length > 0 ? parts.join(', ') : undefined
 }
 
 /** A ring's label: its value and, where recorded, its colors. */
-const ringLabel = (t: Translate, r: TargetFace['rings'][number]) => {
-  const colours = ringColours(t, r)
-  return verbatim(
-    colours
-      ? t('Ring {value} ({colours})', { value: r.value, colours })
-      : t('Ring {value}', { value: r.value }),
-  )
+const ringLabel = (i18n: I18n, r: TargetFace['rings'][number]): LinguiWording => {
+  const colours = ringColours(i18n, r)
+  return colours
+    ? /*i18n*/ {
+        id: 'targets.ringColors',
+        message: 'Ring {value} ({colours})',
+        values: { value: r.value, colours },
+      }
+    : /*i18n*/ { id: 'targets.ring', message: 'Ring {value}', values: { value: r.value } }
 }
 
 /** The face's facts under the page bar: federation, distances, outer diameter, black area, rings. */
-export function targetFaceStrip(f: Omit<Face, 'provenance'>, t: Translate): StripItem[] {
+export function targetFaceStrip(f: Omit<Face, 'provenance'>, i18n: I18n): StripItem[] {
   const outer = nth(f.rings, 0)
   const oval = outer.height !== undefined
-  const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
-    rows[0] ? [{ icon, label, row: rows[0] }] : []
+  const item = (icon: StripItem['icon'], label: MessageDescriptor, rows: FieldRow[]) =>
+    rows[0] ? [{ icon, label: i18n._(label), row: rows[0] }] : []
+  const labels = {
+    federation: /*i18n*/ { id: 'targets.row.federation', message: 'Federation' },
+    distance: /*i18n*/ { id: 'targets.row.distance', message: 'Distance' },
+    outerDiameter: /*i18n*/ { id: 'targets.row.outerDiameter', message: 'Outer diameter' },
+    blackArea: /*i18n*/ { id: 'targets.row.blackArea', message: 'Black area' },
+    rings: /*i18n*/ { id: 'targets.row.rings', message: 'Rings' },
+  }
   return [
-    ...item(
-      'federation',
-      t('Federation'),
-      text(/*i18n*/ { id: 'targets.row.federation', message: 'Federation' }, f.organization),
-    ),
-    ...item('distance', t('Distance'), [
+    ...item('federation', labels.federation, text(labels.federation, f.organization)),
+    ...item('distance', labels.distance, [
       {
-        label: /*i18n*/ { id: 'targets.row.distance', message: 'Distance' },
+        label: labels.distance,
         text: faceDistances(f).join(', '),
         numeric: true,
         unit: 'm',
@@ -186,34 +198,26 @@ export function targetFaceStrip(f: Omit<Face, 'provenance'>, t: Translate): Stri
     ]),
     ...item(
       'diameter',
-      oval ? t('Outer diameter width') : t('Outer diameter'),
-      length(
-        /*i18n*/ { id: 'targets.row.outerDiameter', message: 'Outer diameter' },
-        outer.diameter.value,
-        outer.diameter.raw,
-      ),
+      oval
+        ? /*i18n*/ { id: 'targets.strip.outerDiameterWidth', message: 'Outer diameter width' }
+        : labels.outerDiameter,
+      length(labels.outerDiameter, outer.diameter.value, outer.diameter.raw),
     ),
     ...item(
       'black',
-      oval ? t('Black area width') : t('Black area'),
-      length(
-        /*i18n*/ { id: 'targets.row.blackArea', message: 'Black area' },
-        f.blackDiameter.value,
-        f.blackDiameter.raw,
-      ),
+      oval
+        ? /*i18n*/ { id: 'targets.strip.blackAreaWidth', message: 'Black area width' }
+        : labels.blackArea,
+      length(labels.blackArea, f.blackDiameter.value, f.blackDiameter.raw),
     ),
-    ...item(
-      'rings',
-      t('Rings'),
-      text(/*i18n*/ { id: 'targets.row.rings', message: 'Rings' }, String(f.rings.length)),
-    ),
+    ...item('rings', labels.rings, text(labels.rings, String(f.rings.length))),
   ]
 }
 
 /** The face's values beyond the strip: scoring and sheet, then the ring diameters outer to inner and the inner ten. */
-export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate): FieldGroup[] {
+export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, i18n: I18n): FieldGroup[] {
   const oval = nth(f.rings, 0).height !== undefined
-  const unset = t('Not stated')
+  const unset = i18n._({ id: 'targets.notStated', message: 'Not stated' })
   return [
     {
       title: /*i18n*/ { id: 'targets.group.target', message: 'Target' },
@@ -225,15 +229,15 @@ export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate
         ),
         ...text(
           /*i18n*/ { id: 'targets.row.innerTenRule', message: 'Inner ten rule' },
-          f.innerTen && (f.innerTen.rule ? t(innerTenRule[f.innerTen.rule]) : unset),
+          f.innerTen && (f.innerTen.rule ? i18n._(innerTenRule[f.innerTen.rule]) : unset),
         ),
         ...text(
           /*i18n*/ { id: 'targets.row.tenthRingValues', message: 'Tenth-ring values' },
-          yesNo(t, f.decimal, unset),
+          yesNo(i18n, f.decimal, unset),
         ),
         ...text(
           /*i18n*/ { id: 'targets.row.numeralsPrinted', message: 'Numerals printed' },
-          yesNo(t, f.numerals, unset),
+          yesNo(i18n, f.numerals, unset),
         ),
         ...(f.paper
           ? [
@@ -256,9 +260,13 @@ export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate
         : /*i18n*/ { id: 'targets.group.ringDiameters', message: 'Ring diameters' },
       rows: [
         ...f.rings.flatMap((r) => [
-          ...length(ringLabel(t, r), r.diameter.value, r.diameter.raw),
+          ...length(ringLabel(i18n, r), r.diameter.value, r.diameter.raw),
           ...length(
-            verbatim(t('Ring {value} height', { value: r.value })),
+            /*i18n*/ {
+              id: 'targets.ringHeight',
+              message: 'Ring {value} height',
+              values: { value: r.value },
+            },
             r.height?.value,
             r.height?.raw,
           ),

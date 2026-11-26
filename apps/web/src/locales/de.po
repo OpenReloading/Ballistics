@@ -255,6 +255,10 @@ msgstr "{reason} Für die Zeichnung werden ein Durchmesser und eine Länge benö
 msgid "sources.only"
 msgstr "nur {source}"
 
+# en: "{symbol}: {meaning}"
+msgid "cartridgeRecord.symbolMeaning"
+msgstr "{symbol}: {meaning}"
+
 # en: "{title}: group"
 msgid "fieldTable.groupFilter"
 msgstr "{title}: Gruppe"
@@ -294,6 +298,10 @@ msgstr "Ein Geschoss passt zu einer Patrone, wenn sein Durchmesser über dem Mit
 # en: "A curve could not be loaded."
 msgid "burnRateCompare.loadError"
 msgstr "Eine Kurve konnte nicht geladen werden."
+
+# en: "A data file did not load or the computation failed. Check the connection and retry."
+msgid "powderCompare.apiSilent"
+msgstr "Eine Datendatei wurde nicht geladen oder die Berechnung ist fehlgeschlagen. Prüfen Sie die Verbindung und versuchen Sie es erneut."
 
 # en: "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
 msgid "powderRecord.neighborNote"
@@ -503,6 +511,14 @@ msgstr "Bodenform"
 msgid "recordFields.baseType"
 msgstr "Bodenform"
 
+# en: "basic"
+msgid "cartridgeRecord.note.basic"
+msgstr "Grundmaß"
+
+# en: "Basic"
+msgid "cartridgeRecord.noteLine.basic"
+msgstr "Grundmaß"
+
 # en: "BC ({unit})"
 msgid "fieldTable.coefficientUnit"
 msgstr "BC ({unit})"
@@ -519,9 +535,17 @@ msgstr "BC {model}"
 msgid "recordFields.bearingLength"
 msgstr "Länge des Führungsteils"
 
+# en: "belt diameter (table III)"
+msgid "cartridgeRecord.meaning.beltDiameter"
+msgstr "Gürteldurchmesser (Tabelle III)"
+
 # en: "belted"
 msgid "values.belted"
 msgstr "Gürtelhülse"
+
+# en: "black"
+msgid "targets.color.black"
+msgstr "schwarz"
 
 # en: "Black area"
 msgid "targets.row.blackArea"
@@ -531,9 +555,17 @@ msgstr "Spiegel"
 msgid "targets.row.blackAreaHeight"
 msgstr "Spiegelhöhe"
 
+# en: "Black area width"
+msgid "targets.strip.blackAreaWidth"
+msgstr "Spiegel (Breite)"
+
 # en: "black oxide"
 msgid "values.blackOxide"
 msgstr "Schwarzoxid"
+
+# en: "blue"
+msgid "targets.color.blue"
+msgstr "blau"
 
 # en: "boat-tail"
 msgid "values.boatTail"
@@ -543,9 +575,37 @@ msgstr "Bootsheck"
 msgid "recordFields.boatTailAngle"
 msgstr "Bootsheckwinkel"
 
+# en: "Body"
+msgid "cartridgeRecord.group.body"
+msgstr "Körper"
+
+# en: "body diameter at E"
+msgid "cartridgeRecord.meaning.bodyAtE"
+msgstr "Körperdurchmesser bei E"
+
+# en: "body diameter at L0 (double taper)"
+msgid "cartridgeRecord.meaning.bodyAtL0"
+msgstr "Körperdurchmesser bei L0 (doppelte Verjüngung)"
+
+# en: "body diameter at l2"
+msgid "cartridgeRecord.meaning.bodyAtL2"
+msgstr "Körperdurchmesser bei l2"
+
+# en: "body diameter at the head"
+msgid "cartridgeRecord.meaning.bodyAtHead"
+msgstr "Körperdurchmesser am Boden"
+
 # en: "bonded"
 msgid "values.bonded"
 msgstr "Verbundgeschoss"
+
+# en: "bore cross-section area"
+msgid "cartridgeRecord.meaning.boreArea"
+msgstr "Querschnittsfläche des Laufs"
+
+# en: "bore diameter"
+msgid "cartridgeRecord.meaning.boreDiameter"
+msgstr "Felddurchmesser"
 
 # en: "Bore resistance"
 msgid "recordFields.boreResistance"
@@ -575,6 +635,10 @@ msgstr "Hülsengruppe"
 msgid "cases.filtered"
 msgstr "Hülsen, {filters}"
 
+# en: "brown"
+msgid "targets.color.brown"
+msgstr "braun"
+
 # en: "Build"
 msgid "recordFields.build"
 msgstr "Aufbau"
@@ -602,6 +666,10 @@ msgstr "Tabelle der Geschossdaten"
 # en: "Bullet designer"
 msgid "page.bulletsDesigner"
 msgstr "Geschoss-Editor"
+
+# en: "bullet diameter"
+msgid "cartridgeRecord.meaning.bulletDiameter"
+msgstr "Geschossdurchmesser"
 
 # en: "Bullet diameter G1"
 msgid "cartridges.column.maxBulletDiameter"
@@ -727,6 +795,14 @@ msgstr "Patrone"
 msgid "firearms.column.cartridge"
 msgstr "Patrone"
 
+# en: "cartridge {meaning}"
+msgid "cartridgeRecord.sideMeaning.cartridge"
+msgstr "Patrone: {meaning}"
+
+# en: "Cartridge {symbol}"
+msgid "cartridgeRecord.sideSymbol.cartridge"
+msgstr "Patrone {symbol}"
+
 # en: "Cartridge data is unavailable right now."
 msgid "states.unavailable.cartridge"
 msgstr "Die Patronendaten sind gerade nicht verfügbar."
@@ -738,6 +814,14 @@ msgstr "Patronen-Editor"
 # en: "Cartridge dimensions"
 msgid "cartridgeRecord.dimensions.cartridge"
 msgstr "Maße der Patrone"
+
+# en: "cartridge L3 plus the chamber G"
+msgid "cartridgeRecord.meaning.l3PlusG"
+msgstr "L3 der Patrone plus G des Patronenlagers"
+
+# en: "cartridge length"
+msgid "cartridgeRecord.meaning.cartridgeLength"
+msgstr "Patronenlänge"
 
 # en: "Cartridge length unit"
 msgid "cartridgeRecord.unit.cartridge"
@@ -754,6 +838,14 @@ msgstr "Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
 # en: "Cartridge value of the CIP sheet, smallest variant."
 msgid "cartridges.column.maxBulletDiameterHelp"
 msgstr "Wert der Patrone im CIP-Datenblatt, kleinste Variante."
+
+# en: "Cartridge: {notes}"
+msgid "cartridgeRecord.sideNotes.cartridge"
+msgstr "Patrone: {notes}"
+
+# en: "Cartridge: derived, not dimensioned"
+msgid "cartridgeRecord.derivedCartridge"
+msgstr "Patrone: abgeleitet, nicht bemaßt"
 
 # en: "Cartridges"
 msgid "bulletRecord.cartridges"
@@ -778,6 +870,10 @@ msgstr "Hülse"
 # en: "Case capacity"
 msgid "units.quantity.capacity"
 msgstr "Hülsenvolumen"
+
+# en: "case length"
+msgid "cartridgeRecord.meaning.caseLength"
+msgstr "Hülsenlänge"
 
 # en: "Case length L3"
 msgid "cartridges.column.caseLength"
@@ -827,13 +923,33 @@ msgstr "Hohlraumdurchmesser"
 msgid "cartridgeRecord.side.chamber"
 msgstr "Patronenlager"
 
+# en: "chamber {meaning}"
+msgid "cartridgeRecord.sideMeaning.chamber"
+msgstr "Patronenlager: {meaning}"
+
+# en: "Chamber {symbol}"
+msgid "cartridgeRecord.sideSymbol.chamber"
+msgstr "Patronenlager {symbol}"
+
 # en: "Chamber dimensions"
 msgid "cartridgeRecord.dimensions.chamber"
 msgstr "Maße des Patronenlagers"
 
+# en: "chamber length"
+msgid "cartridgeRecord.meaning.chamberLength"
+msgstr "Länge des Patronenlagers"
+
 # en: "Chamber length unit"
 msgid "cartridgeRecord.unit.chamber"
 msgstr "Längeneinheit des Patronenlagers"
+
+# en: "chamber minimum minus cartridge maximum"
+msgid "cartridgeRecord.clearanceMeaning"
+msgstr "Mindestmaß des Patronenlagers minus Höchstmaß der Patrone"
+
+# en: "Chamber: {notes}"
+msgid "cartridgeRecord.sideNotes.chamber"
+msgstr "Patronenlager: {notes}"
 
 # en: "Check the event: a value is out of its range."
 msgid "events.outOfRange"
@@ -866,6 +982,10 @@ msgstr "Auswahl aufheben"
 # en: "Clearance {value}"
 msgid "cartridgeRecord.clearance"
 msgstr "Spiel {value}"
+
+# en: "Clearance: {meaning}"
+msgid "cartridgeRecord.clearanceLine"
+msgstr "Spiel: {meaning}"
 
 # en: "COAL, the cartridge maximum of the CIP sheet, shortest variant."
 msgid "cartridges.column.cartridgeLengthHelp"
@@ -1031,6 +1151,14 @@ msgstr "Land"
 msgid "fieldStrip.countryNote"
 msgstr "Land des Herstellers"
 
+# en: "Counts when covered"
+msgid "targets.innerTenRule.cover"
+msgstr "Zählt bei Überdeckung"
+
+# en: "Counts when touched"
+msgid "targets.innerTenRule.touch"
+msgstr "Zählt bei Berührung"
+
 # en: "Course of fire"
 msgid "disciplineRecord.column.course"
 msgstr "Schießprogramm"
@@ -1070,6 +1198,10 @@ msgstr "Benutzerdefiniert"
 # en: "Dashed in the flag color: parts the record does not give, drawn from an assumed shape."
 msgid "bulletDrawing.dashed"
 msgstr "Gestrichelt in der Markierungsfarbe: Teile, die der Datensatz nicht angibt, gezeichnet nach einer angenommenen Form."
+
+# en: "data conflict between published cartridge maximum and chamber minimum (check source)"
+msgid "cartridgeRecord.conflict"
+msgstr "Datenkonflikt zwischen veröffentlichtem Höchstmaß der Patrone und Mindestmaß des Patronenlagers (Quelle prüfen)"
 
 # en: "Date"
 msgid "events.date"
@@ -1119,6 +1251,10 @@ msgstr "abgeleitet"
 msgid "disciplines.classBasis.derived"
 msgstr "Abgeleitet aus dem Bereich oder dem Messring, den die Sportordnung angibt"
 
+# en: "Derived, not dimensioned"
+msgid "cartridgeRecord.derived"
+msgstr "Abgeleitet, nicht bemaßt"
+
 # en: "Diameter"
 msgid "recordFields.diameter"
 msgstr "Durchmesser"
@@ -1126,6 +1262,18 @@ msgstr "Durchmesser"
 # en: "Diameter"
 msgid "bullets.column.diameter"
 msgstr "Durchmesser"
+
+# en: "diameter at L"
+msgid "cartridgeRecord.meaning.diameterAtL"
+msgstr "Durchmesser bei L"
+
+# en: "diameter at L1"
+msgid "cartridgeRecord.meaning.diameterAtL1"
+msgstr "Durchmesser bei L1"
+
+# en: "diameter at the mouth (l)"
+msgid "cartridgeRecord.meaning.mouthDiameter"
+msgstr "Durchmesser an der Mündung (l)"
 
 # en: "difference to the first bullet"
 msgid "bulletCompare.difference"
@@ -1323,6 +1471,10 @@ msgstr "Energie"
 msgid "recordFields.energyRatio"
 msgstr "Energieverhältnis"
 
+# en: "energy, as printed under Pressures (Energies)"
+msgid "cartridgeRecord.meaning.energy"
+msgstr "Energie, wie unter Pressures (Energies) gedruckt"
+
 # en: "Entered at the range"
 msgid "sourceLink.entry.range"
 msgstr "Auf dem Schießstand erfasst"
@@ -1387,6 +1539,14 @@ msgstr "CSV exportieren"
 # en: "Export JSON"
 msgid "events.exportJson"
 msgstr "JSON exportieren"
+
+# en: "extractor groove diameter"
+msgid "cartridgeRecord.meaning.extractorGrooveDiameter"
+msgstr "Durchmesser der Auszieherrille"
+
+# en: "extractor groove width at E1"
+msgid "cartridgeRecord.meaning.extractorGrooveWidth"
+msgstr "Breite der Auszieherrille bei E1"
 
 # en: "extruded"
 msgid "values.extruded"
@@ -1608,6 +1768,22 @@ msgstr "Messring"
 msgid "values.gildingMetal"
 msgstr "Tombak"
 
+# en: "green"
+msgid "targets.color.green"
+msgstr "grün"
+
+# en: "grey"
+msgid "targets.color.gray"
+msgstr "grau"
+
+# en: "groove diameter of the bore"
+msgid "cartridgeRecord.meaning.boreGrooveDiameter"
+msgstr "Durchmesser über den Zügen"
+
+# en: "groove front cone angle from the axis (table III: belt cone)"
+msgid "cartridgeRecord.meaning.grooveFrontAngle"
+msgstr "Winkel des vorderen Rillenkegels zur Achse (Tabelle III: Gürtelkegel)"
+
 # en: "Handloads"
 msgid "disciplines.row.handloads"
 msgstr "Wiedergeladene Munition"
@@ -1615,6 +1791,30 @@ msgstr "Wiedergeladene Munition"
 # en: "Hash copied"
 msgid "recordActions.hashCopied"
 msgstr "Hash kopiert"
+
+# en: "head to P0"
+msgid "cartridgeRecord.meaning.headToP0"
+msgstr "Boden bis P0"
+
+# en: "head to the neck start (H1)"
+msgid "cartridgeRecord.meaning.headToNeck"
+msgstr "Boden bis Halsbeginn (H1)"
+
+# en: "head to the shoulder start (P2)"
+msgid "cartridgeRecord.meaning.headToShoulder"
+msgstr "Boden bis Schulterbeginn (P2)"
+
+# en: "head to the start of P1; in the chamber the depth of the rim recess"
+msgid "cartridgeRecord.meaning.headToP1"
+msgstr "Boden bis zum Beginn von P1; im Patronenlager die Tiefe der Randsenkung"
+
+# en: "head to where the shoulder cone meets the axis"
+msgid "cartridgeRecord.meaning.headToShoulderApex"
+msgstr "Boden bis zum Schnittpunkt von Schulterkegel und Achse"
+
+# en: "Head, rim and groove"
+msgid "cartridgeRecord.group.head"
+msgstr "Boden, Rand und Rille"
 
 # en: "Headstamp"
 msgid "recordFields.headstamp"
@@ -1688,6 +1888,18 @@ msgstr "Zur Disziplinliste"
 msgid "federationRecord.inDisciplineList"
 msgstr "Zur Disziplinliste"
 
+# en: "included angle of the forcing cone"
+msgid "cartridgeRecord.meaning.forcingConeAngle"
+msgstr "Eingeschlossener Winkel des Übergangskegels"
+
+# en: "included angle of the h cone"
+msgid "cartridgeRecord.meaning.throatConeAngle"
+msgstr "Eingeschlossener Winkel des h-Kegels"
+
+# en: "included shoulder angle"
+msgid "cartridgeRecord.meaning.shoulderAngle"
+msgstr "Eingeschlossener Schulterwinkel"
+
 # en: "Inner ten"
 msgid "targets.row.innerTen"
 msgstr "Innen-10"
@@ -1743,6 +1955,14 @@ msgstr "Art"
 # en: "kneeling"
 msgid "disciplines.rule.kneeling"
 msgstr "kniend"
+
+# en: "L3 to the end of the leade"
+msgid "cartridgeRecord.meaning.leadeEnd"
+msgstr "L3 bis Ende des Übergangskegels"
+
+# en: "L3 to the leade start (freebore)"
+msgid "cartridgeRecord.meaning.freebore"
+msgstr "L3 bis Beginn des Übergangskegels (Freibohrung)"
 
 # en: "Lacquered steel"
 msgid "values.lacqueredSteel"
@@ -1804,6 +2024,10 @@ msgstr "Bleifrei"
 msgid "recordFields.leadFree"
 msgstr "Bleifrei"
 
+# en: "leade angle"
+msgid "cartridgeRecord.meaning.leadeAngle"
+msgstr "Winkel des Übergangskegels"
+
 # en: "Length"
 msgid "recordFields.length"
 msgstr "Länge"
@@ -1811,6 +2035,10 @@ msgstr "Länge"
 # en: "Length"
 msgid "bullets.column.length"
 msgstr "Länge"
+
+# en: "length of the cone from H2 down to G1, from L3"
+msgid "cartridgeRecord.meaning.throatConeLength"
+msgstr "Länge des Kegels von H2 bis G1, ab L3"
 
 # en: "Length unit"
 msgid "cartridgeRecord.lengthUnit"
@@ -1843,6 +2071,10 @@ msgstr "Unterhebelrepetierer"
 # en: "License"
 msgid "recordSources.column.license"
 msgstr "Lizenz"
+
+# en: "line {colour}"
+msgid "targets.ringLine"
+msgstr "Linie {colour}"
 
 # en: "Line {line}"
 msgid "bulletRecord.line"
@@ -2108,6 +2340,10 @@ msgstr "Max ({unit})"
 msgid "cartridges.column.cartridgeLength"
 msgstr "Max. Länge L6"
 
+# en: "maximum mean pressure"
+msgid "cartridgeRecord.meaning.pmax"
+msgstr "Maximaler mittlerer Druck"
+
 # en: "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
 msgid "cartridges.column.pmaxHelp"
 msgstr "Größter mittlerer Druck laut CIP-Datenblatt, höchste Variante, nach dem Verfahren des Datenblatts."
@@ -2127,6 +2363,10 @@ msgstr "Mittlere Vivacity"
 # en: "measured"
 msgid "recordSources.kind.measured"
 msgstr "gemessen"
+
+# en: "measuring position"
+msgid "cartridgeRecord.meaning.measuringPosition"
+msgstr "Messstelle"
 
 # en: "Member of"
 msgid "federationRecord.memberOf"
@@ -2288,6 +2528,18 @@ msgstr "Name, Nummer, Verband oder Kaliber, 2,53…"
 msgid "disciplines.classBasis.stated"
 msgstr "In der Sportordnung genannt"
 
+# en: "Neck and length"
+msgid "cartridgeRecord.group.neck"
+msgstr "Hals und Länge"
+
+# en: "neck diameter at L2"
+msgid "cartridgeRecord.meaning.neckAtL2"
+msgstr "Halsdurchmesser bei L2"
+
+# en: "neck diameter at the mouth"
+msgid "cartridgeRecord.meaning.neckAtMouth"
+msgstr "Halsdurchmesser an der Mündung"
+
 # en: "New brass group"
 msgid "cases.new"
 msgstr "Neue Hülsengruppe"
@@ -2325,6 +2577,10 @@ msgid "values.noTitle"
 msgstr "Nein"
 
 # en: "No"
+msgid "targets.no"
+msgstr "Nein"
+
+# en: "No"
 msgid "primers.no"
 msgstr "Nein"
 
@@ -2335,6 +2591,10 @@ msgstr "Noch keine eigenen Hülsengruppen"
 # en: "No brass matches these filters."
 msgid "states.noMatch.cases"
 msgstr "Keine Hülsen entsprechen diesen Filtern."
+
+# en: "No bulk density in the record"
+msgid "powderCompare.noBulkDensity"
+msgstr "Kein Schüttgewicht im Datensatz"
 
 # en: "No bullets chosen."
 msgid "bulletCompare.none"
@@ -2396,6 +2656,10 @@ msgstr "Noch keine Schusswaffe in diesem Browser gespeichert"
 msgid "states.noMatch.firearms"
 msgstr "Keine Schusswaffen entsprechen diesen Filtern."
 
+# en: "No fitted model parameters"
+msgid "powderCompare.noModel"
+msgstr "Keine angepassten Modellparameter"
+
 # en: "No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges."
 msgid "burnRate.noFit"
 msgstr "Keine angepassten Parameter: Die Anpassung an Ladetabellen braucht mindestens 10 Trainingszeilen aus mindestens 2 Patronen."
@@ -2452,6 +2716,10 @@ msgstr "Keine Scheiben entsprechen diesen Filtern."
 msgid "events.noShoots"
 msgstr "No-Shoots"
 
+# en: "nominal minimum difference of published dimensions"
+msgid "cartridgeRecord.difference"
+msgstr "nominelle Mindestdifferenz der veröffentlichten Maße"
+
 # en: "None"
 msgid "powderRecord.none"
 msgstr "Keine"
@@ -2487,6 +2755,10 @@ msgstr "Nicht in diesem Browser"
 # en: "Not saved: {reason}"
 msgid "events.notSaved"
 msgstr "Nicht gespeichert: {reason}"
+
+# en: "Not stated"
+msgid "targets.notStated"
+msgstr "Nicht angegeben"
 
 # en: "Not stated"
 msgid "matchRounds.notStated"
@@ -2527,6 +2799,10 @@ msgstr "Nummer"
 # en: "Number"
 msgid "federationRecord.column.number"
 msgstr "Nummer"
+
+# en: "number of grooves"
+msgid "cartridgeRecord.meaning.grooves"
+msgstr "Anzahl der Züge"
 
 # en: "Numerals printed"
 msgid "targets.row.numeralsPrinted"
@@ -2584,6 +2860,10 @@ msgstr "Optik, Einschießentfernung"
 msgid "disciplines.rule.optical"
 msgstr "optisch"
 
+# en: "orange"
+msgid "targets.color.orange"
+msgstr "orange"
+
 # en: "Origin"
 msgid "recordSources.column.origin"
 msgstr "Herkunft"
@@ -2596,6 +2876,10 @@ msgstr "original"
 msgid "values.other"
 msgstr "andere"
 
+# en: "Other"
+msgid "cartridgeRecord.group.other"
+msgstr "Sonstige"
+
 # en: "Outer diameter"
 msgid "targets.row.outerDiameter"
 msgstr "Außendurchmesser"
@@ -2603,6 +2887,10 @@ msgstr "Außendurchmesser"
 # en: "Outer diameter"
 msgid "targets.column.outer"
 msgstr "Außendurchmesser"
+
+# en: "Outer diameter width"
+msgid "targets.strip.outerDiameterWidth"
+msgstr "Außendurchmesser (Breite)"
 
 # en: "Outline, {name}"
 msgid "bulletCompare.outline"
@@ -2796,6 +3084,14 @@ msgstr "Liste der Wettkämpfe drucken"
 msgid "events.printOpen"
 msgstr "Den geöffneten Wettkampf drucken"
 
+# en: "printed {raw}"
+msgid "cartridgeRecord.note.printed"
+msgstr "gedruckt {raw}"
+
+# en: "Printed as {raw}"
+msgid "cartridgeRecord.noteLine.printed"
+msgstr "Gedruckt als {raw}"
+
 # en: "Printed at 100 % scale, the drawing is life size (1:1)."
 msgid "bulletDrawing.lifeSize"
 msgstr "Bei einem Ausdruck im Maßstab 100 % hat die Zeichnung Originalgröße (1:1)."
@@ -2864,6 +3160,10 @@ msgstr "Produktnummer"
 msgid "disciplines.rule.prone"
 msgstr "liegend"
 
+# en: "proof pressure"
+msgid "cartridgeRecord.meaning.proofPressure"
+msgstr "Beschussdruck"
+
 # en: "Propellant temperature"
 msgid "recordFields.propellantTemperature"
 msgstr "Temperatur des Treibladungspulvers"
@@ -2904,6 +3204,18 @@ msgstr "Größe"
 msgid "firearms.column.twistHelp"
 msgstr "R Rechtsdrall, L Linksdrall."
 
+# en: "radius at the neck start"
+msgid "cartridgeRecord.meaning.neckRadius"
+msgstr "Radius am Halsbeginn"
+
+# en: "radius at the shoulder start"
+msgid "cartridgeRecord.meaning.shoulderRadius"
+msgstr "Radius am Schulterbeginn"
+
+# en: "radius of the rim corner at the head face"
+msgid "cartridgeRecord.meaning.rimCornerRadius"
+msgstr "Radius der Randkante an der Bodenfläche"
+
 # en: "Range mode"
 msgid "page.range"
 msgstr "Schießstand-Modus"
@@ -2931,6 +3243,10 @@ msgstr "Bootsheck mit Absatz"
 # en: "Recommended twist"
 msgid "recordFields.recommendedTwist"
 msgstr "Empfohlener Drall"
+
+# en: "red"
+msgid "targets.color.red"
+msgstr "rot"
 
 # en: "Reference pressure"
 msgid "recordFields.referencePressure"
@@ -3016,6 +3332,34 @@ msgstr "Revolver"
 msgid "values.rifle"
 msgstr "Gewehr"
 
+# en: "rim chamfer angle from the head face"
+msgid "cartridgeRecord.meaning.rimChamferAngle"
+msgstr "Winkel der Randfase zur Bodenfläche"
+
+# en: "rim chamfer length along the axis"
+msgid "cartridgeRecord.meaning.rimChamferLength"
+msgstr "Länge der Randfase entlang der Achse"
+
+# en: "rim diameter"
+msgid "cartridgeRecord.meaning.rimDiameter"
+msgstr "Randdurchmesser"
+
+# en: "rim diameter at the head"
+msgid "cartridgeRecord.meaning.rimDiameterHead"
+msgstr "Randdurchmesser am Boden"
+
+# en: "rim recess depth"
+msgid "cartridgeRecord.meaning.rimRecessDepth"
+msgstr "Tiefe der Randsenkung"
+
+# en: "rim recess diameter"
+msgid "cartridgeRecord.meaning.rimRecessDiameter"
+msgstr "Durchmesser der Randsenkung"
+
+# en: "rim thickness"
+msgid "cartridgeRecord.meaning.rimThickness"
+msgstr "Randdicke"
+
 # en: "rimless"
 msgid "values.rimless"
 msgstr "randlos"
@@ -3023,6 +3367,18 @@ msgstr "randlos"
 # en: "rimmed"
 msgid "values.rimmed"
 msgstr "mit Rand"
+
+# en: "Ring {value}"
+msgid "targets.ring"
+msgstr "Ring {value}"
+
+# en: "Ring {value} ({colours})"
+msgid "targets.ringColors"
+msgstr "Ring {value} ({colours})"
+
+# en: "Ring {value} height"
+msgid "targets.ringHeight"
+msgstr "Ring {value} Höhe"
 
 # en: "Ring diameters"
 msgid "targets.group.ringDiameters"
@@ -3275,6 +3631,14 @@ msgstr "Schusszahl der Serien"
 # en: "Shotshell"
 msgid "values.shotshell"
 msgstr "Schrotpatrone"
+
+# en: "Shoulder"
+msgid "cartridgeRecord.group.shoulder"
+msgstr "Schulter"
+
+# en: "shoulder diameter at L1"
+msgid "cartridgeRecord.meaning.shoulderDiameter"
+msgstr "Schulterdurchmesser bei L1"
 
 # en: "Sighters"
 msgid "disciplines.row.sighters"
@@ -3564,6 +3928,18 @@ msgstr "Nutzungsbedingungen"
 msgid "recordSources.termsText"
 msgstr "Nutzungsbedingungen: {terms}"
 
+# en: "The boat tail is not a straight cone in the photograph (a rebated boat tail?)."
+msgid "bulletPhoto.rebatedBoatTail"
+msgstr "Der Heckkonus ist auf dem Foto kein gerader Kegel (ein abgesetzter Heckkonus?)."
+
+# en: "The bullet is too short in the photograph to measure."
+msgid "bulletPhoto.tooShort"
+msgstr "Das Geschoss ist auf dem Foto zu kurz, um es zu messen."
+
+# en: "The cartridge has no CIP limit to compare with."
+msgid "powderCompare.noComparableLimit"
+msgstr "Für die Patrone gibt es keinen CIP-Grenzwert zum Vergleich."
+
 # en: "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
 msgid "powders.noneHint"
 msgstr "Der Katalog enthält kein Treibladungspulver. Legen Sie eines mit „Neues Treibladungspulver“ an oder importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import."
@@ -3575,6 +3951,10 @@ msgstr "Das übliche Kaliber zum Geschossdurchmesser G1."
 # en: "The configuration the trajectory form offers first."
 msgid "firearms.column.configurationHelp"
 msgstr "Die Konfiguration, die das Flugbahnformular zuerst anbietet."
+
+# en: "The cut-out has a ragged edge, likely from a busy background. Use a plain background."
+msgid "bulletPhoto.raggedEdge"
+msgstr "Die Freistellung hat einen ausgefransten Rand, vermutlich wegen eines unruhigen Hintergrunds. Verwenden Sie einen schlichten Hintergrund."
 
 # en: "The data file could not be loaded. Check the connection and retry."
 msgid "states.dataError"
@@ -3603,6 +3983,22 @@ msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodel
 # en: "The manufacturer's first published BC of this drag model."
 msgid "bullets.column.g7Help"
 msgstr "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
+
+# en: "The nose is a secant ogive: its circle cuts the shank at an angle."
+msgid "bulletPhoto.secantOgive"
+msgstr "Der Kopf ist eine Sekanten-Ogive: Ihr Kreis schneidet den Schaft in einem Winkel."
+
+# en: "The nose is a tangent ogive: its circle touches the shank."
+msgid "bulletPhoto.tangentOgive"
+msgstr "Der Kopf ist eine tangentiale Ogive: Ihr Kreis berührt den Schaft."
+
+# en: "The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range."
+msgid "bulletPhoto.noArc"
+msgstr "Der Kopf ist kein Kreisbogen (eine Hybrid- oder andere Form): Es wird kein Ogivenradius und kein Rt/R angegeben, und die Kopflänge beginnt dort, wo der Schaft endet, innerhalb eines Bereichs."
+
+# en: "The powder record was not found."
+msgid "powderCompare.noRecord"
+msgstr "Der Datensatz des Treibladungspulvers wurde nicht gefunden."
 
 # en: "The records of this browser could not be read."
 msgid "events.readFailed"
@@ -3643,6 +4039,14 @@ msgstr "Dieser Link ist ungültig."
 # en: "This page needs JavaScript."
 msgid "recordView.needsJavaScript"
 msgstr "Diese Seite braucht JavaScript."
+
+# en: "Throat and leade"
+msgid "cartridgeRecord.group.throat"
+msgstr "Übergangskegel"
+
+# en: "throat diameter"
+msgid "cartridgeRecord.meaning.throatDiameter"
+msgstr "Durchmesser des Übergangskegels"
 
 # en: "Tick 2 to 4 bullets in the list, then Compare."
 msgid "bulletCompare.noneText"
@@ -3751,6 +4155,10 @@ msgstr "Drall"
 # en: "Twist for Sg 1.5"
 msgid "bullet.millerTwist"
 msgstr "Drall für Sg 1,5"
+
+# en: "twist, length per turn"
+msgid "cartridgeRecord.meaning.twist"
+msgstr "Drall, Länge je Umdrehung"
 
 # en: "Type"
 msgid "recordFields.type"
@@ -3888,6 +4296,10 @@ msgstr "Wasser bis zum Hülsenmund, laut Hersteller."
 msgid "values.waxLube"
 msgstr "Wachsschmierung"
 
+# en: "white"
+msgid "targets.color.white"
+msgstr "weiß"
+
 # en: "whole record"
 msgid "recordSources.wholeRecord"
 msgstr "ganzer Datensatz"
@@ -3900,12 +4312,20 @@ msgstr "Windgeschwindigkeit"
 msgid "burnRateCompare.noCurve"
 msgstr "Ohne Kurve"
 
+# en: "yellow"
+msgid "targets.color.yellow"
+msgstr "gelb"
+
 # en: "yes"
 msgid "values.yes"
 msgstr "ja"
 
 # en: "Yes"
 msgid "values.yesTitle"
+msgstr "Ja"
+
+# en: "Yes"
+msgid "targets.yes"
 msgstr "Ja"
 
 # en: "Yes"

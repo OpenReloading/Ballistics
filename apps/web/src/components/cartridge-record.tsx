@@ -73,10 +73,9 @@ const slotNotes = (v: SpecValue, clearance: number | undefined, system: UnitSyst
 
 /** The clearance note: hover (and the symbol's hint for the keyboard), a screen reader reads "Clearance"; a negative one is red. */
 function Clearance({ text, negative }: { text: string; negative: boolean }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   return (
-    <Tooltip label={clearanceLine(t(clearanceMeaning), t)} events={tipEvents}>
+    <Tooltip label={clearanceLine(i18n._(clearanceMeaning), i18n)} events={tipEvents}>
       <span
         className={negative ? 'clearance conflict' : 'clearance'}
         role="note"
@@ -337,7 +336,6 @@ function SidePanel({
   table?: string | undefined
   figures: ReactNode
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   const id = `record-${side}`
@@ -415,7 +413,7 @@ function SidePanel({
                 key={group[0]?.group}
                 aria-label={groupLabel(
                   rowGroups.find(([g]) => g === group[0]?.group)?.[1] ?? '',
-                  t,
+                  i18n,
                 )}
               >
                 {group.map((r) => (
@@ -451,8 +449,8 @@ function SideRow({
   tabbable: boolean
   system: UnitSystem
 }) {
-  const { t } = useTranslation()
-  const hint = sideHint(r, side, table, t)
+  const { i18n } = useLingui()
+  const hint = sideHint(r, side, table, i18n)
   const value = r[side]
   const tabIndex = tabbable ? 0 : -1
   return (

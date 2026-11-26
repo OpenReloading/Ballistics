@@ -2,10 +2,9 @@
 
 import { useLingui } from '@lingui/react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import type { Face } from '../lib/face-organization.ts'
-import { categoryWord } from '../lib/face-words.ts'
+import { kebabValue } from '../lib/list-values.ts'
 import { type FaceEventRow, targetFaceGroups, targetFaceStrip } from '../lib/target-faces.ts'
 import { controlSize } from '../lib/theme.ts'
 import { FieldStrip } from './field-strip.tsx'
@@ -27,18 +26,17 @@ type FaceValues = Omit<Face, 'provenance'>
 
 /** The face's facts under the page bar. */
 export function FaceStrip({ face }: { face: FaceValues }) {
-  const { t } = useTranslation()
-  return <FieldStrip items={targetFaceStrip(face, t)} />
+  const { i18n } = useLingui()
+  return <FieldStrip items={targetFaceStrip(face, i18n)} />
 }
 
 /** The face's ring diameters and scoring values, with the record's note. */
 export function FaceValuesPanel({ face }: { face: FaceValues }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const title = /*i18n*/ { id: 'faceRecord.rings', message: 'Rings' }
   return (
     <Panel id="record-data" title={i18n._(title)}>
-      <FieldTable caption={title} labelledBy="record-data" groups={targetFaceGroups(face, t)} />
+      <FieldTable caption={title} labelledBy="record-data" groups={targetFaceGroups(face, i18n)} />
       {face.note && <p className="record-note">{face.note}</p>}
     </Panel>
   )
@@ -53,7 +51,6 @@ export function FaceEvents({
   /** The discipline list filtered to this face; no link when it is missing. */
   listHref?: string | undefined
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const categories = rows.some((e) => e.category)
   const scoring = rows.some((e) => e.scoring)
@@ -112,7 +109,7 @@ export function FaceEvents({
             <td className="nowrap">{d.distance.raw ?? `${plainNumber(d.distance.metres)} m`}</td>
             <td className="num">{d.gauge !== undefined && shownLength(d.gauge)}</td>
             <td className="num">{d.shotCount}</td>
-            {categories && <td>{d.category && categoryWord(t, d.category)}</td>}
+            {categories && <td>{d.category && kebabValue(i18n, d.category)}</td>}
             {scoring && (
               <td>
                 {i18n._(

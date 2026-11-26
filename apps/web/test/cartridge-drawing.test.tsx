@@ -1,8 +1,10 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { face } from '@rangefoundry/svg-drawings'
 import { recordFigures } from '@rangefoundry/svg-drawings/cartridge'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { translator } from '../src/i18n/translate.ts'
 import { combinedRows } from '../src/lib/cartridge-record.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
@@ -22,18 +24,20 @@ const { CartridgeDrawing } = await import('../src/components/cartridge-drawing.t
 const render = (file: string, side?: 'cartridge' | 'chamber' | 'designer', unit?: 'mm' | 'in') => {
   const spec = drawable(sheetRecord(file))
   const html = renderToStaticMarkup(
-    <MantineProvider>
-      {side === 'designer' ? (
-        <CartridgeDrawing spec={spec} />
-      ) : side ? (
-        <CartridgeDrawing spec={spec} side={side} unit={unit} />
-      ) : (
-        <>
-          <CartridgeDrawing spec={spec} side="cartridge" />
-          <CartridgeDrawing spec={spec} side="chamber" />
-        </>
-      )}
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        {side === 'designer' ? (
+          <CartridgeDrawing spec={spec} />
+        ) : side ? (
+          <CartridgeDrawing spec={spec} side={side} unit={unit} />
+        ) : (
+          <>
+            <CartridgeDrawing spec={spec} side="cartridge" />
+            <CartridgeDrawing spec={spec} side="chamber" />
+          </>
+        )}
+      </MantineProvider>
+    </I18nProvider>,
   )
   const all = (tag: string) =>
     [...html.matchAll(new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'gs'))].map(([, t = missing()]) =>

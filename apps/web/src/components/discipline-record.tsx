@@ -3,7 +3,6 @@
 import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
 import type { DisciplineRecord } from '../lib/disciplines.ts'
 import { disciplineGroups, disciplineStrip } from '../lib/disciplines.ts'
 import { FieldStrip } from './field-strip.tsx'
@@ -120,9 +119,8 @@ export function DisciplineStrip({
   /** The federation's abbreviation. */
   federation?: string | undefined
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
-  return <FieldStrip items={disciplineStrip(record, i18n, t, federation)} />
+  return <FieldStrip items={disciplineStrip(record, i18n, federation)} />
 }
 
 /** The rule book that defines a discipline, with the section and page of the record. */
