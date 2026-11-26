@@ -1,4 +1,4 @@
-"""Fails when the project could taint its CC-BY-SA-4.0 weights: Ultralytics, a pretrained model zoo or a foreign checkpoint.
+"""Fails when Ultralytics, a pretrained model zoo or a foreign checkpoint could taint the CC-BY-SA-4.0 weights.
 
 Usage: license-check [project folder]. Exit 1 lists every finding.
 """
