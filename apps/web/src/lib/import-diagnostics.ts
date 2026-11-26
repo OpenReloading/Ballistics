@@ -8,7 +8,8 @@ import type {
 import type { Diagnostic } from '@rangefoundry/statistics'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { labelText, translateMessage } from './core-messages.ts'
+import { translateMessage } from './core-messages.ts'
+import { labelText } from './label-text.ts'
 
 /** A table row the user record schema refuses, with the schema's reason. */
 export type InvalidRecordDiagnostic = Diagnostic<'invalidRecord', { reason: string }>

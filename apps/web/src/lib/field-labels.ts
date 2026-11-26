@@ -1,6 +1,6 @@
 /** What a source's field list (dot paths of schema keys) reads as in the Sources table. */
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { labelText } from './core-messages.ts'
+import { labelText } from './label-text.ts'
 
 /** Every other key reads as its words (`waterCapacity`: "Water capacity"). */
 const labels: Record<string, Record<string, Message>> = {
