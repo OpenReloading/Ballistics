@@ -45,6 +45,7 @@
     "@rangefoundry/catalog": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "onnxruntime-web": "1.31.1",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "publint": "catalog:",
