@@ -6,6 +6,13 @@ path = "**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
 SPDX-License-Identifier = "ISC"
 
+# Docs repository widget: own code plus GitHub Octicons icon paths (https://github.com/primer/octicons, MIT).
+[[annotations]]
+path = "apps/docs/src/components/RepoWidget.tsx"
+precedence = "aggregate"
+SPDX-FileCopyrightText = ["2026 the RangeFoundry contributors", "2026 GitHub Inc."]
+SPDX-License-Identifier = "ISC AND MIT"
+
 # Catalog records (NOTICE, packages/catalog/LICENSE).
 [[annotations]]
 path = "packages/catalog/records/**"
