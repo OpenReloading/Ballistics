@@ -10,7 +10,8 @@ const docs = fileURLToPath(new URL('../', import.meta.url))
 const pagesDir = `${docs}docs/libraries/`
 const examplesDir = `${docs}examples/`
 
-const shown = /from '!\.\.\/\.\.\/examples\/([^']+\.ts)\?raw'/g
+const shown =
+  /^import (\w+) from '!\.\.\/\.\.\/examples\/([^']+\.ts)\?raw'\n\n<CodeBlock language="ts">\{\1\}<\/CodeBlock>$/gm
 
 const pages = readdirSync(pagesDir)
   .filter((name) => /\.mdx?$/.test(name))
@@ -18,7 +19,7 @@ const pages = readdirSync(pagesDir)
 const shownOn = new Map(
   pages.map((page) => [
     page,
-    [...readFileSync(`${pagesDir}${page}`, 'utf8').matchAll(shown)].map((match) => match[1]),
+    [...readFileSync(`${pagesDir}${page}`, 'utf8').matchAll(shown)].map((match) => match[2]),
   ]),
 )
 const examples = readdirSync(examplesDir, { recursive: true, encoding: 'utf8' })
@@ -27,7 +28,10 @@ const examples = readdirSync(examplesDir, { recursive: true, encoding: 'utf8' })
 
 for (const page of pages) {
   test(`${page}: shows an example of examples/`, () => {
-    assert.ok((shownOn.get(page) ?? []).length > 0, `${page}: imports no file of examples/`)
+    assert.ok(
+      (shownOn.get(page) ?? []).length > 0,
+      `${page}: shows no file of examples/ in a CodeBlock`,
+    )
   })
 }
 
@@ -37,7 +41,7 @@ for (const example of examples) {
   test(`examples/${example}: a page shows it`, () => {
     assert.ok(
       [...shownOn.values()].some((files) => files.includes(example)),
-      `examples/${example}: no page of docs/libraries/ imports it`,
+      `examples/${example}: no page of docs/libraries/ shows it in a CodeBlock`,
     )
   })
 
