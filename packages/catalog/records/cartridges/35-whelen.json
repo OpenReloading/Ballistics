@@ -375,6 +375,9 @@
       "value": 63.78
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/35-whelen-en.pdf",
         "sha256": "c18e3f5d7039e485c0c7672c0735e11b0e32f3267274d76b0f36930f9ced8897",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .35 Whelen",
+        "url": "https://en.wikipedia.org/w/index.php?title=.35_Whelen&oldid=1377872599",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

@@ -1,6 +1,7 @@
 import { type TargetFaceDesign, targetFace, type UserRecord } from '@rangefoundry/schema'
 import { targetFaceFigure } from '@rangefoundry/svg-drawings/target'
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { historyOf } from '../src/lib/history.ts'
 import {
@@ -108,6 +109,15 @@ describe('faceOf', () => {
     const built = faceOf(d, 'user-a1')
     if (!('problems' in built)) throw new Error('built a face')
     expect(built.problems.some((p) => !p.key && p.message.startsWith('Rings: '))).toBe(true)
+  })
+
+  it('has every English text of a refused face without the designer page', () => {
+    const d = draft({ ...club, rings: club.rings.map((r, i) => (i ? { ...r, height: 50 } : r)) })
+    const absent: string[] = []
+    const stop = linguiOf('en').on('missing', ({ id }) => absent.push(id))
+    faceOf(d, 'user-a1')
+    stop()
+    expect(absent).toEqual([])
   })
 })
 

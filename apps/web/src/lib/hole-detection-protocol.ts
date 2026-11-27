@@ -30,6 +30,8 @@ type Search = {
   /** Expected hole diameter, m. */
   holeDiameter: number
   minContrast: number
+  /** The edition root the served model loads under (`modelRoot`); absent: the classical detector. */
+  model?: string | undefined
 }
 
 export type WorkerRequest =
@@ -54,6 +56,8 @@ export type WorkerRequest =
 
 export type WorkerReply =
   | { kind: 'progress'; done: number }
+  /** The set model did not load in time or did not match its manifest; the classical detector answers. */
+  | { kind: 'fallback' }
   | {
       kind: 'proposals'
       proposals: HoleProposal[]

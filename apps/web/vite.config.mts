@@ -1,8 +1,12 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
+import packageJson from './package.json' with { type: 'json' }
+import { headCommit } from './scripts/git-head.ts'
+import { isModelFile } from './src/lib/offline.ts'
+import { sourceUrl } from './src/lib/repository-url.ts'
 import { webManifest } from './src/lib/web-manifest.ts'
 import { checkRecordPaths, staticPaths } from './src/routes/-static-paths.ts'
 
@@ -42,6 +46,23 @@ const appManifest = (basePath: string): Plugin => ({
   },
 })
 
+/** Fails a client output that holds a WebAssembly or ONNX file other than the served model files copied from public/models/: a bundled one would join the script output the offline layer precaches. */
+const noModelFiles: Plugin = {
+  name: 'no-model-files',
+  applyToEnvironment: (environment) => environment.name === 'client',
+  writeBundle({ dir }) {
+    const served = (file: string) =>
+      file.startsWith('models/') && existsSync(path.join(import.meta.dirname, 'public', file))
+    const found = dir
+      ? globSync('**/*', { cwd: dir }).filter((f) => isModelFile(f) && !served(f))
+      : []
+    if (found.length) this.error(`the client output holds ${found.join(', ')}`)
+  },
+}
+
+/** The ONNX Runtime Web build that loads its WASM files from `wasmPaths`; the package's default build makes the bundler emit them (src/lib/onnx-model.ts). */
+const onnxWasm = 'node_modules/onnxruntime-web/dist/ort.wasm.min.mjs'
+
 export default defineConfig(({ command }) => {
   // the edition's own path, as next.config.ts reads it: /Ballistics/next for next on the project site
   const base = process.env.PAGES_BASE_PATH ?? ''
@@ -63,6 +84,11 @@ export default defineConfig(({ command }) => {
     NEXT_PUBLIC_DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL,
     NEXT_PUBLIC_NO_DOCS: process.env.NEXT_PUBLIC_NO_DOCS,
     NEXT_PUBLIC_REPOSITORY_URL: process.env.NEXT_PUBLIC_REPOSITORY_URL,
+    NEXT_PUBLIC_SOURCE_URL: sourceUrl(
+      process.env.NEXT_PUBLIC_REPOSITORY_URL,
+      headCommit(path.join(import.meta.dirname, '../..')),
+      packageJson.version,
+    ),
     PAGES_URL: site,
   }
   return {
@@ -73,7 +99,12 @@ export default defineConfig(({ command }) => {
         value === undefined ? 'undefined' : JSON.stringify(value),
       ]),
     ),
-    resolve: { alias: { '@': path.join(import.meta.dirname, 'src') } },
+    resolve: {
+      alias: {
+        '@': path.join(import.meta.dirname, 'src'),
+        'onnxruntime-web/wasm': path.join(import.meta.dirname, onnxWasm),
+      },
+    },
     // the prerender fetches its preview server: on `localhost` that binds ::1 alone, and a blocked event loop makes fetch fall back to 127.0.0.1
     preview: { host: '127.0.0.1' },
     build: {
@@ -90,6 +121,7 @@ export default defineConfig(({ command }) => {
     plugins: [
       nextSeam,
       appManifest(base),
+      noModelFiles,
       tanstackStart({
         // Start preloads every chunk of a route file: a not-found chunk of its own goes unused on a found record, which WebKit warns about
         router: {

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Quantity kinds, stored units, conversion to and from SI and the decimal-mark parser.",
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

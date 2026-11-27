@@ -373,6 +373,9 @@
       "value": 70.45
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +384,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page28.pdf",
         "sha256": "38464e710cb40dc2dbb79afb3f6f101c0b9337970363914673e1e26670b2b2bd",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .375 Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.375_Weatherby_Magnum&oldid=1283347140",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

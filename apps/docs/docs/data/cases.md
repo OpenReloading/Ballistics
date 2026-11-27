@@ -27,6 +27,14 @@ A case record describes one cartridge case product as its manufacturer sells it,
 
 Every data field needs a source that lists it in `fields`. A value a source does not state is left out, never estimated.
 
+`packages/catalog/records/cases/` holds no record yet: the catalogue lists case products only from a cited source.
+
+## Generic brass case
+
+A load that names no case record uses the generic brass case of its cartridge, named "Brass case" and the cartridge: brass, a Boxer primer pocket of the cartridge's `defaults.primerSize`, and the cartridge's default capacity record (`defaults.capacity`) as its water capacity. A cartridge without a default capacity keeps the capacity rules of [Case capacity and seating](../models/case-capacity.md), and no estimate stands in. A generic case is no product and no record: it has no manufacturer, product number, headstamp, mass, flash hole or trim length.
+
+A stored load or link that names a case or primer record the catalogue no longer holds opens with the generic case or primer of its cartridge, and the File menu notes the records it replaced.
+
 ## Your brass
 
 The same `Case` shape is the user record of kind `case`, a group of cases the user keeps in the browser (a Mine row of the Brass tab of the Database, edited in `apps/web/src/components/case-group-editor.tsx`): `origin` `user`, a free `name` (for example headstamp and batch), the `cartridge`, the `material` and, as the user measured them, `numberOfFirings`, `trimLength` and `neckWall` (mm), `casesMeasured` and `spread` (g, the standard deviation of the capacity over the cases measured). `basedOn` names the catalogue product the group started from. `manufacturer`, `headstamp`, `mass` and `note` are optional.

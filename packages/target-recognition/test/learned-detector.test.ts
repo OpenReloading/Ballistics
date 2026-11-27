@@ -9,6 +9,7 @@ import {
   ModelContractError,
   type ModelTensor,
   type RunModel,
+  UntrainedScaleError,
 } from '../src/learned-detector.ts'
 import { type ModelManifest, modelManifest } from '../src/model-manifest.ts'
 
@@ -239,8 +240,28 @@ describe('learnedDetector region and contract', () => {
     )
   })
 
-  it('rejects holes so small that the working image passes 2 million px', async () => {
-    await expect(propose([], { expectedHoleDiameter: 0.0005 })).rejects.toThrow(RangeError)
+  it('coarsens a whole 4032 x 3024 photo of 30 px holes to the 2 million px cap', async () => {
+    const dims: number[][] = []
+    const run: RunModel = async (input) => {
+      dims.push([...input.dims])
+      return bigStub([])(input)
+    }
+    const found = await learnedDetector(manifest, run).propose({
+      image: bigImage(4032, 3024),
+      pxPerM: 1000,
+      expectedHoleDiameter: 0.03,
+    })
+    expect(found.proposals).toEqual([])
+    expect(dims).toEqual([[1, 3, 1216, 1632]])
+  })
+
+  it('rejects a whole 4032 x 3024 photo of 16 px holes, which the 2 million px cap leaves under the trained 8 working px', async () => {
+    const photo = { image: bigImage(4032, 3024), ...bigRequest }
+    await expect(learnedDetector(manifest, bigStub([])).propose(photo)).rejects.toThrow(
+      new UntrainedScaleError(
+        "The holes come out at 6.4 working px, under the model's smallest trained hole of 8 px",
+      ),
+    )
   })
 })
 

@@ -1,10 +1,11 @@
 import { chargeTargetExample, interiorExample, loadFileExample } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
+import { exampleBundle } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
 describe('interior examples', () => {
-  const api = withApi()
+  const api = withApi({ seed: exampleBundle })
 
   it.each([
     ['/interior', interiorExample],

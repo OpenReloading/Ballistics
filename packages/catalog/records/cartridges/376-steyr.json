@@ -356,6 +356,9 @@
       "value": 70.16
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -364,6 +367,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page144.pdf",
         "sha256": "e607b2d27b720ac272937ba7db5663f4b5d87811d2ec92c75c06ffa501cf90b9",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .376 Steyr",
+        "url": "https://en.wikipedia.org/w/index.php?title=.376_Steyr&oldid=1369403523",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

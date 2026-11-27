@@ -1,6 +1,6 @@
 'use client'
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Anchor, Button, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
@@ -13,7 +13,7 @@ import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useSta
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { localizeDecimals } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import {
@@ -72,50 +72,69 @@ const BulletPhoto = dynamic(() => import('./bullet-photo.tsx').then((m) => m.Bul
   ssr: false,
 })
 
-const choiceLabels: Record<ChoiceKey, [Message, Group]> = {
-  'base.type': [msg('Base type'), 'base'],
-  'ogive.form': [msg('Nose form'), 'nose'],
-  'tip.type': [msg('Tip'), 'tip'],
+const choiceLabels: Record<ChoiceKey, [MessageDescriptor, Group]> = {
+  'base.type': [/*i18n*/ { id: 'bulletDesigner.baseType', message: 'Base type' }, 'base'],
+  'ogive.form': [/*i18n*/ { id: 'bulletDesigner.noseForm', message: 'Nose form' }, 'nose'],
+  'tip.type': [/*i18n*/ { id: 'bulletDesigner.tip', message: 'Tip' }, 'tip'],
 }
 
 /** Hollow bases get shorter names: the select is too narrow for the full type name. */
-const shortLabels: Record<string, Message> = {
-  'conical-hollow-base': msg('hollow cone'),
-  'rounded-hollow-base': msg('hollow round'),
+const shortLabels: Record<string, MessageDescriptor> = {
+  'conical-hollow-base': /*i18n*/ { id: 'bulletDesigner.hollowCone', message: 'hollow cone' },
+  'rounded-hollow-base': /*i18n*/ { id: 'bulletDesigner.hollowRound', message: 'hollow round' },
 }
 
 /** An option's name: a stored value the catalogue has is translated, English shows it with spaces. */
-function optionLabel(o: string, t: Translator['t'], i18n: I18n) {
-  if (o === '') return t('Not given')
+function optionLabel(o: string, i18n: I18n) {
+  if (o === '') return i18n._({ id: 'bulletDesigner.notGiven', message: 'Not given' })
   const short = shortLabels[o]
-  if (short) return t(short)
+  if (short) return i18n._(short)
   const word = sayLingui(i18n, rawWording(o))
   return word === o ? o.replaceAll('-', ' ') : word
 }
 
 /** The field's state line: where its value comes from. */
-function stateText(s: DesignerSpec, state: FieldState, system: UnitSystem, t: Translator['t']) {
+function stateText(s: DesignerSpec, state: FieldState, system: UnitSystem, i18n: I18n) {
   const unit = system[s.quantity].symbol
   const value = (si: number) => `${formatQuantity(s.quantity, system, si)}${unit ? ` ${unit}` : ''}`
   switch (state.kind) {
     case 'record':
-      return t('From the catalog record')
+      return i18n._({ id: 'bulletDesigner.fromCatalogRecord', message: 'From the catalog record' })
     case 'entered':
-      if (!state.changed) return t('Entered')
+      if (!state.changed) return i18n._({ id: 'bulletDesigner.entered', message: 'Entered' })
       return state.record === undefined
-        ? t('Changed; catalog value not given')
-        : t('Changed; catalog {value}', { value: value(state.record) })
+        ? i18n._({
+            id: 'bulletDesigner.changedCatalogValueNotGiven',
+            message: 'Changed; catalog value not given',
+          })
+        : i18n._({
+            id: 'bulletDesigner.changedCatalog',
+            message: 'Changed; catalog {value}',
+            values: { value: value(state.record) },
+          })
     case 'derived':
-      return t('Derived: {value}', { value: value(state.si) })
+      return i18n._({
+        id: 'bulletDesigner.derived',
+        message: 'Derived: {value}',
+        values: { value: value(state.si) },
+      })
     case 'assumed':
       return state.basis
-        ? t('Assumed: {value} ({basis})', {
-            value: value(state.si),
-            basis: localizeDecimals(state.basis),
+        ? i18n._({
+            id: 'bulletDesigner.assumedBasis',
+            message: 'Assumed: {value} ({basis})',
+            values: {
+              value: value(state.si),
+              basis: localizeDecimals(state.basis),
+            },
           })
-        : t('Assumed: {value}', { value: value(state.si) })
+        : i18n._({
+            id: 'bulletDesigner.assumed',
+            message: 'Assumed: {value}',
+            values: { value: value(state.si) },
+          })
     case 'empty':
-      return t('Not given')
+      return i18n._({ id: 'bulletDesigner.notGiven', message: 'Not given' })
   }
 }
 
@@ -137,21 +156,26 @@ const StartSearch = memo(function StartSearch({
   chosen?: string | undefined
 }) {
   const names = useManufacturerNames()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     // pinned at the top of the Parameters while the fields scroll (globals.css)
     <div className="designer-start">
       <RecordSearch<BulletSummary>
         kind="bullets"
-        label={t('Start from a record')}
-        chosen={chosen ?? t('Start from a record')}
+        label={i18n._({ id: 'bulletDesigner.startFromRecord', message: 'Start from a record' })}
+        chosen={
+          chosen ?? i18n._({ id: 'bulletDesigner.startFromRecord', message: 'Start from a record' })
+        }
         picked={chosen !== undefined}
         describe={(b) =>
           `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}`
         }
         onSelect={(b) => start(b.id)}
-        noneText={t('No bullet found')}
-        unreachableText={t('The database is unreachable. The designer still works.')}
+        noneText={i18n._({ id: 'bulletDesigner.noBulletFound', message: 'No bullet found' })}
+        unreachableText={i18n._({
+          id: 'bulletDesigner.databaseUnreachableDesignerStill',
+          message: 'The database is unreachable. The designer still works.',
+        })}
       />
     </div>
   )
@@ -168,18 +192,17 @@ const ChoiceSelect = memo(function ChoiceSelect({
   error?: string | undefined
   dispatch: (a: Action) => void
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   return (
     // the message is the description (screen readers, the grid's help line) and the title: it moves nothing
     <div className="designer-field" data-error={error ? true : undefined}>
       <NativeSelect
-        label={t(choiceLabels[k][0])}
+        label={i18n._(choiceLabels[k][0])}
         labelProps={{ title: error }}
         value={value}
         description={error}
         error={!!error}
-        data={['', ...choiceOptions[k]].map((o) => ({ value: o, label: optionLabel(o, t, i18n) }))}
+        data={['', ...choiceOptions[k]].map((o) => ({ value: o, label: optionLabel(o, i18n) }))}
         onChange={(ev) => dispatch({ type: 'choice', key: k, value: ev.currentTarget.value })}
       />
     </div>
@@ -226,43 +249,69 @@ const PrintDrawing = memo(function PrintDrawing({
   )
 })
 
-const fieldLabel = (key: string, t: Translator['t']) => {
+const fieldLabel = (key: string, i18n: I18n) => {
   const label =
     designerSpecs.find((s) => s.key === key)?.label ??
     (key in choiceLabels ? choiceLabels[key as ChoiceKey][0] : undefined)
-  return label ? t(label) : key
+  return label ? i18n._(label) : key
 }
 
-const changedText = (changed: DesignerSpec, design: Design, t: Translator['t']) => {
+const changedText = (changed: DesignerSpec, design: Design, i18n: I18n) => {
   const text = design.fields[changed.key]?.text
   return text
-    ? t('{label} {value}. ', { label: t(changed.label), value: text })
-    : t('{label} cleared. ', { label: t(changed.label) })
+    ? i18n._({
+        id: 'bulletDesigner.labelValue',
+        message: '{label} {value}. ',
+        values: { label: i18n._(changed.label), value: text },
+      })
+    : i18n._({
+        id: 'bulletDesigner.cleared',
+        message: '{label} cleared. ',
+        values: { label: i18n._(changed.label) },
+      })
 }
 
 /** The polite line: the refusal, else the last change and that the drawing updated. */
 const announcement = (
   refusal: { reason: string } | undefined,
   change: string | undefined,
-  t: Translator['t'],
+  i18n: I18n,
 ) =>
   refusal
-    ? t('Drawing not updated: {reason}', { reason: refusal.reason })
-    : `${change ?? ''}${t('Drawing updated.')}`
+    ? i18n._({
+        id: 'bulletDesigner.drawingNotUpdated',
+        message: 'Drawing not updated: {reason}',
+        values: { reason: refusal.reason },
+      })
+    : `${change ?? ''}${i18n._({ id: 'bulletDesigner.drawingUpdated', message: 'Drawing updated.' })}`
 
 /** The Parameters panel's message for a locked, changed-base or started-from design. */
-function designMessage(design: Design, t: Translator['t']) {
-  if (design.locked) return t('Read only: {reason}', { reason: design.locked.reason })
+function designMessage(design: Design, i18n: I18n) {
+  if (design.locked)
+    return i18n._({
+      id: 'bulletDesigner.readOnly',
+      message: 'Read only: {reason}',
+      values: { reason: design.locked.reason },
+    })
   if (design.baseChanged)
-    return t(
-      'The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.',
-      { name: design.origin?.title ?? design.basedOn ?? '' },
-    )
-  return design.origin && t('Started from {name}.', { name: design.origin.title })
+    return i18n._({
+      id: 'bulletDesigner.baseRecordChangedSince',
+      message:
+        'The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.',
+      values: { name: design.origin?.title ?? design.basedOn ?? '' },
+    })
+  return (
+    design.origin &&
+    i18n._({
+      id: 'bulletDesigner.startedFrom',
+      message: 'Started from {name}.',
+      values: { name: design.origin.title },
+    })
+  )
 }
 
 /** Whether a segment is drawn from an assumed shape, and the notes under the drawing. */
-function drawingNotes(drawing: Drawing | undefined, t: Translator['t']) {
+function drawingNotes(drawing: Drawing | undefined, i18n: I18n) {
   if (!drawing) return { assumed: undefined, notes: [] }
   const { annotation, outline } = drawing.profile
   const symbols = [...annotation.dimensions, ...annotation.radii].map(
@@ -270,11 +319,27 @@ function drawingNotes(drawing: Drawing | undefined, t: Translator['t']) {
   )
   const assumed = outline.segments.some((s) => s.approximate)
   const notes = [
-    t('Only entered and catalog values are dimensioned.'),
+    i18n._({
+      id: 'bulletDesigner.onlyEnteredCatalogDimensioned',
+      message: 'Only entered and catalog values are dimensioned.',
+    }),
     ...(assumed
-      ? [t('Dashed in the flag color: parts drawn from an assumed shape (see the notes).')]
+      ? [
+          i18n._({
+            id: 'bulletDesigner.dashedFlagColorParts',
+            message: 'Dashed in the flag color: parts drawn from an assumed shape (see the notes).',
+          }),
+        ]
       : []),
-    ...(symbols.length > 0 ? [t('Symbols: {symbols}.', { symbols: symbols.join(', ') })] : []),
+    ...(symbols.length > 0
+      ? [
+          i18n._({
+            id: 'bulletDesigner.symbols',
+            message: 'Symbols: {symbols}.',
+            values: { symbols: symbols.join(', ') },
+          }),
+        ]
+      : []),
     ...outline.notes,
   ]
   return { assumed, notes }
@@ -291,28 +356,30 @@ function markDimension(box: HTMLElement | null, t: Element | null) {
 }
 
 /** The values of the print sheet: identity, choices and the entered fields. */
-const printRows = (
-  design: Design,
-  manufacturer: string | undefined,
-  t: Translator['t'],
-  i18n: I18n,
-): FieldRow[] => [
+const printRows = (design: Design, manufacturer: string | undefined, i18n: I18n): FieldRow[] => [
   ...(
     [
-      [msg('Manufacturer'), manufacturer],
-      [msg('Name'), design.name],
+      [/*i18n*/ { id: 'bulletDesigner.manufacturer', message: 'Manufacturer' }, manufacturer],
+      [/*i18n*/ { id: 'bulletDesigner.name', message: 'Name' }, design.name],
     ] as const
-  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label: verbatim(t(label)), text }] : [])),
+  ).flatMap(([label, text]): FieldRow[] =>
+    text ? [{ label: verbatim(i18n._(label)), text }] : [],
+  ),
   ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
     design.choices[k]
-      ? [{ label: verbatim(t(choiceLabels[k][0])), text: optionLabel(design.choices[k], t, i18n) }]
+      ? [
+          {
+            label: verbatim(i18n._(choiceLabels[k][0])),
+            text: optionLabel(design.choices[k], i18n),
+          },
+        ]
       : [],
   ),
   ...designerSpecs.flatMap((s): FieldRow[] => {
     const si = design.fields[s.key]?.si
     return si === undefined
       ? []
-      : [{ label: verbatim(t(s.label)), value: { quantity: s.quantity, si } }]
+      : [{ label: verbatim(i18n._(s.label)), value: { quantity: s.quantity, si } }]
   }),
 ]
 
@@ -358,8 +425,8 @@ export function BulletDesigner() {
   const [photoOpen, setPhotoOpen] = useState(false)
   const photoButton = useRef<HTMLButtonElement>(null)
   const e = useMemo(
-    () => evaluate(design, system, history.last, t),
-    [design, system, history.last, t],
+    () => evaluate(design, system, history.last, t, i18n),
+    [design, system, history.last, t, i18n],
   )
   const lastGood = useRef<Drawing | undefined>(undefined)
   if (e.drawing) lastGood.current = e.drawing
@@ -367,7 +434,7 @@ export function BulletDesigner() {
   const printed = useDeferredValue(drawing)
   // one polite line 500 ms after the last change
   const changed = history.last && designerSpecs.find((s) => s.key === history.last)
-  const message = announcement(e.refusal, changed && changedText(changed, design, t), t)
+  const message = announcement(e.refusal, changed && changedText(changed, design, i18n), i18n)
   const [announced] = useDebouncedValue(message, 500)
 
   // a changed field of a design from a record goes back to the record's value by its own button
@@ -379,6 +446,7 @@ export function BulletDesigner() {
       design.fields[key],
       system,
       t,
+      i18n,
     ) ?? (e.refusal?.field === key ? e.refusal.reason : undefined)
 
   const groupFields = (g: Group) => (
@@ -407,7 +475,7 @@ export function BulletDesigner() {
               spec={s}
               system={system}
               value={value}
-              help={stateText(s, state, system, t)}
+              help={stateText(s, state, system, i18n)}
               flag={changed ? 'changed' : flagOf[state.kind]}
               changed={changed}
               error={errorOf(s.key)}
@@ -422,8 +490,15 @@ export function BulletDesigner() {
     </div>
   )
 
-  const title = t('Outline, {name}', { name: labelOf(design) || t('new bullet') })
-  const { assumed, notes: drawn } = drawingNotes(drawing, t)
+  const title = i18n._({
+    id: 'bulletDesigner.outline',
+    message: 'Outline, {name}',
+    values: {
+      name:
+        labelOf(design) || i18n._({ id: 'bulletDesigner.newBulletName', message: 'new bullet' }),
+    },
+  })
+  const { assumed, notes: drawn } = drawingNotes(drawing, i18n)
   const notes = design.photo ? [...drawn, ...photoText(design.photo, system, t, i18n)] : drawn
 
   const root = useRef<HTMLDivElement>(null)
@@ -452,8 +527,8 @@ export function BulletDesigner() {
       undo={history.past.length > 0}
       redo={history.future.length > 0}
       reset={design.origin !== undefined}
-      newLabel={t('New bullet')}
-      resetLabel={t('Reset to record')}
+      newLabel={i18n._({ id: 'bulletDesigner.newBullet', message: 'New bullet' })}
+      resetLabel={i18n._({ id: 'bulletDesigner.resetRecord', message: 'Reset to record' })}
       system={system}
       dispatch={toolbarDispatch}
     />
@@ -467,7 +542,7 @@ export function BulletDesigner() {
         onClick={() => setPhotoOpen(true)}
         disabled={design.locked !== undefined}
       >
-        {t('From a photo')}
+        {i18n._({ id: 'bulletDesigner.fromPhoto', message: 'From a photo' })}
       </Button>
       <FileMenu
         ref={fileMenu}
@@ -479,7 +554,7 @@ export function BulletDesigner() {
         kept={kept}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
-        reportBox={t('Include the design')}
+        reportBox={i18n._({ id: 'bulletDesigner.includeDesign', message: 'Include the design' })}
       />
       <UnitsIconButton />
     </>
@@ -490,30 +565,38 @@ export function BulletDesigner() {
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
       <fieldset disabled={design.locked !== undefined} className="designer-fieldset">
         <PropertyGrid
-          title={t('Parameters')}
+          title={i18n._({ id: 'bulletDesigner.parameters', message: 'Parameters' })}
           head={<StartSearch system={system} start={start} chosen={design.origin?.title} />}
-          message={loading ?? designMessage(design, t)}
+          message={loading ?? designMessage(design, i18n)}
           sections={(Object.keys(groups) as Group[]).map((g) => ({
             key: g,
-            title: t(groups[g]),
+            title: i18n._(groups[g]),
             content:
               g === 'identity' ? (
                 <div className="prop-grid designer-grid">
                   <ManufacturerInput
-                    label={t('Manufacturer')}
+                    label={i18n._({ id: 'bulletDesigner.manufacturer', message: 'Manufacturer' })}
                     value={design.manufacturer}
                     manufacturers={manufacturers}
                     onChange={(value) => dispatch({ type: 'manufacturer', value })}
                     autosaved
                   />
-                  <TextField k="name" label={t('Name')} value={design.name} dispatch={dispatch} />
+                  <TextField
+                    k="name"
+                    label={i18n._({ id: 'bulletDesigner.name', message: 'Name' })}
+                    value={design.name}
+                    dispatch={dispatch}
+                  />
                 </div>
               ) : g === 'shank' && bulletGuide ? (
                 <>
                   {groupFields(g)}
                   <p className="note">
                     <Anchor href={bulletGuide} target="_blank" rel="noopener">
-                      {t('How to measure bullet dimensions')}
+                      {i18n._({
+                        id: 'bulletDesigner.howMeasureBulletDimensions',
+                        message: 'How to measure bullet dimensions',
+                      })}
                     </Anchor>
                   </p>
                 </>
@@ -528,15 +611,19 @@ export function BulletDesigner() {
 
   const computed =
     e.computed.length > 0
-      ? t('Computed from the design: {values}.', {
-          values: e.computed
-            .map((r) => `${rowLabel(r, system, i18n)} ${rowValue(r, system, i18n)}`)
-            .join(', '),
+      ? i18n._({
+          id: 'bulletDesigner.computedDesign',
+          message: 'Computed from the design: {values}.',
+          values: {
+            values: e.computed
+              .map((r) => `${rowLabel(r, system, i18n)} ${rowValue(r, system, i18n)}`)
+              .join(', '),
+          },
         })
       : ''
 
   // print: the drawing and the values, not the form
-  const values = printRows(design, manufacturers.nameOf(design.manufacturer), t, i18n)
+  const values = printRows(design, manufacturers.nameOf(design.manufacturer), i18n)
 
   const results = (
     <>
@@ -554,14 +641,20 @@ export function BulletDesigner() {
         />
       )}
       <div className="page-panel-head designer-panel-head">
-        <h2 className="page-panel-title record-heading">{t('Drawing')}</h2>
+        <h2 className="page-panel-title record-heading">
+          {i18n._({ id: 'bulletDesigner.drawing', message: 'Drawing' })}
+        </h2>
       </div>
       {/* a slot of its own: a refusal does not move the drawing */}
       <Text component="p" inherit fz="sm" m={0} className="stale-line" title={e.refusal?.reason}>
         {e.refusal &&
-          t('Drawing for earlier inputs. Fix {field}: {reason}', {
-            field: fieldLabel(e.refusal.field, t),
-            reason: e.refusal.reason,
+          i18n._({
+            id: 'bulletDesigner.drawingEarlierInputsFix',
+            message: 'Drawing for earlier inputs. Fix {field}: {reason}',
+            values: {
+              field: fieldLabel(e.refusal.field, i18n),
+              reason: e.refusal.reason,
+            },
           })}
       </Text>
       {drawing && (
@@ -584,14 +677,20 @@ export function BulletDesigner() {
           <figcaption>
             <span className="screen-only designer-legend">
               {assumed
-                ? t(
-                    'Dashed: drawn from an assumed shape. Derived and assumed values are not dimensioned.',
-                  )
-                : t('Derived and assumed values are not dimensioned.')}
+                ? i18n._({
+                    id: 'bulletDesigner.dashedDrawnAssumedShape',
+                    message:
+                      'Dashed: drawn from an assumed shape. Derived and assumed values are not dimensioned.',
+                  })
+                : i18n._({
+                    id: 'bulletDesigner.derivedAssumedNotDimensioned',
+                    message: 'Derived and assumed values are not dimensioned.',
+                  })}
             </span>
             <DrawingNotes notes={notes} />
             <span className="print-only">
-              {t('Drawing of the design.')} {notes.join(' ')}
+              {i18n._({ id: 'bulletDesigner.drawingDesign', message: 'Drawing of the design.' })}{' '}
+              {notes.join(' ')}
             </span>
           </figcaption>
         </figure>

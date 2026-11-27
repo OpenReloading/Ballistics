@@ -369,6 +369,9 @@
       "value": 32.78
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page96.pdf",
         "sha256": "83ca915606e340d6a7b6cb7c217af3bb5b6aa81965173ef392a44ccb45ea9ff8",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .257 Roberts",
+        "url": "https://en.wikipedia.org/w/index.php?title=.257_Roberts&oldid=1376578554",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

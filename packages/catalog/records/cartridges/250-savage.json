@@ -363,6 +363,9 @@
       "value": 32.9
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -371,6 +374,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page93.pdf",
         "sha256": "95db46a6b1206a1e2bc2e16f9f2db306c8ea5e46a4569818756d585fd0909663",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .250-3000 Savage",
+        "url": "https://en.wikipedia.org/w/index.php?title=.250-3000_Savage&oldid=1328496325",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

@@ -44,9 +44,27 @@ The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fe
 
 Reference holes are labeled one file per labeler in the format of `packages/target-recognition/src/label-set.ts` (`labelSet`): per photo its hash, source, license, author, shooting session, kind, usable and complete, the visible hole diameter in px and the hole centers, each hole with an uncertain flag. `packages/target-recognition/scripts/label-studio.mts` converts a Label Studio export into it, and `packages/target-recognition/scripts/label-agreement.mts` prints how far two labelers disagree in the statistics above, over the photos both mark usable and complete.
 
-A learned model file comes with a manifest in the format of `packages/target-recognition/src/model-manifest.ts` (`modelManifest`): the model id and version; the file's https URL, SHA-256 and size; the runtime package, its exact version and WASM path; the ONNX opset; the input and output contracts; the model license; the training photos as counts per data class (own, third-party, synthetic) and per target kind, with no photo or source listed; the synthetic and holdout corrections in the statistics above; and the largest output difference between PyTorch and ONNX Runtime.
+A learned model file comes with a manifest in the format of `packages/target-recognition/src/model-manifest.ts` (`modelManifest`): the model id and version; the file's path relative to the app's base path, SHA-256 and size; the runtime package, its exact version and WASM folder (relative likewise); the ONNX opset; the input and output contracts; the model license; the training photos as counts per data class (own, third-party, synthetic) and per target kind, with no photo or source listed; the synthetic and holdout corrections in the statistics above; and the largest output difference between PyTorch and ONNX Runtime.
 
 Code: `packages/target-recognition/src/hole-matching.ts`, `matchHoles`, `corrections`, `correctionStats`.
+
+### Accuracy gate
+
+`packages/target-recognition/scripts/holdout-gate.mts` scores the classical and the learned detector on a sealed holdout against the default bar. It runs locally, never in CI, and reads only the photos its label set lists:
+
+```sh
+node scripts/holdout-gate.mts freeze --photos <photo folder> --labels <label set> --freeze <freeze file>
+node scripts/holdout-gate.mts score --photos <photo folder> --labels <label set> --freeze <freeze file> --model <model.onnx> --manifest <manifest.json>
+```
+
+1. `freeze`, before any model runs on the photos, writes the SHA-256 of the label set file and of every photo it lists. It refuses to overwrite a freeze file.
+2. `score` stops with an error, before it scores, when the freeze file is missing, a hash differs from it, a photo differs from its label's hash or size, or the model file differs from its manifest's hash. It then counts the look in `.gate-looks` in the photo folder.
+3. Each usable, complete photo is read with its EXIF rotation. Both detectors run on the whole photo (auto run) with the label's visible hole diameter as the hole size. The gate passes no face, while the app's auto run passes the face it found. The sure proposals (confidence 0.5 or more) are matched to the label's holes, and the corrections per photo give the statistics above, overall and per kind.
+4. The gate is met when the overall median is 1 or fewer and the 90th percentile 3 or fewer (below 20 photos, the maximum). The reference is one labeler's marks, so no labeler agreement widens the bar.
+
+It prints the look number, the photo counts (listed, unusable, usable but incomplete) and each detector's statistics, overall and per kind, with no file name, hash or per-photo figure. A kind with fewer than 20 scored photos gives only its photo count; an error names a photo by its position in the label set. The learned detector runs on `onnxruntime-web` in Node on one thread. The look counter counts the looks at the holdout and refuses none; the model's threshold comes from the validation split.
+
+`packages/target-recognition/test/decode-parity.test.ts` checks that the decoder finds the peaks of the training project's scoring (`training/hole-model`, `find`) within 1 px on one photo and model of `test/fixtures/decode-parity/make.py`. The scoring places a peak half a working pixel up and left of the decoder's cell center.
 
 ## Equations
 
@@ -176,7 +194,7 @@ Code: `packages/target-recognition/src/hole-detection.ts`, `shotsFromParts`, `en
 
 A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step; Accept sure leaves it out, and the counts name the sure and the maybe proposals apart. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
-Code: `packages/target-recognition/src/learned-detector.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
+Code: `packages/target-recognition/src/confidence-tier.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
 
 ### Hole size
 
@@ -333,6 +351,35 @@ $$
 Code: `packages/target-recognition/src/learned-detector.ts`, `learnedDetector`, `coverage`, `peaks`, `confidence`, `clustered`.
 
 Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a chain, share a cluster id. Each proposal's diameter is $D_\mathrm{px}$; a working image over $2 \times 10^6$ pixels is refused.
+
+### Model file
+
+`hole-model` 0.1.0 is a heatmap net of 197,153 parameters, trained from random weights by `training/hole-model` and exported to ONNX opset 17. The file is `apps/web/public/models/hole-model-0.1.0.onnx` (792,640 bytes), licensed CC-BY-SA-4.0 and served by each edition under its own base path (`basePath` of `apps/web/src/platform/edition.ts`), on next at <https://openreloading.github.io/Ballistics/next/models/hole-model-0.1.0.onnx>; its manifest is `hole-model-0.1.0.json` beside it. The manifest's `url` and `wasmPaths` are relative to that base path. The service worker neither precaches nor stores it, and no script bundle holds it.
+
+- Input: RGB in 0 to 1 with the expected hole at 16 px, width and height multiples of 16. Output: one heatmap channel at stride 2.
+- Training photos: 3,000 synthetic and 638 real third-party target photos with unchecked labels. Target kinds are not counted for this model. `NOTICE` credits the third-party photos in aggregate.
+- Threshold 0.45, the best F1 score on the validation photos. The `sure` value 0.9 is not set from scores, so most peaks stay maybes.
+- Validation, 136 real target photos with 938 holes: recall 0.904, precision 0.882, corrections median 0.5, 90th percentile 3.5, maximum 16.
+- Test, 300 synthetic target photos with 1,476 holes: recall 0.731, precision 0.936, corrections median 1, 90th percentile 4, maximum 9.
+- Largest output difference between PyTorch and ONNX Runtime: $2.7 \times 10^{-7}$.
+
+The accuracy gate on the holdout photos has not run on this model, so its manifest has no holdout scores. The web app's Detect step runs this model by default (below).
+
+### Learned detector in the app
+
+The detection worker of the web app runs the learned detector through ONNX Runtime Web on single-thread WebAssembly (no WebGPU): threads need cross-origin isolation, which a static host does not send. Each detection run of the Detect step loads, under the edition's base path:
+
+- the manifest `models/hole-model-0.1.0.json`;
+- the model file at the manifest's `file.url`, refused when its size or SHA-256 differs from the manifest's `bytes` and `sha256`;
+- the runtime's `ort-wasm-simd-threaded.mjs` and `ort-wasm-simd-threaded.wasm` from `onnxruntime-web/dist` of the version the app pins, in the manifest's `runtime.wasmPaths`. They are not in the repository: `scripts/model-runtime.mts` of the web app copies them from the installed package into `public/` at that path before `pnpm run dev`, `build` and `build:start` (and in `tools/src/start-site.ts`), and fails when the installed version is not the manifest's `runtime.version`.
+
+The whole load has a limit of 60 s: the model and the runtime, 4.6 MB with gzip, take about 23 s over a 1.6 Mbit/s mobile link. When the manifest, the model or the runtime does not load, does not match or passes the limit, the worker logs the error to the console, the classical detector answers, and the Detect step says so until the next run or another sheet, photo or group.
+
+An example pick, and a later run with the example's polarity or backing color, runs the classical detector without loading the model: the learned detector reads none of them and measures no hole size, which the example sets. Without a region or a target face, the learned detector works on the paper's outline (`paperOutline`), as the classical detector does, and coarsens a working image past 2 million px to fit, down to a hole of 8 working px, the smallest hole the model is trained on. Below that the classical detector answers, without the fallback note, as it works down to a hole of 4 working px.
+
+The model and the runtime load on demand and stay out of the offline layer's precache and the script output, so without a network a run falls back to the classical detector unless the browser's HTTP cache still holds them: the app imports `onnxruntime-web/wasm` through an alias to the package's build that loads its WASM files from `wasmPaths`, and both builds fail when their output holds a `.wasm` or `.onnx` file other than the files copied from `public/models/`, the runtime's among them (the Start build's client output, the service worker's precache list of the export).
+
+Code: `apps/web/src/lib/hole-model.ts`, `servedDetector`; `apps/web/src/lib/onnx-model.ts`, `openOnnxModel`.
 
 ### Photo quality
 

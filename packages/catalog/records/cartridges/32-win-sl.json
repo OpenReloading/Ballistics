@@ -221,6 +221,9 @@
       "value": 51.26
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -229,6 +232,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page79.pdf",
         "sha256": "325a78a39d0d15c39d67a60bf03ed127d0b067e3e8c96a5ef10527b8c6818caf",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32 Winchester Self-Loading",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32_Winchester_Self-Loading&oldid=1260643634",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

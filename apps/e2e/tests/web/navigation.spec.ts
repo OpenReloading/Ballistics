@@ -191,7 +191,7 @@ test('the drawer marks the current page and its rows are at least 44 px high', a
   const nav = page.getByRole('dialog').getByRole('navigation', { name: 'Main' })
   await expect(nav.locator('[aria-current="page"]')).toHaveText(['Database'])
   const rows = nav.locator('a, button')
-  await expect(rows).toHaveCount(pages.length + (repository ? 4 : 2))
+  await expect(rows).toHaveCount(pages.length + (repository ? 4 : 3))
   for (const box of await rows.evaluateAll((r) => r.map((e) => e.getBoundingClientRect().height)))
     expect(box).toBeGreaterThanOrEqual(44)
 })
@@ -250,7 +250,7 @@ test('from 75em the top bar buttons follow the page actions in the keyboard orde
   await page.setViewportSize({ width: 1280, height: 650 })
   await gotoHydrated(page, '/cartridges/308-win')
   const safety = page.locator('.page-bar').getByRole('button', { name: 'Safety', exact: true })
-  const after = [...(repository ? ['Report an issue', 'Source code on GitHub'] : []), 'Dark theme']
+  const after = [...(repository ? ['Report an issue'] : []), 'Source code on GitHub', 'Dark theme']
   await safety.focus()
   let left = (await safety.boundingBox())?.x ?? 0
   for (const name of after) {

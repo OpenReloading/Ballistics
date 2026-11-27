@@ -235,6 +235,9 @@
       "value": 101.54
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -243,6 +246,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/454-casull-en.pdf",
         "sha256": "fcd600e348669b3dbc97c9703bb0cea3c27312ce452d922d84a12044cef5c990",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .454 Casull",
+        "url": "https://en.wikipedia.org/w/index.php?title=.454_Casull&oldid=1363403309",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Boxer Small rifle."
       }
     ]
   }

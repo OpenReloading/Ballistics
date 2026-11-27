@@ -322,6 +322,9 @@
       "value": 66.32
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -330,6 +333,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/9-3-x-74-r-en.pdf",
         "sha256": "69f401592876ed94fbddf71dd670e8a9d0ae68b25b002905807628ec416cc51d",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 9.3×74mmR",
+        "url": "https://en.wikipedia.org/w/index.php?title=9.3%C3%9774mmR&oldid=1380511404",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

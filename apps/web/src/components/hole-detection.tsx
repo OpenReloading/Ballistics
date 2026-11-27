@@ -32,7 +32,6 @@ import {
 } from 'react'
 import { storedPhoto } from '@/platform/user-store.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
-import { msg } from '../i18n/translate.ts'
 import { commonCaliber } from '../lib/caliber.ts'
 import {
   type CandidateClass,
@@ -57,6 +56,7 @@ import {
   proposalsClearOfShots,
   rectangleFromDiagonal,
 } from '../lib/hole-proposals.ts'
+import { modelRoot } from '../lib/model-root.ts'
 import { belowMinimum, guideRule, layoutOf, type QualityIssue } from '../lib/photo-quality.ts'
 import type { Frame } from '../lib/target-editor.ts'
 import { type Point, turnedBox } from '../lib/target-geometry.ts'
@@ -179,6 +179,7 @@ export function useHoleDetection({
   /** Regions too large to count: the user places their shots by hand; no statistic sees them. */
   const [flagged, setFlagged] = useState<FlaggedRegion[]>([])
   const [progress, setProgress] = useState<number>()
+  const [fellBack, setFellBack] = useState(false)
   const [shape, setShape] = useState<'rectangle' | 'polygon'>('rectangle')
   const [pending, setPending] = useState<Point[]>([])
   /** The guided step shown, 0 to 4; undefined: the one-click start. */
@@ -235,6 +236,7 @@ export function useHoleDetection({
     setHeld(false)
     setResult(false)
     setSizeOpen(false)
+    setFellBack(false)
     awaiting.current = false
     return stop
   }, [sheet.photo, sheetId, group?.id])
@@ -282,6 +284,7 @@ export function useHoleDetection({
       if (worker.current !== w) return
       const m = e.data
       if (m.kind === 'progress') return setProgress(m.done)
+      if (m.kind === 'fallback') return setFellBack(true)
       stop()
       if (m.kind === 'error') {
         const known = workerErrors.find((e) => e.message === m.message)
@@ -293,7 +296,8 @@ export function useHoleDetection({
       if (worker.current !== w) return
       failed(e.message)
     }
-    w.postMessage(request)
+    if (request.kind !== 'face') setFellBack(false)
+    w.postMessage(request.kind === 'face' ? request : { ...request, model: modelRoot() })
   }
 
   const failed = (error?: unknown) => {
@@ -725,17 +729,28 @@ export function useHoleDetection({
   )
 
   const running = progress !== undefined
+  const fellBackNote = fellBack && (
+    <Message severity="info" compact>
+      {i18n._({
+        id: 'holeDetection.modelFellBack',
+        message: 'The hole model did not load; the classical detector ran instead.',
+      })}
+    </Message>
+  )
   const runButton = (label: MessageDescriptor, auto: boolean) => (
-    <RunButton
-      label={label}
-      auto={auto}
-      progress={progress}
-      photo={photo !== undefined}
-      blocked={blocked}
-      onCancel={cancel}
-      onStart={start}
-      onRun={() => run(false)}
-    />
+    <>
+      <RunButton
+        label={label}
+        auto={auto}
+        progress={progress}
+        photo={photo !== undefined}
+        blocked={blocked}
+        onCancel={cancel}
+        onStart={start}
+        onRun={() => run(false)}
+      />
+      {fellBackNote}
+    </>
   )
 
   const regionRow = (
@@ -850,14 +865,19 @@ export function useHoleDetection({
       step={step}
       setStep={goStep}
       start={
-        result
-          ? resultLine
-          : runButton(
-              held
-                ? /*i18n*/ { id: 'holeDetection.detectAnyway', message: 'Detect anyway' }
-                : /*i18n*/ { id: 'holeDetection.detectHoles', message: 'Detect holes' },
-              true,
-            )
+        result ? (
+          <>
+            {resultLine}
+            {fellBackNote}
+          </>
+        ) : (
+          runButton(
+            held
+              ? /*i18n*/ { id: 'holeDetection.detectAnyway', message: 'Detect anyway' }
+              : /*i18n*/ { id: 'holeDetection.detectHoles', message: 'Detect holes' },
+            true,
+          )
+        )
       }
       notes={quality && <QualityNotes issues={quality} held={held} />}
       body={step === undefined ? undefined : stepBody[step]}
@@ -1227,10 +1247,12 @@ function ResultLine({
         <SiField
           spec={{
             key: 'expectedHoleDiameter',
-            label: msg('Hole size'),
-            help: msg(
-              'Expected hole diameter; a typed size overrides the bullet and the marker. Detection runs once it is entered.',
-            ),
+            label: /*i18n*/ { id: 'holeDetection.holeSize', message: 'Hole size' },
+            help: /*i18n*/ {
+              id: 'holeDetection.holeSizeTypedHelp',
+              message:
+                'Expected hole diameter; a typed size overrides the bullet and the marker. Detection runs once it is entered.',
+            },
             quantity: 'length',
             min: 0,
             positive: true,
@@ -1415,10 +1437,12 @@ function RotateStep({
       <SiField
         spec={{
           key: 'photoRotation',
-          label: msg('Photo angle'),
-          help: msg(
-            'Counter-clockwise turn of the photo on screen; type a small angle to straighten it. Holes, scale and aim point turn with the photo, the target axes do not.',
-          ),
+          label: /*i18n*/ { id: 'holeDetection.photoAngle', message: 'Photo angle' },
+          help: /*i18n*/ {
+            id: 'holeDetection.photoAngleHelp',
+            message:
+              'Counter-clockwise turn of the photo on screen; type a small angle to straighten it. Holes, scale and aim point turn with the photo, the target axes do not.',
+          },
           quantity: 'angle',
         }}
         si={turn || undefined}
@@ -1513,10 +1537,12 @@ function ScaleStep({
       <SiField
         spec={{
           key: 'blackDiameter',
-          label: msg('Black diameter'),
-          help: msg(
-            'Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo).',
-          ),
+          label: /*i18n*/ { id: 'holeDetection.blackDiameter', message: 'Black diameter' },
+          help: /*i18n*/ {
+            id: 'holeDetection.blackDiameterHelp',
+            message:
+              'Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo).',
+          },
           quantity: 'length',
           min: 0,
           positive: true,
@@ -1570,11 +1596,13 @@ function ExampleStep({
       <SiField
         spec={{
           key: 'expectedHoleDiameter',
-          label: msg('Hole size'),
+          label: /*i18n*/ { id: 'holeDetection.holeSize', message: 'Hole size' },
           // the 3 is MIN_HOLES_TO_LEARN_SIZE: a spec's help takes no placeholder
-          help: msg(
-            'Expected hole diameter; an example hole sets it to its measured size. Empty: the median of 3 or more accepted single holes, else the bullet diameter, else the marker.',
-          ),
+          help: /*i18n*/ {
+            id: 'holeDetection.holeSizeHelp',
+            message:
+              'Expected hole diameter; an example hole sets it to its measured size. Empty: the median of 3 or more accepted single holes, else the bullet diameter, else the marker.',
+          },
           quantity: 'length',
           min: 0,
           positive: true,

@@ -322,6 +322,9 @@
       "value": 51.34
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -330,6 +333,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/32-win-spec-220214-en.pdf",
         "sha256": "892bc423b8302c1739f36bf8a20c174ef2de47813890eef2e994cd349eaf73ee",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32 Winchester Special",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32_Winchester_Special&oldid=1315662297",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

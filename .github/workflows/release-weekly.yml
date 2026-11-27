@@ -11,7 +11,7 @@ jobs:
       contents: read
       pull-requests: write
       actions: write
-    uses: eikelandin/repo-standards/.github/workflows/release-weekly.yml@3da785e9f3d7890ef72234e5ef84bb7df0827e18
+    uses: eikelandin/repo-standards/.github/workflows/release-weekly.yml@c4192a7461a8894055d2e9615939ea2ac5dd6c71
     with:
       app-client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
     secrets:

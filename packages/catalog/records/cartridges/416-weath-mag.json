@@ -370,6 +370,10 @@
       "value": 86.37
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -378,6 +382,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page33.pdf",
         "sha256": "8891b085e84b2bceba9f215f276d1a225ac9ea156da254a49d188933502eee8a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .416 Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.416_Weatherby_Magnum&oldid=1306004522",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle (magnum)."
       }
     ]
   }

@@ -45,7 +45,7 @@ function unknownKeys(input: unknown, parsed: unknown, path: Path): Path[] {
   )
 }
 
-/** Throws a `ZodError` with the path of each problem: an unknown field, an invalid value, no or several loads, an unresolvable `user:` reference. */
+/** Throws a `ZodError` with the path of each problem: an unknown field, an invalid value, no or several loads, a `user:` reference other than a cartridge design the file holds. */
 export function readLoadFile(json: unknown): { path: Path; record: Load; name: string } {
   const problem = versionProblem(json)
   if (problem) throw new z.ZodError([issue(['version'], problem)])
@@ -60,22 +60,25 @@ export function readLoadFile(json: unknown): { path: Path; record: Load; name: s
   else {
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the one record of kind load
     const [i, r] = loads[0] as [number, { data: Load; name: string }]
-    // user data stays in the browser: the server resolves catalogue records only
-    for (const k of ['cartridge', 'bullet', 'powder'] as const) {
-      const target = r.data[k]
-      if (typeof target === 'string' && parseRef(target)?.scope === 'user')
-        unknown.push(
-          issue(
-            ['records', i, 'data', k],
-            'A user record is not on the server, name a catalogue record',
-          ),
-        )
-    }
+    const designs = new Set(
+      file.data.records.flatMap((d) => (d.kind === 'cartridge' ? [`user:${d.id}`] : [])),
+    )
+    unknown.push(...userRefIssues(r.data, ['records', i, 'data'], designs))
   }
   if (unknown.length > 0) throw new z.ZodError(unknown)
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the one record of kind load
   const [i, r] = loads[0] as [number, { data: Load; name: string }]
   return { path: ['records', i, 'data'], record: r.data, name: r.name }
+}
+
+/** User data stays in the browser: the server resolves catalogue records only, and a cartridge design the file carries (`designs`, as `user:` references). */
+function userRefIssues(data: Load, path: Path, designs: ReadonlySet<string>): z.core.$ZodIssue[] {
+  return (['cartridge', 'bullet', 'powder'] as const).flatMap((k) => {
+    const target = data[k]
+    if (typeof target !== 'string' || parseRef(target)?.scope !== 'user') return []
+    if (k === 'cartridge' && designs.has(target)) return []
+    return [issue([...path, k], 'A user record is not on the server, name a catalogue record')]
+  })
 }
 
 /** The records of a load the catalogue gives values from. */
@@ -111,6 +114,12 @@ export const bulletLengthMm = (
 
 /** The catalogue record id of a `cartridge` or `bullet` of a load file, a plain id or a `catalogue:` reference. */
 export const catalogueIdOf = (target: string): string => parseRef(target)?.id ?? target
+
+/** The catalogue id of the load's cartridge; none without one or for the user's design the file carries. */
+export const catalogueCartridgeOf = (load: Load): string | undefined =>
+  load.cartridge === undefined || parseRef(load.cartridge)?.scope === 'user'
+    ? undefined
+    : catalogueIdOf(load.cartridge)
 
 /** The issues of a strict-object error with one issue per unknown key, at the key's path. */
 export function unknownKeyIssues(error: z.ZodError): z.ZodError {

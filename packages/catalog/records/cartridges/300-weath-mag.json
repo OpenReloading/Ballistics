@@ -373,6 +373,10 @@
       "value": 47.48
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page19.pdf",
         "sha256": "aff7c2c8b5fb069794fae5051a1c79102f64325ebeb9c0516d4a1aa29b0af155",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .300 Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Weatherby_Magnum&oldid=1270042987",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

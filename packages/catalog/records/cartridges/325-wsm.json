@@ -374,6 +374,10 @@
       "value": 52.16
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -382,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page128.pdf",
         "sha256": "a963f9483a845aaf99609536628b6910120e4e9f93f4fe371646ee3608ce7254",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .325 Winchester Short Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.325_Winchester_Short_Magnum&oldid=1380219985",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

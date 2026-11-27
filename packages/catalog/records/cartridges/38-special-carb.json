@@ -133,6 +133,9 @@
       "value": 62.55
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -141,6 +144,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page58.pdf",
         "sha256": "80893f449129aff734270e2cbe4d06cedcac083b71d827461351e1b7fdbc2d49",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-38-special",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

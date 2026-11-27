@@ -1,43 +1,29 @@
 RangeFoundry
 
-The data records (packages/catalog/records/) are licensed under CC BY 4.0
-(packages/catalog/LICENSE). CC BY 4.0 covers only the project's own selection, structure and
+The data records (packages/catalog/records/) are licensed under CC BY-SA 4.0
+(packages/catalog/LICENSE). CC BY-SA 4.0 covers only the project's own selection, structure and
 drawings. The project claims no rights in facts taken from third-party sources (C.I.P. sheets,
 federation rule books). The project is not affiliated with or endorsed by the
 Bundesverwaltungsamt (BVA), the shooting sport federations or the C.I.P.
 
 ---
 
+The hole detection model files (apps/web/public/models/hole-model-*.onnx) are licensed under
+CC BY-SA 4.0 (LICENSES/CC-BY-SA-4.0.txt). They are trained on 3,000 synthetic target photos
+and 638 third-party target photos. The third-party photos are credited in aggregate, as the
+authors of the third-party training photos; no photo, file name, source or author is listed.
+
+---
+
 The Ballistics logo files below are copied from the RangeFoundry Artwork repository,
 https://github.com/OpenReloading/Artwork, folder ballistics/, commit
-09bfdbb14e9d33cf34b75483f5b51196705e4841, under the MIT License that follows.
-The PNG icons are scaled down from ballistics-icon-1024.png.
+09bfdbb14e9d33cf34b75483f5b51196705e4841. The PNG icons are scaled down from
+ballistics-icon-1024.png. The names and logos carry no open license (LicenseRef-Brand,
+LICENSES/LicenseRef-Brand.txt).
 
 - apps/web/src/assets/ballistics-light.svg, ballistics-dark.svg (unchanged)
 - apps/web/public/opengraph-image.png (ballistics-light-1280x640.png, unchanged)
 - apps/web/src/app/icon.png (512 px), apple-icon.png (180 px), apps/web/public/icon-192.png (192 px)
-
-MIT License
-
-Copyright (c) 2026 RangeFoundry contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 ---
 
@@ -217,31 +203,40 @@ the package declares. Written by `node tools/src/licences.ts --write`.
 @lingui/message-utils 6.12.0 MIT
 @lingui/react 6.12.0 MIT
 @lukeed/ms 2.0.2 MIT
-@mantine/core 9.8.1 MIT
-@mantine/form 9.8.1 MIT
-@mantine/hooks 9.8.1 MIT
-@mantine/spotlight 9.8.1 MIT
-@mantine/store 9.8.1 MIT
+@mantine/core 9.8.2 MIT
+@mantine/form 9.8.2 MIT
+@mantine/hooks 9.8.2 MIT
+@mantine/spotlight 9.8.2 MIT
+@mantine/store 9.8.2 MIT
 @messageformat/date-skeleton 1.1.0 MIT
 @messageformat/parser 5.2.0 MIT
 @next/env 16.4.6 MIT
 @noble/hashes 2.4.0 MIT
 @pinojs/redact 0.4.0 MIT
-@scalar/client-side-rendering 0.4.19 MIT
-@scalar/fastify-api-reference 1.78.1 MIT
-@scalar/helpers 0.18.0 MIT
-@scalar/json-magic 0.19.1 MIT
-@scalar/schemas 0.17.1 MIT
-@scalar/types 0.28.1 MIT
-@scalar/validation 0.6.7 MIT
+@protobufjs/aspromise 1.1.2 BSD-3-Clause
+@protobufjs/base64 1.1.2 BSD-3-Clause
+@protobufjs/codegen 2.0.5 BSD-3-Clause
+@protobufjs/eventemitter 1.1.1 BSD-3-Clause
+@protobufjs/fetch 1.1.1 BSD-3-Clause
+@protobufjs/float 1.0.2 BSD-3-Clause
+@protobufjs/path 1.1.2 BSD-3-Clause
+@protobufjs/pool 1.1.0 BSD-3-Clause
+@protobufjs/utf8 1.1.2 BSD-3-Clause
+@scalar/client-side-rendering 0.4.23 MIT
+@scalar/fastify-api-reference 1.83.0 MIT
+@scalar/helpers 0.19.0 MIT
+@scalar/json-magic 0.22.0 MIT
+@scalar/schemas 0.20.0 MIT
+@scalar/types 0.32.0 MIT
+@scalar/validation 0.6.9 MIT
 @standard-schema/spec 1.1.0 MIT
 @swc/helpers 0.5.23 Apache-2.0
 @tanstack/history 1.162.5 MIT
 @tanstack/react-router 1.170.46 MIT
-@tanstack/react-start-client 1.168.44 MIT
-@tanstack/react-start-rsc 0.1.65 MIT
+@tanstack/react-start-client 1.168.45 MIT
+@tanstack/react-start-rsc 0.1.68 MIT
 @tanstack/react-start-server 1.167.52 MIT
-@tanstack/react-start 1.169.4 MIT
+@tanstack/react-start 1.169.7 MIT
 @tanstack/react-store 0.11.2 MIT
 @tanstack/router-core 1.171.39 MIT
 @tanstack/start-client-core 1.170.39 MIT
@@ -249,6 +244,7 @@ the package declares. Written by `node tools/src/licences.ts --write`.
 @tanstack/start-server-core 1.169.45 MIT
 @tanstack/start-storage-context 1.167.41 MIT
 @tanstack/store 0.11.2 MIT
+@types/node 26.6.6 MIT
 abstract-logging 2.0.1 MIT
 ajv-formats 3.0.1 MIT
 ajv 8.20.0 MIT
@@ -278,9 +274,11 @@ fastify 5.12.8 MIT
 fastq 1.20.3 ISC
 fetchdts 0.2.0 MIT
 find-my-way 9.10.0 MIT
+flatbuffers 25.9.23 Apache-2.0
 forwarded 0.2.0 MIT
 get-nonce 1.0.1 MIT
 github-slugger 2.0.0 ISC
+guid-typescript 1.0.9 ISC
 http-errors 2.0.1 MIT
 inherits 2.0.4 ISC
 ipaddr.js 2.5.0 MIT
@@ -290,23 +288,28 @@ json-schema-traverse 1.0.0 MIT
 jsqr 1.4.0 Apache-2.0
 klona 2.0.6 MIT
 light-my-request 6.6.0 BSD-3-Clause
-lucide-react 1.73.0 ISC
+long 5.3.2 Apache-2.0
+lucide-react 1.78.0 ISC
 media-typer 1.1.1 MIT
 mime-db 1.54.0 MIT
 mime-types 3.0.2 MIT
 moo 0.5.3 BSD-3-Clause
 nanoid 3.3.20 MIT
-nanoid 5.1.16 MIT
+nanoid 6.0.2 MIT
 next 16.4.6 MIT
 on-exit-leak-free 2.1.2 MIT
+onnxruntime-common 1.31.1 MIT
+onnxruntime-web 1.31.1 MIT
 pathe 2.0.3 MIT
 picocolors 1.1.1 ISC
 pino-abstract-transport 3.0.0 MIT
 pino-std-serializers 7.1.0 MIT
 pino 10.4.0 MIT
+platform 1.3.6 MIT
 postcss 8.5.23 MIT
 process-warning 4.0.1 MIT
 process-warning 5.1.0 MIT
+protobufjs 7.6.6 BSD-3-Clause
 quick-format-unescaped 4.0.4 MIT
 react-dom 19.3.1 MIT
 react-number-format 5.4.5 MIT
@@ -333,7 +336,7 @@ source-map-js 1.2.2 BSD-3-Clause
 split2 4.2.0 ISC
 statuses 2.0.2 MIT
 styled-jsx 5.1.6 MIT
-tabbable 6.5.0 MIT
+tabbable 6.5.2 MIT
 tagged-tag 1.0.0 MIT
 thread-stream 4.2.0 MIT
 toad-cache 3.7.4 MIT
@@ -342,7 +345,8 @@ tslib 2.3.0 0BSD
 tslib 2.8.1 0BSD
 type-fest 5.10.0 (MIT OR CC0-1.0)
 type-is 2.1.0 MIT
-undici 8.12.3 MIT
+undici-types 8.9.0 MIT
+undici 8.13.1 MIT
 uqr 0.1.3 MIT
 use-callback-ref 1.3.3 MIT
 use-sidecar 1.1.3 MIT

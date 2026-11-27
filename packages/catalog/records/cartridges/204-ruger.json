@@ -367,6 +367,9 @@
       "value": 20.68
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -375,6 +378,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page79.pdf",
         "sha256": "f5eb92fc9f9b723e36cfe9aa280d8314387a96032b2a5c1818d79297215449f8",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .204 Ruger",
+        "url": "https://en.wikipedia.org/w/index.php?title=.204_Ruger&oldid=1381531854",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

@@ -4,7 +4,7 @@ import type { Catalogue } from '@rangefoundry/use-cases/catalog'
 import type { RouteOptions } from 'fastify'
 import type { z } from 'zod'
 import { buildApp } from './app.ts'
-import { API_VERSION } from './version.ts'
+import { API_SOURCE_URL, API_VERSION } from './version.ts'
 
 declare module 'fastify' {
   interface FastifyContextConfig {
@@ -274,8 +274,7 @@ export async function buildOpenApi(): Promise<OpenApiDocument> {
     info: {
       title: 'RangeFoundry API',
       version: API_VERSION,
-      description:
-        'Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data.',
+      description: `Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data. [Source code of this version](${API_SOURCE_URL}) (AGPL-3.0-only).`,
     },
     tags: tags.map(({ name, description }) => ({ name, description })),
     paths: sorted,

@@ -223,7 +223,9 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:357-magnum-wikipedia"
+    "capacity": "catalogue:357-magnum-wikipedia",
+    "primerSize": "small-pistol",
+    "primerMagnum": true
   },
   "provenance": {
     "kind": "published",
@@ -233,6 +235,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/357-magnum-en.pdf",
         "sha256": "be82ccac39fb343cd1b5370b46545e0982aa783fc778ea0d27c086af63f0876b",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-357-magnum",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Small pistol magnum."
       }
     ]
   }

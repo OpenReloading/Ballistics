@@ -39,7 +39,14 @@ import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { type BulletValues, bulletDrag, typedBullet } from '../lib/bullet.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
-import { type FieldSpec, type Fields, fieldError, siValues, specText } from '../lib/field-spec.ts'
+import {
+  type FieldSpec,
+  type Fields,
+  fieldError,
+  type SpecText,
+  siValues,
+  specText,
+} from '../lib/field-spec.ts'
 import { sightPicker } from '../lib/firearm.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { inputsQuery, linkParams, queryFields, tabQuery } from '../lib/query.ts'
@@ -156,7 +163,7 @@ type Inputs = {
 type Attempt =
   | { kind: 'ok'; result: Result }
   /** A changed field shows an error. */
-  | { kind: 'invalid'; label: string }
+  | { kind: 'invalid'; label: SpecText }
   /** A missing choice or an empty field not yet edited: plain text, no alert. */
   | { kind: 'prompt'; text: string }
   | { kind: 'error'; error: unknown }
@@ -177,7 +184,7 @@ function noBcText(model: string, t: T) {
 function checkFields(i: Inputs, t: T) {
   const specs: readonly FieldSpec[] = i.source === 'manual' ? allFields : shotFields
   const errors: Record<string, string> = {}
-  let invalid: string | undefined
+  let invalid: SpecText | undefined
   let empty: string | undefined
   for (const s of specs) {
     const error = fieldError(s, i.fields[s.key], i.system, t)

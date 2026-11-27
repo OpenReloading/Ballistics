@@ -375,6 +375,9 @@
       "value": 104.94
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/458-socom-210827-en.pdf",
         "sha256": "b5ea920d19f5b146dded000125b92273f2cb4b7987c459a59ae9a48363c0a8dc",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .458 SOCOM",
+        "url": "https://en.wikipedia.org/w/index.php?title=.458_SOCOM&oldid=1356907990",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Pistol."
       }
     ]
   }

@@ -369,6 +369,10 @@
       "value": 40.34
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +381,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page41.pdf",
         "sha256": "bfa16a05d23fd42e2398925e409fd9c5c1e0a3c1ba7206da01d29a60216b3a45",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm Remington Ultra Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm_Remington_Ultra_Magnum&oldid=1284006588",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

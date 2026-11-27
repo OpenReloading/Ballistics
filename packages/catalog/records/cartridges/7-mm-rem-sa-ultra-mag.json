@@ -359,6 +359,10 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -367,6 +371,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page40.pdf",
         "sha256": "3a1056d2a7bed5b2658b39a6ba3d5af0291f4e9d0b042fc9c26b9b51f224caec",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm Remington Short Action Ultra Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm_Remington_Short_Action_Ultra_Magnum&oldid=1272545206",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

@@ -363,7 +363,9 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:338-lapua-mag-wikipedia"
+    "capacity": "catalogue:338-lapua-mag-wikipedia",
+    "primerSize": "large-rifle",
+    "primerMagnum": true
   },
   "provenance": {
     "kind": "published",
@@ -373,6 +375,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/338-lapua-mag-en.pdf",
         "sha256": "4305c15d069113c2c0d90b555ecb41dd7418afb30e31bc7d451951cd97d2b947",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .338 Lapua Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.338_Lapua_Magnum&oldid=1386847801",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

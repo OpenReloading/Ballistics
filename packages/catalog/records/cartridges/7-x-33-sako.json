@@ -343,6 +343,9 @@
       "value": 40.15
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -351,6 +354,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page32.pdf",
         "sha256": "56dfffd73e8ff3e1349734a6b02c3a9f4a1c610856cc066d4a2ea7819741fd8f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7×33mm Sako",
+        "url": "https://en.wikipedia.org/w/index.php?title=7%C3%9733mm_Sako&oldid=1302857421",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

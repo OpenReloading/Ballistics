@@ -302,6 +302,9 @@
       "value": 25.03
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -310,6 +313,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page55.pdf",
         "sha256": "c0657f2ffeacca5e628dbbb3b114d6eed05ea4a5cb318e3c0821f89143650425",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .219 Zipper",
+        "url": "https://en.wikipedia.org/w/index.php?title=.219_Zipper&oldid=1294700578",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: large rifle."
       }
     ]
   }

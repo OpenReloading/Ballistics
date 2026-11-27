@@ -38,6 +38,7 @@ import { InputError } from './issue.ts'
 import { type CartridgeWithSpecs, type Warning, warning } from './limits.ts'
 import {
   bulletLengthMm,
+  catalogueCartridgeOf,
   catalogueIdOf,
   fileLoad,
   filePath,
@@ -109,10 +110,9 @@ function knownRecords(catalogue: Catalogue, record: Load) {
 function loadFileRecords(catalogue: Catalogue, record: Load) {
   const bulletId = recordIdOf(record.bullet)
   const powderId = recordIdOf(record.powder)
+  const cartridgeId = catalogueCartridgeOf(record)
   const cartridge: CartridgeWithSpecs | undefined =
-    record.cartridge === undefined
-      ? undefined
-      : findCartridge(catalogue, catalogueIdOf(record.cartridge))
+    cartridgeId === undefined ? undefined : findCartridge(catalogue, cartridgeId)
   const bullet: Bullet | undefined =
     bulletId === undefined ? undefined : findBullet(catalogue, bulletId)
   const powder: Powder | undefined =
@@ -310,12 +310,13 @@ function bodyParser({
   chargeLadder: ReturnType<typeof chargeLadderOf>
   path: Path
 }) {
+  const cartridge = catalogueCartridgeOf(record)
   return (resistance?: InteriorLoad['resistance']) => {
     try {
       return interiorBody.parse({
         model: 'm3',
         load: resistance ? { ...load, resistance } : load,
-        ...(record.cartridge && { cartridge: catalogueIdOf(record.cartridge) }),
+        ...(cartridge && { cartridge }),
         ...(values['pmax'] !== undefined && { pressureLimit: values['pmax'] }),
         ...(chargeLadder && { ladder: chargeLadder }),
       })
@@ -336,6 +337,21 @@ function ladderKindRefusal(ladder: NonNullable<Load['analysis']>['ladder']) {
           ...unprocessable,
           message: `ladder.kind: a ${ladder.kind} ladder runs in the workbench, not in this route`,
           field: 'ladder.kind',
+          notice,
+        },
+      }
+    : undefined
+}
+
+/** A load file without a cartridge: the run needs one, so the answer names the field. */
+function noCartridgeRefusal(record: Load, path: Path) {
+  return record.cartridge === undefined
+    ? {
+        status: 422 as const,
+        payload: {
+          ...unprocessable,
+          message: 'The load has no cartridge: choose a cartridge record to simulate it.',
+          field: [...path, 'cartridge'].join('.'),
           notice,
         },
       }
@@ -400,6 +416,8 @@ export async function simulate(
   if (!parsed.success) throw unknownKeyIssues(parsed.error)
   const { curves } = parsed.data
   const { path, record, name } = readLoadFile(json)
+  const bare = noCartridgeRefusal(record, path)
+  if (bare) return bare
   const values = loadValues(record, knownRecords(context.catalogue, record))
   const lacking = missingValuesAnswer(values, path)
   if (lacking) return lacking

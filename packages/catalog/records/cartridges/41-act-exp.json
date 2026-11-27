@@ -246,6 +246,9 @@
       "value": 82.17
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -254,6 +257,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page67.pdf",
         "sha256": "8ebfad6dadaa4049cf7a18f11b89d9859d7755046133a51724f639e89b777fa4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .41 Action Express",
+        "url": "https://en.wikipedia.org/w/index.php?title=.41_Action_Express&oldid=1315042640",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

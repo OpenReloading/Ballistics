@@ -303,7 +303,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:30-r-blaser-wikipedia"
+    "capacity": "catalogue:30-r-blaser-wikipedia",
+    "primerSize": "large-rifle"
   },
   "provenance": {
     "kind": "published",
@@ -313,6 +314,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page66.pdf",
         "sha256": "3152a3681a7614f69ffd572b960e8a6e840d8bb74d9bf6be38ea489c504af279",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-30-r-blaser",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle or Large rifle Magnum."
       }
     ]
   }

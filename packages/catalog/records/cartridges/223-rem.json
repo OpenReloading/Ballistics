@@ -376,7 +376,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:223-rem-wikipedia"
+    "capacity": "catalogue:223-rem-wikipedia",
+    "primerSize": "small-rifle"
   },
   "provenance": {
     "kind": "published",
@@ -386,6 +387,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/223-rem-170406-en.pdf",
         "sha256": "4818f6b828c82884608fbad61d842eed927e4352a54ed1e28c4c1356320538e2",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .223 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.223_Remington&oldid=1381104652",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

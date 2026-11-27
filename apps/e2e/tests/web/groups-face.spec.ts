@@ -7,7 +7,13 @@ import { storeUnits } from './units.ts'
 // the target face on a photo sets the scale, the center and the face of the group, and the holes are found once the photo is added, without a click
 test.beforeEach(async ({ page }) => {
   await storeUnits(page)
+  // the flows below run the classical detector: the hole model does not load, so it answers in its place
+  await page.route(holeModel, (route) => route.abort())
 })
+
+const holeModel = '**/models/**'
+const fellBack = (page: Page) =>
+  page.getByText('The hole model did not load; the classical detector ran instead.')
 
 /** Test budget of a detection test: up to two 30 s detection waits after the photo is drawn and loaded. */
 const detectionBudget = 90_000
@@ -204,6 +210,7 @@ test('a known hole size: from choosing the photo to Accept is 2 actions, no shot
   await expect(resultLine(page)).toContainText('1 reference')
   await expect(resultLine(page)).toContainText('6 proposed, 0 maybe')
   await expect(status(page)).toHaveText('6 proposed, 0 maybe: accept them to add shots.')
+  await expect(fellBack(page)).toBeVisible()
   // the marker's size preselects its caliber class, which the line names with the size
   await expect(resultLine(page)).toContainText('4.5 mm (.177) air (4.50)')
   // no slider on the main path, and the proposals are no shots yet
@@ -226,6 +233,19 @@ test('a known hole size: from choosing the photo to Accept is 2 actions, no shot
   await expect(side.getByRole('rowheader', { name: 'Width', exact: true })).toHaveCount(0)
   await more.click()
   await expect(side.getByRole('rowheader', { name: 'Width', exact: true })).toBeVisible()
+})
+
+test('the hole model proposes the holes by default', async ({ page }) => {
+  test.setTimeout(detectionBudget)
+  await page.unroute(holeModel)
+  const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
+  await setMarker(page, '4.5')
+  await load(page, png)
+  await expect(page.getByRole('button', { name: /^Accept maybes/ })).toHaveText(
+    'Accept maybes (6)',
+    { timeout: 30_000 },
+  )
+  await expect(fellBack(page)).toHaveCount(0)
 })
 
 test('an unknown hole size: the typed size is the third action, and the shots sit on the holes', async ({

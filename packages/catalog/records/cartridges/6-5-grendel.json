@@ -350,13 +350,22 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:6-5-grendel-wikipedia"
+    "capacity": "catalogue:6-5-grendel-wikipedia",
+    "primerSize": "small-rifle"
   },
   "provenance": {
     "kind": "published",
     "sources": [
       {
         "source": "cip-tdcc"
+      },
+      {
+        "title": "Wikipedia, 6.5mm Grendel",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5mm_Grendel&oldid=1379962937",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ],
     "note": "Checked by hand against the CIP sheet."

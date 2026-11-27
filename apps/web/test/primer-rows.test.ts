@@ -10,39 +10,46 @@ import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 const summary: PrimerSummary = {
-  id: 'demo-primer-large-rifle',
-  manufacturer: 'demo-primers',
-  name: 'Large Rifle Demo',
+  id: 'example-primer-lr',
+  manufacturer: 'example-primers',
+  name: 'Large Rifle Example',
   productNumber: 'DP-LR',
   size: 'large-rifle',
   magnum: false,
   compound: 'lead-free',
 }
 
-const names = new Map([['demo-primers', 'Demo Primers']])
-const aliases = new Map([['demo-primers', ['Old Demo']]])
+const names = new Map([['example-primers', 'Example Primers']])
+const aliases = new Map([['example-primers', ['Old Example']]])
 const rows = primerRows([summary], names, aliases)
 
 it('puts the manufacturer name on each row, empty while it is unknown', () => {
   expect(defined(rows[0])).toMatchObject({
-    manufacturerName: 'Demo Primers',
-    manufacturerAliases: ['Old Demo'],
+    manufacturerName: 'Example Primers',
+    manufacturerAliases: ['Old Example'],
   })
   expect(primerRows([summary], new Map(), new Map())[0]).toMatchObject({ manufacturerName: '' })
 })
 
 it('searches manufacturer, its aliases, name, product number, size and compound, every word', () => {
   const row = defined(rows[0])
-  for (const q of ['demo primers', 'old demo', 'dp-lr', 'large rifle', 'lead free', 'primers lead'])
+  for (const q of [
+    'example primers',
+    'old example',
+    'dp-lr',
+    'large rifle',
+    'lead free',
+    'primers lead',
+  ])
     expect(primerMatches(row, q), q).toBe(true)
   expect(primerMatches(row, 'pistol')).toBe(false)
   expect(primerMatches(row, 'dp-lr magnum')).toBe(false)
 })
 
 const record: Primer = {
-  id: 'demo-primer-large-rifle',
-  manufacturer: 'demo-primers',
-  name: 'Large Rifle Demo',
+  id: 'example-primer-lr',
+  manufacturer: 'example-primers',
+  name: 'Large Rifle Example',
   productNumber: 'DP-LR',
   size: 'large-rifle',
   magnum: true,
@@ -54,7 +61,7 @@ const record: Primer = {
 }
 
 it('the strip has the manufacturer, size and compound, nothing the record lacks', () => {
-  expect(primerStrip(record, 'Demo Primers').map((i) => [i.icon, i.label])).toEqual([
+  expect(primerStrip(record, 'Example Primers').map((i) => [i.icon, i.label])).toEqual([
     ['manufacturer', 'Manufacturer'],
     ['form', 'Size'],
     ['material', 'Priming compound'],

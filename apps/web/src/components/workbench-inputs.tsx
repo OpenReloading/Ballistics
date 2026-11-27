@@ -465,9 +465,9 @@ export function Checklist({
         ))}
       </ol>
       <p>
-        {next === -1 || (next === 0 && todo.slice(1).every((s) => s.done))
+        {next === -1
           ? t('Ready: press Run simulation or {shortcut}.', { shortcut: shortcutLabel('run') })
-          : t('Run simulation needs every step but the cartridge.')}
+          : t('Run simulation needs every step.')}
       </p>
     </section>
   )
@@ -618,7 +618,7 @@ export function InputCards() {
 
 /** The Cartridge card's last row: the choices that depend on the cartridge, one click away; brass and capacity record go in the `choices` slot. */
 function KeepingRow() {
-  const { primerId, setPrimerChoice, system } = useLoad()
+  const { primerId, primerDefault, setPrimerChoice, system } = useLoad()
   const { t } = useTranslation()
   return (
     <details
@@ -631,7 +631,12 @@ function KeepingRow() {
     >
       <summary>{t('Primer, brass, lots')}</summary>
       <div className="keeping-fields">
-        <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
+        <PrimerChoice
+          id={primerId}
+          generic={primerDefault}
+          onChange={setPrimerChoice}
+          system={system}
+        />
         <LotField lot="primer" />
         <SeatingSlot name="choices" />
       </div>
@@ -1493,7 +1498,7 @@ function CartridgePicker() {
           cartridge?.name ??
           (cartridgeDesign
             ? t('{name} (your design)', { name: cartridgeDesign.name })
-            : t('Search cartridges (optional)'))
+            : t('Search cartridges'))
         }
         describe={cartridgeOptionText}
         onSelect={choose}

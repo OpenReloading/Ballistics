@@ -375,6 +375,9 @@
       "value": 25.09
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page84.pdf",
         "sha256": "6c275e211101ea25d98192076c176a52773c24fa10df8dc60e46af0bf0fe7f9a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .222 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.222_Remington&oldid=1387953955",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

@@ -369,6 +369,9 @@
       "value": 29.25
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page88.pdf",
         "sha256": "429f95e41892ebcb19427b4910363406e3585367e3d9ded02a6ebb9e880ec7bb",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .243 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.243_Winchester&oldid=1388096278",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Rifle."
       }
     ]
   }

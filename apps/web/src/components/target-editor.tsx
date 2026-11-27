@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n, MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Anchor,
@@ -87,8 +89,9 @@ import {
   storedRecords,
 } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import type { Message, Translator } from '../i18n/translate.ts'
 import { photoGuide } from '../lib/docs-url.ts'
 import { storageName } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -129,6 +132,7 @@ import {
   mergeWaitingCopies,
   withoutWaitingCopy,
 } from '../lib/waiting-copies.ts'
+import englishMessages from '../locales/en/components/target-editor.json' with { type: 'json' }
 import { confirmDialog, offered, offerUndo } from './confirm.tsx'
 import { FileMenu, FileMenuPlaceholder } from './file-menu.tsx'
 import { useHoleDetection } from './hole-detection.tsx'
@@ -161,6 +165,8 @@ import { type LoadSummary, printTargetSheet, TargetPrint } from './target-print.
 import { TourButton } from './tour-button.tsx'
 import { useUnits } from './units-settings.tsx'
 import type { ZeroTargetMenu } from './zero-target.tsx'
+
+loadEnglish(englishMessages)
 
 type Photo = { url: string; width: number; height: number }
 type RefKind = CalibrationReference['kind']
@@ -218,20 +224,38 @@ const defaultOverlays: Record<Overlay, boolean> = {
   rings: true,
 }
 
-const refNames: Record<RefKind, Message> = {
-  line: msg('Line'),
-  ringCentre: msg('Ring, center and edge'),
-  ringEdge: msg('Ring, three points'),
-  rectangle: msg('Rectangle, four corners'),
+const refNames: Record<RefKind, MessageDescriptor> = {
+  line: /*i18n*/ { id: 'targetEditor.line', message: 'Line' },
+  ringCentre: /*i18n*/ { id: 'targetEditor.ringCenterEdge', message: 'Ring, center and edge' },
+  ringEdge: /*i18n*/ { id: 'targetEditor.ringThreePoints', message: 'Ring, three points' },
+  rectangle: /*i18n*/ {
+    id: 'targetEditor.rectangleFourCorners',
+    message: 'Rectangle, four corners',
+  },
 }
 /** Why placing on the target waits: no scale yet. */
-const noReference = msg('Mark a reference first (Calibrate).')
+const noReference = /*i18n*/ {
+  id: 'targetEditor.markReferenceFirstCalibrate',
+  message: 'Mark a reference first (Calibrate).',
+}
 
-const refHints: Record<RefKind, Message> = {
-  line: msg('Click both ends of a known length.'),
-  ringCentre: msg('Click the ring center, then a point on the ring.'),
-  ringEdge: msg('Click three points on the ring.'),
-  rectangle: msg('Click the corners: top left, top right, bottom right, bottom left.'),
+const refHints: Record<RefKind, MessageDescriptor> = {
+  line: /*i18n*/ {
+    id: 'targetEditor.clickBothEndsKnown',
+    message: 'Click both ends of a known length.',
+  },
+  ringCentre: /*i18n*/ {
+    id: 'targetEditor.clickRingCenterThen',
+    message: 'Click the ring center, then a point on the ring.',
+  },
+  ringEdge: /*i18n*/ {
+    id: 'targetEditor.clickThreePointsRing',
+    message: 'Click three points on the ring.',
+  },
+  rectangle: /*i18n*/ {
+    id: 'targetEditor.clickCornersTopLeft',
+    message: 'Click the corners: top left, top right, bottom right, bottom left.',
+  },
 }
 
 /** A new sheet: one group at `distance` m, of ladder step `step` when the load has a ladder. */
@@ -239,10 +263,10 @@ const blank = (
   load: string | undefined,
   marker: number | undefined,
   distance: number,
-  t: Translator['t'],
+  i18n: I18n,
   step?: number | undefined,
 ): TargetSheet => {
-  const g = newGroup({ references: [], targetRotation: 0, groups: [] }, 'g1', distance, t)
+  const g = newGroup({ references: [], targetRotation: 0, groups: [] }, 'g1', distance, i18n)
   return {
     references: [],
     targetRotation: 0,
@@ -337,25 +361,25 @@ async function restoreCopy(t: Translator['t']) {
 
 /** Names of the group colors (`groupColours`), for the swatches' accessible names. */
 const colourNames = [
-  msg('Blue'),
-  msg('Orange'),
-  msg('Green'),
-  msg('Ocher'),
-  msg('Pink'),
-  msg('Purple'),
+  /*i18n*/ { id: 'targetEditor.blue', message: 'Blue' },
+  /*i18n*/ { id: 'targetEditor.orange', message: 'Orange' },
+  /*i18n*/ { id: 'targetEditor.green', message: 'Green' },
+  /*i18n*/ { id: 'targetEditor.ocher', message: 'Ocher' },
+  /*i18n*/ { id: 'targetEditor.pink', message: 'Pink' },
+  /*i18n*/ { id: 'targetEditor.purple', message: 'Purple' },
 ]
 
 /** The compass words of an aim offset as shown in the offset row. */
-const compassLabels: Record<keyof typeof compassNames, Message> = {
-  N: msg('N'),
-  NE: msg('NE'),
-  E: msg('E'),
-  SE: msg('SE'),
-  S: msg('S'),
-  SW: msg('SW'),
-  W: msg('W'),
-  NW: msg('NW'),
-  centre: msg('center'),
+const compassLabels: Record<keyof typeof compassNames, MessageDescriptor> = {
+  N: /*i18n*/ { id: 'targetEditor.compassN', message: 'N' },
+  NE: /*i18n*/ { id: 'targetEditor.compassNE', message: 'NE' },
+  E: /*i18n*/ { id: 'targetEditor.compassE', message: 'E' },
+  SE: /*i18n*/ { id: 'targetEditor.compassSE', message: 'SE' },
+  S: /*i18n*/ { id: 'targetEditor.compassS', message: 'S' },
+  SW: /*i18n*/ { id: 'targetEditor.compassSW', message: 'SW' },
+  W: /*i18n*/ { id: 'targetEditor.compassW', message: 'W' },
+  NW: /*i18n*/ { id: 'targetEditor.compassNW', message: 'NW' },
+  centre: /*i18n*/ { id: 'targetEditor.compassCenter', message: 'center' },
 }
 
 /** Above this many shots the shot table renders only the rows in view. */
@@ -591,7 +615,7 @@ type Ed = {
 
 /** The photo's display filters: contrast and darken. */
 function FilterPanel({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { sheet, filter, setFilter } = ed
   /** A filter's row: the slider, its value beside it and a reset to `none`, the photo as it is. */
   const row = (
@@ -603,7 +627,10 @@ function FilterPanel({ ed }: { ed: Ed }) {
     <Row
       key={key}
       label={label}
-      help={t('Display only; the file is unchanged.')}
+      help={i18n._({
+        id: 'targetEditor.displayOnlyFileUnchanged',
+        message: 'Display only; the file is unchanged.',
+      })}
       className="filter-row"
     >
       <Slider
@@ -621,8 +648,16 @@ function FilterPanel({ ed }: { ed: Ed }) {
       <ActionIcon
         variant="subtle"
         size={controlSize.row.icon}
-        aria-label={t('Reset {label}', { label })}
-        title={t('Reset {label}', { label })}
+        aria-label={i18n._({
+          id: 'targetEditor.resetLabel',
+          message: 'Reset {label}',
+          values: { label },
+        })}
+        title={i18n._({
+          id: 'targetEditor.resetLabel',
+          message: 'Reset {label}',
+          values: { label },
+        })}
         disabled={filter[key] === range.none}
         onClick={() => setFilter({ ...filter, [key]: range.none })}
       >
@@ -632,12 +667,15 @@ function FilterPanel({ ed }: { ed: Ed }) {
   )
   return (
     <div className="prop-grid">
-      {row('contrast', t('Contrast'), { min: 0.5, max: 3, step: 0.1, none: 1 }, (v) =>
-        fixedNumber(v, 1),
+      {row(
+        'contrast',
+        i18n._({ id: 'targetEditor.contrast', message: 'Contrast' }),
+        { min: 0.5, max: 3, step: 0.1, none: 1 },
+        (v) => fixedNumber(v, 1),
       )}
       {row(
         'darken',
-        t('Darken'),
+        i18n._({ id: 'targetEditor.darken', message: 'Darken' }),
         { min: 0, max: 0.8, step: 0.05, none: 0 },
         (v) => `${plainNumber(Math.round(v * 100))} %`,
       )}
@@ -647,17 +685,19 @@ function FilterPanel({ ed }: { ed: Ed }) {
 
 /** The shot marker's diameter. */
 function MarkerField({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { sheet, apply } = ed
   return (
     <div className="prop-grid">
       <SiField
         spec={{
           key: 'markerDiameter',
-          label: msg('Marker'),
-          help: msg(
-            'Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen.',
-          ),
+          label: /*i18n*/ { id: 'targetEditor.marker', message: 'Marker' },
+          help: /*i18n*/ {
+            id: 'targetEditor.markerHelp',
+            message:
+              'Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen.',
+          },
           quantity: 'length',
           min: 0,
           positive: true,
@@ -669,7 +709,7 @@ function MarkerField({ ed }: { ed: Ed }) {
             'markerDiameter',
           )
         }
-        placeholder={t('screen size')}
+        placeholder={i18n._({ id: 'targetEditor.screenSize', message: 'screen size' })}
       />
     </div>
   )
@@ -677,18 +717,26 @@ function MarkerField({ ed }: { ed: Ed }) {
 
 /** One scale reference of a photo: its known size and Remove. */
 function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][number]; i: number }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { sheet, frame, applyCal } = ed
   const cal = frame?.calibration
   const factor = cal?.factors[i]
   const dev = cal && factor !== undefined ? factor / cal.scale - 1 : undefined
-  const label = t('{kind} {n}', { kind: t(refNames[r.kind]).split(',')[0] ?? '', n: i + 1 })
+  const label = i18n._({
+    id: 'targetEditor.referenceLabel',
+    message: '{kind} {n, decimal}',
+    values: { kind: i18n._(refNames[r.kind]).split(',')[0] ?? '', n: i + 1 },
+  })
   const help =
     dev === undefined || sheet.references.length < 2
-      ? t(refNames[r.kind])
-      : t('{kind}; scale {deviation} % from the mean', {
-          kind: t(refNames[r.kind]),
-          deviation: `${dev >= 0 ? '+' : ''}${fixedNumber(dev * 100, 2)}`,
+      ? i18n._(refNames[r.kind])
+      : i18n._({
+          id: 'targetEditor.scaleMean',
+          message: '{kind}; scale {deviation} % from the mean',
+          values: {
+            kind: i18n._(refNames[r.kind]),
+            deviation: `${dev >= 0 ? '+' : ''}${fixedNumber(dev * 100, 2)}`,
+          },
         })
   const key = r.kind === 'line' ? 'length' : r.kind === 'rectangle' ? 'width' : 'diameter'
   const value = (r as Record<string, unknown>)[key] as number
@@ -719,11 +767,18 @@ function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][numbe
       <ActionIcon
         variant="subtle"
         size={controlSize.row.icon}
-        aria-label={t('Remove {label}', { label })}
+        aria-label={i18n._({
+          id: 'targetEditor.removeLabel',
+          message: 'Remove {label}',
+          values: { label },
+        })}
         disabled={sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)}
         title={
           sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)
-            ? t('The last reference stays while there are shots.')
+            ? i18n._({
+                id: 'targetEditor.lastReferenceStaysWhile',
+                message: 'The last reference stays while there are shots.',
+              })
             : undefined
         }
         onClick={() =>
@@ -738,32 +793,49 @@ function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][numbe
 
 /** The Calibrate panel: scale references, rotation and origin; none on a drawn target. */
 function ScalePanel({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { sheet, refKind, setRefKind, known, setKnown, tool, calTool, applyCal, frame } = ed
   const cal = frame?.calibration
   if (!sheet.photo)
     return (
-      <p className="note">{t('A drawn target: shots in target coordinates, no scale needed.')}</p>
+      <p className="note">
+        {i18n._({
+          id: 'targetEditor.drawnTargetShotsTarget',
+          message: 'A drawn target: shots in target coordinates, no scale needed.',
+        })}
+      </p>
     )
   return (
     <div className="prop-grid">
       <NativeSelect
-        label={t('Reference')}
+        label={i18n._({ id: 'targetEditor.reference', message: 'Reference' })}
         size={controlSize.row.input}
-        data={Object.entries(refNames).map(([value, label]) => ({ value, label: t(label) }))}
+        data={Object.entries(refNames).map(([value, label]) => ({ value, label: i18n._(label) }))}
         value={refKind}
         onChange={(e) => setRefKind(e.currentTarget.value as RefKind)}
-        title={t(refHints[refKind])}
+        title={i18n._(refHints[refKind])}
       />
       {refKind === 'rectangle' ? (
         <>
           <SiField
-            spec={{ key: 'w', label: msg('Width'), quantity: 'length', min: 0, positive: true }}
+            spec={{
+              key: 'w',
+              label: /*i18n*/ { id: 'targetEditor.width', message: 'Width' },
+              quantity: 'length',
+              min: 0,
+              positive: true,
+            }}
             si={known.width}
             onCommit={(si) => setKnown({ ...known, width: si })}
           />
           <SiField
-            spec={{ key: 'h', label: msg('Height'), quantity: 'length', min: 0, positive: true }}
+            spec={{
+              key: 'h',
+              label: /*i18n*/ { id: 'targetEditor.height', message: 'Height' },
+              quantity: 'length',
+              min: 0,
+              positive: true,
+            }}
             si={known.height}
             onCommit={(si) => setKnown({ ...known, height: si })}
           />
@@ -772,7 +844,10 @@ function ScalePanel({ ed }: { ed: Ed }) {
         <SiField
           spec={{
             key: 'len',
-            label: refKind === 'line' ? msg('Known length') : msg('Ring diameter'),
+            label:
+              refKind === 'line'
+                ? /*i18n*/ { id: 'targetEditor.knownLength', message: 'Known length' }
+                : /*i18n*/ { id: 'targetEditor.ringDiameter', message: 'Ring diameter' },
             quantity: 'length',
             min: 0,
             positive: true,
@@ -788,9 +863,9 @@ function ScalePanel({ ed }: { ed: Ed }) {
         data-cal="mark"
         disabled={refKind === 'rectangle' ? !(known.width && known.height) : !known.length}
         onClick={() => calTool('mark', refKind)}
-        title={t(refHints[refKind])}
+        title={i18n._(refHints[refKind])}
       >
-        {t('Mark on photo')}
+        {i18n._({ id: 'targetEditor.markPhoto', message: 'Mark on photo' })}
       </Button>
       {sheet.references.map((r, i) => (
         // oxlint-disable-next-line react/no-array-index-key -- references keep their order
@@ -798,10 +873,12 @@ function ScalePanel({ ed }: { ed: Ed }) {
       ))}
       {sheet.references.length > 1 && cal && (
         <Row
-          label={t('Spread')}
-          help={t(
-            'Largest minus smallest reference scale over their mean. An angled photo shows here; a rectangle corrects it.',
-          )}
+          label={i18n._({ id: 'targetEditor.spread', message: 'Spread' })}
+          help={i18n._({
+            id: 'targetEditor.largestMinusSmallestReference',
+            message:
+              'Largest minus smallest reference scale over their mean. An angled photo shows here; a rectangle corrects it.',
+          })}
         >
           {fixedNumber(cal.spread * 100, 2)} %
         </Row>
@@ -809,18 +886,23 @@ function ScalePanel({ ed }: { ed: Ed }) {
       <SiField
         spec={{
           key: 'targetRotation',
-          label: msg('Target axis angle'),
-          help: msg(
-            "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes.",
-          ),
+          label: /*i18n*/ { id: 'targetEditor.targetAxisAngle', message: 'Target axis angle' },
+          help: /*i18n*/ {
+            id: 'targetEditor.targetAxisAngleHelp',
+            message:
+              "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes.",
+          },
           quantity: 'angle',
         }}
         si={sheet.targetRotation}
         onCommit={(si) => applyCal((s) => ({ ...s, targetRotation: si ?? 0 }), 'targetRotation')}
       />
       <Row
-        label={t('Origin point')}
-        help={t('The photo point of target (0, 0). Shots stay on their holes.')}
+        label={i18n._({ id: 'targetEditor.originPoint', message: 'Origin point' })}
+        help={i18n._({
+          id: 'targetEditor.photoPointTarget0',
+          message: 'The photo point of target (0, 0). Shots stay on their holes.',
+        })}
       >
         <Button
           size={controlSize.row.button}
@@ -828,7 +910,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
           data-cal="origin"
           onClick={() => calTool('origin', 'origin')}
         >
-          {t('Set on photo')}
+          {i18n._({ id: 'targetEditor.setPhoto', message: 'Set on photo' })}
         </Button>
       </Row>
     </div>
@@ -836,16 +918,25 @@ function ScalePanel({ ed }: { ed: Ed }) {
 }
 
 /** The colors offered: the series colors and a stored color that is not one of them. */
-function coloursOf(group: ShotGroup | undefined, t: Translator['t']) {
+function coloursOf(group: ShotGroup | undefined, i18n: I18n) {
   if (!group) return []
   return [
     ...groupColours.map((c, i) => {
       const name = colourNames[i]
-      return { value: c, label: name ? t(name) : c }
+      return { value: c, label: name ? i18n._(name) : c }
     }),
     ...(groupColours.includes(group.colour)
       ? []
-      : [{ value: group.colour, label: t('Color {color}', { color: group.colour }) }]),
+      : [
+          {
+            value: group.colour,
+            label: i18n._({
+              id: 'targetEditor.colorName',
+              message: 'Color {color}',
+              values: { color: group.colour },
+            }),
+          },
+        ]),
   ]
 }
 
@@ -870,9 +961,9 @@ function GroupPanel({ ed }: { ed: Ed }) {
     setSelected,
     deleteGroup,
   } = ed
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const len = system.length
-  const colours = coloursOf(group, t)
+  const colours = coloursOf(group, i18n)
   return (
     <div className="prop-grid">
       {/* above the list: a delete that shortens the list moves neither button (a double click deletes two groups) */}
@@ -890,29 +981,32 @@ function GroupPanel({ ed }: { ed: Ed }) {
                 sheet.groups.map((x) => x.id),
               ),
               group?.distance ?? newDistance.current,
-              t,
+              i18n,
             )
             const linked = charges && step !== undefined ? { ...g, ladderStep: step } : g
             apply((s) => ({ ...s, groups: [...s.groups, linked] }))
             setActive(g.id)
           }}
         >
-          {t('Add group')}
+          {i18n._({ id: 'targetEditor.addGroup', message: 'Add group' })}
         </Button>
         <Button
           size={controlSize.row.button}
           variant="default"
           color="red"
-          title={t('Delete the active group; Undo brings it back')}
+          title={i18n._({
+            id: 'targetEditor.deleteActiveGroupUndo',
+            message: 'Delete the active group; Undo brings it back',
+          })}
           disabled={!group || sheet.groups.length < 2}
           onClick={deleteGroup}
         >
-          {t('Delete')}
+          {i18n._({ id: 'targetEditor.delete', message: 'Delete' })}
         </Button>
       </span>
       <div className="wide">
         <Radio.Group
-          label={t('Groups')}
+          label={i18n._({ id: 'targetEditor.groups', message: 'Groups' })}
           labelProps={{ className: 'visually-hidden' }}
           name={`${uid}-group`}
           value={group?.id ?? ''}
@@ -940,18 +1034,22 @@ function GroupPanel({ ed }: { ed: Ed }) {
       {group && (
         <>
           <TextInput
-            label={t('Group name')}
+            label={i18n._({ id: 'targetEditor.groupName', message: 'Group name' })}
             size={controlSize.row.input}
             value={group.name}
             maxLength={200}
-            error={group.name ? undefined : t('Enter a name.')}
+            error={
+              group.name
+                ? undefined
+                : i18n._({ id: 'targetEditor.enterName', message: 'Enter a name.' })
+            }
             onChange={(e) => {
               const name = e.currentTarget.value
               onGroup((g) => ({ ...g, name }), `name ${group.id}`)
             }}
           />
           <Radio.Group
-            label={t('Color')}
+            label={i18n._({ id: 'targetEditor.colorLabel', message: 'Color' })}
             className="colour-row"
             size={controlSize.row.input}
             name={`${uid}-colour`}
@@ -980,8 +1078,11 @@ function GroupPanel({ ed }: { ed: Ed }) {
           <SiField
             spec={{
               key: 'distance',
-              label: msg('Distance'),
-              help: msg('Muzzle to target; the angles use it.'),
+              label: /*i18n*/ { id: 'targetEditor.distance', message: 'Distance' },
+              help: /*i18n*/ {
+                id: 'targetEditor.distanceHelp',
+                message: 'Muzzle to target; the angles use it.',
+              },
               quantity: 'range',
               min: 0,
               positive: true,
@@ -994,15 +1095,19 @@ function GroupPanel({ ed }: { ed: Ed }) {
           />
           {charges && (
             <NativeSelect
-              label={t('Ladder step')}
+              label={i18n._({ id: 'targetEditor.ladderStep', message: 'Ladder step' })}
               size={controlSize.row.input}
               data={[
-                { value: '', label: t('None') },
+                { value: '', label: i18n._({ id: 'targetEditor.none', message: 'None' }) },
                 ...charges.map((c, i) => ({
                   value: String(i),
-                  label: t('{step}: {charge}', {
-                    step: stepLabels?.[i] ?? i + 1,
-                    charge: withUnit('charge', system, c),
+                  label: i18n._({
+                    id: 'targetEditor.stepCharge',
+                    message: '{step}: {charge}',
+                    values: {
+                      step: stepLabels?.[i] ?? String(i + 1),
+                      charge: withUnit('charge', system, c),
+                    },
                   }),
                 })),
               ]}
@@ -1018,18 +1123,28 @@ function GroupPanel({ ed }: { ed: Ed }) {
           <div className="prop-row aim-row">
             <span
               className="prop-label"
-              title={t(
-                "Each group's point of aim: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.",
-              )}
+              title={i18n._({
+                id: 'targetEditor.eachGroupSPoint',
+                message:
+                  "Each group's point of aim: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.",
+              })}
             >
-              {t('Aim ({unit})', { unit: len.symbol })}
+              {i18n._({
+                id: 'targetEditor.aimUnit',
+                message: 'Aim ({unit})',
+                values: { unit: len.symbol },
+              })}
             </span>
             <span className="prop-value aim-fields">
               {(['x', 'y'] as const).map((axis) => (
                 <span key={axis} className="aim-axis">
                   <span aria-hidden="true">{axis}</span>
                   <CoordInput
-                    label={t('Point of aim {axis}', { axis })}
+                    label={i18n._({
+                      id: 'targetEditor.pointOfAimAxis',
+                      message: 'Point of aim {axis}',
+                      values: { axis },
+                    })}
                     si={group.aim?.[axis]}
                     disabled={!frame}
                     onCommit={(v) =>
@@ -1048,10 +1163,17 @@ function GroupPanel({ ed }: { ed: Ed }) {
               size={controlSize.row.button}
               variant={tool === 'aim' ? 'filled' : 'default'}
               disabled={!frame}
-              title={frame ? t('Click the point of aim on the target') : t(noReference)}
+              title={
+                frame
+                  ? i18n._({
+                      id: 'targetEditor.clickPointAimTarget',
+                      message: 'Click the point of aim on the target',
+                    })
+                  : i18n._(noReference)
+              }
               onClick={() => startTool('aim')}
             >
-              {t('Set')}
+              {i18n._({ id: 'targetEditor.set', message: 'Set' })}
             </Button>
             <Button
               size={controlSize.row.button}
@@ -1059,7 +1181,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
               disabled={!group.aim}
               onClick={() => onGroup(({ aim: _, ...g }) => g)}
             >
-              {t('Clear')}
+              {i18n._({ id: 'targetEditor.clear', message: 'Clear' })}
             </Button>
           </span>
           {score.panel}
@@ -1071,7 +1193,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
 
 /** The add shot button of the shots panel's head. */
 function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, frame, root } = ed
   if (!group) return null
   return (
@@ -1090,13 +1212,15 @@ function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void })
       }}
       title={
         frame
-          ? t(
-              'A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields.',
-            )
-          : t(noReference)
+          ? i18n._({
+              id: 'targetEditor.shotPointAimOrigin',
+              message:
+                'A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields.',
+            })
+          : i18n._(noReference)
       }
     >
-      {t('Add shot')}
+      {i18n._({ id: 'targetEditor.addShot', message: 'Add shot' })}
     </Button>
   )
 }
@@ -1117,7 +1241,7 @@ function ShotsPanel({ ed }: { ed: Ed }) {
     toggle,
     remove,
   } = ed
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!group) return null
   const len = system.length
   const { windowed, firstRow, lastRow, rowHeight, shotCount } = shotWindow
@@ -1157,20 +1281,25 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                 {group.face && (
                   <Table.Th
                     scope="col"
-                    title={`${t('Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
+                    title={`${i18n._({ id: 'targetEditor.ringValueTenthsWhere', message: 'Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total.' })}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
                   >
-                    {t('Score')}
+                    {i18n._({ id: 'targetEditor.score', message: 'Score' })}
                   </Table.Th>
                 )}
                 <Table.Th
                   scope="col"
-                  title={t('Excluded: left out of the statistics, still shown and counted')}
+                  title={i18n._({
+                    id: 'targetEditor.excludedLeftOutStatistics',
+                    message: 'Excluded: left out of the statistics, still shown and counted',
+                  })}
                 >
-                  {t('Excl.')}
+                  {i18n._({ id: 'targetEditor.excl', message: 'Excl.' })}
                 </Table.Th>
                 {!compact && (
                   <Table.Th scope="col">
-                    <span className="visually-hidden">{t('Delete')}</span>
+                    <span className="visually-hidden">
+                      {i18n._({ id: 'targetEditor.delete', message: 'Delete' })}
+                    </span>
                   </Table.Th>
                 )}
               </Table.Tr>
@@ -1181,7 +1310,11 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                 const sel = { group: group.id, index: i }
                 const coord = (axis: 'x' | 'y') => (
                   <CoordInput
-                    label={t('Shot {n} {axis}', { n: i + 1, axis })}
+                    label={i18n._({
+                      id: 'targetEditor.shotAxis',
+                      message: 'Shot {n} {axis}',
+                      values: { n: i + 1, axis },
+                    })}
                     si={s[axis]}
                     onCommit={(v) =>
                       shotAt(sel, (x) => ({ ...x, [axis]: v }), `${group.id}:${axis}:${i}`)
@@ -1206,7 +1339,11 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                     <Table.Td>
                       <Checkbox
                         size="xs"
-                        aria-label={t('Exclude shot {n}', { n: i + 1 })}
+                        aria-label={i18n._({
+                          id: 'targetEditor.excludeShot',
+                          message: 'Exclude shot {n}',
+                          values: { n: i + 1 },
+                        })}
                         checked={!!s.excluded}
                         onChange={() => toggle(sel)}
                       />
@@ -1216,7 +1353,11 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                         <ActionIcon
                           variant="subtle"
                           size={controlSize.row.icon}
-                          aria-label={t('Delete shot {n}', { n: i + 1 })}
+                          aria-label={i18n._({
+                            id: 'targetEditor.deleteShot',
+                            message: 'Delete shot {n}',
+                            values: { n: i + 1 },
+                          })}
                           onClick={() => remove(sel)}
                         >
                           <Trash size={14} aria-hidden="true" />
@@ -1250,6 +1391,7 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
     click,
   } = ed
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!group || !stats) return null
   const len = system.length
   const offset = stats.aimOffset
@@ -1263,12 +1405,18 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
     <div className="stats-panel">
       <Table className="readout-table" withRowBorders horizontalSpacing={4} verticalSpacing={0}>
         <caption className="visually-hidden">
-          {t('Statistics of {name}', { name: group.name })}
+          {i18n._({
+            id: 'targetEditor.statistics',
+            message: 'Statistics of {name}',
+            values: { name: group.name },
+          })}
         </caption>
         <Table.Thead>
           <Table.Tr>
             <Table.Th scope="col">
-              <span className="visually-hidden">{t('Value')}</span>
+              <span className="visually-hidden">
+                {i18n._({ id: 'targetEditor.value', message: 'Value' })}
+              </span>
             </Table.Th>
             <Table.Th scope="col">{len.symbol}</Table.Th>
             <Table.Th scope="col">MOA</Table.Th>
@@ -1279,17 +1427,23 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
           <Table.Tr>
             <Table.Th
               scope="row"
-              title={t(
-                'Shots in the statistics; excluded shots are shown and counted, not measured.',
-              )}
+              title={i18n._({
+                id: 'targetEditor.shotsStatisticsExcludedShots',
+                message:
+                  'Shots in the statistics; excluded shots are shown and counted, not measured.',
+              })}
             >
-              {t('Shots')}
+              {i18n._({ id: 'targetEditor.shots', message: 'Shots' })}
             </Table.Th>
             <Table.Td colSpan={3}>
               {stats.excludedCount
-                ? t('{count} ({excluded} excluded)', {
-                    count: stats.shotCount,
-                    excluded: stats.excludedCount,
+                ? i18n._({
+                    id: 'targetEditor.excluded',
+                    message: '{count} ({excluded} excluded)',
+                    values: {
+                      count: stats.shotCount,
+                      excluded: stats.excludedCount,
+                    },
                   })
                 : plainNumber(stats.shotCount)}
             </Table.Td>
@@ -1299,22 +1453,30 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
               <Table.Tr>
                 <Table.Th
                   scope="row"
-                  title={`${t('Sum of the ring values of the included shots; decimal sum in brackets.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
+                  title={`${i18n._({ id: 'targetEditor.sumRingValuesIncluded', message: 'Sum of the ring values of the included shots; decimal sum in brackets.' })}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
                 >
-                  {t('Score')}
+                  {i18n._({ id: 'targetEditor.score', message: 'Score' })}
                 </Table.Th>
                 <Table.Td colSpan={3}>
                   {groupScore
                     ? `${plainNumber(groupScore.score.total)}${groupScore.score.decimalTotal !== undefined ? ` (${fixedNumber(groupScore.score.decimalTotal, 1)})` : ''}`
-                    : t('n/a')}
+                    : i18n._({ id: 'targetEditor.notAvailable', message: 'n/a' })}
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
-                <Table.Th scope="row" title={t('Inner tens (X) among the included shots.')}>
-                  {t('Inner tens')}
+                <Table.Th
+                  scope="row"
+                  title={i18n._({
+                    id: 'targetEditor.innerTensXAmong',
+                    message: 'Inner tens (X) among the included shots.',
+                  })}
+                >
+                  {i18n._({ id: 'targetEditor.innerTens', message: 'Inner tens' })}
                 </Table.Th>
                 <Table.Td colSpan={3}>
-                  {groupScore ? plainNumber(groupScore.score.innerTenCount) : t('n/a')}
+                  {groupScore
+                    ? plainNumber(groupScore.score.innerTenCount)
+                    : i18n._({ id: 'targetEditor.notAvailable', message: 'n/a' })}
                 </Table.Td>
               </Table.Tr>
             </>
@@ -1324,12 +1486,17 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
             .map((r) => {
               const [a, b] = angles(r.angle)
               const range = (iv: Interval) =>
-                t('{level} % interval {lower} to {upper} {unit} ({df} degrees of freedom)', {
-                  level: Math.round(iv.level * 100),
-                  lower: formatQuantity('length', system, iv.lower),
-                  upper: formatQuantity('length', system, iv.upper),
-                  unit: len.symbol,
-                  df: iv.degreesOfFreedom,
+                i18n._({
+                  id: 'targetEditor.intervalDegreesFreedom',
+                  message:
+                    '{level, decimal} % interval {lower} to {upper} {unit} ({df, decimal} degrees of freedom)',
+                  values: {
+                    level: Math.round(iv.level * 100),
+                    lower: formatQuantity('length', system, iv.lower),
+                    upper: formatQuantity('length', system, iv.upper),
+                    unit: len.symbol,
+                    df: iv.degreesOfFreedom,
+                  },
                 })
               const c = r.circular
               const estimate = c && formatQuantity('length', system, c.value)
@@ -1338,23 +1505,37 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
                 r.interval &&
                   ` ${
                     r.interval.circular
-                      ? t('{interval}; assumes circular spread.', { interval: range(r.interval) })
-                      : t('{interval}.', { interval: range(r.interval) })
+                      ? i18n._({
+                          id: 'targetEditor.assumesCircularSpread',
+                          message: '{interval}; assumes circular spread.',
+                          values: { interval: range(r.interval) },
+                        })
+                      : i18n._({
+                          id: 'targetEditor.intervalOnly',
+                          message: '{interval}.',
+                          values: { interval: range(r.interval) },
+                        })
                   }`,
                 c &&
                   ` ${
                     c.interval
-                      ? t(
-                          'Circular estimate {value} {unit}, {interval}; assumes circular spread.',
-                          {
+                      ? i18n._({
+                          id: 'targetEditor.circularEstimateAssumesCircular',
+                          message:
+                            'Circular estimate {value} {unit}, {interval}; assumes circular spread.',
+                          values: {
                             value: estimate ?? '',
                             unit: len.symbol,
                             interval: range(c.interval),
                           },
-                        )
-                      : t('Circular estimate {value} {unit}; assumes circular spread.', {
-                          value: estimate ?? '',
-                          unit: len.symbol,
+                        })
+                      : i18n._({
+                          id: 'targetEditor.circularEstimateNoInterval',
+                          message: 'Circular estimate {value} {unit}; assumes circular spread.',
+                          values: {
+                            value: estimate ?? '',
+                            unit: len.symbol,
+                          },
                         })
                   }`,
               ].join('')
@@ -1372,12 +1553,18 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
           {offset && !ed.compact && (
             <>
               <Table.Tr>
-                <Table.Th scope="row" title={t('Group center from the point of aim.')}>
-                  {t('Offset')}
+                <Table.Th
+                  scope="row"
+                  title={i18n._({
+                    id: 'targetEditor.groupCenterPointAim',
+                    message: 'Group center from the point of aim.',
+                  })}
+                >
+                  {i18n._({ id: 'targetEditor.offset', message: 'Offset' })}
                 </Table.Th>
                 <Table.Td>{formatQuantity('length', system, offset.distance)}</Table.Td>
-                <Table.Td colSpan={2} title={t(compassNames[offset.compass])}>
-                  {t(compassLabels[offset.compass])}
+                <Table.Td colSpan={2} title={i18n._(compassNames[offset.compass])}>
+                  {i18n._(compassLabels[offset.compass])}
                 </Table.Td>
               </Table.Tr>
               {(['x', 'y'] as const).map((axis) => {
@@ -1389,11 +1576,19 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
                       scope="row"
                       title={
                         axis === 'x'
-                          ? t('Right of the point of aim: positive.')
-                          : t('Above the point of aim: positive.')
+                          ? i18n._({
+                              id: 'targetEditor.rightPointAimPositive',
+                              message: 'Right of the point of aim: positive.',
+                            })
+                          : i18n._({
+                              id: 'targetEditor.abovePointAimPositive',
+                              message: 'Above the point of aim: positive.',
+                            })
                       }
                     >
-                      {axis === 'x' ? t('Offset horiz.') : t('Offset vert.')}
+                      {axis === 'x'
+                        ? i18n._({ id: 'targetEditor.offsetHoriz', message: 'Offset horiz.' })
+                        : i18n._({ id: 'targetEditor.offsetVert', message: 'Offset vert.' })}
                     </Table.Th>
                     <Table.Td>{formatQuantity('length', system, d)}</Table.Td>
                     <Table.Td>{a}</Table.Td>
@@ -1405,35 +1600,39 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
                 <Table.Tr>
                   <Table.Th
                     scope="row"
-                    title={t(
-                      'Clicks of {optic} ({mrad} mrad, {moa} MOA) that move the group center onto the point of aim.',
-                      {
+                    title={i18n._({
+                      id: 'targetEditor.clicksMradMoaThat',
+                      message:
+                        'Clicks of {optic} ({mrad} mrad, {moa} MOA) that move the group center onto the point of aim.',
+                      values: {
                         optic: click.label,
                         mrad: formatNumber(mrad.fromSi(click.click), 3),
                         moa: formatNumber(moa.fromSi(click.click), 3),
                       },
-                    )}
+                    })}
                   >
-                    {t('Clicks')}
+                    {i18n._({ id: 'targetEditor.clicks', message: 'Clicks' })}
                   </Table.Th>
                   <Table.Td colSpan={3}>
                     {(() => {
                       const c = clicksToAim(offset, group.distance, click.click)
                       const direction = {
-                        left: t('left'),
-                        right: t('right'),
-                        up: t('up'),
-                        down: t('down'),
+                        left: i18n._({ id: 'targetEditor.left', message: 'left' }),
+                        right: i18n._({ id: 'targetEditor.right', message: 'right' }),
+                        up: i18n._({ id: 'targetEditor.up', message: 'up' }),
+                        down: i18n._({ id: 'targetEditor.down', message: 'down' }),
                       }
-                      return t(
-                        '{horizontal} {horizontalDirection}, {vertical} {verticalDirection}',
-                        {
+                      return i18n._({
+                        id: 'targetEditor.clicksBoth',
+                        message:
+                          '{horizontal, decimal} {horizontalDirection}, {vertical, decimal} {verticalDirection}',
+                        values: {
                           horizontal: c.horizontal.clicks,
                           horizontalDirection: direction[c.horizontal.direction],
                           vertical: c.vertical.clicks,
                           verticalDirection: direction[c.vertical.direction],
                         },
-                      )
+                      })
                     })()}
                   </Table.Td>
                 </Table.Tr>
@@ -1445,9 +1644,9 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
       {!optic && offset && !ed.compact && options.length > 0 && (
         <NativeSelect
           size={controlSize.row.input}
-          label={t('Optic for clicks')}
+          label={i18n._({ id: 'targetEditor.opticClicks', message: 'Optic for clicks' })}
           data={[
-            { value: '', label: t('None') },
+            { value: '', label: i18n._({ id: 'targetEditor.none', message: 'None' }) },
             ...options.map((o) => ({ value: o.value, label: o.label })),
           ]}
           value={opticChoice}
@@ -1459,17 +1658,19 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
 }
 
 /** A key value of the group as text with its unit; n/a without it. */
-function keyValueText(keyValues: Ed['keyValues'], system: System, key: string, t: Translator['t']) {
+function keyValueText(keyValues: Ed['keyValues'], system: System, key: string, i18n: I18n) {
   const r = keyValues.find((x) => x.key === key)
-  return r ? `${formatQuantity('length', system, r.value)} ${system.length.symbol}` : t('n/a')
+  return r
+    ? `${formatQuantity('length', system, r.value)} ${system.length.symbol}`
+    : i18n._({ id: 'targetEditor.notAvailable', message: 'n/a' })
 }
 
 /** The group's count and key values in one row. */
 function Headline({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, keyValues, system } = ed
   if (!group || !stats) return null
-  const keyValue = (key: string) => keyValueText(keyValues, system, key, t)
+  const keyValue = (key: string) => keyValueText(keyValues, system, key, i18n)
   return (
     <dl className="stat-head">
       <div>
@@ -1477,15 +1678,15 @@ function Headline({ ed }: { ed: Ed }) {
         <dd>{plainNumber(stats.shotCount)}</dd>
       </div>
       <div>
-        <dt>{t('ES')}</dt>
+        <dt>{i18n._({ id: 'targetEditor.es', message: 'ES' })}</dt>
         <dd>{keyValue('extremeSpread')}</dd>
       </div>
       <div>
-        <dt>{t('Mean radius')}</dt>
+        <dt>{i18n._({ id: 'targetEditor.meanRadius', message: 'Mean radius' })}</dt>
         <dd>{keyValue('meanRadius')}</dd>
       </div>
       <div>
-        <dt>{t('CEP')}</dt>
+        <dt>{i18n._({ id: 'targetEditor.cep', message: 'CEP' })}</dt>
         <dd>{keyValue('cepElliptical')}</dd>
       </div>
     </dl>
@@ -1494,7 +1695,7 @@ function Headline({ ed }: { ed: Ed }) {
 
 /** Groups per ladder step of the load: the extreme spread chart and its table. */
 function LadderPanel({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { charges, ladderRows, system, stepLabels, sheet, sessions, apply, impact } = ed
   if (!charges) return null
   const turn = system.correction
@@ -1506,29 +1707,61 @@ function LadderPanel({ ed }: { ed: Ed }) {
         <LazyLineChart
           x={ladderRows.map((r) => system.charge.fromSi(r.charge))}
           y={ladderRows.map((r) => turn.fromSi(r.angle))}
-          xLabel={t('Charge ({unit})', { unit: system.charge.symbol })}
-          yLabel={t('Extreme spread ({unit})', { unit: turn.symbol })}
-          title={t('Group extreme spread against charge')}
-          description={t(
-            'Mean extreme spread per ladder step as an angle, so groups at different distances compare, against charge; the table lists the values.',
-          )}
+          xLabel={i18n._({
+            id: 'targetEditor.chargeUnit',
+            message: 'Charge ({unit})',
+            values: { unit: system.charge.symbol },
+          })}
+          yLabel={i18n._({
+            id: 'targetEditor.extremeSpreadUnit',
+            message: 'Extreme spread ({unit})',
+            values: { unit: turn.symbol },
+          })}
+          title={i18n._({
+            id: 'targetEditor.groupExtremeSpreadAgainst',
+            message: 'Group extreme spread against charge',
+          })}
+          description={i18n._({
+            id: 'targetEditor.meanExtremeSpreadPer',
+            message:
+              'Mean extreme spread per ladder step as an angle, so groups at different distances compare, against charge; the table lists the values.',
+          })}
           height={200}
         />
       ) : (
         <p className="note">
-          {t('Groups at two or more ladder steps give a chart of size against charge.')}
+          {i18n._({
+            id: 'targetEditor.groupsTwoMoreLadder',
+            message: 'Groups at two or more ladder steps give a chart of size against charge.',
+          })}
         </p>
       )}
       <Table className="readout-table" withRowBorders horizontalSpacing={4} verticalSpacing={0}>
-        <caption className="visually-hidden">{t('Groups per ladder step')}</caption>
+        <caption className="visually-hidden">
+          {i18n._({ id: 'targetEditor.groupsPerLadderStep', message: 'Groups per ladder step' })}
+        </caption>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th scope="col">{t('Step')}</Table.Th>
+            <Table.Th scope="col">{i18n._({ id: 'targetEditor.step', message: 'Step' })}</Table.Th>
             <Table.Th scope="col">{system.charge.symbol}</Table.Th>
-            <Table.Th scope="col">{t('Groups')}</Table.Th>
-            <Table.Th scope="col">{t('ES ({unit})', { unit: turn.symbol })}</Table.Th>
+            <Table.Th scope="col">
+              {i18n._({ id: 'targetEditor.groups', message: 'Groups' })}
+            </Table.Th>
+            <Table.Th scope="col">
+              {i18n._({
+                id: 'targetEditor.esUnit',
+                message: 'ES ({unit})',
+                values: { unit: turn.symbol },
+              })}
+            </Table.Th>
             {oneDistance && (
-              <Table.Th scope="col">{t('ES ({unit})', { unit: len.symbol })}</Table.Th>
+              <Table.Th scope="col">
+                {i18n._({
+                  id: 'targetEditor.esUnit',
+                  message: 'ES ({unit})',
+                  values: { unit: len.symbol },
+                })}
+              </Table.Th>
             )}
           </Table.Tr>
         </Table.Thead>
@@ -1560,6 +1793,7 @@ function LadderPanel({ ed }: { ed: Ed }) {
 /** The statistics box of the canvas and the exports: the group's name, lines and score. */
 function StatsBoxContent({ ed }: { ed: Ed }) {
   const translator = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, keyValues, system, groupScore } = ed
   if (!group || !stats) return null
   return (
@@ -1569,7 +1803,13 @@ function StatsBoxContent({ ed }: { ed: Ed }) {
         <span key={line}>{line}</span>
       ))}
       {groupScore && (
-        <span>{translator.t('Score {score}', { score: scoreLine(groupScore) ?? '' })}</span>
+        <span>
+          {i18n._({
+            id: 'targetEditor.scoreLine',
+            message: 'Score {score}',
+            values: { score: scoreLine(groupScore) ?? '' },
+          })}
+        </span>
       )}
     </>
   )
@@ -1646,11 +1886,11 @@ function ToolPopover({
 
 /** The sheet's name while it is renamed. */
 function SheetName({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { meta, setMeta, setRenaming, root } = ed
   return (
     <TextInput
-      aria-label={t('Sheet name')}
+      aria-label={i18n._({ id: 'targetEditor.sheetName', message: 'Sheet name' })}
       className="sheet-select"
       value={meta.name}
       maxLength={200}
@@ -1665,7 +1905,11 @@ function SheetName({ ed }: { ed: Ed }) {
         }
       }}
       onBlur={() => {
-        if (!meta.name) setMeta((m) => ({ ...m, name: t('Target sheet') }))
+        if (!meta.name)
+          setMeta((m) => ({
+            ...m,
+            name: i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' }),
+          }))
         setRenaming(false)
         requestAnimationFrame(() =>
           root.current?.querySelector<HTMLElement>('[data-rename]')?.focus(),
@@ -1677,11 +1921,11 @@ function SheetName({ ed }: { ed: Ed }) {
 
 /** The list of the sheets of this browser. */
 function SheetSelect({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { meta, sheets, stored, open } = ed
   return (
     <NativeSelect
-      aria-label={t('Target sheet')}
+      aria-label={i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' })}
       // the narrow list cuts a long name
       title={meta.name}
       className="sheet-select"
@@ -1700,18 +1944,29 @@ function SheetSelect({ ed }: { ed: Ed }) {
 
 /** Rename, new and delete; the compact tab keeps one row, so they are in Expand. */
 function SheetButtons({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, setRenaming, create, stored, deleteSheet } = ed
   if (compact) return null
   return (
     <>
-      <IconButton label={t('Rename sheet')} data-rename onClick={() => setRenaming(true)}>
+      <IconButton
+        label={i18n._({ id: 'targetEditor.renameSheet', message: 'Rename sheet' })}
+        data-rename
+        onClick={() => setRenaming(true)}
+      >
         <Pencil />
       </IconButton>
-      <IconButton label={t('New sheet')} onClick={create}>
+      <IconButton
+        label={i18n._({ id: 'targetEditor.newSheet', message: 'New sheet' })}
+        onClick={create}
+      >
         <FilePlus />
       </IconButton>
-      <IconButton label={t('Delete sheet')} disabled={!stored} onClick={deleteSheet}>
+      <IconButton
+        label={i18n._({ id: 'targetEditor.deleteSheet', message: 'Delete sheet' })}
+        disabled={!stored}
+        onClick={deleteSheet}
+      >
         <Trash />
       </IconButton>
     </>
@@ -1720,18 +1975,24 @@ function SheetButtons({ ed }: { ed: Ed }) {
 
 /** The Photo popover's content: the photo's buttons and its display filters. */
 function PhotoPanel({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { sheet, coarse, setPop, fileInput, cameraInput, removePhoto } = ed
   return (
     <>
-      <h2 className="prop-head">{t('Photo')}</h2>
+      <h2 className="prop-head">{i18n._({ id: 'targetEditor.photo', message: 'Photo' })}</h2>
       <p className="note">
-        {t('Choose, drop or paste a photo; it stays in this browser and is never uploaded.')}
+        {i18n._({
+          id: 'targetEditor.chooseDropPastePhoto',
+          message: 'Choose, drop or paste a photo; it stays in this browser and is never uploaded.',
+        })}
         {photoGuide && (
           <>
             {' '}
             <Anchor href={photoGuide} target="_blank" rel="noopener">
-              {t('How to take a photo the app can score')}
+              {i18n._({
+                id: 'targetEditor.howTakePhotoApp',
+                message: 'How to take a photo the app can score',
+              })}
             </Anchor>
           </>
         )}
@@ -1746,7 +2007,9 @@ function PhotoPanel({ ed }: { ed: Ed }) {
             fileInput.current?.click()
           }}
         >
-          {sheet.photo ? t('Replace photo') : t('Add photo')}
+          {sheet.photo
+            ? i18n._({ id: 'targetEditor.replacePhoto', message: 'Replace photo' })
+            : i18n._({ id: 'targetEditor.addPhoto', message: 'Add photo' })}
         </Button>
         {coarse && (
           <Button
@@ -1758,7 +2021,7 @@ function PhotoPanel({ ed }: { ed: Ed }) {
               cameraInput.current?.click()
             }}
           >
-            {t('Camera')}
+            {i18n._({ id: 'targetEditor.camera', message: 'Camera' })}
           </Button>
         )}
         <Button
@@ -1771,7 +2034,7 @@ function PhotoPanel({ ed }: { ed: Ed }) {
             void removePhoto()
           }}
         >
-          {t('Remove photo')}
+          {i18n._({ id: 'targetEditor.removePhoto', message: 'Remove photo' })}
         </Button>
       </Flex>
       <FilterPanel ed={ed} />
@@ -1781,14 +2044,16 @@ function PhotoPanel({ ed }: { ed: Ed }) {
 
 /** The photo tool: a button in the compact tab, a popover otherwise. */
 function PhotoTool({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, fileInput } = ed
   if (compact)
     return (
       <IconButton
-        label={t(
-          'Photo: choose, drop or paste one; it stays in this browser and is never uploaded',
-        )}
+        label={i18n._({
+          id: 'targetEditor.photoChooseDropPaste',
+          message:
+            'Photo: choose, drop or paste one; it stays in this browser and is never uploaded',
+        })}
         onClick={() => fileInput.current?.click()}
       >
         <ImageIcon />
@@ -1798,8 +2063,11 @@ function PhotoTool({ ed }: { ed: Ed }) {
     <ToolPopover
       ed={ed}
       p="photo"
-      tip={t('Photo: add, replace or remove; contrast and darken')}
-      name={t('Photo')}
+      tip={i18n._({
+        id: 'targetEditor.photoAddReplaceRemove',
+        message: 'Photo: add, replace or remove; contrast and darken',
+      })}
+      name={i18n._({ id: 'targetEditor.photo', message: 'Photo' })}
       icon={
         <span className="icon-slot" aria-hidden="true">
           <ImageIcon />
@@ -1813,11 +2081,14 @@ function PhotoTool({ ed }: { ed: Ed }) {
 
 /** The camera button of the compact tab on a touch screen. */
 function CameraButton({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, coarse, cameraInput } = ed
   if (!compact || !coarse) return null
   return (
-    <IconButton label={t('Photo from the camera')} onClick={() => cameraInput.current?.click()}>
+    <IconButton
+      label={i18n._({ id: 'targetEditor.photoCamera', message: 'Photo from the camera' })}
+      onClick={() => cameraInput.current?.click()}
+    >
       <Camera />
     </IconButton>
   )
@@ -1855,7 +2126,7 @@ function PhotoInputs({ ed }: { ed: Ed }) {
 
 /** The Calibrate popover: the scale references, rotation and origin. */
 function CalibrateTool({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, unscaled } = ed
   if (compact) return null
   return (
@@ -1864,12 +2135,22 @@ function CalibrateTool({ ed }: { ed: Ed }) {
       p="calibrate"
       tip={
         unscaled
-          ? t('Calibrate: the photo has no scale yet; mark a reference of known size')
-          : t('Calibrate: scale references, rotation and origin')
+          ? i18n._({
+              id: 'targetEditor.calibratePhotoHasScale',
+              message: 'Calibrate: the photo has no scale yet; mark a reference of known size',
+            })
+          : i18n._({
+              id: 'targetEditor.calibrateScaleReferencesRotation',
+              message: 'Calibrate: scale references, rotation and origin',
+            })
       }
       wideTip
-      name={t('Calibrate')}
-      description={unscaled ? t('The photo has no scale yet.') : undefined}
+      name={i18n._({ id: 'targetEditor.calibrate', message: 'Calibrate' })}
+      description={
+        unscaled
+          ? i18n._({ id: 'targetEditor.photoHasScaleYet', message: 'The photo has no scale yet.' })
+          : undefined
+      }
       icon={
         <span className="icon-slot" aria-hidden="true">
           <Scan />
@@ -1889,7 +2170,9 @@ function CalibrateTool({ ed }: { ed: Ed }) {
         </Indicator>
       )}
     >
-      <h2 className="prop-head">{t('Calibrate')}</h2>
+      <h2 className="prop-head">
+        {i18n._({ id: 'targetEditor.calibrate', message: 'Calibrate' })}
+      </h2>
       <ScalePanel ed={ed} />
     </ToolPopover>
   )
@@ -1897,11 +2180,11 @@ function CalibrateTool({ ed }: { ed: Ed }) {
 
 /** The Select and Shot tools. */
 function ToolSwitch({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { meta, storeError, tool, startTool } = ed
   return (
     <SegmentedControl
-      aria-label={t('Tool')}
+      aria-label={i18n._({ id: 'targetEditor.tool', message: 'Tool' })}
       // an edit before the store is read is lost when the sheet opens
       disabled={!meta.id && !storeError}
       value={tool === 'select' || tool === 'shot' ? tool : ''}
@@ -1915,12 +2198,16 @@ function ToolSwitch({ ed }: { ed: Ed }) {
               display="inline-flex"
               gap={4}
               wrap="nowrap"
-              title={t(
-                'Select: drag shots, points of aim and reference points; drag the background to pan',
-              )}
+              title={i18n._({
+                id: 'targetEditor.selectDragShotsPoints',
+                message:
+                  'Select: drag shots, points of aim and reference points; drag the background to pan',
+              })}
             >
               <MousePointer size={14} aria-hidden="true" />
-              <span className="seg-text">{t('Select')}</span>
+              <span className="seg-text">
+                {i18n._({ id: 'targetEditor.select', message: 'Select' })}
+              </span>
             </Group>
           ),
         },
@@ -1932,10 +2219,15 @@ function ToolSwitch({ ed }: { ed: Ed }) {
               display="inline-flex"
               gap={4}
               wrap="nowrap"
-              title={t('Shot: add shots to the active group by click or tap')}
+              title={i18n._({
+                id: 'targetEditor.shotAddShotsActive',
+                message: 'Shot: add shots to the active group by click or tap',
+              })}
             >
               <Target size={14} aria-hidden="true" />
-              <span className="seg-text">{t('Shot')}</span>
+              <span className="seg-text">
+                {i18n._({ id: 'targetEditor.shot', message: 'Shot' })}
+              </span>
             </Group>
           ),
         },
@@ -1946,12 +2238,16 @@ function ToolSwitch({ ed }: { ed: Ed }) {
 
 /** Undo, and Redo outside the compact tab. */
 function UndoRedo({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, h, setH } = ed
   return (
     <>
       <IconButton
-        label={t('Undo ({shortcut})', { shortcut: shortcutLabel('undo') })}
+        label={i18n._({
+          id: 'targetEditor.undoShortcut',
+          message: 'Undo ({shortcut})',
+          values: { shortcut: shortcutLabel('undo') },
+        })}
         aria-keyshortcuts={shortcutAriaKeys('undo')}
         disabled={!h.past.length}
         onClick={() => setH(undo)}
@@ -1960,7 +2256,11 @@ function UndoRedo({ ed }: { ed: Ed }) {
       </IconButton>
       {!compact && (
         <IconButton
-          label={t('Redo ({shortcut})', { shortcut: shortcutLabel('redo') })}
+          label={i18n._({
+            id: 'targetEditor.redoShortcut',
+            message: 'Redo ({shortcut})',
+            values: { shortcut: shortcutLabel('redo') },
+          })}
           aria-keyshortcuts={shortcutAriaKeys('redo')}
           disabled={!h.future.length}
           onClick={() => setH(redo)}
@@ -1975,14 +2275,19 @@ function UndoRedo({ ed }: { ed: Ed }) {
 /** The Overlays popover: the switches of what the canvas draws. */
 function OverlaysTool({ ed }: { ed: Ed }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, overlays, toggleOverlay } = ed
   const overlayCount = (Object.keys(overlayNames) as Overlay[]).filter((o) => overlays[o]).length
   return (
     <ToolPopover
       ed={ed}
       p="overlays"
-      tip={t('Overlays: {count} on', { count: overlayCount })}
-      name={t('Overlays')}
+      tip={i18n._({
+        id: 'targetEditor.overlaysOn',
+        message: 'Overlays: {count, decimal} on',
+        values: { count: overlayCount },
+      })}
+      name={i18n._({ id: 'targetEditor.overlays', message: 'Overlays' })}
       position="bottom-end"
       icon={<Eye size={16} aria-hidden="true" />}
       frame={(popover) => (
@@ -1999,7 +2304,9 @@ function OverlaysTool({ ed }: { ed: Ed }) {
       )}
     >
       <fieldset className="overlay-list">
-        <legend className="overlay-legend">{t('Overlays')}</legend>
+        <legend className="overlay-legend">
+          {i18n._({ id: 'targetEditor.overlays', message: 'Overlays' })}
+        </legend>
         {(Object.keys(overlayNames) as Overlay[]).map((o) => {
           const help = overlayHelp[o]
           const title = help && t(help)
@@ -2022,12 +2329,16 @@ function OverlaysTool({ ed }: { ed: Ed }) {
 
 /** The workbench tab's Expand and Close button. */
 function ExpandButton({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { expand } = ed
   if (!expand) return null
   return (
     <IconButton
-      label={expand.expanded ? t('Close') : t('Expand')}
+      label={
+        expand.expanded
+          ? i18n._({ id: 'targetEditor.close', message: 'Close' })
+          : i18n._({ id: 'targetEditor.expand', message: 'Expand' })
+      }
       data-expand
       onClick={() => expand.onChange(!expand.expanded)}
     >
@@ -2038,14 +2349,14 @@ function ExpandButton({ ed }: { ed: Ed }) {
 
 /** The editor's toolbar: sheet, photo, calibration, tools, undo and the overlays. */
 function Toolbar({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { renaming, heading, exportMenu, toolbarKeys } = ed
   return (
     // oxlint-disable-next-line jsx-a11y/interactive-supports-focus -- a toolbar moves focus among its buttons (toolbarKeys); the bar itself takes none
     <div
       className="target-toolbar"
       role="toolbar"
-      aria-label={t('Target sheet tools')}
+      aria-label={i18n._({ id: 'targetEditor.targetSheetTools', message: 'Target sheet tools' })}
       onKeyDown={toolbarKeys}
     >
       {renaming ? <SheetName ed={ed} /> : <SheetSelect ed={ed} />}
@@ -2124,7 +2435,7 @@ function Canvas({ ed }: { ed: Ed }) {
     takePhoto,
     unscaled,
   } = ed
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const statsBox = group && stats && <StatsBoxContent ed={ed} />
   const photoBox =
     photo && photo !== 'missing'
@@ -2198,21 +2509,29 @@ function Canvas({ ed }: { ed: Ed }) {
       {blankSheet && (
         <div className="canvas-start">
           <p>
-            {t(
-              'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one.',
-            )}
+            {i18n._({
+              id: 'targetEditor.drawnTargetPlaceShots',
+              message:
+                'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one.',
+            })}
           </p>
           {startActions(controlSize.bar.button)}
         </div>
       )}
       {photo === 'missing' && (
         <p className="canvas-note">
-          {t('The photo of this sheet is not in this browser; its shots are kept.')}
+          {i18n._({
+            id: 'targetEditor.photoSheetBrowserShots',
+            message: 'The photo of this sheet is not in this browser; its shots are kept.',
+          })}
         </p>
       )}
       {unscaled && (
         <p className="canvas-note">
-          {t('Mark a reference of known size (Calibrate) to place shots.')}
+          {i18n._({
+            id: 'targetEditor.markReferenceKnownSize',
+            message: 'Mark a reference of known size (Calibrate) to place shots.',
+          })}
         </p>
       )}
     </div>
@@ -2221,7 +2540,7 @@ function Canvas({ ed }: { ed: Ed }) {
 
 /** The shots section's head: the fold toggle and the add button. */
 function ShotsHead({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, uid, shotsOpen, setShotsOpen, addShot } = ed
   if (!group) return null
   return (
@@ -2239,7 +2558,11 @@ function ShotsHead({ ed }: { ed: Ed }) {
           ) : (
             <ChevronUp size={12} aria-hidden="true" />
           )}
-          {t('Shots ({count})', { count: group.shots.length })}
+          {i18n._({
+            id: 'targetEditor.shotsCount',
+            message: 'Shots ({count, decimal})',
+            values: { count: group.shots.length },
+          })}
         </button>
       </h2>
       <AddShotButton ed={ed} addShot={addShot} />
@@ -2287,22 +2610,34 @@ function SidePanel({ ed, v }: { ed: Ed; v: string }) {
 
 /** The panels as tabs: beside the target, or in the phone's bottom sheet. */
 function SideTabs({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, side, setSide, panel, charges } = ed
-  const tabs: [string, Message][] = [
-    ['groups', msg('Group')],
-    ['shots', msg('Shots')],
-    ['stats', msg('Stats')],
-    ['notes', msg('Notes')],
-    ...(charges ? [['ladder', msg('Ladder')] as [string, Message]] : []),
+  const tabs: [string, MessageDescriptor][] = [
+    ['groups', /*i18n*/ { id: 'targetEditor.group', message: 'Group' }],
+    ['shots', /*i18n*/ { id: 'targetEditor.shots', message: 'Shots' }],
+    ['stats', /*i18n*/ { id: 'targetEditor.stats', message: 'Stats' }],
+    ['notes', /*i18n*/ { id: 'targetEditor.notes', message: 'Notes' }],
+    ...(charges
+      ? [
+          ['ladder', /*i18n*/ { id: 'targetEditor.ladder', message: 'Ladder' }] as [
+            string,
+            MessageDescriptor,
+          ],
+        ]
+      : []),
   ]
   return (
     <Tabs value={side} onChange={setSide} className={`target-tabs${panel}`}>
-      {panel && <SideHead ed={ed} title={group?.name ?? t('Groups')} />}
+      {panel && (
+        <SideHead
+          ed={ed}
+          title={group?.name ?? i18n._({ id: 'targetEditor.groups', message: 'Groups' })}
+        />
+      )}
       <Tabs.List>
         {tabs.map(([v, label]) => (
           <Tabs.Tab key={v} value={v}>
-            {t(label)}
+            {i18n._(label)}
           </Tabs.Tab>
         ))}
       </Tabs.List>
@@ -2314,7 +2649,9 @@ function SideTabs({ ed }: { ed: Ed }) {
       {/* the group's key values under every other tab, at the panel's foot */}
       {panel && side !== 'stats' && group && stats && (
         <div className="target-summary">
-          <h3 className="prop-head">{t('Summary')}</h3>
+          <h3 className="prop-head">
+            {i18n._({ id: 'targetEditor.summary', message: 'Summary' })}
+          </h3>
           <Headline ed={ed} />
         </div>
       )}
@@ -2324,22 +2661,32 @@ function SideTabs({ ed }: { ed: Ed }) {
 
 /** The phone's bottom sheet: a summary strip that opens the panels. */
 function BottomSheet({ ed }: { ed: Ed }) {
-  const { t, tn } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, keyValues, system, uid, sheetOpen, setSheetOpen } = ed
   const summaryLine = group
     ? [
         group.name,
-        tn(stats?.shotCount ?? 0, '{count} shot', '{count} shots'),
+        i18n._(
+          'targetEditor.countShots',
+          { count: stats?.shotCount ?? 0 },
+          { message: '{count, plural, one {# shot} other {# shots}}', formats: ungrouped },
+        ),
         ...(stats && stats.shotCount > 1
-          ? [t('ES {value}', { value: keyValueText(keyValues, system, 'extremeSpread', t) })]
+          ? [
+              i18n._({
+                id: 'targetEditor.esValue',
+                message: 'ES {value}',
+                values: { value: keyValueText(keyValues, system, 'extremeSpread', i18n) },
+              }),
+            ]
           : []),
       ].join(' · ')
-    : t('No group')
+    : i18n._({ id: 'targetEditor.noGroup', message: 'No group' })
   return (
     <section
       className="target-sheet"
       data-open={sheetOpen || undefined}
-      aria-label={t('Group panels')}
+      aria-label={i18n._({ id: 'targetEditor.groupPanels', message: 'Group panels' })}
     >
       <button
         type="button"
@@ -2357,7 +2704,11 @@ function BottomSheet({ ed }: { ed: Ed }) {
         ) : (
           <ChevronUp size={16} aria-hidden="true" />
         )}
-        <span className="visually-hidden">{sheetOpen ? t('Hide panels') : t('Show panels')}</span>
+        <span className="visually-hidden">
+          {sheetOpen
+            ? i18n._({ id: 'targetEditor.hidePanels', message: 'Hide panels' })
+            : i18n._({ id: 'targetEditor.showPanels', message: 'Show panels' })}
+        </span>
       </button>
       <div id={`${uid}-sheet`} className="sheet-body" hidden={!sheetOpen}>
         {sheetOpen && <SideTabs ed={ed} />}
@@ -2368,11 +2719,16 @@ function BottomSheet({ ed }: { ed: Ed }) {
 
 /** The side column of the compact tab: the key statistics, or how to start. */
 function KeySide({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, sheet, frame, startActions } = ed
   return (
-    <aside className="target-side key-side" aria-label={t('Key statistics')}>
-      <h3 className="prop-head">{group?.name ?? t('Statistics')}</h3>
+    <aside
+      className="target-side key-side"
+      aria-label={i18n._({ id: 'targetEditor.keyStatistics', message: 'Key statistics' })}
+    >
+      <h3 className="prop-head">
+        {group?.name ?? i18n._({ id: 'targetEditor.statisticsTitle', message: 'Statistics' })}
+      </h3>
       {group?.shots.length ? (
         <>
           {stats && <StatsPanel ed={ed} />}
@@ -2380,7 +2736,7 @@ function KeySide({ ed }: { ed: Ed }) {
         </>
       ) : (
         <Stack gap={4}>
-          <p className="note">{startNote(!!sheet.photo, !!frame, t)}</p>
+          <p className="note">{startNote(!!sheet.photo, !!frame, i18n)}</p>
           {startActions(controlSize.row.button)}
         </Stack>
       )}
@@ -2389,26 +2745,40 @@ function KeySide({ ed }: { ed: Ed }) {
 }
 
 /** What to do first on a compact tab without shots. */
-function startNote(photo: boolean, scaled: boolean, t: Translator['t']) {
+function startNote(photo: boolean, scaled: boolean, i18n: I18n) {
   if (!photo)
-    return t(
-      'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.',
-    )
+    return i18n._({
+      id: 'targetEditor.drawnTargetPlaceShots2',
+      message:
+        'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.',
+    })
   return scaled
-    ? t('Place shots, then click each hole.')
-    : t('Mark a reference of known size (Expand, Calibrate) to place shots.')
+    ? i18n._({
+        id: 'targetEditor.placeShotsThenClick',
+        message: 'Place shots, then click each hole.',
+      })
+    : i18n._({
+        id: 'targetEditor.markReferenceKnownSize2',
+        message: 'Mark a reference of known size (Expand, Calibrate) to place shots.',
+      })
 }
 
 /** The statistics column of the wide layout, with the shots, the notes and the ladder. */
 function StatsSide({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { group, stats, uid, shotsOpen, panel, charges, notesPanel, keyValues } = ed
   // the key values stay open, the other rows on request: the shot list keeps its room
   const [allStats, setAllStats] = useState(false)
   const more = keyValues.some((r) => !keyReadouts.includes(r.key))
   return (
-    <aside className={`target-side stats-side${panel}`} aria-label={t('Statistics and shots')}>
-      <SideHead ed={ed} title={t('Statistics')} />
+    <aside
+      className={`target-side stats-side${panel}`}
+      aria-label={i18n._({ id: 'targetEditor.statisticsShots', message: 'Statistics and shots' })}
+    >
+      <SideHead
+        ed={ed}
+        title={i18n._({ id: 'targetEditor.statisticsTitle', message: 'Statistics' })}
+      />
       <Headline ed={ed} />
       {group && stats && !more && <StatsPanel ed={ed} />}
       {group && stats && more && (
@@ -2428,7 +2798,7 @@ function StatsSide({ ed }: { ed: Ed }) {
             ) : (
               <ChevronDown size={12} aria-hidden="true" />
             )}
-            {t('All statistics')}
+            {i18n._({ id: 'targetEditor.allStatistics', message: 'All statistics' })}
           </button>
         </>
       )}
@@ -2436,11 +2806,11 @@ function StatsSide({ ed }: { ed: Ed }) {
       <div id={`${uid}-shots`} className="shots-body" hidden={!shotsOpen}>
         {shotsOpen && group && <ShotsPanel ed={ed} />}
       </div>
-      <h2 className="prop-head">{t('Notes')}</h2>
+      <h2 className="prop-head">{i18n._({ id: 'targetEditor.notes', message: 'Notes' })}</h2>
       {notesPanel}
       {charges && (
         <>
-          <h2 className="prop-head">{t('Ladder')}</h2>
+          <h2 className="prop-head">{i18n._({ id: 'targetEditor.ladder', message: 'Ladder' })}</h2>
           <LadderPanel ed={ed} />
         </>
       )}
@@ -2450,7 +2820,7 @@ function StatsSide({ ed }: { ed: Ed }) {
 
 /** The target body: the canvas with the panels beside it, in the layout the width allows. */
 function Body({ ed }: { ed: Ed }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { compact, wide, phone, panel, detect } = ed
   if (compact)
     return (
@@ -2463,8 +2833,12 @@ function Body({ ed }: { ed: Ed }) {
   if (wide)
     return (
       <>
-        <aside key="left" className={`target-side${panel}`} aria-label={t('Groups')}>
-          <SideHead ed={ed} title={t('Groups')} />
+        <aside
+          key="left"
+          className={`target-side${panel}`}
+          aria-label={i18n._({ id: 'targetEditor.groups', message: 'Groups' })}
+        >
+          <SideHead ed={ed} title={i18n._({ id: 'targetEditor.groups', message: 'Groups' })} />
           <GroupPanel ed={ed} />
           {detect.panel}
         </aside>
@@ -2496,7 +2870,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
     sheet,
     group,
   } = ed
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [Zero, setZero] = useState<typeof ZeroTargetMenu>()
   if (heading === undefined) return null
   return (
@@ -2509,7 +2883,9 @@ function SheetPageBar({ ed }: { ed: Ed }) {
           {meta.id ? (
             <FileMenu
               kind="targetSheet"
-              name={meta.name || t('Target sheet')}
+              name={
+                meta.name || i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' })
+              }
               data={fileData}
               autosaved={meta.id}
               // the save effect brings the two together again
@@ -2535,16 +2911,18 @@ function SheetPageBar({ ed }: { ed: Ed }) {
                 import('./zero-target.tsx').then((m) => setZero(() => m.ZeroTargetMenu))
               }
             >
-              {t('Zero target')}
+              {i18n._({ id: 'targetEditor.zeroTarget', message: 'Zero target' })}
             </Button>
           )}
           <TourButton page="groups" />
           <PrintButton
             onClick={printSheet}
-            hint={t(
-              'Print: what Fit shows at a stated scale with a ruler, and the statistics (also {shortcut})',
-              { shortcut: shortcutLabel('print') },
-            )}
+            hint={i18n._({
+              id: 'targetEditor.printWhatFitShows',
+              message:
+                'Print: what Fit shows at a stated scale with a ruler, and the statistics (also {shortcut})',
+              values: { shortcut: shortcutLabel('print') },
+            })}
           />
         </>
       }
@@ -2680,22 +3058,44 @@ function toolHintOf(
   pointsDone: number,
   detectHint: string | undefined,
   scoreHint: string | undefined,
-  t: Translator['t'],
+  i18n: I18n,
 ) {
   const first = detectHint ?? scoreHint
   if (first !== undefined) return first
-  const keys = t('Or arrow keys and Enter. Esc cancels.')
+  const keys = i18n._({
+    id: 'targetEditor.arrowKeysEnterEsc',
+    message: 'Or arrow keys and Enter. Esc cancels.',
+  })
   if (toolPoints[tool])
-    return t('{hint} Point {n} of {total}. {keys}', {
-      hint: t(refHints[tool as RefKind]),
-      n: pointsDone + 1,
-      total: toolPoints[tool],
-      keys,
+    return i18n._({
+      id: 'targetEditor.pointOfTotal',
+      message: '{hint} Point {n, decimal} of {total, decimal}. {keys}',
+      values: {
+        hint: i18n._(refHints[tool as RefKind]),
+        n: pointsDone + 1,
+        total: toolPoints[tool],
+        keys,
+      },
     })
-  if (tool === 'origin') return t('Click the photo point of target (0, 0). {keys}', { keys })
-  if (tool === 'aim') return t('Click the point of aim of the active group. {keys}', { keys })
+  if (tool === 'origin')
+    return i18n._({
+      id: 'targetEditor.clickPhotoPointTarget',
+      message: 'Click the photo point of target (0, 0). {keys}',
+      values: { keys },
+    })
+  if (tool === 'aim')
+    return i18n._({
+      id: 'targetEditor.clickPointAimActive',
+      message: 'Click the point of aim of the active group. {keys}',
+      values: { keys },
+    })
   if (tool !== 'shot') return
-  return frame ? t('Click a hole to add a shot to the active group.') : t(noReference)
+  return frame
+    ? i18n._({
+        id: 'targetEditor.clickHoleAddShot',
+        message: 'Click a hole to add a shot to the active group.',
+      })
+    : i18n._(noReference)
 }
 
 /** The state the File menu shows for the sheet. */
@@ -2746,14 +3146,24 @@ export function TargetEditor({
   stored?: number
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   /** The distance of a new sheet: 100 of the display unit (100 yd or 100 m), held in m. */
   const newDistance = useRef(0)
   newDistance.current = system.range.toSi(100)
   const [sheets, setSheets] = useState<TargetSheetRecord[]>([])
   // the id is set on mount (`create` or `open`): no clock or random value during the prerender
-  const [meta, setMeta] = useState({ id: '', name: t('Target sheet {n}', { n: 1 }) })
-  const [h, setH] = useState(() => historyOf(blank(load, bulletDiameter, newDistance.current, t)))
+  const [meta, setMeta] = useState({
+    id: '',
+    name: i18n._({
+      id: 'targetEditor.targetSheetN',
+      message: 'Target sheet {n, decimal}',
+      values: { n: 1 },
+    }),
+  })
+  const [h, setH] = useState(() =>
+    historyOf(blank(load, bulletDiameter, newDistance.current, i18n)),
+  )
   const sheet = h.present
   // the Report issue boxes of /groups, not of the workbench tab
   useSheetReport(heading === undefined ? undefined : sheet)
@@ -2851,6 +3261,9 @@ export function TargetEditor({
   /** The translator of this render, for the save callbacks that outlive it. */
   const tNow = useRef(t)
   tNow.current = t
+  /** The Lingui instance of this render, read the same way. */
+  const i18nNow = useRef(i18n)
+  i18nNow.current = i18n
   /** The save of the last edit while it waits for the debounce. */
   const pendingSave = useRef<(() => void) & { record?: () => WaitingRecord }>(undefined)
   /** Saves started and not yet landed, by sheet id: copied too when the page goes. */
@@ -2872,7 +3285,11 @@ export function TargetEditor({
   const frame = useMemo(() => frameOf(sheet), [sheet])
   const group = activeGroupOf(sheet, active)
   const scrollFocus = useScrollFocus(
-    t('Shots of {name}', { name: group?.name ?? '' }),
+    i18n._({
+      id: 'targetEditor.shotsOf',
+      message: 'Shots of {name}',
+      values: { name: group?.name ?? '' },
+    }),
     shotScroller,
   )
 
@@ -2995,15 +3412,19 @@ export function TargetEditor({
   function create(list = sheets, face?: GroupFace) {
     flush()
     // the units and the language may be read after the mount that calls this, so the refs hold the current ones
-    const t = tNow.current
-    const empty = blank(load, bulletDiameter, newDistance.current, t, charges ? step : undefined)
+    const i18n = i18nNow.current
+    const empty = blank(load, bulletDiameter, newDistance.current, i18n, charges ? step : undefined)
     const data = face
       ? {
           ...empty,
           groups: empty.groups.map((g, i) => (i === 0 ? { ...g, face } : g)),
         }
       : empty
-    const name = t('Target sheet {n}', { n: list.length + 1 })
+    const name = i18n._({
+      id: 'targetEditor.targetSheetN',
+      message: 'Target sheet {n, decimal}',
+      values: { n: list.length + 1 },
+    })
     setMeta({ id: newId(), name })
     opened.current = { data, name }
     setH(historyOf(data))
@@ -3021,16 +3442,23 @@ export function TargetEditor({
   useEffect(() => {
     const o = opened.current
     if (stored || !meta.id || sheet !== o.data || meta.name !== o.name) return
-    const name = t('Target sheet {n}', { n: sheets.length + 1 })
+    const name = i18n._({
+      id: 'targetEditor.targetSheetN',
+      message: 'Target sheet {n, decimal}',
+      values: { n: sheets.length + 1 },
+    })
     const data = {
       ...sheet,
-      groups: sheet.groups.map((g, i) => ({ ...g, name: t('Group {n}', { n: i + 1 }) })),
+      groups: sheet.groups.map((g, i) => ({
+        ...g,
+        name: i18n._({ id: 'targetEditor.groupN', message: 'Group {n}', values: { n: i + 1 } }),
+      })),
     }
     setMeta((m) => ({ ...m, name }))
     opened.current = { data, name }
     setH(historyOf(data))
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a language change only
-  }, [t])
+  }, [i18n])
 
   /** The sheets of this browser (of the load in the workbench), the newest first. */
   const sheetsOf = (records: UserRecord[]) =>
@@ -3179,9 +3607,15 @@ export function TargetEditor({
       setSaveFailed(false)
       if (!meta.id && storeError)
         say(
-          t('Not saved: the browser store could not be read. {reason}', {
-            reason: storeError.reason,
-          }).trim(),
+          i18n
+            ._({
+              id: 'targetEditor.notSavedStoreUnread',
+              message: 'Not saved: the browser store could not be read. {reason}',
+              values: {
+                reason: storeError.reason,
+              },
+            })
+            .trim(),
           true,
         )
       return
@@ -3191,7 +3625,11 @@ export function TargetEditor({
       pendingSave.current = undefined
       setSaveFailed(true)
       say(
-        t('Not saved: {reason}', { reason: z.prettifyError(parsed.error).split('\n')[0] ?? '' }),
+        i18n._({
+          id: 'targetEditor.notSavedReason',
+          message: 'Not saved: {reason}',
+          values: { reason: z.prettifyError(parsed.error).split('\n')[0] ?? '' },
+        }),
         true,
       )
       return
@@ -3199,7 +3637,7 @@ export function TargetEditor({
     const recordNow = (): TargetSheetRecord => ({
       kind: 'targetSheet',
       id: meta.id,
-      name: meta.name || t('Target sheet'),
+      name: meta.name || i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' }),
       saved: new Date().toISOString(),
       data: parsed.data,
     })
@@ -3231,7 +3669,8 @@ export function TargetEditor({
           setStored(true)
           setSaveFailed(false)
           // on /groups the page bar's File state says it
-          if (heading === undefined) say(t('Saved in this browser.'))
+          if (heading === undefined)
+            say(i18n._({ id: 'targetEditor.savedBrowser', message: 'Saved in this browser.' }))
           rememberSheet(record.id)
         })
         .catch((error) => {
@@ -3239,10 +3678,12 @@ export function TargetEditor({
           if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
           if (shown.current === record.id) setSaveFailed(true)
           say(
-            t(
-              'Not saved: the browser store refused the sheet. {reason} Free browser storage or allow site storage for this page, then edit the sheet again.',
-              { reason: errorText(error) },
-            ),
+            i18n._({
+              id: 'targetEditor.notSavedStoreRefused',
+              message:
+                'Not saved: the browser store refused the sheet. {reason} Free browser storage or allow site storage for this page, then edit the sheet again.',
+              values: { reason: errorText(error) },
+            }),
             true,
           )
         })
@@ -3252,7 +3693,7 @@ export function TargetEditor({
     })
     const timer = setTimeout(save, 300)
     return () => clearTimeout(timer)
-  }, [sheet, meta, storeError, say, heading, t])
+  }, [sheet, meta, storeError, say, heading, i18n])
   // an edit still waiting is saved when the editor goes (a link, a load change) or the page does
   useEffect(() => {
     const flushNow = () => pendingSave.current?.()
@@ -3279,14 +3720,23 @@ export function TargetEditor({
   async function takePhoto(file: File | undefined) {
     if (!file) return
     if (!(photoTypes as readonly string[]).includes(file.type))
-      return say(t('The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.'), true)
+      return say(
+        i18n._({
+          id: 'targetEditor.fileNotPhoto',
+          message: 'The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.',
+        }),
+        true,
+      )
     const target = meta.id
     if (
       sheet.photo &&
       !(await confirmDialog({
-        title: t('Replace the photo?'),
-        message: t('Its references go; the shots keep their target values.'),
-        confirmLabel: t('Replace'),
+        title: i18n._({ id: 'targetEditor.replacePhotoQuestion', message: 'Replace the photo?' }),
+        message: i18n._({
+          id: 'targetEditor.referencesGoShotsKeep',
+          message: 'Its references go; the shots keep their target values.',
+        }),
+        confirmLabel: i18n._({ id: 'targetEditor.replace', message: 'Replace' }),
         danger: true,
       }))
     )
@@ -3314,9 +3764,17 @@ export function TargetEditor({
       setPhoto(undefined)
       detect.photoAdded(id)
       setRefKind('line')
-      say(t('Photo kept in this browser. Looking for the target and the holes.'))
+      say(
+        i18n._({
+          id: 'targetEditor.photoKeptBrowserLooking',
+          message: 'Photo kept in this browser. Looking for the target and the holes.',
+        }),
+      )
     } catch {
-      say(t('The photo could not be read.'), true)
+      say(
+        i18n._({ id: 'targetEditor.photoNotRead', message: 'The photo could not be read.' }),
+        true,
+      )
     }
   }
 
@@ -3326,9 +3784,12 @@ export function TargetEditor({
     if (
       !old ||
       !(await confirmDialog({
-        title: t('Remove the photo?'),
-        message: t('The shots stay on a drawn target.'),
-        confirmLabel: t('Remove'),
+        title: i18n._({ id: 'targetEditor.removePhotoQuestion', message: 'Remove the photo?' }),
+        message: i18n._({
+          id: 'targetEditor.shotsStayDrawnTarget',
+          message: 'The shots stay on a drawn target.',
+        }),
+        confirmLabel: i18n._({ id: 'targetEditor.remove', message: 'Remove' }),
         danger: true,
       })) ||
       shown.current !== target
@@ -3356,7 +3817,7 @@ export function TargetEditor({
       ? {
           kind: 'targetSheet',
           id,
-          name: name || t('Target sheet'),
+          name: name || i18n._({ id: 'targetEditor.targetSheet', message: 'Target sheet' }),
           saved: '',
           data: parsed.data,
         }
@@ -3374,7 +3835,13 @@ export function TargetEditor({
         open(own)
         if (!put) say(keptNote(own.name, t), true)
       } catch {
-        say(t('Not restored: the browser store refused.'), true)
+        say(
+          i18n._({
+            id: 'targetEditor.notRestoredStoreRefused',
+            message: 'Not restored: the browser store refused.',
+          }),
+          true,
+        )
       }
     }
     deleteRecord(id)
@@ -3389,9 +3856,25 @@ export function TargetEditor({
         setSheets(rest)
         if (rest[0]) open(rest[0])
         else create(rest)
-        if (record) offerUndo(t('Deleted {name}.', { name }), () => restore(record))
+        if (record)
+          offerUndo(
+            i18n._({
+              id: 'targetEditor.deletedName',
+              message: 'Deleted {name}.',
+              values: { name },
+            }),
+            () => restore(record),
+          )
       })
-      .catch(() => say(t('Not deleted: the browser store refused.'), true))
+      .catch(() =>
+        say(
+          i18n._({
+            id: 'targetEditor.notDeletedStoreRefused',
+            message: 'Not deleted: the browser store refused.',
+          }),
+          true,
+        ),
+      )
   }
 
   // a pasted image becomes the photo while the editor is shown and no field has the focus
@@ -3421,7 +3904,11 @@ export function TargetEditor({
 
   function addReference(points: Point[]) {
     const r = referenceOf(refKind, known, points)
-    if (!r) return say(t('Enter the known size first.'), true)
+    if (!r)
+      return say(
+        i18n._({ id: 'targetEditor.enterKnownSizeFirst', message: 'Enter the known size first.' }),
+        true,
+      )
     pushReference(r)
   }
 
@@ -3434,13 +3921,31 @@ export function TargetEditor({
         ref,
       ],
     }
-    if (next.references.length > 20) return say(t('A sheet holds at most 20 references.'), true)
-    if (!frameOf(next)) return say(t('These points give no scale: three lie on one line.'), true)
+    if (next.references.length > 20)
+      return say(
+        i18n._({
+          id: 'targetEditor.sheetHoldsMost20',
+          message: 'A sheet holds at most 20 references.',
+        }),
+        true,
+      )
+    if (!frameOf(next))
+      return say(
+        i18n._({
+          id: 'targetEditor.pointsGiveNoScale',
+          message: 'These points give no scale: three lie on one line.',
+        }),
+        true,
+      )
     applyCal(() => next)
     say(
-      t('{kind} {n} added.', {
-        kind: t(refNames[ref.kind]).split(',')[0] ?? '',
-        n: next.references.length,
+      i18n._({
+        id: 'targetEditor.referenceAdded',
+        message: '{kind} {n, decimal} added.',
+        values: {
+          kind: i18n._(refNames[ref.kind]).split(',')[0] ?? '',
+          n: next.references.length,
+        },
       }),
     )
   }
@@ -3470,14 +3975,26 @@ export function TargetEditor({
     if (!g || !s) return ''
     const value = scored(g.id)?.score.shots[sel.index]
     return [
-      t('{group}, shot {n}, x {x}, y {y}', {
-        group: g.name,
-        n: sel.index + 1,
-        x: formatQuantity('length', system, s.x),
-        y: withUnit('length', system, s.y),
+      i18n._({
+        id: 'targetEditor.shotXY',
+        message: '{group}, shot {n, decimal}, x {x}, y {y}',
+        values: {
+          group: g.name,
+          n: sel.index + 1,
+          x: formatQuantity('length', system, s.x),
+          y: withUnit('length', system, s.y),
+        },
       }),
-      ...(s.excluded ? [t('excluded')] : []),
-      ...(value ? [t('score {score}', { score: shotText(value) })] : []),
+      ...(s.excluded ? [i18n._({ id: 'targetEditor.excludedShot', message: 'excluded' })] : []),
+      ...(value
+        ? [
+            i18n._({
+              id: 'targetEditor.scoreValue',
+              message: 'score {score}',
+              values: { score: shotText(value) },
+            }),
+          ]
+        : []),
     ].join(', ')
   }
 
@@ -3501,7 +4018,14 @@ export function TargetEditor({
 
   const addShot = (q: Point) => {
     if (!group) return
-    if (group.shots.length >= 1000) return say(t('A group holds at most 1000 shots.'), true)
+    if (group.shots.length >= 1000)
+      return say(
+        i18n._({
+          id: 'targetEditor.groupHoldsMost1000',
+          message: 'A group holds at most 1000 shots.',
+        }),
+        true,
+      )
     setSelected({ group: group.id, index: group.shots.length })
     onGroup((g) => ({ ...g, shots: [...g.shots, { x: q.x, y: q.y, placement: 'placed' }] }))
   }
@@ -3572,7 +4096,14 @@ export function TargetEditor({
       earlier?.undo()
     }
     groupUndo.current = {
-      n: offerUndo(t('Deleted {name}.', { name: names.join(', ') }), undo),
+      n: offerUndo(
+        i18n._({
+          id: 'targetEditor.deletedName',
+          message: 'Deleted {name}.',
+          values: { name: names.join(', ') },
+        }),
+        undo,
+      ),
       undo,
       names,
     }
@@ -3607,7 +4138,7 @@ export function TargetEditor({
     [charges, ladderGroups, sessions, slopeAt],
   )
 
-  const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint, t)
+  const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint, i18n)
   const hint = hintOf(status, toolHint, help)
 
   /** The sheet without the photo at a fixed view, for the exports (with the statistics box) and the print. */
@@ -3737,7 +4268,9 @@ export function TargetEditor({
         leftSection={<ImageIcon size={size === 'sm' ? 16 : 12} aria-hidden="true" />}
         onClick={() => fileInput.current?.click()}
       >
-        {sheet.photo ? t('Replace photo') : t('Add photo')}
+        {sheet.photo
+          ? i18n._({ id: 'targetEditor.replacePhoto', message: 'Replace photo' })
+          : i18n._({ id: 'targetEditor.addPhoto', message: 'Add photo' })}
       </Button>
       <Button
         size={size}
@@ -3746,7 +4279,7 @@ export function TargetEditor({
         disabled={!frame}
         onClick={() => startTool('shot')}
       >
-        {t('Place shots')}
+        {i18n._({ id: 'targetEditor.placeShots', message: 'Place shots' })}
       </Button>
     </span>
   )

@@ -4,20 +4,20 @@
   "version": "0.1.0",
   "file": {
     "name": "hole-heatmap-0.1.0.onnx",
-    "url": "https://example.org/models/hole-heatmap-0.1.0.onnx",
+    "url": "models/hole-heatmap-0.1.0.onnx",
     "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
     "bytes": 450212
   },
   "runtime": {
     "package": "onnxruntime-web",
     "version": "1.31.1",
-    "wasmPaths": "/models/ort/",
+    "wasmPaths": "models/ort/",
     "opset": 17
   },
   "input": { "holePx": 16, "channels": "rgb", "range": [0, 1], "sizeMultiple": 16 },
   "output": { "stride": 2, "channels": 1, "threshold": 0.35, "sure": 0.6 },
   "license": {
-    "model": "CC0-1.0",
+    "model": "CC-BY-SA-4.0",
     "training": {
       "classes": { "own": 120, "third-party": 0, "synthetic": 20000 },
       "kinds": { "printed": 9000, "colored": 4000, "grid": 3000, "reactive": 4120 }

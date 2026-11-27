@@ -1,24 +1,49 @@
 version = 1
 
-# Everything else: the repository's code, documentation and test fixtures (LICENSE).
+# Everything else: the repository's code, tests, test fixtures, scripts and generated files (LICENSE).
 [[annotations]]
 path = "**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
-SPDX-License-Identifier = "ISC"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# Documentation: the docs site pages and the Markdown files.
+[[annotations]]
+path = ["apps/docs/docs/**", "**/*.md", "**/*.mdx"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "MIT"
+
+# API reports generated from the code's declarations, and a test fixture.
+[[annotations]]
+path = ["**/*.api.md", "tools/test/fixtures/markdown-meaning.md"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# The design tokens, which other projects use (packages/design-tokens/LICENSE).
+[[annotations]]
+path = "packages/design-tokens/**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "MIT"
+
+# Docs repository widget: own code plus GitHub Octicons icon paths (https://github.com/primer/octicons, MIT).
+[[annotations]]
+path = "apps/docs/src/components/RepoWidget.tsx"
+precedence = "aggregate"
+SPDX-FileCopyrightText = ["2026 the RangeFoundry contributors", "2026 GitHub Inc."]
+SPDX-License-Identifier = "ISC AND MIT"
 
 # Catalog records (NOTICE, packages/catalog/LICENSE).
 [[annotations]]
 path = "packages/catalog/records/**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
-SPDX-License-Identifier = "CC-BY-4.0"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
 
-# Records derived from Wikipedia state CC-BY-SA-4.0 in their source (packages/catalog/LICENSE).
+# Records derived from Wikipedia: the Wikipedia contributors hold rights in them too.
 [[annotations]]
 path = "packages/catalog/records/capacities/*-wikipedia.json"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors, Wikipedia contributors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
-# Logo files copied from the RangeFoundry Artwork repository (NOTICE).
+# Names and logos: no open license (LICENSES/LicenseRef-Brand.txt, NOTICE).
 [[annotations]]
 path = [
   "apps/web/src/assets/ballistics-light.svg",
@@ -28,8 +53,14 @@ path = [
   "apps/web/src/app/apple-icon.png",
   "apps/web/public/icon-192.png",
 ]
-SPDX-FileCopyrightText = "2026 RangeFoundry contributors"
-SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "LicenseRef-Brand"
+
+# Hole detection model weights, trained in part on third-party target photos (NOTICE, apps/docs/docs/models/hole-detection.md, Model file).
+[[annotations]]
+path = "apps/web/public/models/hole-model-*.onnx"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors, the authors of the third-party training photos"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
 
 # Inter fonts and their license text (apps/web/src/platform/fonts/OFL.txt).
 [[annotations]]

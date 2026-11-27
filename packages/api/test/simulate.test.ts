@@ -502,7 +502,7 @@ describe('POST /interior/load-file', () => {
     const { body } = await simulate(file({ siValues, powder: fitted.id }))
     expect(body.warnings.map((w: { code: string }) => w.code)).toContain('resistanceNotApplied')
     expect(body.warnings.at(-1).message).toContain('the parameters of Example F Fitted were fitted')
-    expect(body.warnings.at(-1).message).toContain('missing: a cartridge record, a bullet length')
+    expect(body.warnings.at(-1).message).toContain('(missing: a bullet length)')
   })
 
   it('runs the ladder as the workbench does and shows the main step', async () => {
@@ -709,6 +709,20 @@ describe('POST /interior/load-file', () => {
     expect((await simulate(file({ siValues, cartridge: 'nope' }))).status).toBe(404)
     expect((await simulate(file({ siValues, bullet: 'nope' }))).status).toBe(404)
     expect((await simulate(file({ siValues, powder: 'nope' }))).status).toBe(404)
+  })
+
+  it('refuses a load without a cartridge with 422 at its field', async () => {
+    // an empty id leaves the cartridge out of the file
+    const { status, body } = await simulate(file({ siValues, cartridge: '' }))
+    expect(status).toBe(422)
+    expect(body.field).toBe('records.0.data.cartridge')
+    expect(body.message).toBe(
+      'The load has no cartridge: choose a cartridge record to simulate it.',
+    )
+    // before the solver values: filling in those would only lead to this refusal
+    const empty = await simulate(file({ cartridge: '' }))
+    expect(empty.status).toBe(422)
+    expect(empty.body.field).toBe('records.0.data.cartridge')
   })
 })
 

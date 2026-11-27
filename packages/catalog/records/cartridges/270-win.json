@@ -369,6 +369,9 @@
       "value": 38.52
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page99.pdf",
         "sha256": "94538778740a81cbaf675518c41e22e49b012509e67f0def6d707f7d2127d94a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .270 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.270_Winchester&oldid=1384013474",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

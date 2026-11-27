@@ -60,17 +60,18 @@ test('a record page opens another without a page load, back and forward too', as
     if (new URL(r.url()).pathname.endsWith('.txt') && r.status() >= 400)
       failed.push(`${r.status()} ${r.url()}`)
   })
-  // the only record this case links is in the sample: a link to a cartridge page the sample leaves out would log a 404
-  await gotoHydrated(page, './cases/demo-case-308-brass')
+  // the only record this discipline links is in the sample: a link to a page the sample leaves out would log a 404
+  await gotoHydrated(page, './disciplines/dsb-25m-pistole-revolver')
   // a full page load drops the marker
   await page.evaluate(() => Object.assign(window, { softNav: true }))
-  await page.getByRole('link', { name: '308 Win.', exact: true }).click()
+  const federation = 'Deutscher Schützenbund e.V.'
+  await page.getByRole('main').getByRole('link', { name: federation }).click()
   const h1 = page.getByRole('heading', { level: 1 })
-  await expect(h1).toHaveText('308 Win.')
+  await expect(h1).toHaveText(federation)
   await page.goBack()
-  await expect(h1).toContainText('Brass Demo')
+  await expect(h1).not.toHaveText(federation)
   await page.goForward()
-  await expect(h1).toHaveText('308 Win.')
+  await expect(h1).toHaveText(federation)
   expect(await page.evaluate(() => 'softNav' in window)).toBe(true)
   expect(failed).toEqual([])
 })

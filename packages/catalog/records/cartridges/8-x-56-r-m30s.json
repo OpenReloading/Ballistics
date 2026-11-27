@@ -329,6 +329,9 @@
       "value": 52.53
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -337,6 +340,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page31.pdf",
         "sha256": "6107720af63329a3684a243af39c42ed547637451d87f613c684c107aead5432",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 8×56mmR",
+        "url": "https://en.wikipedia.org/w/index.php?title=8%C3%9756mmR&oldid=1364002947",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or Boxer Large Rifle."
       }
     ]
   }

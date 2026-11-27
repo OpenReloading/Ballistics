@@ -259,6 +259,10 @@
       "value": 104.94
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -267,6 +271,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page36.pdf",
         "sha256": "15965c71b3c54114709c366eb1a449b0a9fa83321be25613577b5ed16ca00a03",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .458 Winchester Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.458_Winchester_Magnum&oldid=1301627955",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

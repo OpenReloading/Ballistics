@@ -106,8 +106,13 @@ export const listEventTypes = () => listItems<{ id: string }>('/event-types')
 export async function staticIds(list: () => Promise<Fetched<{ id: string }[]>>, what: string) {
   const r = await list()
   if (r.status !== 'ok') throw new Error(`no ${what} list at build`)
-  return exportIds(
+  const ids = exportIds(
     what,
     r.data.map((c) => c.id),
-  ).map((id) => ({ id }))
+  )
+  // `output: export` refuses a dynamic route without a page: an empty kind gets one id that no record has, which answers notFound
+  return (ids.length > 0 ? ids : [noRecordId]).map((id) => ({ id }))
 }
+
+/** The id of the one page of a kind without records. */
+const noRecordId = 'no-record'

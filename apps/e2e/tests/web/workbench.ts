@@ -70,7 +70,6 @@ export const fixtureLoad = {
       },
       ladder: { stepCount: 5, step: 0.012959782, direction: 'down' },
     },
-    case: { record: 'catalogue:demo-case-308-brass' },
   },
 }
 

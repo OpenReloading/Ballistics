@@ -112,6 +112,9 @@
       "value": 90.65
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -120,6 +123,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/44-rem-mag-car-200922-en.pdf",
         "sha256": "355b616ad6a7927cfdd8d9b160102d4bd16cf4a92cc14d2cb544831fd76e30d3",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-44-magnum",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

@@ -373,6 +373,9 @@
       "value": 24.93
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +384,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page8.pdf",
         "sha256": "316a30f870ceb68fd93a2d43df56e1c899ee3c5e857b247a35aeb0dcda4b40b0",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .224 Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.224_Weatherby_Magnum&oldid=1388073110",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }
