@@ -15,10 +15,8 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import type { Message } from '../i18n/translate.ts'
 import { tipEvents } from '../lib/theme.ts'
 import { titleTemplate } from '../lib/title-template.ts'
-import { say } from '../lib/wording.ts'
 import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
@@ -160,13 +158,13 @@ export function PageBar({
     }
   | {
       /** The h1: a message of the catalogue (a list's title), which the language shown translates. */
-      title: Message | MessageDescriptor
+      title: MessageDescriptor
       translated: true
     }
 )) {
   const { t } = useTranslation()
   const { i18n } = useLingui()
-  const title = translated ? say(i18n, t, given) : given
+  const title = translated ? i18n._(given) : given
   // React writes Next's English metadata title back after hydration: keep the tab in the language shown
   useEffect(() => {
     if (!translated) return

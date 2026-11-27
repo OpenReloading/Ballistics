@@ -1,8 +1,8 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
-import type { Message } from '../i18n/translate.ts'
 import type { DirectoryState } from '../lib/directory.ts'
 import { countText, type ListNoun, widestCount } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
@@ -29,7 +29,7 @@ export function DirectoryPage({
   filters,
   table,
 }: {
-  title: Message
+  title: MessageDescriptor
   noun: ListNoun
   shown: number
   total: number

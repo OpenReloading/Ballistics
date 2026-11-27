@@ -3,9 +3,8 @@
 import { useLingui } from '@lingui/react'
 import type { Provenance } from '@rangefoundry/schema'
 import type { ReactNode } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
-import { say, type Wording } from '../lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/record-page.json' with { type: 'json' }
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
@@ -39,7 +38,7 @@ export function RecordPage({
   /** The title on a phone, where the bar has room for the name alone (`PageBar`). */
   short?: string | undefined
   /** Facts beside the title (line, caliber, product number), not repeated in the tables. */
-  badges: Wording[]
+  badges: LinguiWording[]
   /** A layout of the grid, such as `record-chart` (powder) or `cartridge-record`. */
   className?: string
   /** "Compare" link. */
@@ -69,9 +68,8 @@ export function RecordPage({
   /** Over the sources table: facts of the record's standard (the cartridge record's table, date, country and method). */
   sourceFacts?: ReactNode
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
-  const facts = badges.map((b) => say(i18n, t, b))
+  const facts = badges.map((b) => sayLingui(i18n, b))
   return (
     <div className={`record record-frame${className ? ` ${className}` : ''}`}>
       <PageBar

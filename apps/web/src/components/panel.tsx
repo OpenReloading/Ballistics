@@ -3,8 +3,7 @@
 import { useLingui } from '@lingui/react'
 import { Paper } from '@mantine/core'
 import type { ReactNode } from 'react'
-import { useTranslation } from '../i18n/language.ts'
-import { say, type Wording } from '../lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../lib/wording.ts'
 
 /** A title row of at most 28 px; flat on phones (no border or padding) and in print (no border, radius or background), never split across pages. */
 export function Panel({
@@ -29,13 +28,12 @@ export function Panel({
     }
   | {
       /** The heading: a message, which the language shown translates. */
-      title: Wording
+      title: LinguiWording
       translated: true
     }
 )) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
-  const title = translated ? say(i18n, t, given) : given
+  const title = translated ? sayLingui(i18n, given) : given
   return (
     <Paper
       component="section"

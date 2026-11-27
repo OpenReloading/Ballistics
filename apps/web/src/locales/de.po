@@ -8894,6 +8894,10 @@ msgstr "Wachsschmierung"
 msgid "powderTune.weakPrior"
 msgstr "Schwacher Prior"
 
+# en: "What's new"
+msgid "homeNews.title"
+msgstr "Neuigkeiten"
+
 # en: "Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group."
 msgid "holeDetection.whereLookRectangleTwo"
 msgstr "Wo gesucht wird: ein Rechteck (zwei gegenüberliegende Ecken) oder ein Polygon; ohne Angabe: die im Foto gefundene Zielscheibe. Wird mit dem Schussbild gespeichert."

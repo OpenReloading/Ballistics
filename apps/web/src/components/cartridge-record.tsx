@@ -23,7 +23,6 @@ import {
   useRef,
   useState,
 } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import {
   type CombinedRow,
@@ -42,7 +41,7 @@ import {
 import { caseTypeText } from '../lib/list-values.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { drawingLengthUnit, type UnitSystem } from '../lib/units.ts'
-import { say, type Wording } from '../lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/cartridge-record.json' with { type: 'json' }
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Label, Sized, slotUnits } from './fact-cards.tsx'
@@ -638,11 +637,10 @@ export function StandardFacts({
   method,
 }: {
   table?: string | undefined
-  date?: { label: Wording; value: string } | undefined
+  date?: { label: LinguiWording; value: string } | undefined
   countries?: { name: string; code?: string | undefined }[] | undefined
-  method?: Wording | undefined
+  method?: LinguiWording | undefined
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   if (!table && !date && !countries && !method) return null
   return (
@@ -660,7 +658,7 @@ export function StandardFacts({
       )}
       {date && (
         <div>
-          <dt>{say(i18n, t, date.label)}</dt>
+          <dt>{sayLingui(i18n, date.label)}</dt>
           <dd>{date.value}</dd>
         </div>
       )}
@@ -680,7 +678,7 @@ export function StandardFacts({
               notes={[i18n._(factMeanings.method)]}
             />
           </dt>
-          <dd>{say(i18n, t, method)}</dd>
+          <dd>{sayLingui(i18n, method)}</dd>
         </div>
       )}
     </dl>

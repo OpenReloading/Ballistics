@@ -13,7 +13,6 @@ import {
 } from '../src/components/cartridge-record.tsx'
 import { Cartridge } from '../src/components/cartridge-record-page.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { msg } from '../src/i18n/translate.ts'
 import {
   combinedRows,
   dimensionStripValues,
@@ -160,7 +159,9 @@ describe('the cartridge record', () => {
       <StandardFacts
         table={c.table}
         date={{
-          label: c.revised ? msg('Revised') : msg('Published'),
+          label: c.revised
+            ? { id: 'cartridgeRecord.revised', message: 'Revised' }
+            : { id: 'cartridgeRecord.published', message: 'Published' },
           value: c.revised ?? c.published,
         }}
         countries={c.country ? parseCountries(c.country) : undefined}

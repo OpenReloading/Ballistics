@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { TargetEditor } from '../components/target-editor.tsx'
-import { msg } from '../i18n/translate.ts'
 import { listHead } from './-list-route.ts'
 import { searchOf } from './-search.ts'
 
@@ -8,7 +7,7 @@ import { searchOf } from './-search.ts'
 function GroupsPage() {
   return (
     <div className="groups-page">
-      <TargetEditor heading={msg('Shot groups')} />
+      <TargetEditor heading />
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import type { Bullet, Powder, Provenance } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { translator } from '../src/i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   buildRows,
@@ -22,12 +21,11 @@ import {
   rowValue,
 } from '../src/lib/record-fields.ts'
 import { presetUnits } from '../src/lib/units.ts'
-import { say, verbatim } from '../src/lib/wording.ts'
+import { sayLingui, verbatim } from '../src/lib/wording.ts'
 import { defined, missing } from './defined.ts'
 import { targetBullet } from './fixtures/bullets.ts'
 
 const provenance: Provenance = { kind: 'published', sources: [] }
-const english = translator().t
 const grains = presetUnits('metric-grains')
 const us = presetUnits('us')
 const si = presetUnits('metric-grams')
@@ -41,7 +39,7 @@ const target = targetBullet
 /** The rows of a bullet's data groups, the computed ones left out. */
 const dataRows = (b: Bullet) =>
   bulletDataGroups(b)
-    .filter((g) => !g.title || say(linguiOf('en'), english, g.title) !== 'Computed')
+    .filter((g) => !g.title || sayLingui(linguiOf('en'), g.title) !== 'Computed')
     .flatMap((g) => g.rows)
 
 it('lists the cavity diameter and a measured cavity depth of a hollow base', () => {
@@ -54,7 +52,7 @@ it('lists the cavity diameter and a measured cavity depth of a hollow base', () 
     ['Cavity diameter', '5.00 mm'],
     ['Cavity depth', '4.00 mm'],
   ])
-  const depth = rows.find((r) => say(linguiOf('en'), english, r.label) === 'Cavity depth')
+  const depth = rows.find((r) => sayLingui(linguiOf('en'), r.label) === 'Cavity depth')
   expect(defined(depth).symbol).toBeUndefined()
 })
 
@@ -90,10 +88,7 @@ it('splits the build into structure, jacket, core and surface, the manufacturer 
 
 it('shows the jacket wall, core hardness, gas check, driving bands and the derived lead-free flag', () => {
   const rows = (construction: Bullet['construction']) =>
-    buildRows(construction).map((r) => [
-      say(linguiOf('en'), english, r.label),
-      r.text ?? r.value?.si,
-    ])
+    buildRows(construction).map((r) => [sayLingui(linguiOf('en'), r.label), r.text ?? r.value?.si])
   expect(
     rows({
       raw: 'x',
@@ -216,7 +211,7 @@ it('leaves the identity fields to the title and badges and gives text fields as 
     ['Boat-tail angle', '8.3333 deg'],
   ])
   // the groups the record fills, each dimension with its drawing symbol
-  expect(bulletDataGroups(b).map((g) => g.title && say(linguiOf('en'), english, g.title))).toEqual([
+  expect(bulletDataGroups(b).map((g) => g.title && sayLingui(linguiOf('en'), g.title))).toEqual([
     'Size',
     'Shape',
     'Tip and base',
@@ -266,7 +261,7 @@ it('leaves the powder properties of the strip out of the Properties table', () =
       country: 'US',
       bulkDensity: { value: 0.9512, raw: 'VMD 0.0681 cm³/gr' },
       provenance,
-    }).map((g) => [g.title && say(linguiOf('en'), english, g.title), g.rows]),
+    }).map((g) => [g.title && sayLingui(linguiOf('en'), g.title), g.rows]),
   ).toEqual([
     [undefined, []],
     ['Composition', []],
@@ -410,7 +405,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
     ['Bore resistance', '4.20 bar'],
   ])
   expect(
-    burnFormRows(p).map((r) => [r.symbol, say(linguiOf('en'), english, r.label), r.text]),
+    burnFormRows(p).map((r) => [r.symbol, sayLingui(linguiOf('en'), r.label), r.text]),
   ).toEqual([
     ['a', 'Burn form a', '0'],
     ['m', 'Burn form m', '0.5'],
@@ -419,8 +414,8 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
   ])
   expect(
     powderParameterGroups(p, 2).map((g) => [
-      g.title && say(linguiOf('en'), english, g.title),
-      g.filter && say(linguiOf('en'), english, g.filter),
+      g.title && sayLingui(linguiOf('en'), g.title),
+      g.filter && sayLingui(linguiOf('en'), g.filter),
       g.rows.length,
     ]),
   ).toEqual([

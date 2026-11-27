@@ -6,7 +6,6 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
   type DisciplineRecord,
@@ -27,12 +26,12 @@ import {
 } from '../src/lib/disciplines.ts'
 import { facetRows } from '../src/lib/facets.ts'
 import { formatQuantity, presetUnits } from '../src/lib/units.ts'
-import { say, type Wording } from '../src/lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 import { catalogBundle } from './records.ts'
 
 /** A row label or group title in English. */
-const labelOf = (w: Wording) => say(linguiOf('en'), translator().t, w)
+const labelOf = (w: LinguiWording) => sayLingui(linguiOf('en'), w)
 
 // the list renders its tab bar, which reads the route and the router
 const route = vi.hoisted(() => ({ path: '/disciplines' }))
@@ -134,13 +133,12 @@ it('renders the discipline list: one row per discipline linking its page, no fed
 })
 
 it('gives the strip, the number, section, page and caliber classes, and the rule book with its page', () => {
-  const { t } = translator()
   expect(disciplineStrip(pistol, linguiOf('en'), 'DSB').map((i) => [i.label, i.row.text])).toEqual([
     ['Federation', 'DSB'],
     ['Distance', '25 m'],
   ])
   const rowsOf = defined(disciplineGroups(pistol, classes, linguiOf('en'))[0]).rows
-  expect(rowsOf.map((r) => say(linguiOf('en'), t, r.label))).toEqual([
+  expect(rowsOf.map((r) => sayLingui(linguiOf('en'), r.label))).toEqual([
     'Number',
     'Section',
     'Page',

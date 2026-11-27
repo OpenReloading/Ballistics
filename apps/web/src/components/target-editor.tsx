@@ -91,7 +91,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
-import type { Message, Translator } from '../i18n/translate.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { photoGuide } from '../lib/docs-url.ts'
 import { storageName } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -277,7 +277,7 @@ const blank = (
 }
 
 /** A new sheet opens on the face and event of `/groups?face=<id>&event=<event id>`; none in the workbench tab (no `heading`) or for a malformed id, and an event name longer than any record's or with control characters is left out. */
-function linkedFace(heading: string | undefined) {
+function linkedFace(heading: true | undefined) {
   const url = new URL(window.location.href)
   const id = heading ? url.searchParams.get('face') : null
   if (!id) return
@@ -578,7 +578,7 @@ type Ed = {
   setH: Dispatch<SetStateAction<History<TargetSheet>>>
   overlays: Record<Overlay, boolean>
   toggleOverlay: (o: Overlay, on: boolean) => void
-  heading: Message | undefined
+  heading: true | undefined
   exportMenu: ReactNode
   expand: { expanded: boolean; onChange: (expanded: boolean) => void } | undefined
   toolbarKeys: (e: KeyboardEvent<HTMLDivElement>) => void
@@ -2875,7 +2875,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
   if (heading === undefined) return null
   return (
     <PageBar
-      title={heading}
+      title={/*i18n*/ { id: 'page.groups', message: 'Shot groups' }}
       translated
       actions={
         <>
@@ -3040,7 +3040,7 @@ function overlaysOf(sheet: TargetSheet, browser: Record<Overlay, boolean>) {
 }
 
 /** The class of the side panels: the page template's panels on /groups only. */
-function panelOf(heading: string | undefined) {
+function panelOf(heading: true | undefined) {
   return heading === undefined ? '' : ' page-panel'
 }
 
@@ -3140,8 +3140,8 @@ export function TargetEditor({
   expand?: { expanded: boolean; onChange: (expanded: boolean) => void }
   /** The workbench's load and its simulated velocities, for the print sheet. */
   summary?: LoadSummary | undefined
-  /** The page heading (`/groups`): shown with the File menu of the open sheet beside it. */
-  heading?: Message | undefined
+  /** Shows the page heading (`/groups`) with the File menu of the open sheet beside it. */
+  heading?: true | undefined
   /** Counts the page's File menu writes to the browser store (workbench Import, Replace). */
   stored?: number
 }) {
