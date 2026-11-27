@@ -16,7 +16,8 @@ import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
-import { fieldError, specText } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import { specText } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
 import {

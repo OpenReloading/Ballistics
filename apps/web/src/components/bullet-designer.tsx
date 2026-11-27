@@ -37,7 +37,7 @@ import {
 } from '../lib/bullet-designer.ts'
 import { photoText } from '../lib/bullet-photo-design.ts'
 import { bulletGuide } from '../lib/docs-url.ts'
-import { fieldError } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
 import { fetchManufacturerNames, noManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
 import { rawWording } from '../lib/record-values.ts'

@@ -355,13 +355,25 @@ msgstr "{label} ab {velocity}"
 msgid "fieldStrip.bandFrom"
 msgstr "{label} ab {velocity}"
 
+# en: "{label} must be a whole number."
+msgid "fieldError.wholeNumber"
+msgstr "{label} muss eine ganze Zahl sein."
+
 # en: "{label} must be above {min, decimal}."
 msgid "powderDesigner.above"
 msgstr "{label} muss größer als {min, decimal} sein."
 
 # en: "{label} must be at least {min, decimal}{unit}."
+msgid "fieldError.atLeast"
+msgstr "{label} muss mindestens {min, decimal}{unit} betragen."
+
+# en: "{label} must be at least {min, decimal}{unit}."
 msgid "powderDesigner.atLeast"
 msgstr "{label} muss mindestens {min, decimal}{unit} betragen."
+
+# en: "{label} must be at most {max, decimal}{unit}."
+msgid "fieldError.atMost"
+msgstr "{label} darf höchstens {max, decimal}{unit} betragen."
 
 # en: "{label} must be at most {max, decimal}{unit}."
 msgid "powderDesigner.atMost"
@@ -374,6 +386,10 @@ msgstr "{label} darf im Editor höchstens {max} {unit} betragen."
 # en: "{label} must be below {max, decimal}."
 msgid "powderDesigner.below"
 msgstr "{label} muss kleiner als {max, decimal} sein."
+
+# en: "{label} must be greater than 0{unit}."
+msgid "fieldError.greaterThanZero"
+msgstr "{label} muss größer als 0{unit} sein."
 
 # en: "{label} must be greater than 0{unit}."
 msgid "powderDesigner.greaterThanZero"
@@ -606,6 +622,14 @@ msgstr "{value} {unit}"
 # en: "{value} at {charge}"
 msgid "chargeTarget.valueAt"
 msgstr "{value} bei {charge}"
+
+# en: "{what}: enter a number."
+msgid "caseGroup.enterNumber"
+msgstr "{what}: Zahl eingeben."
+
+# en: "{what}: not valid."
+msgid "caseGroup.notValid"
+msgstr "{what}: ungültig."
 
 # en: "{year}: {entries}, {rounds}"
 msgid "logSummary.yearTotals"
@@ -1324,10 +1348,6 @@ msgid "page.cases"
 msgstr "Hülsen"
 
 # en: "Brass"
-msgid "reportIssue.area.brass"
-msgstr "Hülsen"
-
-# en: "Brass"
 msgid "values.brass"
 msgstr "Messinghülse"
 
@@ -1411,10 +1431,6 @@ msgstr "Tabelle der Geschossdaten"
 msgid "page.bulletsDesigner"
 msgstr "Geschoss-Editor"
 
-# en: "Bullet designer"
-msgid "reportIssue.area.bulletDesigner"
-msgstr "Geschoss-Editor"
-
 # en: "bullet diameter"
 msgid "cartridgeRecord.meaning.bulletDiameter"
 msgstr "Geschossdurchmesser"
@@ -1449,10 +1465,6 @@ msgstr "Geschosse"
 
 # en: "Bullets"
 msgid "page.bullets"
-msgstr "Geschosse"
-
-# en: "Bullets"
-msgid "reportIssue.area.bullets"
 msgstr "Geschosse"
 
 # en: "Bullets"
@@ -1639,6 +1651,10 @@ msgstr "Breite der Rändelung"
 msgid "powderTune.cannotRun"
 msgstr "Nicht rechenbar"
 
+# en: "Capacity spread"
+msgid "caseGroup.capacitySpread"
+msgstr "Streuung der Kapazität"
+
 # en: "Carbine"
 msgid "values.carbine"
 msgstr "Karabiner"
@@ -1689,10 +1705,6 @@ msgstr "Patronenentwurf"
 
 # en: "Cartridge designer"
 msgid "page.cartridgesDesigner"
-msgstr "Patronen-Editor"
-
-# en: "Cartridge designer"
-msgid "reportIssue.area.cartridgeDesigner"
 msgstr "Patronen-Editor"
 
 # en: "Cartridge dimensions"
@@ -1763,10 +1775,6 @@ msgstr "Patronen"
 msgid "powderRecord.cartridges"
 msgstr "Patronen"
 
-# en: "Cartridges"
-msgid "reportIssue.area.cartridges"
-msgstr "Patronen"
-
 # en: "Cartridges, {filters}"
 msgid "cartridges.filtered"
 msgstr "Patronen, {filters}"
@@ -1795,6 +1803,10 @@ msgstr "Hülsenlänge"
 msgid "cartridges.column.caseLength"
 msgstr "Hülsenlänge L3"
 
+# en: "Case mass"
+msgid "caseGroup.caseMass"
+msgstr "Hülsenmasse"
+
 # en: "Case type"
 msgid "cartridges.column.type"
 msgstr "Hülsenform"
@@ -1810,6 +1822,14 @@ msgstr "Wandler am Hülsenkörper"
 # en: "Case: the case type, derived from the record"
 msgid "cartridgeRecord.meaning.case"
 msgstr "Hülse: die Hülsenart, aus dem Datensatz abgeleitet"
+
+# en: "Cases measured"
+msgid "caseGroup.casesMeasured"
+msgstr "Gemessene Hülsen"
+
+# en: "Cases the capacity and the other measured values come from."
+msgid "caseGroup.casesMeasuredHelp"
+msgstr "Hülsen, aus denen die Kapazität und die übrigen gemessenen Werte stammen."
 
 # en: "cast"
 msgid "values.cast"
@@ -2022,6 +2042,10 @@ msgstr "Wählen Sie eine Chronograph-Datei aus oder ziehen Sie sie hierher, oder
 # en: "Choose photograph"
 msgid "bulletPhoto.choosePhotograph"
 msgstr "Foto wählen"
+
+# en: "Choose the cartridge."
+msgid "caseGroup.chooseCartridge"
+msgstr "Wählen Sie die Patrone."
 
 # en: "Choose, drop or paste a photo; it stays in this browser and is never uploaded."
 msgid "targetEditor.chooseDropPastePhoto"
@@ -2812,10 +2836,6 @@ msgid "page.disciplines"
 msgstr "Disziplinen"
 
 # en: "Disciplines"
-msgid "reportIssue.area.disciplines"
-msgstr "Disziplinen"
-
-# en: "Disciplines"
 msgid "targets.column.disciplines"
 msgstr "Disziplinen"
 
@@ -3104,8 +3124,16 @@ msgid "caseEditor.enterName"
 msgstr "Geben Sie einen Namen ein."
 
 # en: "Enter a name."
+msgid "caseGroup.enterName"
+msgstr "Geben Sie einen Namen ein."
+
+# en: "Enter a name."
 msgid "targetEditor.enterName"
 msgstr "Geben Sie einen Namen ein."
+
+# en: "Enter a number for {label}."
+msgid "fieldError.enterNumber"
+msgstr "Geben Sie eine Zahl für {label} ein."
 
 # en: "Enter a number for {label}."
 msgid "powderDesigner.enterNumberFor"
@@ -3122,6 +3150,10 @@ msgstr "Geben Sie eine Zielgröße über 0{unit} ein."
 # en: "Enter a target of at most {max}{unit}."
 msgid "chargeTarget.enterTargetAtMost"
 msgstr "Geben Sie eine Zielgröße von höchstens {max}{unit} ein."
+
+# en: "Enter a twist as 1:8 or 8."
+msgid "fieldError.twist"
+msgstr "Geben Sie den Drall als 1:8 oder 8 ein."
 
 # en: "Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw."
 msgid "cartridgeDesigner.enterLeastToDraw"
@@ -3408,10 +3440,6 @@ msgstr "Die Verbandsdaten sind gerade nicht verfügbar."
 msgid "page.federations"
 msgstr "Verbände"
 
-# en: "Federations"
-msgid "reportIssue.area.federations"
-msgstr "Verbände"
-
 # en: "Federations, {filters}"
 msgid "disciplines.federationsFiltered"
 msgstr "Verbände, {filters}"
@@ -3512,13 +3540,13 @@ msgstr "Schusswaffen"
 msgid "page.firearms"
 msgstr "Schusswaffen"
 
-# en: "Firearms"
-msgid "reportIssue.area.firearms"
-msgstr "Schusswaffen"
-
 # en: "Firearms, {filters}"
 msgid "firearms.titleFiltered"
 msgstr "Schusswaffen, {filters}"
+
+# en: "Firings of these cases so far."
+msgid "caseGroup.timesFiredHelp"
+msgstr "Bisherige Abschüsse dieser Hülsen."
 
 # en: "Fit a powder from chronograph strings"
 msgid "powderDesigner.fitPowderChronographStrings"
@@ -4948,6 +4976,10 @@ msgstr "Mittlerer größter Schussabstand je Stufe der Ladeleiter als Winkel, da
 msgid "powderDesigner.meanMolarMassCombustion"
 msgstr "Mittlere molare Masse des Verbrennungsgases."
 
+# en: "Mean of the cases measured in this group, for example fired and sized. The workbench uses it as the measured case capacity."
+msgid "caseGroup.waterCapacityHelp"
+msgstr "Mittelwert der gemessenen Hülsen dieser Gruppe, zum Beispiel abgeschossen und kalibriert. Die Werkbank übernimmt ihn als gemessenes Hülsenvolumen."
+
 # en: "Mean radius"
 msgid "targetEditor.meanRadius"
 msgstr "Mittlerer Radius"
@@ -5291,6 +5323,10 @@ msgstr "Halsdurchmesser bei L2"
 # en: "neck diameter at the mouth"
 msgid "cartridgeRecord.meaning.neckAtMouth"
 msgstr "Halsdurchmesser an der Mündung"
+
+# en: "Neck wall"
+msgid "caseGroup.neckWall"
+msgstr "Hülsenhalsstärke"
 
 # en: "New brass group"
 msgid "caseEditor.new"
@@ -6400,10 +6436,6 @@ msgstr "Werte des Treibladungspulvers aus dem eigenen Entwurf {name}, nicht aus 
 msgid "page.powders"
 msgstr "Treibladungspulver"
 
-# en: "Powders"
-msgid "reportIssue.area.powders"
-msgstr "Treibladungspulver"
-
 # en: "Powders by burn rate"
 msgid "burnRateCompare.byRate"
 msgstr "Treibladungspulver nach Abbrandgeschwindigkeit"
@@ -6498,10 +6530,6 @@ msgstr "Zündglocke"
 
 # en: "Primers"
 msgid "page.primers"
-msgstr "Zündhütchen"
-
-# en: "Primers"
-msgid "reportIssue.area.primers"
 msgstr "Zündhütchen"
 
 # en: "Primers, {filters}"
@@ -7520,10 +7548,6 @@ msgstr "Sitzung"
 msgid "page.session"
 msgstr "Sitzungsübersicht"
 
-# en: "Session summary"
-msgid "reportIssue.area.sessionSummary"
-msgstr "Sitzungsübersicht"
-
 # en: "Set"
 msgid "targetEditor.set"
 msgstr "Setzen"
@@ -7543,10 +7567,6 @@ msgstr "Stellen Sie zuerst den Maßstab ein (Schritt 2)."
 # en: "Set Values came about by to Fitted to data."
 msgid "powderDesigner.setFittedData"
 msgstr "Setzen Sie Herkunft der Werte auf An Daten angepasst."
-
-# en: "Settings"
-msgid "reportIssue.area.settings"
-msgstr "Einstellungen"
 
 # en: "Settings"
 msgid "shell.settings"
@@ -7614,10 +7634,6 @@ msgstr "Schussbilder"
 
 # en: "Shot groups"
 msgid "page.groups"
-msgstr "Schussbilder"
-
-# en: "Shot groups"
-msgid "reportIssue.area.shotGroups"
 msgstr "Schussbilder"
 
 # en: "Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen."
@@ -7924,6 +7940,10 @@ msgstr "Stage-Punkte"
 msgid "events.stages"
 msgstr "Stages"
 
+# en: "Standard deviation of the water capacity over the cases measured."
+msgid "caseGroup.capacitySpreadHelp"
+msgstr "Standardabweichung der Wasserkapazität über die gemessenen Hülsen."
+
 # en: "Standard uncertainty"
 msgid "powderTune.standardUncertainty"
 msgstr "Standardunsicherheit"
@@ -8212,10 +8232,6 @@ msgstr "Scheiben"
 
 # en: "Targets"
 msgid "page.targets"
-msgstr "Scheiben"
-
-# en: "Targets"
-msgid "reportIssue.area.targets"
 msgstr "Scheiben"
 
 # en: "Targets ({count})"
@@ -8794,6 +8810,10 @@ msgstr "Zeit (s)"
 msgid "disciplines.row.timeLimit"
 msgstr "Schießzeit"
 
+# en: "Times fired"
+msgid "caseGroup.timesFired"
+msgstr "Anzahl der Abschüsse"
+
 # en: "tin"
 msgid "values.tin"
 msgstr "Zinn"
@@ -8881,6 +8901,10 @@ msgstr "mechanisch-elektrischer Wandler"
 # en: "Trigger weight from"
 msgid "disciplines.row.minTriggerWeight"
 msgstr "Abzugsgewicht ab"
+
+# en: "Trim length"
+msgid "caseGroup.trimLength"
+msgstr "Länge nach dem Kürzen"
 
 # en: "triple"
 msgid "values.triple"
@@ -9225,6 +9249,10 @@ msgstr "Wasserkapazität"
 # en: "Water capacity"
 msgid "recordFields.waterCapacity"
 msgstr "Wasserkapazität"
+
+# en: "Water capacity to the mouth"
+msgid "caseGroup.waterCapacity"
+msgstr "Wasserkapazität bis zum Hülsenmund"
 
 # en: "Water to the case mouth, as the manufacturer states."
 msgid "cases.column.capacityHelp"

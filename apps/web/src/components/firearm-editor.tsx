@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Button,
@@ -30,7 +31,8 @@ import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary } from '../lib/api-types.ts'
 import { dayText } from '../lib/dates.ts'
-import { close, type FieldSpec, fieldError, type SpecText, specText } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import { close, type FieldSpec, type SpecText, specText } from '../lib/field-spec.ts'
 import {
   cylinderGapField,
   fieldSi,
@@ -87,6 +89,7 @@ export function SiField({
   error?: string | undefined
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const shown = (x: number | undefined) => ({
     text: x === undefined ? '' : roundedFieldText(spec.quantity, system, x),
     si: x,
@@ -109,7 +112,7 @@ export function SiField({
         spec={spec}
         system={system}
         value={value}
-        error={(s) => (left ? fieldError(spec, value, s, t) : undefined) ?? error}
+        error={(s) => (left ? fieldError(spec, value, s, t, i18n) : undefined) ?? error}
         onBlur={() => setLeft(true)}
         onChange={(v) => {
           setState({ value: v, system })

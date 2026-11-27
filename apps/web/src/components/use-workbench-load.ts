@@ -36,7 +36,7 @@ import { type SetStateAction, useCallback, useEffect, useMemo, useRef, useState 
 import { flushSync } from 'react-dom'
 import { putRecords, storedRecord, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { loadEnglish } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { english, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
 import type {
@@ -64,11 +64,11 @@ import { powderIncomplete } from '../lib/complete-records.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
 import { exampleFields } from '../lib/examples.ts'
+import { fieldError } from '../lib/field-error.ts'
 import {
   type FieldSpec,
   type Fields,
   type FieldValue,
-  fieldError,
   siValues,
   specText,
 } from '../lib/field-spec.ts'
@@ -965,9 +965,15 @@ function fillRecordValues(
 }
 
 /** The step size field's own error: invalid, or not above 0. */
-function ownStepError(spec: FieldSpec, v: FieldValue, shown: UnitSystem, t: Translator['t']) {
+function ownStepError(
+  spec: FieldSpec,
+  v: FieldValue,
+  shown: UnitSystem,
+  t: Translator['t'],
+  i18n: I18n,
+) {
   return (
-    fieldError(spec, v, shown, t) ??
+    fieldError(spec, v, shown, t, i18n) ??
     (v.si === undefined || v.si > 0
       ? undefined
       : t('{label} must be above 0.', { label: specText(t, spec.label) }))
@@ -1301,7 +1307,8 @@ const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
   Object.fromEntries(
     interiorFields.flatMap((s) => {
       // stored English: a field shows the message again in the language and units shown
-      const error = linked[s.key]?.text && fieldError(s, linked[s.key], system, english.t)
+      const error =
+        linked[s.key]?.text && fieldError(s, linked[s.key], system, english.t, linguiOf('en'))
       return error ? [[s.key, error]] : []
     }),
   )
@@ -1519,7 +1526,7 @@ export function useWorkbenchState() {
         interiorFields.map((s) => [
           s.key,
           // stored English: a field shows the message again in the language and units shown
-          fieldError(s, values[s.key], unitsNow.current, english.t) ??
+          fieldError(s, values[s.key], unitsNow.current, english.t, linguiOf('en')) ??
             burnFormError(siValues(values), s.key, english.t) ??
             null,
         ]),
@@ -2372,7 +2379,7 @@ export function useWorkbenchState() {
       temp: tempStep,
       charge: ladder,
     })
-    const own = ownStepError(spec, v, shown, t)
+    const own = ownStepError(spec, v, shown, t, i18n)
     if (own || ladderKind === 'charge') return own
     const blocked = ladderKind === 'temperature' ? temperatureBlock : seatingBlockNow()
     if (blocked) return blocked
@@ -2451,7 +2458,7 @@ export function useWorkbenchState() {
   function refusedSpec() {
     for (const f of specFields) {
       const v = spec.typed[f.key]
-      const error = v?.text.trim() ? fieldError(f, v, system, t) : undefined
+      const error = v?.text.trim() ? fieldError(f, v, system, t, i18n) : undefined
       if (error) return { key: f.key, error }
     }
     return
@@ -2757,7 +2764,7 @@ export function useWorkbenchState() {
       Object.values(form.errors).some(Boolean) ||
       !form.isValid() ||
       (gunWeight !== undefined &&
-        fieldError(firearmMassSpec, gunWeight, system, t) !== undefined) ||
+        fieldError(firearmMassSpec, gunWeight, system, t, i18n) !== undefined) ||
       stepError() !== undefined
     if (!changed || loading || invalid) return
     try {

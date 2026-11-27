@@ -8,6 +8,18 @@ vi.mock('react', async (original) => ({
   ...(await original<typeof import('react')>()),
   ...(await import('./fake-hooks.ts')).fakeHooks,
 }))
+vi.mock('@lingui/react', async () => {
+  // a namespace, not its names: the module is still evaluating here, as `@rangefoundry/ui` imports this mock
+  const lingui = await import('../src/i18n/lingui.ts')
+  return { useLingui: () => ({ i18n: lingui.linguiOf('en') }) }
+})
+vi.mock('../src/i18n/language.ts', async (original) => {
+  const { english } = await import('../src/i18n/translate.ts')
+  return {
+    ...(await original<typeof import('../src/i18n/language.ts')>()),
+    useTranslation: () => english,
+  }
+})
 vi.mock('../src/components/units-settings.tsx', async () => {
   const { presetUnits } = await import('../src/lib/units.ts')
   return { useUnits: () => ({ system: presetUnits('us') }) }
