@@ -771,6 +771,10 @@ msgstr "Vielleicht-Vorschläge übernehmen ({count, decimal})"
 msgid "holeDetection.acceptSure"
 msgstr "Sichere übernehmen ({count, decimal})"
 
+# en: "Action"
+msgid "shortcuts.action"
+msgstr "Aktion"
+
 # en: "Actions"
 msgid "disciplines.row.actions"
 msgstr "Aktionen"
@@ -1014,6 +1018,10 @@ msgstr "Diopter"
 # en: "Apply"
 msgid "chargeTarget.apply"
 msgstr "Übernehmen"
+
+# en: "Area"
+msgid "reportIssue.areaLabel"
+msgstr "Bereich"
 
 # en: "Area {n, decimal} to place by hand: about {count, decimal} holes of area joined (touching holes or dark print); detection does not count it."
 msgid "holeDetection.areaPlaceHandAbout"
@@ -1316,6 +1324,10 @@ msgid "page.cases"
 msgstr "Hülsen"
 
 # en: "Brass"
+msgid "reportIssue.area.brass"
+msgstr "Hülsen"
+
+# en: "Brass"
 msgid "values.brass"
 msgstr "Messinghülse"
 
@@ -1359,6 +1371,10 @@ msgstr "Pinsel: hinzufügen"
 msgid "bulletPhoto.brushErase"
 msgstr "Pinsel: entfernen"
 
+# en: "Bug"
+msgid "reportIssue.type.bug"
+msgstr "Fehler"
+
 # en: "Build"
 msgid "recordFields.build"
 msgstr "Aufbau"
@@ -1395,6 +1411,10 @@ msgstr "Tabelle der Geschossdaten"
 msgid "page.bulletsDesigner"
 msgstr "Geschoss-Editor"
 
+# en: "Bullet designer"
+msgid "reportIssue.area.bulletDesigner"
+msgstr "Geschoss-Editor"
+
 # en: "bullet diameter"
 msgid "cartridgeRecord.meaning.bulletDiameter"
 msgstr "Geschossdurchmesser"
@@ -1429,6 +1449,14 @@ msgstr "Geschosse"
 
 # en: "Bullets"
 msgid "page.bullets"
+msgstr "Geschosse"
+
+# en: "Bullets"
+msgid "reportIssue.area.bullets"
+msgstr "Geschosse"
+
+# en: "Bullets"
+msgid "siteSearch.bullets"
 msgstr "Geschosse"
 
 # en: "Bullets ({count})"
@@ -1583,6 +1611,10 @@ msgstr "Abbrechen"
 msgid "powderCompare.cancel"
 msgstr "Abbrechen"
 
+# en: "Cancel"
+msgid "reportIssue.cancel"
+msgstr "Abbrechen"
+
 # en: "Cancel ({pct, decimal} %)"
 msgid "holeDetection.cancelPercent"
 msgstr "Abbrechen ({pct, decimal} %)"
@@ -1659,6 +1691,10 @@ msgstr "Patronenentwurf"
 msgid "page.cartridgesDesigner"
 msgstr "Patronen-Editor"
 
+# en: "Cartridge designer"
+msgid "reportIssue.area.cartridgeDesigner"
+msgstr "Patronen-Editor"
+
 # en: "Cartridge dimensions"
 msgid "cartridgeRecord.dimensions.cartridge"
 msgstr "Maße der Patrone"
@@ -1725,6 +1761,10 @@ msgstr "Patronen"
 
 # en: "Cartridges"
 msgid "powderRecord.cartridges"
+msgstr "Patronen"
+
+# en: "Cartridges"
+msgid "reportIssue.area.cartridges"
 msgstr "Patronen"
 
 # en: "Cartridges, {filters}"
@@ -2116,6 +2156,14 @@ msgid "targetEditor.clicksMradMoaThat"
 msgstr "Klicks von {optic} ({mrad} mrad, {moa} MOA), die die Mitte des Schussbilds auf den Haltepunkt verschieben."
 
 # en: "Close"
+msgid "safetyDialog.close"
+msgstr "Schließen"
+
+# en: "Close"
+msgid "settingsDialog.done"
+msgstr "Schließen"
+
+# en: "Close"
 msgid "targetEditor.close"
 msgstr "Schließen"
 
@@ -2126,6 +2174,10 @@ msgstr "Nah genug"
 # en: "Close navigation"
 msgid "shell.closeNavigation"
 msgstr "Navigation schließen"
+
+# en: "Close settings"
+msgid "settingsDialog.close"
+msgstr "Einstellungen schließen"
 
 # en: "Close the photograph tool"
 msgid "bulletPhoto.close"
@@ -2282,6 +2334,10 @@ msgstr "Konstruktion"
 # en: "Construction"
 msgid "recordFields.construction"
 msgstr "Konstruktion"
+
+# en: "Continue"
+msgid "continueStrip.label"
+msgstr "Fortsetzen"
 
 # en: "Contrast"
 msgid "targetEditor.contrast"
@@ -2463,6 +2519,10 @@ msgstr "Erneut freistellen"
 msgid "bulletPhoto.cutting"
 msgstr "Das Geschoss wird freigestellt…"
 
+# en: "Dark theme"
+msgid "themeSwitch.dark"
+msgstr "Dunkles Farbschema"
+
 # en: "Darken"
 msgid "targetEditor.darken"
 msgstr "Abdunkeln"
@@ -2482,6 +2542,10 @@ msgstr "Gestrichelt: nach einer angenommenen Form gezeichnet. Abgeleitete und an
 # en: "data conflict between published cartridge maximum and chamber minimum (check source)"
 msgid "cartridgeRecord.conflict"
 msgstr "Datenkonflikt zwischen veröffentlichtem Höchstmaß der Patrone und Mindestmaß des Patronenlagers (Quelle prüfen)"
+
+# en: "Data of a pre-release version"
+msgid "preRelease.title"
+msgstr "Daten einer Vorabversion"
 
 # en: "Database"
 msgid "sections.database"
@@ -2511,6 +2575,10 @@ msgstr "Datum: {date}"
 msgid "targetDesigner.decimalScoring"
 msgstr "Zehntelwertung"
 
+# en: "Decline"
+msgid "safetyDialog.decline"
+msgstr "Ablehnen"
+
 # en: "Delete"
 msgid "firearms.delete"
 msgstr "Löschen"
@@ -2521,6 +2589,10 @@ msgstr "Löschen"
 
 # en: "Delete"
 msgid "log.delete"
+msgstr "Löschen"
+
+# en: "Delete"
+msgid "preRelease.delete"
 msgstr "Löschen"
 
 # en: "Delete"
@@ -2737,6 +2809,10 @@ msgstr "Disziplinen"
 
 # en: "Disciplines"
 msgid "page.disciplines"
+msgstr "Disziplinen"
+
+# en: "Disciplines"
+msgid "reportIssue.area.disciplines"
 msgstr "Disziplinen"
 
 # en: "Disciplines"
@@ -3332,6 +3408,10 @@ msgstr "Die Verbandsdaten sind gerade nicht verfügbar."
 msgid "page.federations"
 msgstr "Verbände"
 
+# en: "Federations"
+msgid "reportIssue.area.federations"
+msgstr "Verbände"
+
 # en: "Federations, {filters}"
 msgid "disciplines.federationsFiltered"
 msgstr "Verbände, {filters}"
@@ -3430,6 +3510,10 @@ msgstr "Schusswaffen"
 
 # en: "Firearms"
 msgid "page.firearms"
+msgstr "Schusswaffen"
+
+# en: "Firearms"
+msgid "reportIssue.area.firearms"
 msgstr "Schusswaffen"
 
 # en: "Firearms, {filters}"
@@ -3996,6 +4080,14 @@ msgstr "So gelingt ein Foto, das die App auswerten kann"
 msgid "values.hybrid"
 msgstr "hybrid"
 
+# en: "I accept"
+msgid "safetyDialog.accept"
+msgstr "Ich akzeptiere"
+
+# en: "Idea"
+msgid "reportIssue.type.idea"
+msgstr "Idee"
+
 # en: "Identity"
 msgid "bulletDesigner.identity"
 msgstr "Bezeichnung"
@@ -4160,6 +4252,14 @@ msgstr "Eingaben"
 msgid "powderCompare.inputsChangedSinceThese"
 msgstr "Eingaben seit diesen Zeilen geändert"
 
+# en: "Install"
+msgid "install.label"
+msgstr "Installieren"
+
+# en: "Install as an app"
+msgid "install.tooltip"
+msgstr "Als App installieren"
+
 # en: "Intended use"
 msgid "recordFields.intendedUse"
 msgstr "Verwendungszweck"
@@ -4207,6 +4307,14 @@ msgstr "Kennwerte"
 # en: "Keyboard shortcuts"
 msgid "shellActions.keyboardShortcuts"
 msgstr "Tastenkürzel"
+
+# en: "Keyboard shortcuts"
+msgid "shortcuts.title"
+msgstr "Tastenkürzel"
+
+# en: "Keys"
+msgid "shortcuts.keys"
+msgstr "Tasten"
 
 # en: "Kind"
 msgid "faceRecord.column.kind"
@@ -4607,6 +4715,10 @@ msgstr "Ihre Daten werden geladen"
 # en: "Loads"
 msgid "firearms.column.loads"
 msgstr "Laborierungen"
+
+# en: "Loads you save show here."
+msgid "continueStrip.empty"
+msgstr "Gespeicherte Laborierungen erscheinen hier."
 
 # en: "Long gun"
 msgid "disciplines.firearm.longGun"
@@ -5832,6 +5944,10 @@ msgstr "Ogive Rt/R"
 msgid "listSources.ok"
 msgstr "OK"
 
+# en: "On macOS, Cmd for Ctrl, except Ctrl+Y."
+msgid "shortcuts.macCmd"
+msgstr "Unter macOS Cmd statt Ctrl, außer Ctrl+Y."
+
 # en: "on the point of aim"
 msgid "targetEditor.onPointOfAim"
 msgstr "auf dem Haltepunkt"
@@ -5892,6 +6008,10 @@ msgstr "In Schussbildern öffnen"
 msgid "home.open.workbench"
 msgstr "Werkbank für Laborierungen öffnen"
 
+# en: "Open on GitHub"
+msgid "reportIssue.open"
+msgstr "Auf GitHub öffnen"
+
 # en: "Open session summary"
 msgid "home.open.session"
 msgstr "Sitzungsübersicht öffnen"
@@ -5932,6 +6052,10 @@ msgstr "Optik, Einschießentfernung"
 msgid "disciplines.rule.optical"
 msgstr "optisch"
 
+# en: "or"
+msgid "shortcuts.or"
+msgstr "oder"
+
 # en: "Or arrow keys and Enter. Esc cancels."
 msgid "targetEditor.arrowKeysEnterEsc"
 msgstr "Oder Pfeiltasten und Eingabetaste. Esc bricht ab."
@@ -5962,6 +6086,10 @@ msgstr "andere"
 
 # en: "Other"
 msgid "cartridgeRecord.group.other"
+msgstr "Sonstige"
+
+# en: "Other"
+msgid "reportIssue.area.other"
 msgstr "Sonstige"
 
 # en: "Outer diameter"
@@ -6272,6 +6400,10 @@ msgstr "Werte des Treibladungspulvers aus dem eigenen Entwurf {name}, nicht aus 
 msgid "page.powders"
 msgstr "Treibladungspulver"
 
+# en: "Powders"
+msgid "reportIssue.area.powders"
+msgstr "Treibladungspulver"
+
 # en: "Powders by burn rate"
 msgid "burnRateCompare.byRate"
 msgstr "Treibladungspulver nach Abbrandgeschwindigkeit"
@@ -6366,6 +6498,10 @@ msgstr "Zündglocke"
 
 # en: "Primers"
 msgid "page.primers"
+msgstr "Zündhütchen"
+
+# en: "Primers"
+msgid "reportIssue.area.primers"
 msgstr "Zündhütchen"
 
 # en: "Primers, {filters}"
@@ -6527,6 +6663,10 @@ msgstr "Herkunft"
 # en: "public"
 msgid "recordSources.origin.public"
 msgstr "öffentlich"
+
+# en: "Public on GitHub. No photos, files or other records of this browser."
+msgid "reportIssue.public"
+msgstr "Öffentlich auf GitHub. Keine Fotos, Dateien oder anderen Datensätze dieses Browsers."
 
 # en: "published"
 msgid "recordSources.kind.published"
@@ -6795,6 +6935,10 @@ msgstr "Foto ersetzen"
 # en: "Replace the photo?"
 msgid "targetEditor.replacePhotoQuestion"
 msgstr "Das Foto ersetzen?"
+
+# en: "Report an issue"
+msgid "reportIssue.title"
+msgstr "Problem melden"
 
 # en: "Required."
 msgid "targetDesigner.required"
@@ -7140,6 +7284,14 @@ msgstr "Regeln"
 msgid "targetEditor.compassS"
 msgstr "S"
 
+# en: "Safety"
+msgid "safetyDialog.button"
+msgstr "Sicherheit"
+
+# en: "Safety notice"
+msgid "safetyDialog.title"
+msgstr "Sicherheitsregeln"
+
 # en: "Safety notice"
 msgid "shellActions.safetyNotice"
 msgstr "Sicherheitsregeln"
@@ -7332,6 +7484,10 @@ msgstr "Halbautomat"
 msgid "values.semiRimmed"
 msgstr "halbrandig"
 
+# en: "Sent with the report"
+msgid "reportIssue.sent"
+msgstr "Wird mit der Meldung gesendet"
+
 # en: "Separated by spaces"
 msgid "powderTune.separatedBySpaces"
 msgstr "Durch Leerzeichen getrennt"
@@ -7364,6 +7520,10 @@ msgstr "Sitzung"
 msgid "page.session"
 msgstr "Sitzungsübersicht"
 
+# en: "Session summary"
+msgid "reportIssue.area.sessionSummary"
+msgstr "Sitzungsübersicht"
+
 # en: "Set"
 msgid "targetEditor.set"
 msgstr "Setzen"
@@ -7383,6 +7543,10 @@ msgstr "Stellen Sie zuerst den Maßstab ein (Schritt 2)."
 # en: "Set Values came about by to Fitted to data."
 msgid "powderDesigner.setFittedData"
 msgstr "Setzen Sie Herkunft der Werte auf An Daten angepasst."
+
+# en: "Settings"
+msgid "reportIssue.area.settings"
+msgstr "Einstellungen"
 
 # en: "Settings"
 msgid "shell.settings"
@@ -7450,6 +7614,10 @@ msgstr "Schussbilder"
 
 # en: "Shot groups"
 msgid "page.groups"
+msgstr "Schussbilder"
+
+# en: "Shot groups"
+msgid "reportIssue.area.shotGroups"
 msgstr "Schussbilder"
 
 # en: "Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen."
@@ -7596,6 +7764,10 @@ msgstr "einbasig"
 msgid "disciplines.rule.singleShot"
 msgstr "Einzellader"
 
+# en: "Single-key shortcuts are off. Turn them on in Settings, General."
+msgid "shortcuts.singleKeysOff"
+msgstr "Die Tastenkürzel mit einer Taste sind aus. Sie lassen sich unter Einstellungen, Allgemein einschalten."
+
 # en: "sitting"
 msgid "disciplines.rule.sitting"
 msgstr "sitzend"
@@ -7611,6 +7783,14 @@ msgstr "Maße"
 # en: "Size"
 msgid "recordFields.size"
 msgstr "Maße"
+
+# en: "Skip to content"
+msgid "skipLink.content"
+msgstr "Zum Inhalt springen"
+
+# en: "Skip to results"
+msgid "skipLink.results"
+msgstr "Zu den Ergebnissen springen"
 
 # en: "sling"
 msgid "disciplines.rule.sling"
@@ -7679,6 +7859,10 @@ msgstr "Quelle"
 # en: "Source"
 msgid "recordSources.column.source"
 msgstr "Quelle"
+
+# en: "Source code on GitHub"
+msgid "repositoryLink.label"
+msgstr "Quellcode auf GitHub"
 
 # en: "Source: {text}"
 msgid "listSources.button"
@@ -8028,6 +8212,10 @@ msgstr "Scheiben"
 
 # en: "Targets"
 msgid "page.targets"
+msgstr "Scheiben"
+
+# en: "Targets"
+msgid "reportIssue.area.targets"
 msgstr "Scheiben"
 
 # en: "Targets ({count})"
@@ -8546,6 +8734,10 @@ msgstr "Diese Schussreihen können den Temperaturfaktor nicht vom Abbrandkoeffiz
 msgid "bulletPhoto.unreadable"
 msgstr "Dieser Browser kann das Foto nicht lesen."
 
+# en: "This browser holds data of a pre-release version of the app, which this version does not read. Delete it to save records in this browser again."
+msgid "preRelease.message"
+msgstr "Dieser Browser enthält Daten einer Vorabversion der App, die diese Version nicht liest. Löschen Sie sie, um wieder Datensätze in diesem Browser zu speichern."
+
 # en: "This cartridge has no CIP record that draws. The designer still works."
 msgid "cartridgeDesigner.noDrawingRecord"
 msgstr "Zu dieser Patrone gibt es keinen CIP-Datensatz, der sich zeichnen lässt. Der Editor funktioniert weiterhin."
@@ -8756,6 +8948,10 @@ msgstr "Art"
 
 # en: "Type"
 msgid "recordFields.type"
+msgstr "Art"
+
+# en: "Type"
+msgid "reportIssue.typeLabel"
 msgstr "Art"
 
 # en: "typed"
@@ -9042,6 +9238,14 @@ msgstr "Wachsschmierung"
 msgid "powderTune.weakPrior"
 msgstr "Schwacher Prior"
 
+# en: "What do you need?"
+msgid "reportIssue.need"
+msgstr "Was brauchen Sie?"
+
+# en: "What happened?"
+msgid "reportIssue.happened"
+msgstr "Was ist passiert?"
+
 # en: "What's new"
 msgid "homeNews.title"
 msgstr "Neuigkeiten"
@@ -9078,6 +9282,10 @@ msgstr "Windgeschwindigkeit"
 msgid "burnRateCompare.noCurve"
 msgstr "Ohne Kurve"
 
+# en: "Workbench"
+msgid "reportIssue.area.workbench"
+msgstr "Werkbank"
+
 # en: "Workbench settings"
 msgid "shellActions.workbenchSettings"
 msgstr "Einstellungen der Werkbank"
@@ -9093,6 +9301,10 @@ msgstr "Funktioniert offline"
 # en: "Writes the charge into the charge field"
 msgid "chargeTarget.applyHelp"
 msgstr "Schreibt die Treibladung in das Treibladungsfeld"
+
+# en: "Wrong data"
+msgid "reportIssue.type.wrongData"
+msgstr "Falsche Daten"
 
 # en: "Year"
 msgid "log.year"

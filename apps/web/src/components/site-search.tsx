@@ -1,22 +1,26 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { createSpotlight } from '@mantine/spotlight'
 import { useEffect, useMemo } from 'react'
 import { useRouter } from '@/platform/navigation.ts'
-import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { designerHref, userBulletRows } from '../lib/sources.ts'
 import { userBullets } from '../lib/variants.ts'
+import englishMessages from '../locales/en/components/site-search.json' with { type: 'json' }
 import { useResolved, useUserRecords } from './list-sources.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { WorkbenchSearch } from './workbench-search.tsx'
+
+loadEnglish(englishMessages)
 
 const search = createSpotlight()
 
 /** The browser's bullet designs are read again at each opening and open their designer; loaded when first asked for (`SiteHeader`), each new `request` opens it. */
 export function SiteSearch({ request }: { request: number }) {
   const router = useRouter()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const names = useManufacturerNames()
   const [records] = useUserRecords(request)
   const mine = useResolved(records, userBullets)
@@ -32,7 +36,7 @@ export function SiteSearch({ request }: { request: number }) {
       }
       onPowder={(p) => router.push(`/powders/${p.id}`)}
       describeBullet={(b) => productLabel(b, names)}
-      bulletsLabel={t('Bullets')}
+      bulletsLabel={i18n._({ id: 'siteSearch.bullets', message: 'Bullets' })}
       designs={designs}
     />
   )

@@ -580,6 +580,9 @@ msgstr "Accept maybes ({count, decimal})"
 msgid "holeDetection.acceptSure"
 msgstr "Accept sure ({count, decimal})"
 
+msgid "shortcuts.action"
+msgstr "Action"
+
 msgid "disciplines.row.actions"
 msgstr "Actions"
 
@@ -762,6 +765,9 @@ msgstr "aperture"
 
 msgid "chargeTarget.apply"
 msgstr "Apply"
+
+msgid "reportIssue.areaLabel"
+msgstr "Area"
 
 msgid "holeDetection.areaPlaceHandAbout"
 msgstr "Area {n, decimal} to place by hand: about {count, decimal} holes of area joined (touching holes or dark print); detection does not count it."
@@ -988,6 +994,9 @@ msgstr "boron nitride"
 msgid "page.cases"
 msgstr "Brass"
 
+msgid "reportIssue.area.brass"
+msgstr "Brass"
+
 msgid "values.brass"
 msgstr "Brass"
 
@@ -1021,6 +1030,9 @@ msgstr "Brush: add"
 msgid "bulletPhoto.brushErase"
 msgstr "Brush: erase"
 
+msgid "reportIssue.type.bug"
+msgstr "Bug"
+
 msgid "recordFields.build"
 msgstr "Build"
 
@@ -1048,6 +1060,9 @@ msgstr "Bullet data table"
 msgid "page.bulletsDesigner"
 msgstr "Bullet designer"
 
+msgid "reportIssue.area.bulletDesigner"
+msgstr "Bullet designer"
+
 msgid "cartridgeRecord.meaning.bulletDiameter"
 msgstr "bullet diameter"
 
@@ -1073,6 +1088,12 @@ msgid "disciplines.row.bulletTypes"
 msgstr "Bullets"
 
 msgid "page.bullets"
+msgstr "Bullets"
+
+msgid "reportIssue.area.bullets"
+msgstr "Bullets"
+
+msgid "siteSearch.bullets"
 msgstr "Bullets"
 
 msgid "cartridgeRecord.bullets"
@@ -1189,6 +1210,9 @@ msgstr "Cancel"
 msgid "powderCompare.cancel"
 msgstr "Cancel"
 
+msgid "reportIssue.cancel"
+msgstr "Cancel"
+
 msgid "holeDetection.cancelPercent"
 msgstr "Cancel ({pct, decimal} %)"
 
@@ -1246,6 +1270,9 @@ msgstr "Cartridge design"
 msgid "page.cartridgesDesigner"
 msgstr "Cartridge designer"
 
+msgid "reportIssue.area.cartridgeDesigner"
+msgstr "Cartridge designer"
+
 msgid "cartridgeRecord.dimensions.cartridge"
 msgstr "Cartridge dimensions"
 
@@ -1295,6 +1322,9 @@ msgid "powderDesigner.cartridges"
 msgstr "Cartridges"
 
 msgid "powderRecord.cartridges"
+msgstr "Cartridges"
+
+msgid "reportIssue.area.cartridges"
 msgstr "Cartridges"
 
 msgid "cartridges.filtered"
@@ -1588,6 +1618,12 @@ msgstr "Clicks"
 msgid "targetEditor.clicksMradMoaThat"
 msgstr "Clicks of {optic} ({mrad} mrad, {moa} MOA) that move the group center onto the point of aim."
 
+msgid "safetyDialog.close"
+msgstr "Close"
+
+msgid "settingsDialog.done"
+msgstr "Close"
+
 msgid "targetEditor.close"
 msgstr "Close"
 
@@ -1596,6 +1632,9 @@ msgstr "Close enough"
 
 msgid "shell.closeNavigation"
 msgstr "Close navigation"
+
+msgid "settingsDialog.close"
+msgstr "Close settings"
 
 msgid "bulletPhoto.close"
 msgstr "Close the photograph tool"
@@ -1713,6 +1752,9 @@ msgstr "Construction"
 
 msgid "recordFields.construction"
 msgstr "Construction"
+
+msgid "continueStrip.label"
+msgstr "Continue"
 
 msgid "targetEditor.contrast"
 msgstr "Contrast"
@@ -1849,6 +1891,9 @@ msgstr "Cut out again"
 msgid "bulletPhoto.cutting"
 msgstr "Cutting out the bullet…"
 
+msgid "themeSwitch.dark"
+msgstr "Dark theme"
+
 msgid "targetEditor.darken"
 msgstr "Darken"
 
@@ -1863,6 +1908,9 @@ msgstr "Dashed: drawn from an assumed shape. Derived and assumed values are not 
 
 msgid "cartridgeRecord.conflict"
 msgstr "data conflict between published cartridge maximum and chamber minimum (check source)"
+
+msgid "preRelease.title"
+msgstr "Data of a pre-release version"
 
 msgid "sections.database"
 msgstr "Database"
@@ -1885,6 +1933,9 @@ msgstr "Date: {date}"
 msgid "targetDesigner.decimalScoring"
 msgstr "Decimal scoring"
 
+msgid "safetyDialog.decline"
+msgstr "Decline"
+
 msgid "firearms.delete"
 msgstr "Delete"
 
@@ -1892,6 +1943,9 @@ msgid "listSources.delete"
 msgstr "Delete"
 
 msgid "log.delete"
+msgstr "Delete"
+
+msgid "preRelease.delete"
 msgstr "Delete"
 
 msgid "targetEditor.delete"
@@ -2054,6 +2108,9 @@ msgid "federationRecord.column.disciplines"
 msgstr "Disciplines"
 
 msgid "page.disciplines"
+msgstr "Disciplines"
+
+msgid "reportIssue.area.disciplines"
 msgstr "Disciplines"
 
 msgid "targets.column.disciplines"
@@ -2501,6 +2558,9 @@ msgstr "Federation data is unavailable right now."
 msgid "page.federations"
 msgstr "Federations"
 
+msgid "reportIssue.area.federations"
+msgstr "Federations"
+
 msgid "disciplines.federationsFiltered"
 msgstr "Federations, {filters}"
 
@@ -2574,6 +2634,9 @@ msgid "firearms.title"
 msgstr "Firearms"
 
 msgid "page.firearms"
+msgstr "Firearms"
+
+msgid "reportIssue.area.firearms"
 msgstr "Firearms"
 
 msgid "firearms.titleFiltered"
@@ -2999,6 +3062,12 @@ msgstr "How to take a photo the app can score"
 msgid "values.hybrid"
 msgstr "hybrid"
 
+msgid "safetyDialog.accept"
+msgstr "I accept"
+
+msgid "reportIssue.type.idea"
+msgstr "Idea"
+
 msgid "bulletDesigner.identity"
 msgstr "Identity"
 
@@ -3122,6 +3191,12 @@ msgstr "Inputs"
 msgid "powderCompare.inputsChangedSinceThese"
 msgstr "Inputs changed since these rows"
 
+msgid "install.label"
+msgstr "Install"
+
+msgid "install.tooltip"
+msgstr "Install as an app"
+
 msgid "recordFields.intendedUse"
 msgstr "Intended use"
 
@@ -3157,6 +3232,12 @@ msgstr "Key values"
 
 msgid "shellActions.keyboardShortcuts"
 msgstr "Keyboard shortcuts"
+
+msgid "shortcuts.title"
+msgstr "Keyboard shortcuts"
+
+msgid "shortcuts.keys"
+msgstr "Keys"
 
 msgid "faceRecord.column.kind"
 msgstr "Kind"
@@ -3457,6 +3538,9 @@ msgstr "Loading your data"
 
 msgid "firearms.column.loads"
 msgstr "Loads"
+
+msgid "continueStrip.empty"
+msgstr "Loads you save show here."
 
 msgid "disciplines.firearm.longGun"
 msgstr "Long gun"
@@ -4376,6 +4460,9 @@ msgstr "Ogive Rt/R"
 msgid "listSources.ok"
 msgstr "OK"
 
+msgid "shortcuts.macCmd"
+msgstr "On macOS, Cmd for Ctrl, except Ctrl+Y."
+
 msgid "targetEditor.onPointOfAim"
 msgstr "on the point of aim"
 
@@ -4421,6 +4508,9 @@ msgstr "Open in shot groups"
 msgid "home.open.workbench"
 msgstr "Open load workbench"
 
+msgid "reportIssue.open"
+msgstr "Open on GitHub"
+
 msgid "home.open.session"
 msgstr "Open session summary"
 
@@ -4451,6 +4541,9 @@ msgstr "Optic, zero"
 msgid "disciplines.rule.optical"
 msgstr "optical"
 
+msgid "shortcuts.or"
+msgstr "or"
+
 msgid "targetEditor.arrowKeysEnterEsc"
 msgstr "Or arrow keys and Enter. Esc cancels."
 
@@ -4473,6 +4566,9 @@ msgid "values.other"
 msgstr "other"
 
 msgid "cartridgeRecord.group.other"
+msgstr "Other"
+
+msgid "reportIssue.area.other"
 msgstr "Other"
 
 msgid "targets.column.outer"
@@ -4706,6 +4802,9 @@ msgstr "Powder values from the user design {name}, not a catalogue record."
 msgid "page.powders"
 msgstr "Powders"
 
+msgid "reportIssue.area.powders"
+msgstr "Powders"
+
 msgid "burnRateCompare.byRate"
 msgstr "Powders by burn rate"
 
@@ -4776,6 +4875,9 @@ msgid "recordFields.primerPocket"
 msgstr "Primer pocket"
 
 msgid "page.primers"
+msgstr "Primers"
+
+msgid "reportIssue.area.primers"
 msgstr "Primers"
 
 msgid "primers.filtered"
@@ -4897,6 +4999,9 @@ msgstr "Provenance"
 
 msgid "recordSources.origin.public"
 msgstr "public"
+
+msgid "reportIssue.public"
+msgstr "Public on GitHub. No photos, files or other records of this browser."
 
 msgid "recordSources.kind.published"
 msgstr "published"
@@ -5098,6 +5203,9 @@ msgstr "Replace photo"
 
 msgid "targetEditor.replacePhotoQuestion"
 msgstr "Replace the photo?"
+
+msgid "reportIssue.title"
+msgstr "Report an issue"
 
 msgid "targetDesigner.required"
 msgstr "Required."
@@ -5357,6 +5465,12 @@ msgstr "Rules"
 msgid "targetEditor.compassS"
 msgstr "S"
 
+msgid "safetyDialog.button"
+msgstr "Safety"
+
+msgid "safetyDialog.title"
+msgstr "Safety notice"
+
 msgid "shellActions.safetyNotice"
 msgstr "Safety notice"
 
@@ -5501,6 +5615,9 @@ msgstr "semi automatic"
 msgid "values.semiRimmed"
 msgstr "semi-rimmed"
 
+msgid "reportIssue.sent"
+msgstr "Sent with the report"
+
 msgid "powderTune.separatedBySpaces"
 msgstr "Separated by spaces"
 
@@ -5525,6 +5642,9 @@ msgstr "Session"
 msgid "page.session"
 msgstr "Session summary"
 
+msgid "reportIssue.area.sessionSummary"
+msgstr "Session summary"
+
 msgid "targetEditor.set"
 msgstr "Set"
 
@@ -5539,6 +5659,9 @@ msgstr "Set the scale first (step 2)."
 
 msgid "powderDesigner.setFittedData"
 msgstr "Set Values came about by to Fitted to data."
+
+msgid "reportIssue.area.settings"
+msgstr "Settings"
 
 msgid "shell.settings"
 msgstr "Settings"
@@ -5589,6 +5712,9 @@ msgid "disciplineRecord.column.groups"
 msgstr "Shot groups"
 
 msgid "page.groups"
+msgstr "Shot groups"
+
+msgid "reportIssue.area.shotGroups"
 msgstr "Shot groups"
 
 msgid "targetEditor.markerHelp"
@@ -5699,6 +5825,9 @@ msgstr "single"
 msgid "disciplines.rule.singleShot"
 msgstr "single shot"
 
+msgid "shortcuts.singleKeysOff"
+msgstr "Single-key shortcuts are off. Turn them on in Settings, General."
+
 msgid "disciplines.rule.sitting"
 msgstr "sitting"
 
@@ -5710,6 +5839,12 @@ msgstr "Size"
 
 msgid "recordFields.size"
 msgstr "Size"
+
+msgid "skipLink.content"
+msgstr "Skip to content"
+
+msgid "skipLink.results"
+msgstr "Skip to results"
 
 msgid "disciplines.rule.sling"
 msgstr "sling"
@@ -5761,6 +5896,9 @@ msgstr "Source"
 
 msgid "recordSources.column.source"
 msgstr "Source"
+
+msgid "repositoryLink.label"
+msgstr "Source code on GitHub"
 
 msgid "listSources.button"
 msgstr "Source: {text}"
@@ -6023,6 +6161,9 @@ msgid "federationRecord.column.targets"
 msgstr "Targets"
 
 msgid "page.targets"
+msgstr "Targets"
+
+msgid "reportIssue.area.targets"
 msgstr "Targets"
 
 msgid "disciplineRecord.targets"
@@ -6412,6 +6553,9 @@ msgstr "These strings cannot tell the temperature factor from the burn coefficie
 msgid "bulletPhoto.unreadable"
 msgstr "This browser cannot read the photograph."
 
+msgid "preRelease.message"
+msgstr "This browser holds data of a pre-release version of the app, which this version does not read. Delete it to save records in this browser again."
+
 msgid "cartridgeDesigner.noDrawingRecord"
 msgstr "This cartridge has no CIP record that draws. The designer still works."
 
@@ -6569,6 +6713,9 @@ msgid "bullets.column.type"
 msgstr "Type"
 
 msgid "recordFields.type"
+msgstr "Type"
+
+msgid "reportIssue.typeLabel"
 msgstr "Type"
 
 msgid "holeDetection.typed"
@@ -6784,6 +6931,12 @@ msgstr "wax lube"
 msgid "powderTune.weakPrior"
 msgstr "Weak prior"
 
+msgid "reportIssue.need"
+msgstr "What do you need?"
+
+msgid "reportIssue.happened"
+msgstr "What happened?"
+
 msgid "homeNews.title"
 msgstr "What's new"
 
@@ -6811,6 +6964,9 @@ msgstr "Wind speed"
 msgid "burnRateCompare.noCurve"
 msgstr "Without a curve"
 
+msgid "reportIssue.area.workbench"
+msgstr "Workbench"
+
 msgid "shellActions.workbenchSettings"
 msgstr "Workbench settings"
 
@@ -6822,6 +6978,9 @@ msgstr "Works offline"
 
 msgid "chargeTarget.applyHelp"
 msgstr "Writes the charge into the charge field"
+
+msgid "reportIssue.type.wrongData"
+msgstr "Wrong data"
 
 msgid "log.year"
 msgstr "Year"

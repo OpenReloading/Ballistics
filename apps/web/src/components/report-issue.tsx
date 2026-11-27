@@ -1,5 +1,7 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Button,
@@ -17,8 +19,7 @@ import {
 import { Bug } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import web from '../../package.json'
-import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   type ReportArea,
   type ReportBlock,
@@ -26,44 +27,55 @@ import {
   type ReportType,
   reportArea,
   reportAreas,
-  reportQuestion,
   reportRecord,
   reportSent,
   reportTypes,
   reportUrl,
 } from '../lib/report-issue.ts'
 import { presetNames } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/report-issue.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
 import { type ReportOption, reportHost } from './report-host.ts'
 import { useUnits } from './units-settings.tsx'
 import { useRoute } from './use-route.ts'
 
-const label = msg('Report an issue')
+loadEnglish(englishMessages)
+
+const label = /*i18n*/ { id: 'reportIssue.title', message: 'Report an issue' }
 
 /** The areas and types as the dialog shows them; the report itself carries the English value. */
-const areaLabels: Record<ReportArea, Message> = {
-  Workbench: msg('Workbench'),
-  'Shot groups': msg('Shot groups'),
-  'Session summary': msg('Session summary'),
-  Cartridges: msg('Cartridges'),
-  Bullets: msg('Bullets'),
-  Powders: msg('Powders'),
-  Brass: msg('Brass'),
-  Primers: msg('Primers'),
-  Targets: msg('Targets'),
-  Disciplines: msg('Disciplines'),
-  Federations: msg('Federations'),
-  Firearms: msg('Firearms'),
-  'Cartridge designer': msg('Cartridge designer'),
-  'Bullet designer': msg('Bullet designer'),
-  Settings: msg('Settings'),
-  Other: msg('Other'),
+const areaLabels: Record<ReportArea, MessageDescriptor> = {
+  Workbench: /*i18n*/ { id: 'reportIssue.area.workbench', message: 'Workbench' },
+  'Shot groups': /*i18n*/ { id: 'reportIssue.area.shotGroups', message: 'Shot groups' },
+  'Session summary': /*i18n*/ { id: 'reportIssue.area.sessionSummary', message: 'Session summary' },
+  Cartridges: /*i18n*/ { id: 'reportIssue.area.cartridges', message: 'Cartridges' },
+  Bullets: /*i18n*/ { id: 'reportIssue.area.bullets', message: 'Bullets' },
+  Powders: /*i18n*/ { id: 'reportIssue.area.powders', message: 'Powders' },
+  Brass: /*i18n*/ { id: 'reportIssue.area.brass', message: 'Brass' },
+  Primers: /*i18n*/ { id: 'reportIssue.area.primers', message: 'Primers' },
+  Targets: /*i18n*/ { id: 'reportIssue.area.targets', message: 'Targets' },
+  Disciplines: /*i18n*/ { id: 'reportIssue.area.disciplines', message: 'Disciplines' },
+  Federations: /*i18n*/ { id: 'reportIssue.area.federations', message: 'Federations' },
+  Firearms: /*i18n*/ { id: 'reportIssue.area.firearms', message: 'Firearms' },
+  'Cartridge designer': /*i18n*/ {
+    id: 'reportIssue.area.cartridgeDesigner',
+    message: 'Cartridge designer',
+  },
+  'Bullet designer': /*i18n*/ { id: 'reportIssue.area.bulletDesigner', message: 'Bullet designer' },
+  Settings: /*i18n*/ { id: 'reportIssue.area.settings', message: 'Settings' },
+  Other: /*i18n*/ { id: 'reportIssue.area.other', message: 'Other' },
 }
-const typeLabels: Record<ReportType, Message> = {
-  Bug: msg('Bug'),
-  'Wrong data': msg('Wrong data'),
-  Idea: msg('Idea'),
+const typeLabels: Record<ReportType, MessageDescriptor> = {
+  Bug: /*i18n*/ { id: 'reportIssue.type.bug', message: 'Bug' },
+  'Wrong data': /*i18n*/ { id: 'reportIssue.type.wrongData', message: 'Wrong data' },
+  Idea: /*i18n*/ { id: 'reportIssue.type.idea', message: 'Idea' },
 }
+
+/** The dialog's label of the report text. */
+const reportQuestion = (type: ReportType) =>
+  type === 'Idea'
+    ? /*i18n*/ { id: 'reportIssue.need', message: 'What do you need?' }
+    : /*i18n*/ { id: 'reportIssue.happened', message: 'What happened?' }
 
 /** An icon left of the repository link from 75em, a labeled row in the phone drawer; nothing without a repository URL. */
 export function ReportIssueButton({
@@ -75,25 +87,25 @@ export function ReportIssueButton({
   drawer?: boolean
   onOpen: () => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!url) return null
   const icon = <Bug size={20} aria-hidden="true" />
   if (drawer)
     return (
       <NavLink
         component="button"
-        label={t(label)}
+        label={i18n._(label)}
         leftSection={icon}
         aria-haspopup="dialog"
         onClick={onOpen}
       />
     )
   return (
-    <Tooltip label={t(label)}>
+    <Tooltip label={i18n._(label)}>
       <ActionIcon
         variant="default"
         visibleFrom="lg"
-        aria-label={t(label)}
+        aria-label={i18n._(label)}
         className="report-issue"
         onClick={onOpen}
       >
@@ -138,7 +150,7 @@ export function ReportIssueDialog({
   onClose: () => void
 }) {
   const route = useRoute()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const context = useContextNow(opened, route)
   const [area, setArea] = useState<ReportArea>('Other')
   const [type, setType] = useState<ReportType>('Bug')
@@ -176,12 +188,12 @@ export function ReportIssueDialog({
     <AppModal
       opened={opened}
       onClose={onClose}
-      title={t(label)}
+      title={i18n._(label)}
       size="lg"
       footer={
         <Group justify="flex-end" gap="xs" p="md" pt={0}>
           <Button variant="default" onClick={onClose}>
-            {t('Cancel')}
+            {i18n._({ id: 'reportIssue.cancel', message: 'Cancel' })}
           </Button>
           <Button
             component="a"
@@ -191,7 +203,7 @@ export function ReportIssueDialog({
             onClick={onClose}
             disabled={!url}
           >
-            {t('Open on GitHub')}
+            {i18n._({ id: 'reportIssue.open', message: 'Open on GitHub' })}
           </Button>
         </Group>
       }
@@ -199,27 +211,27 @@ export function ReportIssueDialog({
       <Stack gap="xs">
         <Group gap="xs" align="flex-end" wrap="wrap">
           <Select
-            label={t('Area')}
+            label={i18n._({ id: 'reportIssue.areaLabel', message: 'Area' })}
             allowDeselect={false}
-            data={reportAreas.map((a) => ({ value: a, label: t(areaLabels[a]) }))}
+            data={reportAreas.map((a) => ({ value: a, label: i18n._(areaLabels[a]) }))}
             value={area}
             onChange={(v) => v && setArea(v as ReportArea)}
             comboboxProps={{ withinPortal: false }}
           />
           <Stack gap={4}>
             <Text size="sm" fw={500} id="report-type">
-              {t('Type')}
+              {i18n._({ id: 'reportIssue.typeLabel', message: 'Type' })}
             </Text>
             <SegmentedControl
               aria-labelledby="report-type"
-              data={reportTypes.map((r) => ({ value: r, label: t(typeLabels[r]) }))}
+              data={reportTypes.map((r) => ({ value: r, label: i18n._(typeLabels[r]) }))}
               value={type}
               onChange={(v) => setType(v as ReportType)}
             />
           </Stack>
         </Group>
         <Textarea
-          label={t(reportQuestion(type))}
+          label={i18n._(reportQuestion(type))}
           autosize
           minRows={3}
           maxRows={8}
@@ -240,8 +252,11 @@ export function ReportIssueDialog({
           />
         ))}
         <Textarea
-          label={t('Sent with the report')}
-          description={t('Public on GitHub. No photos, files or other records of this browser.')}
+          label={i18n._({ id: 'reportIssue.sent', message: 'Sent with the report' })}
+          description={i18n._({
+            id: 'reportIssue.public',
+            message: 'Public on GitHub. No photos, files or other records of this browser.',
+          })}
           readOnly
           autosize
           minRows={4}

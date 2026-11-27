@@ -1,15 +1,26 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { RepositoryLink } from '../src/components/repository-link.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { repositoryUrl, sourceUrl } from '../src/lib/repository-url.ts'
 
-const render = (url?: string | undefined, drawer?: boolean) =>
-  renderToStaticMarkup(
-    <MantineProvider>
-      <RepositoryLink url={url} drawer={drawer} />
-    </MantineProvider>,
+/** The link's markup in English; a message without its English fails the test. */
+function render(url?: string | undefined, drawer?: boolean) {
+  const missing: string[] = []
+  const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+  const html = renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <RepositoryLink url={url} drawer={drawer} />
+      </MantineProvider>
+    </I18nProvider>,
   )
+  stop()
+  expect(missing).toEqual([])
+  return html
+}
 
 it('renders nothing without a URL', () => {
   for (const html of [render(), render(undefined, true), render(repositoryUrl(''))]) {

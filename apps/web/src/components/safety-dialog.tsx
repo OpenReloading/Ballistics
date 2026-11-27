@@ -1,13 +1,18 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { ActionIcon, Button, Group, Tooltip } from '@mantine/core'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import type { Message } from '../i18n/translate.ts'
 import { storageName } from '../lib/edition.ts'
 import { safety } from '../lib/safety.ts'
+import englishMessages from '../locales/en/components/safety-dialog.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
 import { NavIcon } from './nav-icons.tsx'
+
+loadEnglish(englishMessages)
 
 /** Browser storage key of the acceptance; a new value asks again after the text changes. */
 const ackKey = storageName('safety-ack')
@@ -15,6 +20,8 @@ const ackValue = '4'
 /** Where Decline leads: away from the site to the browser's empty page, naming no other site. */
 const declineUrl = 'about:blank'
 const openEvent = 'safety-open'
+const title = /*i18n*/ { id: 'safetyDialog.title', message: 'Safety notice' }
+const short = /*i18n*/ { id: 'safetyDialog.button', message: 'Safety' }
 
 /** Whether this browser has accepted the current text of the notice. */
 function isSafetyAccepted() {
@@ -65,21 +72,21 @@ export function SafetyActions({
   onDecline: () => void
   onClose: () => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <Group justify="flex-end" p="md">
       {required ? (
         <>
           <Button variant="default" onClick={onDecline}>
-            {t('Decline')}
+            {i18n._({ id: 'safetyDialog.decline', message: 'Decline' })}
           </Button>
           <Button color="yellow.5" c="dark.9" onClick={onAccept}>
-            {t('I accept')}
+            {i18n._({ id: 'safetyDialog.accept', message: 'I accept' })}
           </Button>
         </>
       ) : (
         <Button variant="default" onClick={onClose}>
-          {t('Close')}
+          {i18n._({ id: 'safetyDialog.close', message: 'Close' })}
         </Button>
       )}
     </Group>
@@ -89,6 +96,7 @@ export function SafetyActions({
 /** On the first visit it must be accepted (no close button, Escape or outside click), Decline leaves the site; a translation stands beside the English text, each with the line that the English text is binding. */
 export function SafetyDialog() {
   const { t, language } = useTranslation()
+  const { i18n } = useLingui()
   const translated = language !== 'en'
   const [opened, setOpened] = useState(false)
   const [required, setRequired] = useState(false)
@@ -131,7 +139,7 @@ export function SafetyDialog() {
       }}
       title={
         <>
-          <NavIcon name="safety" /> {t('Safety notice')}
+          <NavIcon name="safety" /> {i18n._(title)}
         </>
       }
       // the first focus is on the text, not on a button that Enter would press, and focusable so the keys scroll it
@@ -162,14 +170,14 @@ export function SafetyBarButton({
   className?: string
 }) {
   const icon = <NavIcon name="safety" />
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return iconOnly ? (
-    <Tooltip label={t('Safety')}>
+    <Tooltip label={i18n._(short)}>
       <ActionIcon
         color="yellow"
         variant="light"
         className={`safety-light screen-only ${className ?? ''}`}
-        aria-label={t('Safety notice')}
+        aria-label={i18n._(title)}
         onClick={openSafety}
       >
         {icon}
@@ -183,7 +191,7 @@ export function SafetyBarButton({
       className="page-bar-safety safety-light screen-only"
       onClick={openSafety}
     >
-      {t('Safety')}
+      {i18n._(short)}
     </Button>
   )
 }

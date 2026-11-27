@@ -1,6 +1,5 @@
 /** Report issue: the area of a page, the record it shows, and the prefilled new-issue link of the repository. */
 import { fromSi, type TargetSheet } from '@rangefoundry/schema'
-import { msg } from '../i18n/translate.ts'
 import type { FederationData } from './face-disciplines.ts'
 
 /** Areas of the app, the second part of a report title. */
@@ -26,10 +25,6 @@ export type ReportArea = (typeof reportAreas)[number]
 
 export const reportTypes = ['Bug', 'Wrong data', 'Idea'] as const
 export type ReportType = (typeof reportTypes)[number]
-
-/** The dialog's label of the report text. */
-export const reportQuestion = (type: ReportType) =>
-  type === 'Idea' ? msg('What do you need?') : msg('What happened?')
 
 /** Longest link: GitHub and browsers refuse longer ones. */
 export const maxReportChars = 7000
