@@ -1,3 +1,4 @@
+import { type Messages, setupI18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { type ChronographString, interior, powderModelValues } from '@rangefoundry/ballistics'
@@ -8,7 +9,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import { saveFailures, TuneNotes } from '../src/components/powder-tune.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import { dayText, localDay } from '../src/lib/dates.ts'
 import { nth } from '../src/lib/nth.ts'
 import { fileData, fromFile, newerFit, powderDesigns } from '../src/lib/powder-designer.ts'
@@ -150,8 +151,21 @@ describe('a refit of a fitted user powder', () => {
 
   it('counts on from the name of a refit, in the language shown', () => {
     expect(refitOf({ ...base, name: 'DP40 (fit 2)' }, old.data.fit)?.name).toBe('DP40 (fit 3)')
-    const t = translator({ '{name} (fit {n})': '{name} (Fit {n})' }, 'de').t
-    expect(refitOf({ ...base, name: 'DP40 (Fit 3)' }, old.data.fit, t)?.name).toBe('DP40 (Fit 4)')
+    const german = setupI18n({
+      locale: 'de',
+      messages: { de: { 'powderSave.nameFit': [['name'], ' (Fit ', ['n'], ')'] } as Messages },
+    })
+    expect(refitOf({ ...base, name: 'DP40 (Fit 3)' }, old.data.fit, german)?.name).toBe(
+      'DP40 (Fit 4)',
+    )
+  })
+
+  it('has every English text of a refit without the tuning screen', () => {
+    const missing: string[] = []
+    const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+    refitOf(base, old.data.fit)
+    stop()
+    expect(missing).toEqual([])
   })
 
   it('is no refit for a catalogue powder or a user powder saved without a fit', () => {
@@ -272,8 +286,7 @@ describe('a fit of more strings than a record holds', () => {
     )
     expect(record?.data.fit?.input).toHaveLength(maxFitPoints + 1)
     expect(userRecord.safeParse(record).success).toBe(false)
-    expect(saveFailures.points).toContain(String(maxFitPoints))
-    expect(new Set(Object.values(saveFailures)).size).toBe(3)
+    expect(saveFailures.points.message).toContain(String(maxFitPoints))
   })
 })
 
