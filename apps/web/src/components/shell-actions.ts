@@ -1,14 +1,19 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { useMantineColorScheme } from '@mantine/core'
 import { useContext } from 'react'
 import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { sections } from '../lib/sections.ts'
 import { shortcutLabel } from '../lib/shortcuts.ts'
+import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
 import { openSafety } from './safety-dialog.tsx'
 import { SettingsDialog } from './settings-dialog.ts'
 import { openShortcuts, useSingleKeys } from './shortcuts.tsx'
+
+loadEnglish(sectionsEnglish)
 
 /** A command of the search; `keys` names its shortcut, shown beside it. */
 export type Command = { label: string; run: () => void; keys?: string }
@@ -20,6 +25,7 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
   const { setColorScheme } = useMantineColorScheme()
   const singleKeys = useSingleKeys()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return {
     pages: [
       { label: t('Home'), run: () => router.push('/') },
@@ -27,7 +33,7 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
       ...sections.flatMap((s) =>
         s.pages.flatMap((p) =>
           [p, ...('tabs' in p ? p.tabs : [])].map((x) => ({
-            label: t(x.label),
+            label: i18n._(x.label),
             run: () => router.push(x.href),
           })),
         ),

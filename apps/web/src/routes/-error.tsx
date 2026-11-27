@@ -1,13 +1,7 @@
-import { Text } from '@mantine/core'
 import { type ErrorComponentProps, useRouter } from '@tanstack/react-router'
-import { PageBar } from '../components/page-bar.tsx'
-import { ErrorNote } from '../components/states.tsx'
+import { PageErrorState } from '../components/page-error-state.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { loadEnglish } from '../i18n/lingui.ts'
 import { msg } from '../i18n/translate.ts'
-import englishMessages from '../locales/en/routes/-error.json' with { type: 'json' }
-
-loadEnglish(englishMessages)
 
 // anything may be thrown
 const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
@@ -18,22 +12,8 @@ const kept = msg(
 
 /** A page's render or load error, as the Next app's `app/error.tsx`: the frame stays, Retry loads and renders it anew. */
 export function PageError({ error }: ErrorComponentProps) {
-  const { t } = useTranslation()
   const router = useRouter()
-  return (
-    <>
-      <PageBar title={/*i18n*/ { id: 'page.error', message: 'Something went wrong' }} translated />
-      <ErrorNote
-        title={t('This page could not be shown.')}
-        onRetry={() => void router.invalidate()}
-      >
-        {t(kept)}
-        <Text size="xs" c="dimmed">
-          {messageOf(error)}
-        </Text>
-      </ErrorNote>
-    </>
-  )
+  return <PageErrorState message={messageOf(error)} retry={() => void router.invalidate()} />
 }
 
 /** The frame's own error, as the Next app's `app/global-error.tsx`: no frame, the document's providers stay. */

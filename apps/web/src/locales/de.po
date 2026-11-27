@@ -191,6 +191,10 @@ msgstr "{count, plural, one {# Datensatz einer anderen Art ausgelassen; der Impo
 msgid "log.otherKinds"
 msgstr "{count, plural, one {# Datensatz einer anderen Art ausgelassen; der Import eines Datei-Menüs liest ihn.} other {# Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie.}}"
 
+# en: "{count, plural, one {# record} other {# records}}"
+msgid "home.recordCount"
+msgstr "{count, plural, one {# Datensatz} other {# Datensätze}}"
+
 # en: "{count, plural, one {# reference} other {# references}}"
 msgid "holeDetection.referenceCount"
 msgstr "{count, plural, one {# Referenz} other {# Referenzen}}"
@@ -630,6 +634,10 @@ msgstr "1:{twist} L"
 # en: "1:{twist} R"
 msgid "firearms.twistRight"
 msgstr "1:{twist} R"
+
+# en: "A ballistics database with interior and exterior ballistics simulations"
+msgid "home.lead"
+msgstr "Eine Ballistik-Datenbank mit Simulationen der Innen- und Außenballistik"
 
 # en: "A brass group keeps the cases you measured, with their water capacity, in this browser."
 msgid "cases.noneOwnHint"
@@ -2463,6 +2471,10 @@ msgstr "Gestrichelt: nach einer angenommenen Form gezeichnet. Abgeleitete und an
 msgid "cartridgeRecord.conflict"
 msgstr "Datenkonflikt zwischen veröffentlichtem Höchstmaß der Patrone und Mindestmaß des Patronenlagers (Quelle prüfen)"
 
+# en: "Database"
+msgid "sections.database"
+msgstr "Datenbank"
+
 # en: "Date"
 msgid "events.column.date"
 msgstr "Datum"
@@ -3768,6 +3780,10 @@ msgstr "Name des Schussbilds"
 msgid "targetEditor.groupPanels"
 msgstr "Bereiche des Schussbilds"
 
+# en: "Group size and dispersion from a target photo or a drawn target; the photo stays in your browser."
+msgid "sections.groups.about"
+msgstr "Streukreis und Streuung aus einem Foto der Zielscheibe oder einer gezeichneten Zielscheibe; das Foto bleibt in Ihrem Browser."
+
 # en: "Groups"
 msgid "targetEditor.groups"
 msgstr "Schussbilder"
@@ -4327,6 +4343,10 @@ msgstr "Unterhebelrepetierer"
 # en: "Lever action"
 msgid "values.leverAction"
 msgstr "Unterhebelrepetierer"
+
+# en: "Library"
+msgid "sections.library"
+msgstr "Bibliothek"
 
 # en: "License"
 msgid "recordSources.column.license"
@@ -5828,6 +5848,18 @@ msgstr "Im Editor öffnen"
 msgid "recordActions.openInShotGroups"
 msgstr "In Schussbildern öffnen"
 
+# en: "Open load workbench"
+msgid "home.open.workbench"
+msgstr "Werkbank für Laborierungen öffnen"
+
+# en: "Open session summary"
+msgid "home.open.session"
+msgstr "Sitzungsübersicht öffnen"
+
+# en: "Open shot groups"
+msgid "home.open.groups"
+msgstr "Schussbilder öffnen"
+
 # en: "Open the workbench"
 msgid "powderTune.openWorkbench"
 msgstr "Werkbank öffnen"
@@ -5955,6 +5987,10 @@ msgstr "Seite"
 # en: "Page {page}"
 msgid "recordSources.page"
 msgstr "Seite {page}"
+
+# en: "Page actions"
+msgid "pageBar.actions"
+msgstr "Seitenaktionen"
 
 # en: "Page not found"
 msgid "page.notFound"
@@ -7400,6 +7436,10 @@ msgstr "Schüsse"
 msgid "targetEditor.shotsCount"
 msgstr "Schüsse ({count, decimal})"
 
+# en: "Shots and statistics per string from a chronograph export, read in your browser."
+msgid "sections.session.about"
+msgstr "Schüsse und Statistik je Schussreihe aus einem Chronograph-Export, in Ihrem Browser gelesen."
+
 # en: "Shots in the statistics; excluded shots are shown and counted, not measured."
 msgid "targetEditor.shotsStatisticsExcludedShots"
 msgstr "Schüsse in der Statistik; ausgeschlossene Schüsse werden angezeigt und gezählt, aber nicht gemessen."
@@ -7475,6 +7515,10 @@ msgstr "Vereinfachte Zeichnung aus dem Datensatz; nur Werte mit Quelle sind bema
 # en: "Simulated ({unit})"
 msgid "powderTune.simulated"
 msgstr "Simuliert ({unit})"
+
+# en: "Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser."
+msgid "sections.workbench.about"
+msgstr "Simulierte Geschwindigkeit, Druck im Vergleich zu den CIP-Grenzwerten und Flugbahn für Ihre Patrone, Ihr Geschoss, Ihr Treibladungspulver und Ihre Schusswaffe, berechnet in Ihrem Browser."
 
 # en: "simulation parameters, hand-tuned"
 msgid "powderRecord.handTuned"
@@ -8274,6 +8318,10 @@ msgstr "Der Datensatz des Treibladungspulvers wurde nicht gefunden."
 msgid "powderTune.powderNotSaved"
 msgstr "Das Treibladungspulver wurde nicht gespeichert."
 
+# en: "The published records, each with its source, and your own beside them."
+msgid "sections.database.about"
+msgstr "Die veröffentlichten Datensätze, jeweils mit ihrer Quelle, und Ihre eigenen daneben."
+
 # en: "The records of this browser could not be read."
 msgid "events.readFailed"
 msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
@@ -8430,6 +8478,10 @@ msgstr "Diese Datei ist kein Bild, das dieser Browser lesen kann."
 msgid "bulletCompare.invalid"
 msgstr "Dieser Link ist ungültig."
 
+# en: "This page could not be shown."
+msgid "pageError.title"
+msgstr "Diese Seite konnte nicht angezeigt werden."
+
 # en: "This page needs JavaScript."
 msgid "recordView.needsJavaScript"
 msgstr "Diese Seite braucht JavaScript."
@@ -8521,6 +8573,10 @@ msgstr "Werkzeug"
 # en: "Tool"
 msgid "targetEditor.tool"
 msgstr "Werkzeug"
+
+# en: "Tools"
+msgid "sections.tools"
+msgstr "Werkzeuge"
 
 # en: "Total"
 msgid "events.column.total"
@@ -8985,6 +9041,10 @@ msgstr "Ja"
 # en: "Your own record; a club or authority decides whether to accept it."
 msgid "log.ownRecord"
 msgstr "Ihre eigene Aufzeichnung; ob ein Verein oder eine Behörde sie anerkennt, entscheiden diese."
+
+# en: "Your saved records stay in this browser. Reload the page; if the error comes back, report an issue with the message below."
+msgid "pageError.kept"
+msgstr "Ihre gespeicherten Datensätze bleiben in diesem Browser. Laden Sie die Seite neu; tritt der Fehler erneut auf, melden Sie ihn mit der Meldung unten als Issue."
 
 # en: "z1 {z}"
 msgid "powderRecord.z1"

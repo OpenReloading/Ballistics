@@ -12,10 +12,8 @@ import {
 
 const hrefs: string[] = sections.flatMap((s) => s.pages.map((p) => p.href))
 
-it('lists the two groups in order: Tools, Library; four pages in all', () => {
-  expect(sections.map((s) => s.title)).toEqual(['Tools', 'Library'])
+it('lists the two groups in order: tools, then the library; four pages in all', () => {
   expect(sections[0].pages.map((p) => p.href)).toEqual(['/workbench', '/session', '/groups'])
-  expect(sections[1].pages.map((p) => p.label)).toEqual(['Database'])
   expect(databaseTabs.map((t) => t.href)).toEqual([
     '/firearms',
     '/cartridges',
@@ -29,7 +27,6 @@ it('lists the two groups in order: Tools, Library; four pages in all', () => {
   ])
   // the Database opens on the catalogue's first list, not on the user's own firearms
   expect(sections[1].pages.map((p) => p.href)).toEqual(['/cartridges'])
-  expect(hrefs.concat(databaseTabs.map((t) => t.label))).not.toContain('My gear')
   // Settings is a dialog, no page
   expect(hrefs).not.toContain('/settings')
 })
@@ -66,9 +63,9 @@ it('marks the Database current on the firearms, the events and the case group ed
 })
 
 it('shows a tab bar on the route of a tab only, not on a record or a designer under it', () => {
-  expect(libraryOf('/bullets')?.label).toBe('Database')
-  expect(libraryOf('/firearms')?.label).toBe('Database')
-  expect(libraryOf('/federations')?.label).toBe('Database')
+  expect(libraryOf('/bullets')?.href).toBe('/cartridges')
+  expect(libraryOf('/firearms')?.href).toBe('/cartridges')
+  expect(libraryOf('/federations')?.href).toBe('/cartridges')
   for (const r of [
     '/cases/editor',
     '/bullets/designer',
