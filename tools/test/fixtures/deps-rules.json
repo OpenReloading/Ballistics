@@ -167,32 +167,36 @@
     "source": "import { parse } from '@rangefoundry/importers'\nexport { parse }",
     "rules": ["api-imports-logic-catalog-schema-only"]
   },
-  "packages/cli/src/rows.ts": {
+  "apps/cli/src/rows.ts": {
     "source": "export const rows = 1",
     "rules": []
   },
-  "packages/cli/src/own.ts": {
+  "apps/cli/src/own.ts": {
     "source": "import { rows } from './rows.ts'\nexport { rows }",
     "rules": []
   },
-  "packages/cli/src/libraries.ts": {
+  "apps/cli/src/libraries.ts": {
     "source": "import { interior } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@rangefoundry/catalog'\nimport { seat } from '@rangefoundry/svg-drawings/seating'\nimport { toSi } from '@rangefoundry/schema'\nimport { readRecords } from '@rangefoundry/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
     "rules": []
   },
-  "packages/cli/src/api.ts": {
+  "apps/cli/src/api.ts": {
     "source": "import { buildApp } from '@rangefoundry/api'\nexport { buildApp }",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
-  "packages/cli/src/api-entries.ts": {
+  "apps/cli/src/api-entries.ts": {
     "source": "import { openCatalogue } from '@rangefoundry/api/catalogue'\nimport { operations } from '@rangefoundry/use-cases'\nexport { openCatalogue, operations }",
     "rules": []
   },
-  "packages/cli/src/api-static.ts": {
+  "apps/cli/src/api-static.ts": {
     "source": "import { startBundleApi } from '@rangefoundry/api/static'\nexport { startBundleApi }",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
-  "packages/cli/src/web.ts": {
+  "apps/cli/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
+    "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
+  },
+  "apps/cli/src/web-sibling.ts": {
+    "source": "import type { SpecValue } from '../../web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
   "packages/api/src/into-use-cases.ts": {
@@ -235,7 +239,7 @@
     "source": "import { runTask } from '@rangefoundry/api/compute'\nexport { runTask }",
     "rules": ["web-reads-api-only"]
   },
-  "packages/cli/src/api-compute.ts": {
+  "apps/cli/src/api-compute.ts": {
     "source": "import { operations } from '@rangefoundry/api/compute'\nexport { operations }",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },

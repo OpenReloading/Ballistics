@@ -108,6 +108,55 @@ importers:
         specifier: 'catalog:'
         version: 1.94.0(oxlint-tsgolint@7.0.2008)
 
+  apps/cli:
+    dependencies:
+      '@rangefoundry/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@rangefoundry/ballistics':
+        specifier: workspace:*
+        version: link:../../packages/ballistics
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../../packages/catalog
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@rangefoundry/statistics':
+        specifier: workspace:*
+        version: link:../../packages/statistics
+      '@rangefoundry/svg-drawings':
+        specifier: workspace:*
+        version: link:../../packages/svg-drawings
+      '@rangefoundry/tools':
+        specifier: workspace:*
+        version: link:../../tools
+      '@rangefoundry/units':
+        specifier: workspace:*
+        version: link:../../packages/units
+      '@rangefoundry/use-cases':
+        specifier: workspace:*
+        version: link:../../packages/use-cases
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.1.1(@vitest/browser@5.1.1)(vitest@5.1.1)
+      ajv:
+        specifier: 'catalog:'
+        version: 8.20.0
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/browser-playwright@5.1.1)(@vitest/coverage-v8@5.1.1)(@vitest/ui@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
   apps/docs:
     dependencies:
       '@docusaurus/core':
@@ -170,7 +219,7 @@ importers:
         version: link:../../packages/catalog
       '@rangefoundry/cli':
         specifier: workspace:*
-        version: link:../../packages/cli
+        version: link:../cli
       '@rangefoundry/importers':
         specifier: workspace:*
         version: link:../../packages/importers
@@ -472,55 +521,6 @@ importers:
       publint:
         specifier: 'catalog:'
         version: 0.3.25
-      typescript:
-        specifier: 'catalog:'
-        version: 7.0.2
-      vitest:
-        specifier: 'catalog:'
-        version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/browser-playwright@5.1.1)(@vitest/coverage-v8@5.1.1)(@vitest/ui@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
-
-  packages/cli:
-    dependencies:
-      '@rangefoundry/api':
-        specifier: workspace:*
-        version: link:../api
-      '@rangefoundry/ballistics':
-        specifier: workspace:*
-        version: link:../ballistics
-      '@rangefoundry/catalog':
-        specifier: workspace:*
-        version: link:../catalog
-      '@rangefoundry/schema':
-        specifier: workspace:*
-        version: link:../schema
-      '@rangefoundry/statistics':
-        specifier: workspace:*
-        version: link:../statistics
-      '@rangefoundry/svg-drawings':
-        specifier: workspace:*
-        version: link:../svg-drawings
-      '@rangefoundry/tools':
-        specifier: workspace:*
-        version: link:../../tools
-      '@rangefoundry/units':
-        specifier: workspace:*
-        version: link:../units
-      '@rangefoundry/use-cases':
-        specifier: workspace:*
-        version: link:../use-cases
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.7
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 26.6.6
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 5.1.1(@vitest/browser@5.1.1)(vitest@5.1.1)
-      ajv:
-        specifier: 'catalog:'
-        version: 8.20.0
       typescript:
         specifier: 'catalog:'
         version: 7.0.2

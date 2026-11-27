@@ -1,4 +1,7 @@
-import { catalogueListContract, catalogueRecordContract } from '../../catalog/test/contract.ts'
+import {
+  catalogueListContract,
+  catalogueRecordContract,
+} from '../../../packages/catalog/test/contract.ts'
 import { catalogueOf } from '../src/operations.ts'
 
 catalogueListContract('the CLI', catalogueOf)
