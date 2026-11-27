@@ -29,7 +29,7 @@ SPDX-License-Identifier = "MIT"
 path = "apps/docs/src/components/RepoWidget.tsx"
 precedence = "aggregate"
 SPDX-FileCopyrightText = ["2026 the RangeFoundry contributors", "2026 GitHub Inc."]
-SPDX-License-Identifier = "ISC AND MIT"
+SPDX-License-Identifier = "AGPL-3.0-only AND MIT"
 
 # Catalog records (NOTICE, packages/catalog/LICENSE).
 [[annotations]]
