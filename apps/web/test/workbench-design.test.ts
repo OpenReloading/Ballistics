@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import {
   fileData,
   fromRecord,
@@ -52,5 +53,13 @@ describe('a cartridge design in the workbench', () => {
 
   it('is not offered without the cartridge L3 the seating needs', () => {
     expect(design(saved(['cartridge.L3', '']), 'a')).toBeUndefined()
+  })
+
+  it('has every English text of the design without the designer page', () => {
+    const missing: string[] = []
+    const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+    design(saved(), 'a')
+    stop()
+    expect(missing).toEqual([])
   })
 })

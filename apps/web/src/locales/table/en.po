@@ -280,10 +280,10 @@ msgstr "compute worker exited"
 msgid "coreMessage.request.workerFailed"
 msgstr "compute worker failed"
 
-msgid "refusal.confidenceLevelOutsideUnit"
+msgid "refusal.confidenceLevel"
 msgstr "confidence level must lie in (0, 1)"
 
-msgid "refusal.confidenceLevel"
+msgid "refusal.confidenceLevelOutsideUnit"
 msgstr "confidence level must lie in (0, 1)"
 
 msgid "refusal.confidenceLevelOptionOutsideUnit"

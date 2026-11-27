@@ -10,6 +10,7 @@ import { seededUniforms } from '@rangefoundry/statistics'
 import { face } from '@rangefoundry/svg-drawings'
 import { bulletFigureModel, bulletOutline } from '@rangefoundry/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
   type Action,
@@ -590,6 +591,14 @@ describe('drafts', () => {
     expect(shape?.base?.length).toBeCloseTo(r.base?.length?.value as number, 9)
     const noLength = { diameter: targetBullet.diameter }
     expect(designShape({ base: { status: 'none' }, record: noLength }, metric)).toBeUndefined()
+  })
+
+  it('has every English text of the seating preview shape without the designer page', () => {
+    const missing: string[] = []
+    const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+    designShape(resolvedOf(fileData(fromRecord(targetBullet, metric)), targetBullet), metric)
+    stop()
+    expect(missing).toEqual([])
   })
 })
 

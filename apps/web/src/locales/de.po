@@ -15,6 +15,10 @@ msgstr ", Seite {page}"
 msgid "bulletPhoto.differs"
 msgstr "(weicht ab)"
 
+# en: "(H2 - G1) / 2 = {wall, decimal} mm"
+msgid "cartridgeDesigner.wallFromG1"
+msgstr "(H2 - G1) / 2 = {wall, decimal} mm"
+
 # en: "(simulation, not load data)."
 msgid "chargeTarget.notLoadData"
 msgstr "(Simulation, keine Ladedaten)."
@@ -120,11 +124,11 @@ msgid "lists.count.logEntries"
 msgstr "{count, plural, one {# Eintrag} other {# Einträge}}"
 
 # en: "{count, plural, one {# entry} other {# entries}}"
-msgid "logSummary.entryCount"
+msgid "log.entryCount"
 msgstr "{count, plural, one {# Eintrag} other {# Einträge}}"
 
 # en: "{count, plural, one {# entry} other {# entries}}"
-msgid "log.entryCount"
+msgid "logSummary.entryCount"
 msgstr "{count, plural, one {# Eintrag} other {# Einträge}}"
 
 # en: "{count, plural, one {# event not imported: a record of this browser has its id.} other {# events not imported: records of this browser have their ids.}}"
@@ -188,11 +192,11 @@ msgid "logSummary.unsavedLoadRounds"
 msgstr "{count, plural, one {# Schuss von Einträgen ohne gespeicherte Laborierung zählt nur bei seiner Schusswaffe.} other {# Schuss von Einträgen ohne gespeicherte Laborierung zählen nur bei ihren Schusswaffen.}}"
 
 # en: "{count, plural, one {# round} other {# rounds}}"
-msgid "logSummary.roundCount"
+msgid "log.roundTotal"
 msgstr "{count, plural, one {# Schuss abgegeben} other {# Schuss abgegeben}}"
 
 # en: "{count, plural, one {# round} other {# rounds}}"
-msgid "log.roundTotal"
+msgid "logSummary.roundCount"
 msgstr "{count, plural, one {# Schuss abgegeben} other {# Schuss abgegeben}}"
 
 # en: "{count, plural, one {# shot added.} other {# shots added.}}"
@@ -303,13 +307,33 @@ msgstr "{kind} {n, decimal} hinzugefügt."
 msgid "targetEditor.scaleMean"
 msgstr "{kind}; Maßstab {deviation} % vom Mittel"
 
-# en: "{label} from {velocity}"
-msgid "fieldStrip.bandFrom"
-msgstr "{label} ab {velocity}"
+# en: "{label} {value}."
+msgid "cartridgeDesigner.labelValue"
+msgstr "{label} {value}."
+
+# en: "{label} {value}. "
+msgid "bulletDesigner.labelValue"
+msgstr "{label} {value}. "
+
+# en: "{label} cleared."
+msgid "cartridgeDesigner.cleared"
+msgstr "{label} geleert."
+
+# en: "{label} cleared. "
+msgid "bulletDesigner.cleared"
+msgstr "{label} geleert. "
 
 # en: "{label} from {velocity}"
 msgid "bulletCompare.labelFrom"
 msgstr "{label} ab {velocity}"
+
+# en: "{label} from {velocity}"
+msgid "fieldStrip.bandFrom"
+msgstr "{label} ab {velocity}"
+
+# en: "{label} must be at most {max} {unit} in the designer."
+msgid "cartridgeDesigner.atMostInDesigner"
+msgstr "{label} darf im Editor höchstens {max} {unit} betragen."
 
 # en: "{label} table"
 msgid "fieldTable.region"
@@ -415,6 +439,10 @@ msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine f
 msgid "listSources.notDeleted"
 msgstr "{name} wurde nicht gelöscht: Der Browser hat es abgelehnt."
 
+# en: "{name}, CIP table {table}"
+msgid "cartridgeDesigner.nameCipTable"
+msgstr "{name}, CIP-Tabelle {table}"
+
 # en: "{order} of {total}"
 msgid "recordFields.burnRateOrder"
 msgstr "{order} von {total}"
@@ -499,6 +527,10 @@ msgstr "% von Pmax"
 msgid "powderCompare.percentPmax"
 msgstr "% Pmax"
 
+# en: "0.3 mm (assumed, no G1)"
+msgid "cartridgeDesigner.wallAssumed"
+msgstr "0,3 mm (angenommen, kein G1)"
+
 # en: "1 = fastest"
 msgid "recordFields.fastest"
 msgstr "1 = am schnellsten"
@@ -534,6 +566,10 @@ msgstr "Ein Geschoss passt zu einer Patrone, wenn sein Durchmesser über dem Mit
 # en: "A bullet hole is only about {n} px across in this photo."
 msgid "photoQuality.holePixels"
 msgstr "Ein Schussloch ist auf diesem Foto nur etwa {n} px breit."
+
+# en: "A cannelure needs a start and a width."
+msgid "bulletDesigner.cannelureNeedsStartWidth"
+msgstr "Eine Rändelung braucht einen Beginn und eine Breite."
 
 # en: "A curve could not be loaded."
 msgid "burnRateCompare.loadError"
@@ -815,6 +851,14 @@ msgstr "Die Pfeiltasten bewegen den Cursor, mit Umschalt um einzelne Pixel, mit 
 msgid "recordFields.asPrinted"
 msgstr "Wie gedruckt: {printed}"
 
+# en: "Assumed: {value}"
+msgid "bulletDesigner.assumed"
+msgstr "Angenommen: {value}"
+
+# en: "Assumed: {value} ({basis})"
+msgid "bulletDesigner.assumedBasis"
+msgstr "Angenommen: {value} ({basis})"
+
 # en: "At constant volume; min and max over the composition ranges."
 msgid "powderDesigner.constantVolumeMinMax"
 msgstr "Bei konstantem Volumen; Min und Max über die Bereiche der Zusammensetzung."
@@ -880,7 +924,7 @@ msgid "units.quantity.twist"
 msgstr "Laufdrall"
 
 # en: "Base"
-msgid "recordFields.base"
+msgid "bulletDesigner.base"
 msgstr "Basis"
 
 # en: "Base"
@@ -891,6 +935,14 @@ msgstr "Basis"
 msgid "powders.column.base"
 msgstr "Basis"
 
+# en: "Base"
+msgid "recordFields.base"
+msgstr "Basis"
+
+# en: "Base diameter"
+msgid "bulletDesigner.baseDiameter"
+msgstr "Bodendurchmesser"
+
 # en: "Base diameter"
 msgid "recordFields.baseDiameter"
 msgstr "Bodendurchmesser"
@@ -900,12 +952,20 @@ msgid "recordFields.baseLength"
 msgstr "Länge des Bodens"
 
 # en: "Base to ogive"
+msgid "bulletDesigner.baseOgive"
+msgstr "Boden bis Ogive"
+
+# en: "Base to ogive"
 msgid "recordFields.baseToOgive"
 msgstr "Boden bis Ogive"
 
 # en: "Base to tip, y down. Typing a direction fixes the axis."
 msgid "bulletPhoto.axisHelp"
 msgstr "Vom Boden zur Spitze, y nach unten. Eine eingegebene Richtung legt die Achse fest."
+
+# en: "Base type"
+msgid "bulletDesigner.baseType"
+msgstr "Bodenform"
 
 # en: "Base type"
 msgid "bullets.facet.base"
@@ -934,6 +994,10 @@ msgstr "BC {model}"
 # en: "BC {model}"
 msgid "recordFields.coefficient"
 msgstr "BC {model}"
+
+# en: "Bearing length"
+msgid "bulletDesigner.bearingLength"
+msgstr "Länge des Führungsteils"
 
 # en: "Bearing length"
 msgid "recordFields.bearingLength"
@@ -980,8 +1044,16 @@ msgid "values.boatTail"
 msgstr "Bootsheck"
 
 # en: "Boat-tail angle"
+msgid "bulletDesigner.boatTailAngle"
+msgstr "Bootsheckwinkel"
+
+# en: "Boat-tail angle"
 msgid "recordFields.boatTailAngle"
 msgstr "Bootsheckwinkel"
+
+# en: "Boat-tail length"
+msgid "bulletDesigner.boatTailLength"
+msgstr "Länge des Heckkonus"
 
 # en: "Body"
 msgid "cartridgeRecord.group.body"
@@ -1024,12 +1096,12 @@ msgid "values.boronNitride"
 msgstr "Bornitrid"
 
 # en: "Brass"
-msgid "values.brass"
-msgstr "Messinghülse"
-
-# en: "Brass"
 msgid "page.cases"
 msgstr "Hülsen"
+
+# en: "Brass"
+msgid "values.brass"
+msgstr "Messinghülse"
 
 # en: "brass {id}"
 msgid "workbench.replacedCase"
@@ -1176,11 +1248,11 @@ msgid "powderDesigner.burnLawInteriorModel"
 msgstr "Abbrandgesetz (Innenballistikmodell)"
 
 # en: "Burn rate"
-msgid "recordFields.burnRate"
+msgid "powderRecord.burnRateTable"
 msgstr "Abbrandgeschwindigkeit"
 
 # en: "Burn rate"
-msgid "powderRecord.burnRateTable"
+msgid "recordFields.burnRate"
 msgstr "Abbrandgeschwindigkeit"
 
 # en: "Burn rate (model output)"
@@ -1240,11 +1312,11 @@ msgid "holeDetection.caliberClass"
 msgstr "Kaliberklasse"
 
 # en: "Caliber classes"
-msgid "disciplines.row.caliberClasses"
+msgid "disciplines.column.classes"
 msgstr "Kaliberklassen"
 
 # en: "Caliber classes"
-msgid "disciplines.column.classes"
+msgid "disciplines.row.caliberClasses"
 msgstr "Kaliberklassen"
 
 # en: "Caliber classes from"
@@ -1280,11 +1352,11 @@ msgid "events.cancel"
 msgstr "Abbrechen"
 
 # en: "Cancel"
-msgid "powderCompare.cancel"
+msgid "log.cancel"
 msgstr "Abbrechen"
 
 # en: "Cancel"
-msgid "log.cancel"
+msgid "powderCompare.cancel"
 msgstr "Abbrechen"
 
 # en: "Cancel ({pct, decimal} %)"
@@ -1294,6 +1366,18 @@ msgstr "Abbrechen ({pct, decimal} %)"
 # en: "Cancelled after {done, decimal} of {total, decimal} powders."
 msgid "powderCompare.cancelledAfterPowders"
 msgstr "Abgebrochen nach {done, decimal} von {total, decimal} Treibladungspulvern."
+
+# en: "Cannelure depth"
+msgid "bulletDesigner.cannelureDepth"
+msgstr "Tiefe der Rändelung"
+
+# en: "Cannelure start"
+msgid "bulletDesigner.cannelureStart"
+msgstr "Beginn der Rändelung"
+
+# en: "Cannelure width"
+msgid "bulletDesigner.cannelureWidth"
+msgstr "Breite der Rändelung"
 
 # en: "Carbine"
 msgid "values.carbine"
@@ -1320,12 +1404,24 @@ msgid "cartridgeRecord.sideMeaning.cartridge"
 msgstr "Patrone: {meaning}"
 
 # en: "Cartridge {symbol}"
+msgid "cartridgeDesigner.cartridgeSymbol"
+msgstr "Patrone {symbol}"
+
+# en: "Cartridge {symbol}"
 msgid "cartridgeRecord.sideSymbol.cartridge"
 msgstr "Patrone {symbol}"
+
+# en: "Cartridge body taper"
+msgid "cartridgeDesigner.cartridgeBodyTaper"
+msgstr "Körperkonizität der Patrone"
 
 # en: "Cartridge data is unavailable right now."
 msgid "states.unavailable.cartridge"
 msgstr "Die Patronendaten sind gerade nicht verfügbar."
+
+# en: "Cartridge design"
+msgid "cartridgeDesigner.cartridgeDesign"
+msgstr "Patronenentwurf"
 
 # en: "Cartridge designer"
 msgid "page.cartridgesDesigner"
@@ -1355,13 +1451,25 @@ msgstr "Patronenliste"
 msgid "cartridges.column.caseLengthHelp"
 msgstr "Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
 
+# en: "Cartridge neck length"
+msgid "cartridgeDesigner.cartridgeNeckLength"
+msgstr "Halslänge der Patrone"
+
 # en: "Cartridge not known"
 msgid "logSummary.cartridgeUnknown"
 msgstr "Patrone nicht bekannt"
 
+# en: "Cartridge shoulder angle"
+msgid "cartridgeDesigner.cartridgeShoulderAngle"
+msgstr "Schulterwinkel der Patrone"
+
 # en: "Cartridge value of the CIP sheet, smallest variant."
 msgid "cartridges.column.maxBulletDiameterHelp"
 msgstr "Wert der Patrone im CIP-Datenblatt, kleinste Variante."
+
+# en: "Cartridge, {unit}"
+msgid "cartridgeDesigner.cartridgeUnit"
+msgstr "Patrone, {unit}"
 
 # en: "Cartridge: {notes}"
 msgid "cartridgeRecord.sideNotes.cartridge"
@@ -1376,11 +1484,11 @@ msgid "bulletRecord.cartridges"
 msgstr "Patronen"
 
 # en: "Cartridges"
-msgid "powderRecord.cartridges"
+msgid "page.cartridges"
 msgstr "Patronen"
 
 # en: "Cartridges"
-msgid "page.cartridges"
+msgid "powderRecord.cartridges"
 msgstr "Patronen"
 
 # en: "Cartridges, {filters}"
@@ -1411,6 +1519,10 @@ msgstr "Hülsenlänge L3"
 msgid "cartridges.column.type"
 msgstr "Hülsenform"
 
+# en: "Case volume (approximate)"
+msgid "cartridgeDesigner.caseVolumeApproximate"
+msgstr "Hülsenvolumen (näherungsweise)"
+
 # en: "case-contact"
 msgid "values.caseContact"
 msgstr "Wandler am Hülsenkörper"
@@ -1424,6 +1536,10 @@ msgid "values.cast"
 msgstr "gegossen"
 
 # en: "Category"
+msgid "disciplines.column.category"
+msgstr "Waffenart"
+
+# en: "Category"
 msgid "disciplines.facet.category"
 msgstr "Waffenart"
 
@@ -1432,16 +1548,20 @@ msgid "disciplines.strip.category"
 msgstr "Waffenart"
 
 # en: "Category"
-msgid "disciplines.column.category"
-msgstr "Waffenart"
-
-# en: "Category"
 msgid "federationRecord.column.category"
 msgstr "Waffenart"
 
 # en: "Cavity depth"
+msgid "bulletDesigner.cavityDepth"
+msgstr "Hohlraumtiefe"
+
+# en: "Cavity depth"
 msgid "recordFields.cavityDepth"
 msgstr "Hohlraumtiefe"
+
+# en: "Cavity diameter"
+msgid "bulletDesigner.cavityDiameter"
+msgstr "Hohlraumdurchmesser"
 
 # en: "Cavity diameter"
 msgid "recordFields.cavityDiameter"
@@ -1464,8 +1584,16 @@ msgid "cartridgeRecord.sideMeaning.chamber"
 msgstr "Patronenlager: {meaning}"
 
 # en: "Chamber {symbol}"
+msgid "cartridgeDesigner.chamberSymbol"
+msgstr "Patronenlager {symbol}"
+
+# en: "Chamber {symbol}"
 msgid "cartridgeRecord.sideSymbol.chamber"
 msgstr "Patronenlager {symbol}"
+
+# en: "Chamber body taper"
+msgid "cartridgeDesigner.chamberBodyTaper"
+msgstr "Körperkonizität des Patronenlagers"
 
 # en: "Chamber dimensions"
 msgid "cartridgeRecord.dimensions.chamber"
@@ -1482,6 +1610,18 @@ msgstr "Längeneinheit des Patronenlagers"
 # en: "chamber minimum minus cartridge maximum"
 msgid "cartridgeRecord.clearanceMeaning"
 msgstr "Mindestmaß des Patronenlagers minus Höchstmaß der Patrone"
+
+# en: "Chamber neck length"
+msgid "cartridgeDesigner.chamberNeckLength"
+msgstr "Halslänge des Patronenlagers"
+
+# en: "Chamber shoulder angle"
+msgid "cartridgeDesigner.chamberShoulderAngle"
+msgstr "Schulterwinkel des Patronenlagers"
+
+# en: "Chamber, {unit}"
+msgid "cartridgeDesigner.chamberUnit"
+msgstr "Patronenlager, {unit}"
 
 # en: "Chamber: {notes}"
 msgid "cartridgeRecord.sideNotes.chamber"
@@ -1506,6 +1646,26 @@ msgstr "Maßstab ändern"
 # en: "Change the target"
 msgid "holeDetection.changeTarget"
 msgstr "Zielscheibe ändern"
+
+# en: "Changed values are drawn as entered, without the record's tolerances."
+msgid "cartridgeDesigner.changedValuesDrawnEntered"
+msgstr "Geänderte Werte sind wie eingegeben gezeichnet, ohne die Toleranzen des Datensatzes."
+
+# en: "Changed; catalog {value}"
+msgid "bulletDesigner.changedCatalog"
+msgstr "Geändert; Katalog {value}"
+
+# en: "Changed; catalog value not given"
+msgid "bulletDesigner.changedCatalogValueNotGiven"
+msgstr "Geändert; im Katalog kein Wert angegeben"
+
+# en: "Changed; record {value}"
+msgid "cartridgeDesigner.changedRecord"
+msgstr "Geändert; Datensatz {value}"
+
+# en: "Changed; record value not printed"
+msgid "cartridgeDesigner.changedRecordValueNotPrinted"
+msgstr "Geändert; Wert im Datensatz nicht abgedruckt"
 
 # en: "Charge"
 msgid "powderCompare.charge"
@@ -1619,6 +1779,10 @@ msgstr "Spiel {value}"
 msgid "cartridgeRecord.clearanceLine"
 msgstr "Spiel: {meaning}"
 
+# en: "Cleared; record {value}"
+msgid "cartridgeDesigner.clearedRecord"
+msgstr "Geleert; Datensatz {value}"
+
 # en: "Click a hole to add a shot to the active group."
 msgid "targetEditor.clickHoleAddShot"
 msgstr "Klicken Sie ein Schussloch an, um dem aktiven Schussbild einen Schuss hinzuzufügen."
@@ -1728,19 +1892,19 @@ msgid "bulletCompare.compareOthers"
 msgstr "Die übrigen vergleichen"
 
 # en: "Competition event"
-msgid "log.competitionEvent"
-msgstr "Wettkampf"
-
-# en: "Competition event"
 msgid "log.column.event"
 msgstr "Wettkampf"
 
-# en: "Competition events"
-msgid "page.events"
-msgstr "Wettkämpfe"
+# en: "Competition event"
+msgid "log.competitionEvent"
+msgstr "Wettkampf"
 
 # en: "Competition events"
 msgid "events.title"
+msgstr "Wettkämpfe"
+
+# en: "Competition events"
+msgid "page.events"
 msgstr "Wettkämpfe"
 
 # en: "Competitions"
@@ -1775,6 +1939,10 @@ msgstr "Berechnet"
 msgid "powderDesigner.computedModel"
 msgstr "Mit einem Modell berechnet"
 
+# en: "Computed from the design: {values}."
+msgid "bulletDesigner.computedDesign"
+msgstr "Aus dem Entwurf berechnet: {values}."
+
 # en: "Computed: mass over diameter squared."
 msgid "bullet.sectionalDensityMethod"
 msgstr "Berechnet: Masse geteilt durch das Quadrat des Durchmessers."
@@ -1800,11 +1968,11 @@ msgid "firearms.column.configuration"
 msgstr "Konfiguration"
 
 # en: "Confirmed by"
-msgid "log.confirmedBy"
+msgid "log.column.confirmed"
 msgstr "Bestätigt von"
 
 # en: "Confirmed by"
-msgid "log.column.confirmed"
+msgid "log.confirmedBy"
 msgstr "Bestätigt von"
 
 # en: "Confirmed on"
@@ -1884,10 +2052,6 @@ msgid "units.quantity.correction"
 msgstr "Korrekturen"
 
 # en: "Country"
-msgid "federations.facet.country"
-msgstr "Land"
-
-# en: "Country"
 msgid "cartridgeRecord.country"
 msgstr "Land"
 
@@ -1897,6 +2061,10 @@ msgstr "Land"
 
 # en: "Country"
 msgid "federationRecord.country"
+msgstr "Land"
+
+# en: "Country"
+msgid "federations.facet.country"
 msgstr "Land"
 
 # en: "Country"
@@ -1991,28 +2159,36 @@ msgstr "Das Geschoss wird freigestellt…"
 msgid "targetEditor.darken"
 msgstr "Abdunkeln"
 
+# en: "Dashed in the flag color: parts drawn from an assumed shape (see the notes)."
+msgid "bulletDesigner.dashedFlagColorParts"
+msgstr "Gestrichelt in der Markierungsfarbe: Teile, die nach einer angenommenen Form gezeichnet sind (siehe Hinweise)."
+
 # en: "Dashed in the flag color: parts the record does not give, drawn from an assumed shape."
 msgid "bulletDrawing.dashed"
 msgstr "Gestrichelt in der Markierungsfarbe: Teile, die der Datensatz nicht angibt, gezeichnet nach einer angenommenen Form."
+
+# en: "Dashed: drawn from an assumed shape. Derived and assumed values are not dimensioned."
+msgid "bulletDesigner.dashedDrawnAssumedShape"
+msgstr "Gestrichelt: nach einer angenommenen Form gezeichnet. Abgeleitete und angenommene Werte sind nicht bemaßt."
 
 # en: "data conflict between published cartridge maximum and chamber minimum (check source)"
 msgid "cartridgeRecord.conflict"
 msgstr "Datenkonflikt zwischen veröffentlichtem Höchstmaß der Patrone und Mindestmaß des Patronenlagers (Quelle prüfen)"
 
 # en: "Date"
-msgid "events.date"
-msgstr "Datum"
-
-# en: "Date"
 msgid "events.column.date"
 msgstr "Datum"
 
 # en: "Date"
-msgid "log.date"
+msgid "events.date"
 msgstr "Datum"
 
 # en: "Date"
 msgid "log.column.date"
+msgstr "Datum"
+
+# en: "Date"
+msgid "log.date"
 msgstr "Datum"
 
 # en: "Date: {date}"
@@ -2099,6 +2275,18 @@ msgstr "abgeleitet"
 msgid "powderDesigner.derived"
 msgstr "Abgeleitet"
 
+# en: "Derived and assumed values are not dimensioned."
+msgid "bulletDesigner.derivedAssumedNotDimensioned"
+msgstr "Abgeleitete und angenommene Werte sind nicht bemaßt."
+
+# en: "Derived by the drawing: {value}"
+msgid "cartridgeDesigner.derivedDrawing"
+msgstr "Aus der Zeichnung abgeleitet: {value}"
+
+# en: "Derived from the design"
+msgid "cartridgeDesigner.derivedDesign"
+msgstr "Aus dem Entwurf abgeleitet"
+
 # en: "Derived from the range or gauge the rule book states"
 msgid "disciplines.classBasis.derived"
 msgstr "Abgeleitet aus dem Bereich oder dem Messring, den die Sportordnung angibt"
@@ -2106,6 +2294,14 @@ msgstr "Abgeleitet aus dem Bereich oder dem Messring, den die Sportordnung angib
 # en: "Derived, not dimensioned"
 msgid "cartridgeRecord.derived"
 msgstr "Abgeleitet, nicht bemaßt"
+
+# en: "Derived: {value}"
+msgid "bulletDesigner.derived"
+msgstr "Abgeleitet: {value}"
+
+# en: "design from {name}"
+msgid "cartridgeDesigner.designFrom"
+msgstr "Entwurf aus {name}"
 
 # en: "Detect"
 msgid "holeDetection.detect"
@@ -2136,11 +2332,15 @@ msgid "sessionSummary.device"
 msgstr "Gerät: {device}"
 
 # en: "Diameter"
-msgid "recordFields.diameter"
+msgid "bulletDesigner.diameter"
 msgstr "Durchmesser"
 
 # en: "Diameter"
 msgid "bullets.column.diameter"
+msgstr "Durchmesser"
+
+# en: "Diameter"
+msgid "recordFields.diameter"
 msgstr "Durchmesser"
 
 # en: "diameter at L"
@@ -2164,15 +2364,11 @@ msgid "bulletCompare.difference"
 msgstr "Unterschied zum ersten Geschoss"
 
 # en: "Discipline"
-msgid "targets.facet.discipline"
+msgid "disciplineRecord.data"
 msgstr "Disziplin"
 
 # en: "Discipline"
 msgid "events.discipline"
-msgstr "Disziplin"
-
-# en: "Discipline"
-msgid "disciplineRecord.data"
 msgstr "Disziplin"
 
 # en: "Discipline"
@@ -2184,11 +2380,15 @@ msgid "federationRecord.column.discipline"
 msgstr "Disziplin"
 
 # en: "Discipline"
+msgid "log.column.discipline"
+msgstr "Disziplin"
+
+# en: "Discipline"
 msgid "log.discipline"
 msgstr "Disziplin"
 
 # en: "Discipline"
-msgid "log.column.discipline"
+msgid "targets.facet.discipline"
 msgstr "Disziplin"
 
 # en: "Discipline data is unavailable right now."
@@ -2204,11 +2404,11 @@ msgid "federationRecord.column.disciplines"
 msgstr "Disziplinen"
 
 # en: "Disciplines"
-msgid "targets.column.disciplines"
+msgid "page.disciplines"
 msgstr "Disziplinen"
 
 # en: "Disciplines"
-msgid "page.disciplines"
+msgid "targets.column.disciplines"
 msgstr "Disziplinen"
 
 # en: "Disciplines ({count})"
@@ -2236,23 +2436,15 @@ msgid "events.disqualifiedNoTotal"
 msgstr "Disqualifiziert: kein Gesamtergebnis."
 
 # en: "Distance"
+msgid "disciplines.column.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
 msgid "disciplines.facet.dist"
 msgstr "Entfernung"
 
 # en: "Distance"
 msgid "disciplines.strip.distance"
-msgstr "Entfernung"
-
-# en: "Distance"
-msgid "targets.facet.dist"
-msgstr "Entfernung"
-
-# en: "Distance"
-msgid "targets.row.distance"
-msgstr "Entfernung"
-
-# en: "Distance"
-msgid "disciplines.column.distance"
 msgstr "Entfernung"
 
 # en: "Distance"
@@ -2265,6 +2457,14 @@ msgstr "Entfernung"
 
 # en: "Distance"
 msgid "targets.column.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
+msgid "targets.facet.dist"
+msgstr "Entfernung"
+
+# en: "Distance"
+msgid "targets.row.distance"
 msgstr "Entfernung"
 
 # en: "Distance A to B"
@@ -2292,12 +2492,40 @@ msgid "fieldTable.column.dragModel"
 msgstr "Luftwiderstandsmodell"
 
 # en: "Drawing"
+msgid "bulletDesigner.drawing"
+msgstr "Zeichnung"
+
+# en: "Drawing"
 msgid "bulletRecord.drawing"
 msgstr "Zeichnung"
+
+# en: "Drawing"
+msgid "cartridgeDesigner.drawing"
+msgstr "Zeichnung"
+
+# en: "Drawing for earlier inputs. Fix {field}: {reason}"
+msgid "bulletDesigner.drawingEarlierInputsFix"
+msgstr "Zeichnung für frühere Eingaben. Korrigieren Sie {field}: {reason}"
+
+# en: "Drawing for earlier inputs. Fix {label}: {reason}"
+msgid "cartridgeDesigner.drawingEarlierInputsFix"
+msgstr "Zeichnung zu früheren Eingaben. Korrigieren Sie {label}: {reason}"
+
+# en: "Drawing not updated: {reason}"
+msgid "bulletDesigner.drawingNotUpdated"
+msgstr "Zeichnung nicht aktualisiert: {reason}"
+
+# en: "Drawing not updated: {reason}"
+msgid "cartridgeDesigner.drawingNotUpdated"
+msgstr "Zeichnung nicht aktualisiert: {reason}"
 
 # en: "Drawing notes"
 msgid "recordActions.drawingNotes"
 msgstr "Hinweise zur Zeichnung"
+
+# en: "Drawing of the design."
+msgid "bulletDesigner.drawingDesign"
+msgstr "Zeichnung des Entwurfs."
 
 # en: "Drawing opacity"
 msgid "bulletPhoto.drawingOpacity"
@@ -2306,6 +2534,22 @@ msgstr "Deckkraft der Zeichnung"
 # en: "Drawing over the photograph, {percent, decimal} %"
 msgid "bulletPhoto.drawingOpacityValue"
 msgstr "Zeichnung über dem Foto, {percent, decimal} %"
+
+# en: "Drawing rules of CIP table"
+msgid "cartridgeDesigner.drawingRulesCipTable"
+msgstr "Zeichenregeln der CIP-Tabelle"
+
+# en: "Drawing updated."
+msgid "bulletDesigner.drawingUpdated"
+msgstr "Zeichnung aktualisiert."
+
+# en: "Drawing updated."
+msgid "cartridgeDesigner.drawingUpdated"
+msgstr "Zeichnung aktualisiert."
+
+# en: "Drawing updated. {derived}."
+msgid "cartridgeDesigner.drawingUpdatedDerived"
+msgstr "Zeichnung aktualisiert. {derived}."
 
 # en: "Drawings"
 msgid "bulletCompare.drawings"
@@ -2431,6 +2675,10 @@ msgstr "Geben Sie eine Zielgröße über 0{unit} ein."
 msgid "chargeTarget.enterTargetAtMost"
 msgstr "Geben Sie eine Zielgröße von höchstens {max}{unit} ein."
 
+# en: "Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw."
+msgid "cartridgeDesigner.enterLeastToDraw"
+msgstr "Geben Sie mindestens R1, R, P1, L3 und H2 der Patrone oder des Patronenlagers ein, um zu zeichnen."
+
 # en: "Enter the date."
 msgid "log.enterDate"
 msgstr "Geben Sie das Datum ein."
@@ -2451,6 +2699,14 @@ msgstr "Geben Sie zuerst die bekannte Größe ein."
 msgid "log.enterConfirmedBy"
 msgstr "Geben Sie ein, wer den Eintrag bestätigt hat, oder leeren Sie den Tag der Bestätigung."
 
+# en: "Entered"
+msgid "bulletDesigner.entered"
+msgstr "Eingegeben"
+
+# en: "Entered"
+msgid "cartridgeDesigner.entered"
+msgstr "Eingegeben"
+
 # en: "Entered at the range"
 msgid "sourceLink.entry.range"
 msgstr "Auf dem Schießstand erfasst"
@@ -2460,11 +2716,11 @@ msgid "sourceLink.entry.targetDesigner"
 msgstr "Im Scheiben-Editor erfasst"
 
 # en: "Entries"
-msgid "logSummary.entries"
+msgid "log.entries"
 msgstr "Einträge"
 
 # en: "Entries"
-msgid "log.entries"
+msgid "logSummary.entries"
 msgstr "Einträge"
 
 # en: "Error"
@@ -2512,11 +2768,11 @@ msgid "events.totalFromResult"
 msgstr "Gesamtergebnis: tragen Sie die Stage-Punkte aus dem offiziellen Ergebnis ein."
 
 # en: "Event type"
-msgid "events.eventType"
+msgid "events.column.type"
 msgstr "Wettkampfart"
 
 # en: "Event type"
-msgid "events.column.type"
+msgid "events.eventType"
 msgstr "Wettkampfart"
 
 # en: "Event type data is unavailable right now."
@@ -2585,11 +2841,11 @@ msgid "firearms.exportCsv"
 msgstr "CSV exportieren"
 
 # en: "Export CSV"
-msgid "sessionSummary.exportCsv"
+msgid "log.exportCsv"
 msgstr "CSV exportieren"
 
 # en: "Export CSV"
-msgid "log.exportCsv"
+msgid "sessionSummary.exportCsv"
 msgstr "CSV exportieren"
 
 # en: "Export JSON"
@@ -2597,11 +2853,11 @@ msgid "events.exportJson"
 msgstr "JSON exportieren"
 
 # en: "Export JSON"
-msgid "sessionSummary.exportJson"
+msgid "log.exportJson"
 msgstr "JSON exportieren"
 
 # en: "Export JSON"
-msgid "log.exportJson"
+msgid "sessionSummary.exportJson"
 msgstr "JSON exportieren"
 
 # en: "Export summary CSV"
@@ -2633,19 +2889,7 @@ msgid "powderRecord.faster"
 msgstr "Schneller ({unit})"
 
 # en: "Federation"
-msgid "disciplines.facet.org"
-msgstr "Verband"
-
-# en: "Federation"
-msgid "disciplines.strip.federation"
-msgstr "Verband"
-
-# en: "Federation"
-msgid "targets.facet.org"
-msgstr "Verband"
-
-# en: "Federation"
-msgid "targets.row.federation"
+msgid "disciplineRecord.federation"
 msgstr "Verband"
 
 # en: "Federation"
@@ -2653,7 +2897,11 @@ msgid "disciplines.column.federation"
 msgstr "Verband"
 
 # en: "Federation"
-msgid "disciplineRecord.federation"
+msgid "disciplines.facet.org"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "disciplines.strip.federation"
 msgstr "Verband"
 
 # en: "Federation"
@@ -2666,6 +2914,14 @@ msgstr "Verband"
 
 # en: "Federation"
 msgid "targets.column.organization"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "targets.facet.org"
+msgstr "Verband"
+
+# en: "Federation"
+msgid "targets.row.federation"
 msgstr "Verband"
 
 # en: "Federation data is unavailable right now."
@@ -2733,11 +2989,11 @@ msgid "events.firearm"
 msgstr "Schusswaffe"
 
 # en: "Firearm"
-msgid "log.firearm"
+msgid "log.column.firearm"
 msgstr "Schusswaffe"
 
 # en: "Firearm"
-msgid "log.column.firearm"
+msgid "log.firearm"
 msgstr "Schusswaffe"
 
 # en: "firearm {name}"
@@ -2816,6 +3072,10 @@ msgstr "Angepasst: plus und minus {k, decimal} Standardunsicherheiten, eine Unte
 msgid "bullets.fitting"
 msgstr "passend zu {name}"
 
+# en: "Fix {label}: {reason}"
+msgid "cartridgeDesigner.fix"
+msgstr "Korrigieren Sie {label}: {reason}"
+
 # en: "Fixed inputs"
 msgid "recordFields.fixedInputsFilter"
 msgstr "Feste Eingaben"
@@ -2833,11 +3093,11 @@ msgid "values.flake"
 msgstr "Blättchenpulver"
 
 # en: "Flame temperature"
-msgid "recordFields.flameTemperature"
+msgid "powderDesigner.flameTemperature"
 msgstr "Flammentemperatur"
 
 # en: "Flame temperature"
-msgid "powderDesigner.flameTemperature"
+msgid "recordFields.flameTemperature"
 msgstr "Flammentemperatur"
 
 # en: "Flame temperature max"
@@ -2873,15 +3133,15 @@ msgid "bulletPhoto.needScale"
 msgstr "Für Werte setzen Sie zwei Punkte auf das Lineal und geben ihren Abstand ein, oder geben Sie Durchmesser oder Gesamtlänge vom Messschieber ein."
 
 # en: "Form"
-msgid "recordFields.form"
-msgstr "Form"
-
-# en: "Form"
 msgid "powderCompare.form"
 msgstr "Form"
 
 # en: "Form"
 msgid "powders.column.form"
+msgstr "Form"
+
+# en: "Form"
+msgid "recordFields.form"
 msgstr "Form"
 
 # en: "Form a"
@@ -2932,9 +3192,21 @@ msgstr "freihändig"
 msgid "log.from"
 msgstr "Von"
 
+# en: "From a photo"
+msgid "bulletDesigner.fromPhoto"
+msgstr "Aus einem Foto"
+
+# en: "From the catalog record"
+msgid "bulletDesigner.fromCatalogRecord"
+msgstr "Aus dem Katalogdatensatz"
+
 # en: "From the official result, where published."
 msgid "events.stagePointsHint"
 msgstr "Aus dem offiziellen Ergebnis, wo veröffentlicht."
+
+# en: "From the record"
+msgid "cartridgeDesigner.fromRecord"
+msgstr "Aus dem Datensatz"
 
 # en: "Frozen ratio of specific heats at the flame temperature."
 msgid "powderDesigner.frozenRatioSpecificHeats"
@@ -3152,13 +3424,25 @@ msgstr "Lochrand, nach außen gemessen"
 msgid "holeDetection.holes"
 msgstr "Schusslöcher"
 
+# en: "hollow cone"
+msgid "bulletDesigner.hollowCone"
+msgstr "Hohlkegel"
+
 # en: "hollow point"
 msgid "disciplines.rule.hollowPoint"
 msgstr "Hohlspitze"
 
+# en: "hollow round"
+msgid "bulletDesigner.hollowRound"
+msgstr "Hohlrund"
+
 # en: "hollow-point"
 msgid "values.hollowPoint"
 msgstr "Hohlspitze"
+
+# en: "Hollow-point mouth diameter"
+msgid "bulletDesigner.hollowPointMouthDiameter"
+msgstr "Durchmesser der Hohlspitzenöffnung"
 
 # en: "Hollow-point mouth diameter"
 msgid "recordFields.hollowPointMouthDiameter"
@@ -3172,6 +3456,10 @@ msgstr "Webseite"
 msgid "federationRecord.homepage"
 msgstr "Webseite"
 
+# en: "How to measure bullet dimensions"
+msgid "bulletDesigner.howMeasureBulletDimensions"
+msgstr "So messen Sie die Geschossmaße"
+
 # en: "How to take a photo the app can score"
 msgid "targetEditor.howTakePhotoApp"
 msgstr "So gelingt ein Foto, das die App auswerten kann"
@@ -3179,6 +3467,10 @@ msgstr "So gelingt ein Foto, das die App auswerten kann"
 # en: "hybrid"
 msgid "values.hybrid"
 msgstr "hybrid"
+
+# en: "Identity"
+msgid "bulletDesigner.identity"
+msgstr "Bezeichnung"
 
 # en: "Ignition pressure"
 msgid "powderDesigner.ignitionPressure"
@@ -3189,11 +3481,11 @@ msgid "recordFields.ignitionPressure"
 msgstr "Zünddruck"
 
 # en: "Impetus"
-msgid "recordFields.impetus"
+msgid "powderDesigner.impetus"
 msgstr "Impetus"
 
 # en: "Impetus"
-msgid "powderDesigner.impetus"
+msgid "recordFields.impetus"
 msgstr "Impetus"
 
 # en: "Impetus max"
@@ -3240,6 +3532,18 @@ msgstr "Zur Disziplinliste"
 msgid "firearms.inThisBrowser"
 msgstr "In diesem Browser"
 
+# en: "Include the design"
+msgid "bulletDesigner.includeDesign"
+msgstr "Den Entwurf beifügen"
+
+# en: "Include the design"
+msgid "cartridgeDesigner.includeDesign"
+msgstr "Den Entwurf beifügen"
+
+# en: "included angle from P1 at its drawn station to P2 at L1"
+msgid "cartridgeDesigner.includedAngleP1Drawn"
+msgstr "eingeschlossener Winkel von P1 an seiner gezeichneten Stelle bis P2 bei L1"
+
 # en: "included angle of the forcing cone"
 msgid "cartridgeRecord.meaning.forcingConeAngle"
 msgstr "Eingeschlossener Winkel des Übergangskegels"
@@ -3251,6 +3555,10 @@ msgstr "Eingeschlossener Winkel des h-Kegels"
 # en: "included shoulder angle"
 msgid "cartridgeRecord.meaning.shoulderAngle"
 msgstr "Eingeschlossener Schulterwinkel"
+
+# en: "included, 2 atan((P2 - H1) / 2 / (L2 - L1))"
+msgid "cartridgeDesigner.included2AtanP2"
+msgstr "eingeschlossen, 2 atan((P2 - H1) / 2 / (L2 - L1))"
 
 # en: "Ingredient"
 msgid "powderDesigner.ingredient"
@@ -3453,11 +3761,15 @@ msgid "targetEditor.left"
 msgstr "links"
 
 # en: "Length"
-msgid "recordFields.length"
+msgid "bulletDesigner.length"
 msgstr "Länge"
 
 # en: "Length"
 msgid "bullets.column.length"
+msgstr "Länge"
+
+# en: "Length"
+msgid "recordFields.length"
 msgstr "Länge"
 
 # en: "length of the cone from H2 down to G1, from L3"
@@ -3477,11 +3789,11 @@ msgid "units.quantity.length"
 msgstr "Längen"
 
 # en: "Level"
-msgid "events.level"
+msgid "events.column.level"
 msgstr "Ebene"
 
 # en: "Level"
-msgid "events.column.level"
+msgid "events.level"
 msgstr "Ebene"
 
 # en: "lever action"
@@ -3537,11 +3849,11 @@ msgid "sessionSummary.loadExample"
 msgstr "Beispiel laden"
 
 # en: "Load or ammunition"
-msgid "log.loadAmmunition"
+msgid "log.column.ammunition"
 msgstr "Laborierung oder Munition"
 
 # en: "Load or ammunition"
-msgid "log.column.ammunition"
+msgid "log.loadAmmunition"
 msgstr "Laborierung oder Munition"
 
 # en: "Load ratio"
@@ -3729,11 +4041,11 @@ msgid "disciplines.row.maxMagnification"
 msgstr "Vergrößerung bis"
 
 # en: "Magnum"
-msgid "recordFields.magnum"
+msgid "primers.column.magnum"
 msgstr "Magnum"
 
 # en: "Magnum"
-msgid "primers.column.magnum"
+msgid "recordFields.magnum"
 msgstr "Magnum"
 
 # en: "Major"
@@ -3753,7 +4065,7 @@ msgid "recordSources.origin.manufacturer"
 msgstr "Hersteller"
 
 # en: "Manufacturer"
-msgid "recordFields.manufacturer"
+msgid "bulletDesigner.manufacturer"
 msgstr "Hersteller"
 
 # en: "Manufacturer"
@@ -3774,6 +4086,10 @@ msgstr "Hersteller"
 
 # en: "Manufacturer"
 msgid "primers.column.manufacturer"
+msgstr "Hersteller"
+
+# en: "Manufacturer"
+msgid "recordFields.manufacturer"
 msgstr "Hersteller"
 
 # en: "Manufacturer or name, DP40…"
@@ -3821,7 +4137,7 @@ msgid "holeDetection.marker"
 msgstr "Markierung"
 
 # en: "Mass"
-msgid "recordFields.mass"
+msgid "bulletDesigner.mass"
 msgstr "Masse"
 
 # en: "Mass"
@@ -3830,6 +4146,10 @@ msgstr "Masse"
 
 # en: "Mass"
 msgid "cases.column.mass"
+msgstr "Masse"
+
+# en: "Mass"
+msgid "recordFields.mass"
 msgstr "Masse"
 
 # en: "Mass per volume of loose powder, voids included."
@@ -3844,16 +4164,20 @@ msgstr "Massenprozent max"
 msgid "powderDesigner.massPercentMin"
 msgstr "Massenprozent min"
 
+# en: "Mass, diameter and length"
+msgid "bulletDesigner.massDiameterLength"
+msgstr "Masse, Durchmesser und Länge"
+
 # en: "matching \"{query}\""
 msgid "lists.matching"
 msgstr "Suche nach „{query}“"
 
 # en: "Material"
-msgid "recordFields.material"
+msgid "cases.column.material"
 msgstr "Material"
 
 # en: "Material"
-msgid "cases.column.material"
+msgid "recordFields.material"
 msgstr "Material"
 
 # en: "Max"
@@ -3945,6 +4269,10 @@ msgid "federationRecord.memberOf"
 msgstr "Mitglied von"
 
 # en: "Meplat diameter"
+msgid "bulletDesigner.meplatDiameter"
+msgstr "Durchmesser der Stirnfläche"
+
+# en: "Meplat diameter"
 msgid "recordFields.meplatDiameter"
 msgstr "Durchmesser der Stirnfläche"
 
@@ -4013,11 +4341,11 @@ msgid "powderRecord.modelParameters"
 msgstr "Modellparameter"
 
 # en: "Molar mass"
-msgid "recordFields.molarMass"
+msgid "powderDesigner.molarMass"
 msgstr "Molare Masse"
 
 # en: "Molar mass"
-msgid "powderDesigner.molarMass"
+msgid "recordFields.molarMass"
 msgstr "Molare Masse"
 
 # en: "Molar mass max"
@@ -4101,7 +4429,15 @@ msgid "targetEditor.notAvailable"
 msgstr "k. A."
 
 # en: "Name"
+msgid "bulletDesigner.name"
+msgstr "Name"
+
+# en: "Name"
 msgid "bullets.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "cartridgeDesigner.name"
 msgstr "Name"
 
 # en: "Name"
@@ -4113,7 +4449,7 @@ msgid "cases.column.name"
 msgstr "Name"
 
 # en: "Name"
-msgid "events.name"
+msgid "disciplines.column.name"
 msgstr "Name"
 
 # en: "Name"
@@ -4121,7 +4457,7 @@ msgid "events.column.name"
 msgstr "Name"
 
 # en: "Name"
-msgid "disciplines.column.name"
+msgid "events.name"
 msgstr "Name"
 
 # en: "Name"
@@ -4130,6 +4466,10 @@ msgstr "Name"
 
 # en: "Name"
 msgid "firearms.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "logSummary.name"
 msgstr "Name"
 
 # en: "Name"
@@ -4142,10 +4482,6 @@ msgstr "Name"
 
 # en: "Name"
 msgid "primers.column.name"
-msgstr "Name"
-
-# en: "Name"
-msgid "logSummary.name"
 msgstr "Name"
 
 # en: "Name"
@@ -4196,9 +4532,25 @@ msgstr "Halsdurchmesser an der Mündung"
 msgid "cases.new"
 msgstr "Neue Hülsengruppe"
 
+# en: "new bullet"
+msgid "bulletDesigner.newBulletName"
+msgstr "neues Geschoss"
+
+# en: "New bullet"
+msgid "bulletDesigner.newBullet"
+msgstr "Neues Geschoss"
+
 # en: "New bullet"
 msgid "bullets.new"
 msgstr "Neues Geschoss"
+
+# en: "new cartridge"
+msgid "cartridgeDesigner.newCartridgeName"
+msgstr "neue Patrone"
+
+# en: "New cartridge"
+msgid "cartridgeDesigner.newCartridge"
+msgstr "Neue Patrone"
 
 # en: "New cartridge"
 msgid "cartridges.new"
@@ -4245,7 +4597,7 @@ msgid "values.no"
 msgstr "nein"
 
 # en: "No"
-msgid "values.noTitle"
+msgid "primers.no"
 msgstr "Nein"
 
 # en: "No"
@@ -4253,7 +4605,7 @@ msgid "targets.no"
 msgstr "Nein"
 
 # en: "No"
-msgid "primers.no"
+msgid "values.noTitle"
 msgstr "Nein"
 
 # en: "No brass groups of your own yet"
@@ -4267,6 +4619,10 @@ msgstr "Keine Hülsen entsprechen diesen Filtern."
 # en: "No bulk density in the record"
 msgid "powderCompare.noBulkDensity"
 msgstr "Kein Schüttgewicht im Datensatz"
+
+# en: "No bullet found"
+msgid "bulletDesigner.noBulletFound"
+msgstr "Kein Geschoss gefunden"
 
 # en: "No bullet found: no part of the photograph stands out from the background."
 msgid "bulletPhoto.noBullet"
@@ -4287,6 +4643,10 @@ msgstr "Keine Geschosse entsprechen diesen Filtern."
 # en: "No canvas to read the photo."
 msgid "holeDetection.noCanvas"
 msgstr "Es gibt keine Zeichenfläche, um das Foto zu lesen."
+
+# en: "No cartridge found"
+msgid "cartridgeDesigner.noCartridgeFound"
+msgstr "Keine Patrone gefunden"
 
 # en: "No cartridge matches {query}."
 msgid "bulletRecord.noCartridge"
@@ -4331,6 +4691,10 @@ msgstr "Keine Disziplinen entsprechen diesen Filtern."
 # en: "No drawing for this record."
 msgid "bulletDrawing.none"
 msgstr "Keine Zeichnung für diesen Datensatz."
+
+# en: "No drawing yet"
+msgid "cartridgeDesigner.noDrawingYet"
+msgstr "Noch keine Zeichnung"
 
 # en: "No drawing: {reason}"
 msgid "bulletCompare.noDrawing"
@@ -4497,15 +4861,15 @@ msgid "powderCompare.none"
 msgstr "keine"
 
 # en: "None"
-msgid "powderRecord.none"
-msgstr "Keine"
-
-# en: "None"
 msgid "events.none"
 msgstr "Keine"
 
 # en: "None"
 msgid "log.none"
+msgstr "Keine"
+
+# en: "None"
+msgid "powderRecord.none"
 msgstr "Keine"
 
 # en: "None"
@@ -4515,6 +4879,18 @@ msgstr "Keine"
 # en: "None marked."
 msgid "holeDetection.noneMarked"
 msgstr "Keine markiert."
+
+# en: "Nose"
+msgid "bulletDesigner.nose"
+msgstr "Kopf"
+
+# en: "Nose form"
+msgid "bulletDesigner.noseForm"
+msgstr "Kopfform"
+
+# en: "Nose length"
+msgid "bulletDesigner.noseLength"
+msgstr "Kopflänge"
 
 # en: "Nose length"
 msgid "recordFields.noseLength"
@@ -4544,6 +4920,22 @@ msgstr "Nicht bemaßt: {parts}."
 msgid "bulletPhoto.notGiven"
 msgstr "nicht angegeben"
 
+# en: "Not given"
+msgid "bulletDesigner.notGiven"
+msgstr "Nicht angegeben"
+
+# en: "Not given"
+msgid "cartridgeDesigner.notGiven"
+msgstr "Nicht angegeben"
+
+# en: "Not given: a drawing of the cartridge, which the seating needs."
+msgid "cartridgeDesigner.notGivenCartridgeDrawing"
+msgstr "Nicht angegeben: eine Zeichnung der Patrone, die das Setzen des Geschosses benötigt."
+
+# en: "Not given: the cartridge L3, which the seating needs."
+msgid "cartridgeDesigner.notGivenCartridgeL3"
+msgstr "Nicht angegeben: das Maß L3 der Patrone, das die Setztiefe benötigt."
+
 # en: "Not imported: {reason}"
 msgid "events.notImported"
 msgstr "Nicht importiert: {reason}"
@@ -4572,6 +4964,10 @@ msgstr "Nicht in diesem Browser"
 msgid "log.notInBrowser"
 msgstr "Nicht in diesem Browser"
 
+# en: "Not printed in the record"
+msgid "cartridgeDesigner.notPrintedRecord"
+msgstr "Im Datensatz nicht abgedruckt"
+
 # en: "Not restored: the browser store refused."
 msgid "targetEditor.notRestoredStoreRefused"
 msgstr "Nicht wiederhergestellt: Der Browserspeicher hat es abgelehnt."
@@ -4597,15 +4993,15 @@ msgid "targetEditor.notSavedStoreRefused"
 msgstr "Nicht gespeichert: Der Browserspeicher hat das Blatt abgelehnt. {reason} Geben Sie Browserspeicher frei oder erlauben Sie Websitedaten für diese Seite und bearbeiten Sie das Blatt dann erneut."
 
 # en: "Not stated"
-msgid "targets.notStated"
-msgstr "Nicht angegeben"
-
-# en: "Not stated"
 msgid "matchRounds.notStated"
 msgstr "Nicht angegeben"
 
 # en: "Not stated"
 msgid "powderDesigner.notStated"
+msgstr "Nicht angegeben"
+
+# en: "Not stated"
+msgid "targets.notStated"
 msgstr "Nicht angegeben"
 
 # en: "Note"
@@ -4649,11 +5045,11 @@ msgid "holeDetection.nowCorners"
 msgstr "Jetzt {count, decimal} Ecken."
 
 # en: "Number"
-msgid "disciplines.row.number"
+msgid "disciplines.column.number"
 msgstr "Nummer"
 
 # en: "Number"
-msgid "disciplines.column.number"
+msgid "disciplines.row.number"
 msgstr "Nummer"
 
 # en: "Number"
@@ -4701,12 +5097,20 @@ msgid "recordFields.ogive"
 msgstr "Ogive"
 
 # en: "Ogive radius"
+msgid "bulletDesigner.ogiveRadius"
+msgstr "Ogivenradius"
+
+# en: "Ogive radius"
 msgid "recordFields.ogiveRadius"
 msgstr "Ogivenradius"
 
 # en: "Ogive radius ratio"
 msgid "recordFields.ogiveRadiusRatio"
 msgstr "Verhältnis des Ogivenradius"
+
+# en: "Ogive Rt/R"
+msgid "bulletDesigner.ogiveRtR"
+msgstr "Ogive Rt/R"
 
 # en: "OK"
 msgid "listSources.ok"
@@ -4727,6 +5131,10 @@ msgstr "Eine Seite der Freistellung ist breiter als die andere, wie durch einen 
 # en: "One target, all of it"
 msgid "photoQuality.rule.oneTarget"
 msgstr "Eine Zielscheibe, ganz im Bild"
+
+# en: "Only entered and catalog values are dimensioned."
+msgid "bulletDesigner.onlyEnteredCatalogDimensioned"
+msgstr "Nur eingegebene Werte und Katalogwerte sind bemaßt."
 
 # en: "open"
 msgid "disciplines.rule.open"
@@ -4817,11 +5225,11 @@ msgid "cartridgeRecord.group.other"
 msgstr "Sonstige"
 
 # en: "Outer diameter"
-msgid "targets.row.outerDiameter"
+msgid "targets.column.outer"
 msgstr "Außendurchmesser"
 
 # en: "Outer diameter"
-msgid "targets.column.outer"
+msgid "targets.row.outerDiameter"
 msgstr "Außendurchmesser"
 
 # en: "Outer diameter width"
@@ -4833,7 +5241,15 @@ msgid "bulletCompare.outline"
 msgstr "Umriss, {name}"
 
 # en: "Outline, {name}"
+msgid "bulletDesigner.outline"
+msgstr "Umriss, {name}"
+
+# en: "Outline, {name}"
 msgid "bulletDrawing.outline"
+msgstr "Umriss, {name}"
+
+# en: "Outline, {name}"
+msgid "cartridgeDesigner.outline"
 msgstr "Umriss, {name}"
 
 # en: "Over the composition ranges: {min, decimal} to {max, decimal}."
@@ -4875,6 +5291,14 @@ msgstr "Lack"
 # en: "Paint over the picture to add to the bullet or erase from it. Keys: arrows move the cursor, Enter paints."
 msgid "bulletPhoto.brushHelp"
 msgstr "Malen Sie über das Bild, um dem Geschoss etwas hinzuzufügen oder davon zu entfernen. Tasten: Pfeile bewegen den Cursor, Eingabe malt."
+
+# en: "Parameters"
+msgid "bulletDesigner.parameters"
+msgstr "Parameter"
+
+# en: "Parameters"
+msgid "cartridgeDesigner.parameters"
+msgstr "Parameter"
 
 # en: "Parameters"
 msgid "powderDesigner.parameters"
@@ -4973,11 +5397,11 @@ msgid "events.place"
 msgstr "Ort"
 
 # en: "Place"
-msgid "log.place"
+msgid "log.column.place"
 msgstr "Ort"
 
 # en: "Place"
-msgid "log.column.place"
+msgid "log.place"
 msgstr "Ort"
 
 # en: "place by hand"
@@ -5027,6 +5451,10 @@ msgstr "Polymerbeschichtung"
 # en: "Polymer coated steel"
 msgid "values.polymerCoatedSteel"
 msgstr "Polymerbeschichteter Stahl"
+
+# en: "Polymer tip length"
+msgid "bulletDesigner.polymerTipLength"
+msgstr "Länge der Polymerspitze"
 
 # en: "polymer-tip"
 msgid "values.polymerTip"
@@ -5257,11 +5685,11 @@ msgid "bulletRecord.product"
 msgstr "Artikelnummer {number}"
 
 # en: "Product number"
-msgid "recordFields.productNumber"
+msgid "primers.column.number"
 msgstr "Produktnummer"
 
 # en: "Product number"
-msgid "primers.column.number"
+msgid "recordFields.productNumber"
 msgstr "Produktnummer"
 
 # en: "prone"
@@ -5396,6 +5824,14 @@ msgstr "Verhältnis der spezifischen Wärmen des Gases; über 1."
 msgid "sessionSummary.read"
 msgstr "{strings}, {shots} gelesen."
 
+# en: "Read only: {reason}"
+msgid "bulletDesigner.readOnly"
+msgstr "Nur lesbar: {reason}"
+
+# en: "Read only: {reason}"
+msgid "cartridgeDesigner.readOnly"
+msgstr "Nur lesbar: {reason}"
+
 # en: "Read the target as a percentage of the cartridge's CIP Pmax"
 msgid "powderCompare.readTargetPercentageCartridge"
 msgstr "Ziel als Prozentsatz des CIP-Pmax der Patrone lesen"
@@ -5489,11 +5925,11 @@ msgid "bulletCompare.remove"
 msgstr "{name} entfernen"
 
 # en: "Remove {name}"
-msgid "events.removeStage"
+msgid "directoryTable.removeScope"
 msgstr "{name} entfernen"
 
 # en: "Remove {name}"
-msgid "directoryTable.removeScope"
+msgid "events.removeStage"
 msgstr "{name} entfernen"
 
 # en: "Remove ingredient {n, decimal}"
@@ -5564,20 +6000,28 @@ msgstr "{label} zurücksetzen"
 msgid "units.reset"
 msgstr "Auf die Voreinstellung zurücksetzen"
 
+# en: "Reset to record"
+msgid "bulletDesigner.resetRecord"
+msgstr "Auf den Datensatz zurücksetzen"
+
+# en: "Reset to record"
+msgid "cartridgeDesigner.resetRecord"
+msgstr "Auf den Datensatz zurücksetzen"
+
 # en: "rest"
 msgid "disciplines.rule.rest"
 msgstr "aufgelegt"
-
-# en: "Result"
-msgid "events.result"
-msgstr "Ergebnis"
 
 # en: "Result"
 msgid "events.column.state"
 msgstr "Ergebnis"
 
 # en: "Result"
-msgid "powderCompare.result"
+msgid "events.result"
+msgstr "Ergebnis"
+
+# en: "Result"
+msgid "log.column.result"
 msgstr "Ergebnis"
 
 # en: "Result"
@@ -5585,7 +6029,7 @@ msgid "log.result"
 msgstr "Ergebnis"
 
 # en: "Result"
-msgid "log.column.result"
+msgid "powderCompare.result"
 msgstr "Ergebnis"
 
 # en: "Results"
@@ -5729,19 +6173,19 @@ msgid "targetEditor.ringThreePoints"
 msgstr "Ring, drei Punkte"
 
 # en: "Rings"
-msgid "targets.facet.rings"
-msgstr "Ringe"
-
-# en: "Rings"
-msgid "targets.row.rings"
-msgstr "Ringe"
-
-# en: "Rings"
 msgid "faceRecord.rings"
 msgstr "Ringe"
 
 # en: "Rings"
 msgid "targets.column.rings"
+msgstr "Ringe"
+
+# en: "Rings"
+msgid "targets.facet.rings"
+msgstr "Ringe"
+
+# en: "Rings"
+msgid "targets.row.rings"
 msgstr "Ringe"
 
 # en: "Rotate"
@@ -5765,7 +6209,7 @@ msgid "values.roundedHollowBase"
 msgstr "gerundete Hohlbasis"
 
 # en: "Rounds"
-msgid "logSummary.rounds"
+msgid "log.column.rounds"
 msgstr "Patronen"
 
 # en: "Rounds"
@@ -5773,7 +6217,7 @@ msgid "log.rounds"
 msgstr "Patronen"
 
 # en: "Rounds"
-msgid "log.column.rounds"
+msgid "logSummary.rounds"
 msgstr "Patronen"
 
 # en: "Rounds fired"
@@ -5940,6 +6384,10 @@ msgstr "Suchen"
 msgid "fieldTable.search"
 msgstr "{title} durchsuchen"
 
+# en: "Seat a bullet"
+msgid "cartridgeDesigner.seatBullet"
+msgstr "Geschoss setzen"
+
 # en: "secant"
 msgid "values.secant"
 msgstr "sekantial"
@@ -6036,6 +6484,10 @@ msgstr "Je Zeile der Ladetabelle durch die Lauflänge und den Geschossaufbau fes
 msgid "holeDetection.setScaleFirstStep"
 msgstr "Stellen Sie zuerst den Maßstab ein (Schritt 2)."
 
+# en: "Shank"
+msgid "bulletDesigner.shank"
+msgstr "Schaft"
+
 # en: "Shape"
 msgid "recordFields.shape"
 msgstr "Form"
@@ -6105,11 +6557,11 @@ msgid "powderCompare.shotgunOnlyPowdersLeft"
 msgstr "Ausgelassene Treibladungspulver nur für Flinten: {shotgun, decimal}"
 
 # en: "Shots"
-msgid "events.shots"
+msgid "disciplineRecord.column.shots"
 msgstr "Schüsse"
 
 # en: "Shots"
-msgid "disciplineRecord.column.shots"
+msgid "events.shots"
 msgstr "Schüsse"
 
 # en: "Shots"
@@ -6155,6 +6607,10 @@ msgstr "Schusszahl der Serien"
 # en: "Shotshell"
 msgid "values.shotshell"
 msgstr "Schrotpatrone"
+
+# en: "Shotshell dimensions (CIP table VII) are read only; the drawing shows the record."
+msgid "cartridgeDesigner.shotshellDimensionsCipTable"
+msgstr "Maße von Schrotpatronen (CIP-Tabelle VII) sind schreibgeschützt; die Zeichnung zeigt den Datensatz."
 
 # en: "Shoulder"
 msgid "cartridgeRecord.group.shoulder"
@@ -6213,11 +6669,11 @@ msgid "holeDetection.size"
 msgstr "Größe"
 
 # en: "Size"
-msgid "recordFields.size"
+msgid "primers.column.size"
 msgstr "Maße"
 
 # en: "Size"
-msgid "primers.column.size"
+msgid "recordFields.size"
 msgstr "Maße"
 
 # en: "sling"
@@ -6344,6 +6800,14 @@ msgstr "Stages"
 msgid "disciplines.rule.standing"
 msgstr "stehend"
 
+# en: "Start from a record"
+msgid "bulletDesigner.startFromRecord"
+msgstr "Von einem Datensatz ausgehen"
+
+# en: "Start from a record"
+msgid "cartridgeDesigner.startFromRecord"
+msgstr "Von einem Datensatz ausgehen"
+
 # en: "Start pressure"
 msgid "powderDesigner.startPressure"
 msgstr "Startdruck"
@@ -6351,6 +6815,14 @@ msgstr "Startdruck"
 # en: "Start pressure"
 msgid "recordFields.startPressure"
 msgstr "Startdruck"
+
+# en: "Started from {name}."
+msgid "bulletDesigner.startedFrom"
+msgstr "Ausgehend von {name}."
+
+# en: "Started from {name}."
+msgid "cartridgeDesigner.startedFrom"
+msgstr "Ausgehend von {name}."
 
 # en: "Statistics"
 msgid "targetEditor.statisticsTitle"
@@ -6461,6 +6933,10 @@ msgid "bulletCompare.symbol"
 msgstr "Symbol"
 
 # en: "Symbol"
+msgid "cartridgeDesigner.symbol"
+msgstr "Symbol"
+
+# en: "Symbol"
 msgid "cartridgeRecord.symbol"
 msgstr "Symbol"
 
@@ -6472,9 +6948,21 @@ msgstr "Symbol"
 msgid "fieldTable.searchSymbolOrName"
 msgstr "Symbol oder Name"
 
+# en: "Symbols: {symbols}."
+msgid "bulletDesigner.symbols"
+msgstr "Symbole: {symbols}."
+
 # en: "Table"
 msgid "cartridgeRecord.table"
 msgstr "Tabelle"
+
+# en: "Table {table}"
+msgid "cartridgeDesigner.table"
+msgstr "Tabelle {table}"
+
+# en: "Table III draws a belt; the other tables draw the same outline."
+msgid "cartridgeDesigner.tableIiiDrawsBelt"
+msgstr "Tabelle III zeichnet einen Gürtel; die anderen Tabellen zeichnen denselben Umriss."
 
 # en: "Table: the CIP table of the record, I to XI, by cartridge class"
 msgid "cartridgeRecord.meaning.table"
@@ -6485,15 +6973,15 @@ msgid "values.tangent"
 msgstr "tangential"
 
 # en: "Target"
+msgid "disciplineRecord.column.target"
+msgstr "Scheibe"
+
+# en: "Target"
 msgid "disciplines.facet.face"
 msgstr "Scheibe"
 
 # en: "Target"
-msgid "targets.group.target"
-msgstr "Scheibe"
-
-# en: "Target"
-msgid "disciplineRecord.column.target"
+msgid "faceRecord.drawing"
 msgstr "Scheibe"
 
 # en: "Target"
@@ -6505,7 +6993,7 @@ msgid "holeDetection.target"
 msgstr "Scheibe"
 
 # en: "Target"
-msgid "faceRecord.drawing"
+msgid "targets.group.target"
 msgstr "Scheibe"
 
 # en: "Target"
@@ -6606,6 +7094,14 @@ msgstr "Nutzungsbedingungen"
 msgid "recordSources.termsText"
 msgstr "Nutzungsbedingungen: {terms}"
 
+# en: "The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base."
+msgid "bulletDesigner.baseRecordChangedSince"
+msgstr "Der Basisdatensatz {name} hat sich geändert, seit dieser Entwurf gespeichert wurde. Felder, die Sie nicht geändert haben, folgen ihm; Speichern behält den Entwurf gegenüber der neuen Basis."
+
+# en: "The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base."
+msgid "cartridgeDesigner.baseRecordChangedSince"
+msgstr "Der Basisdatensatz {name} hat sich geändert, seit dieser Entwurf gespeichert wurde. Felder, die Sie nicht geändert haben, folgen ihm; Speichern behält den Entwurf gegenüber der neuen Basis."
+
 # en: "The black area and the paper are close in brightness."
 msgid "photoQuality.lowContrast"
 msgstr "Der Spiegel und das Papier haben fast die gleiche Helligkeit."
@@ -6666,6 +7162,10 @@ msgstr "Für die Patrone gibt es keinen CIP-Grenzwert zum Vergleich."
 msgid "powderCompare.noComparableLimit"
 msgstr "Für die Patrone gibt es keinen CIP-Grenzwert zum Vergleich."
 
+# en: "the cartridge outline less a wall of {wall} everywhere, from the head end (E, else R) at {head, decimal} mm to the mouth; cartridge maxima, not a measured capacity"
+msgid "cartridgeDesigner.cartridgeOutlineLessWall"
+msgstr "der Umriss der Patrone abzüglich einer Wand von überall {wall}, vom Bodenende (E, sonst R) bei {head, decimal} mm bis zur Mündung; Höchstmaße der Patrone, kein gemessenes Volumen"
+
 # en: "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
 msgid "powders.noneHint"
 msgstr "Der Katalog enthält kein Treibladungspulver. Legen Sie eines mit „Neues Treibladungspulver“ an oder importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import."
@@ -6697,6 +7197,14 @@ msgstr "Die Freistellung berührt den Rand des Fotos: Vielleicht ist nicht das g
 # en: "The data file could not be loaded. Check the connection and retry."
 msgid "states.dataError"
 msgstr "Die Datendatei konnte nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut."
+
+# en: "The database is unreachable. The designer still works."
+msgid "bulletDesigner.databaseUnreachableDesignerStill"
+msgstr "Die Datenbank ist nicht erreichbar. Der Editor funktioniert weiterhin."
+
+# en: "The database is unreachable. The designer still works."
+msgid "cartridgeDesigner.databaseUnreachableDesignerStill"
+msgstr "Die Datenbank ist nicht erreichbar. Der Editor funktioniert weiterhin."
 
 # en: "The diameter and overall length entered give scales {percent, decimal} % apart. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera. The scale used is their weighted mean; the difference adds to its uncertainty."
 msgid "bulletPhoto.scalesApart"
@@ -6927,12 +7435,16 @@ msgid "chargeTarget.notMonotone"
 msgstr "Der Wert schneidet die Zielgröße bei mehr als einer Treibladung."
 
 # en: "Thermochemistry"
-msgid "recordFields.thermochemistry"
+msgid "powderDesigner.thermochemistry"
 msgstr "Thermochemie"
 
 # en: "Thermochemistry"
-msgid "powderDesigner.thermochemistry"
+msgid "recordFields.thermochemistry"
 msgstr "Thermochemie"
+
+# en: "These dimensions do not form an outline."
+msgid "cartridgeDesigner.noOutline"
+msgstr "Diese Maße ergeben keinen Umriss."
 
 # en: "These points give no scale: three lie on one line."
 msgid "targetEditor.pointsGiveNoScale"
@@ -6987,6 +7499,10 @@ msgid "bulletCompare.legend"
 msgstr "Getönt: Werte unterscheiden sich. ▲ größter, ▼ kleinster Wert einer Zeile. In Klammern: Unterschied zum ersten Geschoss."
 
 # en: "Tip"
+msgid "bulletDesigner.tip"
+msgstr "Spitze"
+
+# en: "Tip"
 msgid "bullets.facet.tip"
 msgstr "Spitze"
 
@@ -7031,11 +7547,11 @@ msgid "targetEditor.tool"
 msgstr "Werkzeug"
 
 # en: "Total"
-msgid "events.totalHeading"
+msgid "events.column.total"
 msgstr "Summe"
 
 # en: "Total"
-msgid "events.column.total"
+msgid "events.totalHeading"
 msgstr "Summe"
 
 # en: "Total {total}"
@@ -7091,11 +7607,11 @@ msgid "holeDetection.turnRight90Degrees"
 msgstr "90 Grad nach rechts drehen"
 
 # en: "Twist"
-msgid "recordFields.twist"
+msgid "firearms.column.twist"
 msgstr "Drall"
 
 # en: "Twist"
-msgid "firearms.column.twist"
+msgid "recordFields.twist"
 msgstr "Drall"
 
 # en: "Twist for Sg 1.5"
@@ -7107,11 +7623,11 @@ msgid "cartridgeRecord.meaning.twist"
 msgstr "Drall, Länge je Umdrehung"
 
 # en: "Type"
-msgid "recordFields.type"
+msgid "bullets.column.type"
 msgstr "Art"
 
 # en: "Type"
-msgid "bullets.column.type"
+msgid "recordFields.type"
 msgstr "Art"
 
 # en: "typed"
@@ -7335,11 +7851,11 @@ msgid "states.warning"
 msgstr "Warnung"
 
 # en: "Water capacity"
-msgid "recordFields.waterCapacity"
+msgid "cases.column.capacity"
 msgstr "Wasserkapazität"
 
 # en: "Water capacity"
-msgid "cases.column.capacity"
+msgid "recordFields.waterCapacity"
 msgstr "Wasserkapazität"
 
 # en: "Water to the case mouth, as the manufacturer states."
@@ -7399,15 +7915,15 @@ msgid "targets.color.yellow"
 msgstr "gelb"
 
 # en: "yes"
-msgid "values.yes"
-msgstr "ja"
-
-# en: "yes"
 msgid "sessionSummary.yes"
 msgstr "ja"
 
+# en: "yes"
+msgid "values.yes"
+msgstr "ja"
+
 # en: "Yes"
-msgid "values.yesTitle"
+msgid "primers.yes"
 msgstr "Ja"
 
 # en: "Yes"
@@ -7415,7 +7931,7 @@ msgid "targets.yes"
 msgstr "Ja"
 
 # en: "Yes"
-msgid "primers.yes"
+msgid "values.yesTitle"
 msgstr "Ja"
 
 # en: "Your own record; a club or authority decides whether to accept it."

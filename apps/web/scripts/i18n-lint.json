@@ -299,7 +299,6 @@
   },
   "sameAsEnglish": {
     "de": [
-      "(H2 - G1) / 2 = {wall} mm",
       "{label} in {unit}",
       "{magnification}x",
       "{mass}, BC {bc}",
@@ -332,7 +331,6 @@
       "Name",
       "Navigation",
       "Offline",
-      "Ogive Rt/R",
       "Online",
       "Parameter",
       "Pause",

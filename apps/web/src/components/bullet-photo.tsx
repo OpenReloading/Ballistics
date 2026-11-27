@@ -103,7 +103,7 @@ function valueMessages(
   t: Translator['t'],
   i18n: I18n,
 ): MessageEntry[] {
-  const differing = p.rows.filter((r) => r.differs).map((r) => t(r.spec.label).toLowerCase())
+  const differing = p.rows.filter((r) => r.differs).map((r) => i18n._(r.spec.label).toLowerCase())
   const values = differing.join(', ')
   return [
     ...(p.found?.measurement?.notes ?? []).map(
@@ -242,7 +242,6 @@ function ValuesTable({
   system: UnitSystem
   record: Design['origin']
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   return (
     <Table
@@ -267,7 +266,7 @@ function ValuesTable({
       <Table.Tbody>
         {rows.map((r) => (
           <Table.Tr key={r.spec.key} data-differs={r.differs || undefined}>
-            <Table.Th scope="row">{t(r.spec.label)}</Table.Th>
+            <Table.Th scope="row">{i18n._(r.spec.label)}</Table.Th>
             <Table.Td>{valueText(r.spec, system, r.value)}</Table.Td>
             {record && (
               <Table.Td>
