@@ -54,6 +54,7 @@ import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } fr
 import { resolveCartridge } from '../lib/variants.ts'
 import { verbatim } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/cartridge-designer.json' with { type: 'json' }
+import englishSpecs from '../locales/en/lib/cartridge-designer.json' with { type: 'json' }
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -68,7 +69,7 @@ import { UnitsIconButton, useFieldUnits } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
 import { Workspace } from './workspace.tsx'
 
-loadEnglish(englishMessages)
+loadEnglish(englishMessages, englishSpecs)
 
 const SeatingPreview = dynamic(
   () => import('./seating-preview.tsx').then((m) => m.SeatingPreview),
@@ -93,27 +94,44 @@ function helpText(
   state: FieldState,
   system: UnitSystem,
   notes: string[],
-  t: Translate,
   i18n: I18n,
 ) {
   const value = (si: number) => valueText(s.quantity as Derived['quantity'], system, si)
   const from = (() => {
     switch (state.kind) {
       case 'record':
-        return t('From the record')
+        return i18n._({ id: 'cartridgeDesigner.fromRecord', message: 'From the record' })
       case 'entered':
-        if (!state.changed) return t('Entered')
+        if (!state.changed) return i18n._({ id: 'cartridgeDesigner.entered', message: 'Entered' })
         return state.record === undefined
-          ? t('Changed; record value not printed')
-          : t('Changed; record {value}', { value: value(state.record) })
+          ? i18n._({
+              id: 'cartridgeDesigner.changedRecordValueNotPrinted',
+              message: 'Changed; record value not printed',
+            })
+          : i18n._({
+              id: 'cartridgeDesigner.changedRecord',
+              message: 'Changed; record {value}',
+              values: { value: value(state.record) },
+            })
       case 'cleared':
-        return t('Cleared; record {value}', { value: value(state.record) })
+        return i18n._({
+          id: 'cartridgeDesigner.clearedRecord',
+          message: 'Cleared; record {value}',
+          values: { value: value(state.record) },
+        })
       case 'derived':
-        return t('Derived by the drawing: {value}', { value: value(state.si) })
+        return i18n._({
+          id: 'cartridgeDesigner.derivedDrawing',
+          message: 'Derived by the drawing: {value}',
+          values: { value: value(state.si) },
+        })
       case 'notPrinted':
-        return t('Not printed in the record')
+        return i18n._({
+          id: 'cartridgeDesigner.notPrintedRecord',
+          message: 'Not printed in the record',
+        })
       case 'empty':
-        return t('Not given')
+        return i18n._({ id: 'cartridgeDesigner.notGiven', message: 'Not given' })
     }
   })()
   const text = meaningText(s.meaning, i18n)
@@ -151,17 +169,29 @@ const StartSearch = memo(function StartSearch({
   /** The record the design started from, shown in the empty field. */
   chosen?: string | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <RecordSearch<CartridgeSummary>
       kind="cartridges"
-      label={t('Start from a record')}
-      chosen={chosen ?? t('Start from a record')}
+      label={i18n._({ id: 'cartridgeDesigner.startFromRecord', message: 'Start from a record' })}
+      chosen={
+        chosen ??
+        i18n._({ id: 'cartridgeDesigner.startFromRecord', message: 'Start from a record' })
+      }
       picked={chosen !== undefined}
-      describe={(c) => t('{name}, CIP table {table}', { name: c.name, table: c.table })}
+      describe={(c) =>
+        i18n._({
+          id: 'cartridgeDesigner.nameCipTable',
+          message: '{name}, CIP table {table}',
+          values: { name: c.name, table: c.table },
+        })
+      }
       onSelect={(c) => start(c.id)}
-      noneText={t('No cartridge found')}
-      unreachableText={t('The database is unreachable. The designer still works.')}
+      noneText={i18n._({ id: 'cartridgeDesigner.noCartridgeFound', message: 'No cartridge found' })}
+      unreachableText={i18n._({
+        id: 'cartridgeDesigner.databaseUnreachableDesignerStill',
+        message: 'The database is unreachable. The designer still works.',
+      })}
     />
   )
 })
@@ -177,10 +207,10 @@ const NameField = memo(function NameField({
   placeholder: string
   dispatch: (a: Action) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <TextInput
-      label={t('Name')}
+      label={i18n._({ id: 'cartridgeDesigner.name', message: 'Name' })}
       maxLength={200}
       value={value}
       placeholder={placeholder}
@@ -198,16 +228,26 @@ const TableSelect = memo(function TableSelect({
 }) {
   // a table VII record keeps its own table: its shotshell symbols are not edited here
   const shotshell = value === 'VII'
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <NativeSelect
-      label={t('Drawing rules of CIP table')}
-      description={t('Table III draws a belt; the other tables draw the same outline.')}
+      label={i18n._({
+        id: 'cartridgeDesigner.drawingRulesCipTable',
+        message: 'Drawing rules of CIP table',
+      })}
+      description={i18n._({
+        id: 'cartridgeDesigner.tableIiiDrawsBelt',
+        message: 'Table III draws a belt; the other tables draw the same outline.',
+      })}
       value={value}
       disabled={shotshell}
       data={(shotshell ? ['VII'] : tables).map((table) => ({
         value: table,
-        label: t('Table {table}', { table }),
+        label: i18n._({
+          id: 'cartridgeDesigner.table',
+          message: 'Table {table}',
+          values: { table },
+        }),
       }))}
       onChange={(ev) => dispatch({ type: 'table', value: ev.currentTarget.value })}
     />
@@ -216,7 +256,7 @@ const TableSelect = memo(function TableSelect({
 
 /** The derived values as a table of label and value; a row's title has the value's basis. */
 function DerivedTable({ rows, system }: { rows: Derived[]; system: UnitSystem }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (rows.length === 0) return null
   return (
     <Table
@@ -226,7 +266,9 @@ function DerivedTable({ rows, system }: { rows: Derived[]; system: UnitSystem })
       horizontalSpacing="xs"
       withRowBorders={false}
     >
-      <Table.Caption>{t('Derived from the design')}</Table.Caption>
+      <Table.Caption>
+        {i18n._({ id: 'cartridgeDesigner.derivedDesign', message: 'Derived from the design' })}
+      </Table.Caption>
       <Table.Tbody>
         {rows.map((d) => (
           <Table.Tr key={d.key} title={d.basis}>
@@ -239,24 +281,34 @@ function DerivedTable({ rows, system }: { rows: Derived[]; system: UnitSystem })
   )
 }
 
-const labelOf = (key: string, t: Translate) => {
+const labelOf = (key: string, i18n: I18n) => {
   const s = fieldSpecs.find((f) => f.key === key)
-  return s ? fieldLabel(s, t) : key
+  return s ? fieldLabel(s, i18n) : key
 }
 
 const isChanged = (state: FieldState) =>
   state.kind === 'cleared' || (state.kind === 'entered' && state.changed)
 
-const seatMissing = (drawn: boolean, t: Translate) =>
+const seatMissing = (drawn: boolean, i18n: I18n) =>
   drawn
-    ? t('Not given: the cartridge L3, which the seating needs.')
-    : t('Not given: a drawing of the cartridge, which the seating needs.')
+    ? i18n._({
+        id: 'cartridgeDesigner.notGivenCartridgeL3',
+        message: 'Not given: the cartridge L3, which the seating needs.',
+      })
+    : i18n._({
+        id: 'cartridgeDesigner.notGivenCartridgeDrawing',
+        message: 'Not given: a drawing of the cartridge, which the seating needs.',
+      })
 
-const staleText = (refusal: { field: string; reason: string }, drawn: boolean, t: Translate) => {
-  const values = { label: labelOf(refusal.field, t), reason: refusal.reason }
+const staleText = (refusal: { field: string; reason: string }, drawn: boolean, i18n: I18n) => {
+  const values = { label: labelOf(refusal.field, i18n), reason: refusal.reason }
   return drawn
-    ? t('Drawing for earlier inputs. Fix {label}: {reason}', values)
-    : t('Fix {label}: {reason}', values)
+    ? i18n._({
+        id: 'cartridgeDesigner.drawingEarlierInputsFix',
+        message: 'Drawing for earlier inputs. Fix {label}: {reason}',
+        values,
+      })
+    : i18n._({ id: 'cartridgeDesigner.fix', message: 'Fix {label}: {reason}', values })
 }
 
 /** The polite line: the refusal, else the last change, that the drawing updated and the derived values. */
@@ -265,31 +317,60 @@ function announcement(
   changed: CartridgeFieldSpec | undefined | '',
   design: Design,
   derivedText: string,
-  t: Translate,
+  i18n: I18n,
 ) {
-  if (e.refusal) return t('Drawing not updated: {reason}', { reason: e.refusal.reason })
+  if (e.refusal)
+    return i18n._({
+      id: 'cartridgeDesigner.drawingNotUpdated',
+      message: 'Drawing not updated: {reason}',
+      values: { reason: e.refusal.reason },
+    })
   const text = changed && design.fields[changed.key]?.text
   const change = !changed
     ? ''
     : text
-      ? t('{label} {value}.', { label: fieldLabel(changed, t), value: localizeNumber(text) })
-      : t('{label} cleared.', { label: fieldLabel(changed, t) })
+      ? i18n._({
+          id: 'cartridgeDesigner.labelValue',
+          message: '{label} {value}.',
+          values: { label: fieldLabel(changed, i18n), value: localizeNumber(text) },
+        })
+      : i18n._({
+          id: 'cartridgeDesigner.cleared',
+          message: '{label} cleared.',
+          values: { label: fieldLabel(changed, i18n) },
+        })
   const updated = derivedText
-    ? t('Drawing updated. {derived}.', { derived: derivedText })
-    : t('Drawing updated.')
+    ? i18n._({
+        id: 'cartridgeDesigner.drawingUpdatedDerived',
+        message: 'Drawing updated. {derived}.',
+        values: { derived: derivedText },
+      })
+    : i18n._({ id: 'cartridgeDesigner.drawingUpdated', message: 'Drawing updated.' })
   return change ? `${change} ${updated}` : updated
 }
 
 /** The Parameters panel's message for a locked, changed-base or started-from design. */
-function designMessage(design: Design, t: Translate) {
-  if (design.locked) return t('Read only: {reason}', { reason: design.locked.reason })
+function designMessage(design: Design, i18n: I18n) {
+  if (design.locked)
+    return i18n._({
+      id: 'cartridgeDesigner.readOnly',
+      message: 'Read only: {reason}',
+      values: { reason: design.locked.reason },
+    })
   if (design.baseChanged)
-    return t(
-      'The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.',
-      { name: design.origin?.title ?? design.basedOn ?? '' },
-    )
+    return i18n._({
+      id: 'cartridgeDesigner.baseRecordChangedSince',
+      message:
+        'The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.',
+      values: { name: design.origin?.title ?? design.basedOn ?? '' },
+    })
   return (
-    design.origin && t('Started from {name}.', { name: design.origin.title.replace(/\.$/, '') })
+    design.origin &&
+    i18n._({
+      id: 'cartridgeDesigner.startedFrom',
+      message: 'Started from {name}.',
+      values: { name: design.origin.title.replace(/\.$/, '') },
+    })
   )
 }
 
@@ -313,7 +394,7 @@ function DrawingFigure({
   controls: HTMLElement | null
   unit: ReturnType<typeof drawingLengthUnit>
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (drawn?.spec)
     return (
       <div className="designer-drawing" data-stale={stale || undefined}>
@@ -321,7 +402,10 @@ function DrawingFigure({
           spec={drawn.spec}
           list={drawn.figures}
           heading={title}
-          caption={t("Changed values are drawn as entered, without the record's tolerances.")}
+          caption={i18n._({
+            id: 'cartridgeDesigner.changedValuesDrawnEntered',
+            message: "Changed values are drawn as entered, without the record's tolerances.",
+          })}
           view={view}
           onView={onView}
           controls={controls}
@@ -333,8 +417,8 @@ function DrawingFigure({
   return (
     <EmptyNote
       icon={<Ruler size={24} aria-hidden="true" />}
-      title={t('No drawing yet')}
-      description={t(missingHint)}
+      title={i18n._({ id: 'cartridgeDesigner.noDrawingYet', message: 'No drawing yet' })}
+      description={i18n._(missingHint)}
     />
   )
 }
@@ -346,8 +430,8 @@ function seating(drawn: Evaluation | undefined) {
 }
 
 /** The instruction for a design missing its base values is not shown as a refusal. */
-const withoutHint = (refusal: Evaluation['refusal'], t: Translate) =>
-  refusal?.reason.endsWith(t(missingHint)) ? undefined : refusal
+const withoutHint = (refusal: Evaluation['refusal'], i18n: I18n) =>
+  refusal?.reason.endsWith(i18n._(missingHint)) ? undefined : refusal
 
 const fieldFlag = (state: FieldState) => (isChanged(state) ? 'changed' : flagOf[state.kind])
 
@@ -366,9 +450,10 @@ function fieldErrorText(
   refusal: { field: string; reason: string } | undefined,
   e: Evaluation,
   t: Translate,
+  i18n: I18n,
 ) {
   return (
-    fieldError({ ...s, label: fieldLabel(s, t) }, design.fields[s.key], system, t) ??
+    fieldError({ ...s, label: fieldLabel(s, i18n) }, design.fields[s.key], system, t, i18n) ??
     (refusal?.field === s.key ? refusal.reason : undefined) ??
     e.checks[s.key]?.join(' ')
   )
@@ -390,7 +475,7 @@ function ParameterHead({
   /** The Seat a bullet block: the most used fields, before the long CIP groups. */
   seat: ReactNode
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // the column head sticks under the pinned search, whose status line can take one or two lines
   const { ref: startBox, height: startHeight } = useElementSize<HTMLDivElement>()
   return (
@@ -401,19 +486,28 @@ function ParameterHead({
       <div className="prop-grid designer-grid">
         <NameField
           value={design.name ?? ''}
-          placeholder={design.origin?.title ?? t('Cartridge design')}
+          placeholder={
+            design.origin?.title ??
+            i18n._({ id: 'cartridgeDesigner.cartridgeDesign', message: 'Cartridge design' })
+          }
           dispatch={dispatch}
         />
         <TableSelect value={design.table} dispatch={dispatch} />
       </div>
       {shotshell ? (
         <p className="note">
-          {t('Shotshell dimensions (CIP table VII) are read only; the drawing shows the record.')}
+          {i18n._({
+            id: 'cartridgeDesigner.shotshellDimensionsCipTable',
+            message:
+              'Shotshell dimensions (CIP table VII) are read only; the drawing shows the record.',
+          })}
         </p>
       ) : (
         <>
           <div className="designer-seat">
-            <h3 className="prop-head">{t('Seat a bullet')}</h3>
+            <h3 className="prop-head">
+              {i18n._({ id: 'cartridgeDesigner.seatBullet', message: 'Seat a bullet' })}
+            </h3>
             {seat}
           </div>
           {/* the unit once per column; screen readers have it in each field's name */}
@@ -426,9 +520,21 @@ function ParameterHead({
                 : undefined
             }
           >
-            <span>{t('Symbol')}</span>
-            <span>{t('Cartridge, {unit}', { unit })}</span>
-            <span>{t('Chamber, {unit}', { unit })}</span>
+            <span>{i18n._({ id: 'cartridgeDesigner.symbol', message: 'Symbol' })}</span>
+            <span>
+              {i18n._({
+                id: 'cartridgeDesigner.cartridgeUnit',
+                message: 'Cartridge, {unit}',
+                values: { unit },
+              })}
+            </span>
+            <span>
+              {i18n._({
+                id: 'cartridgeDesigner.chamberUnit',
+                message: 'Chamber, {unit}',
+                values: { unit },
+              })}
+            </span>
           </div>
         </>
       )}
@@ -437,10 +543,16 @@ function ParameterHead({
 }
 
 /** The design's typed name, else the record it started from, else a new cartridge. */
-function designNameOf(design: Design, t: Translator['t']) {
+function designNameOf(design: Design, i18n: I18n) {
   const typed = design.name?.trim()
   if (typed) return typed
-  return design.origin ? t('design from {name}', { name: design.origin.title }) : t('new cartridge')
+  return design.origin
+    ? i18n._({
+        id: 'cartridgeDesigner.designFrom',
+        message: 'design from {name}',
+        values: { name: design.origin.title },
+      })
+    : i18n._({ id: 'cartridgeDesigner.newCartridgeName', message: 'new cartridge' })
 }
 
 /** The last valid drawing stays while the input is refused. */
@@ -477,8 +589,8 @@ export function CartridgeDesigner() {
   })
 
   const e = useMemo(
-    () => evaluate(design, system, history.last, t),
-    [design, system, history.last, t],
+    () => evaluate(design, system, history.last, t, i18n),
+    [design, system, history.last, t, i18n],
   )
   const lastGood = useRef<Evaluation | undefined>(undefined)
   if (e.spec) lastGood.current = e
@@ -494,8 +606,12 @@ export function CartridgeDesigner() {
     (update) => setCapacity((f) => update({ measuredWaterCapacity: f }).measuredWaterCapacity ?? f),
     fixedFieldText,
   )
-  const designName = designNameOf(design, t)
-  const title = t('Outline, {name}', { name: designName })
+  const designName = designNameOf(design, i18n)
+  const title = i18n._({
+    id: 'cartridgeDesigner.outline',
+    message: 'Outline, {name}',
+    values: { name: designName },
+  })
   const { seatSpec, canSeat } = seating(drawn)
   const draft = useMemo(
     () => (seatSpec && canSeat ? { spec: seatSpec, title: designName } : undefined),
@@ -508,12 +624,12 @@ export function CartridgeDesigner() {
     .map((d) => `${d.label} ${valueText(d.quantity, system, d.si)}`)
     .join(', ')
   // nothing to announce before the first change or start
-  const message = history.past.length ? announcement(e, changed, design, derivedText, t) : ''
+  const message = history.past.length ? announcement(e, changed, design, derivedText, i18n) : ''
   const [announced] = useDebouncedValue(message, 500)
   // before the first edit a design missing its base values shows the instruction, not a refusal
-  const refusal = history.past.length ? e.refusal : withoutHint(e.refusal, t)
+  const refusal = history.past.length ? e.refusal : withoutHint(e.refusal, i18n)
 
-  const errorOf = (s: CartridgeFieldSpec) => fieldErrorText(s, design, system, refusal, e, t)
+  const errorOf = (s: CartridgeFieldSpec) => fieldErrorText(s, design, system, refusal, e, t, i18n)
 
   const shotshell = design.table === 'VII'
   const field = (s: CartridgeFieldSpec) => {
@@ -527,7 +643,7 @@ export function CartridgeDesigner() {
         spec={s}
         system={system}
         value={value}
-        help={helpText(s, state, system, e.notes[s.key] ?? [], t, i18n)}
+        help={helpText(s, state, system, e.notes[s.key] ?? [], i18n)}
         flag={fieldFlag(state)}
         changed={changed}
         error={errorOf(s)}
@@ -568,8 +684,8 @@ export function CartridgeDesigner() {
       undo={history.past.length > 0}
       redo={history.future.length > 0}
       reset={design.origin !== undefined}
-      newLabel={t('New cartridge')}
-      resetLabel={t('Reset to record')}
+      newLabel={i18n._({ id: 'cartridgeDesigner.newCartridge', message: 'New cartridge' })}
+      resetLabel={i18n._({ id: 'cartridgeDesigner.resetRecord', message: 'Reset to record' })}
       system={system}
       dispatch={toolbarDispatch}
     />
@@ -579,7 +695,10 @@ export function CartridgeDesigner() {
       <FileMenu
         ref={fileMenu}
         kind="cartridge"
-        name={designFileName(fileDesign, t('Cartridge design'))}
+        name={designFileName(
+          fileDesign,
+          i18n._({ id: 'cartridgeDesigner.cartridgeDesign', message: 'Cartridge design' }),
+        )}
         // a name typed is a change to save
         nameKey={fileDesign.name?.trim() ?? ''}
         data={fileValue}
@@ -588,7 +707,7 @@ export function CartridgeDesigner() {
         kept={kept}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
-        reportBox={t('Include the design')}
+        reportBox={i18n._({ id: 'cartridgeDesigner.includeDesign', message: 'Include the design' })}
       />
       <UnitsIconButton />
     </>
@@ -599,7 +718,7 @@ export function CartridgeDesigner() {
       {/* a design whose base is gone is shown, not edited */}
       <fieldset disabled={design.locked !== undefined} className="designer-fieldset">
         <PropertyGrid
-          title={t('Parameters')}
+          title={i18n._({ id: 'cartridgeDesigner.parameters', message: 'Parameters' })}
           head={
             <ParameterHead
               start={start}
@@ -611,12 +730,12 @@ export function CartridgeDesigner() {
                 canSeat ? (
                   <div ref={setSeatSlot} className="seating-slot" />
                 ) : (
-                  <p className="note">{seatMissing(drawn?.spec !== undefined, t)}</p>
+                  <p className="note">{seatMissing(drawn?.spec !== undefined, i18n)}</p>
                 )
               }
             />
           }
-          message={loading ?? designMessage(design, t)}
+          message={loading ?? designMessage(design, i18n)}
           sections={
             shotshell
               ? []
@@ -636,18 +755,20 @@ export function CartridgeDesigner() {
     const si = design.fields[s.key]?.si
     return si === undefined
       ? []
-      : [{ label: verbatim(fieldLabel(s, t)), value: { quantity: s.quantity, si } }]
+      : [{ label: verbatim(fieldLabel(s, i18n)), value: { quantity: s.quantity, si } }]
   })
 
   const results = (
     <>
       <div className="page-panel-head designer-panel-head">
-        <h2 className="page-panel-title record-heading">{t('Drawing')}</h2>
+        <h2 className="page-panel-title record-heading">
+          {i18n._({ id: 'cartridgeDesigner.drawing', message: 'Drawing' })}
+        </h2>
         <div ref={setViewSlot} className="designer-view-slot" />
       </div>
       {/* a slot of its own: a refusal does not move the drawing */}
       <Text component="p" inherit fz="sm" m={0} className="stale-line" title={refusal?.reason}>
-        {refusal && staleText(refusal, drawn !== undefined, t)}
+        {refusal && staleText(refusal, drawn !== undefined, i18n)}
       </Text>
       <DrawingFigure
         drawn={drawn}

@@ -372,11 +372,11 @@ msgid "coreMessage.request.workerFailed"
 msgstr "Der Rechenprozess ist fehlgeschlagen"
 
 # en: "confidence level must lie in (0, 1)"
-msgid "refusal.confidenceLevelOutsideUnit"
+msgid "refusal.confidenceLevel"
 msgstr "Das Konfidenzniveau muss in (0, 1) liegen"
 
 # en: "confidence level must lie in (0, 1)"
-msgid "refusal.confidenceLevel"
+msgid "refusal.confidenceLevelOutsideUnit"
 msgstr "Das Konfidenzniveau muss in (0, 1) liegen"
 
 # en: "confidenceLevel must lie in (0, 1)"

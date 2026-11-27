@@ -13,6 +13,9 @@ msgstr ", page {page}"
 msgid "bulletPhoto.differs"
 msgstr "(differs)"
 
+msgid "cartridgeDesigner.wallFromG1"
+msgstr "(H2 - G1) / 2 = {wall, decimal} mm"
+
 msgid "chargeTarget.notLoadData"
 msgstr "(simulation, not load data)."
 
@@ -91,10 +94,10 @@ msgstr "{count, plural, one {# entry of the file differs from the one in this br
 msgid "lists.count.logEntries"
 msgstr "{count, plural, one {# entry} other {# entries}}"
 
-msgid "logSummary.entryCount"
+msgid "log.entryCount"
 msgstr "{count, plural, one {# entry} other {# entries}}"
 
-msgid "log.entryCount"
+msgid "logSummary.entryCount"
 msgstr "{count, plural, one {# entry} other {# entries}}"
 
 msgid "events.heldCount"
@@ -142,10 +145,10 @@ msgstr "{count, plural, one {# ring} other {# rings}}"
 msgid "logSummary.unsavedLoadRounds"
 msgstr "{count, plural, one {# round of entries without a saved load is under its firearm only.} other {# rounds of entries without a saved load are under their firearms only.}}"
 
-msgid "logSummary.roundCount"
+msgid "log.roundTotal"
 msgstr "{count, plural, one {# round} other {# rounds}}"
 
-msgid "log.roundTotal"
+msgid "logSummary.roundCount"
 msgstr "{count, plural, one {# round} other {# rounds}}"
 
 msgid "holeDetection.shotsAdded"
@@ -229,17 +232,26 @@ msgstr "{kind} {n, decimal} added."
 msgid "targetEditor.scaleMean"
 msgstr "{kind}; scale {deviation} % from the mean"
 
+msgid "cartridgeDesigner.labelValue"
+msgstr "{label} {value}."
+
 msgid "bulletDesigner.labelValue"
 msgstr "{label} {value}. "
+
+msgid "cartridgeDesigner.cleared"
+msgstr "{label} cleared."
 
 msgid "bulletDesigner.cleared"
 msgstr "{label} cleared. "
 
+msgid "bulletCompare.labelFrom"
+msgstr "{label} from {velocity}"
+
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
 
-msgid "bulletCompare.labelFrom"
-msgstr "{label} from {velocity}"
+msgid "cartridgeDesigner.atMostInDesigner"
+msgstr "{label} must be at most {max} {unit} in the designer."
 
 msgid "fieldTable.region"
 msgstr "{label} table"
@@ -319,6 +331,9 @@ msgstr "{name} has no round count; set one on the Firearms page to add the log t
 msgid "listSources.notDeleted"
 msgstr "{name} was not deleted: the browser refused."
 
+msgid "cartridgeDesigner.nameCipTable"
+msgstr "{name}, CIP table {table}"
+
 msgid "recordFields.burnRateOrder"
 msgstr "{order} of {total}"
 
@@ -381,6 +396,9 @@ msgstr "% of Pmax"
 
 msgid "powderCompare.percentPmax"
 msgstr "% Pmax"
+
+msgid "cartridgeDesigner.wallAssumed"
+msgstr "0.3 mm (assumed, no G1)"
 
 msgid "recordFields.fastest"
 msgstr "1 = fastest"
@@ -679,13 +697,13 @@ msgstr "Barrel twist"
 msgid "bulletDesigner.base"
 msgstr "Base"
 
-msgid "recordFields.base"
-msgstr "Base"
-
 msgid "powderCompare.base"
 msgstr "Base"
 
 msgid "powders.column.base"
+msgstr "Base"
+
+msgid "recordFields.base"
 msgstr "Base"
 
 msgid "bulletDesigner.baseDiameter"
@@ -706,13 +724,13 @@ msgstr "Base to ogive"
 msgid "bulletPhoto.axisHelp"
 msgstr "Base to tip, y down. Typing a direction fixes the axis."
 
+msgid "bulletDesigner.baseType"
+msgstr "Base type"
+
 msgid "bullets.facet.base"
 msgstr "Base type"
 
 msgid "recordFields.baseType"
-msgstr "Base type"
-
-msgid "bulletDesigner.baseType"
 msgstr "Base type"
 
 msgid "cartridgeRecord.note.basic"
@@ -805,10 +823,10 @@ msgstr "Bore resistance"
 msgid "values.boronNitride"
 msgstr "boron nitride"
 
-msgid "values.brass"
+msgid "page.cases"
 msgstr "Brass"
 
-msgid "page.cases"
+msgid "values.brass"
 msgstr "Brass"
 
 msgid "states.unavailable.case"
@@ -913,10 +931,10 @@ msgstr "Burn form, two-stage"
 msgid "powderDesigner.burnLawInteriorModel"
 msgstr "Burn law (interior model)"
 
-msgid "recordFields.burnRate"
+msgid "powderRecord.burnRateTable"
 msgstr "Burn rate"
 
-msgid "powderRecord.burnRateTable"
+msgid "recordFields.burnRate"
 msgstr "Burn rate"
 
 msgid "powderRecord.burnRate"
@@ -961,10 +979,10 @@ msgstr "Caliber class"
 msgid "holeDetection.caliberClass"
 msgstr "Caliber class"
 
-msgid "disciplines.row.caliberClasses"
+msgid "disciplines.column.classes"
 msgstr "Caliber classes"
 
-msgid "disciplines.column.classes"
+msgid "disciplines.row.caliberClasses"
 msgstr "Caliber classes"
 
 msgid "disciplines.row.caliberClassBasis"
@@ -991,10 +1009,10 @@ msgstr "Camera"
 msgid "events.cancel"
 msgstr "Cancel"
 
-msgid "powderCompare.cancel"
+msgid "log.cancel"
 msgstr "Cancel"
 
-msgid "log.cancel"
+msgid "powderCompare.cancel"
 msgstr "Cancel"
 
 msgid "holeDetection.cancelPercent"
@@ -1030,11 +1048,20 @@ msgstr "Cartridge"
 msgid "cartridgeRecord.sideMeaning.cartridge"
 msgstr "cartridge {meaning}"
 
+msgid "cartridgeDesigner.cartridgeSymbol"
+msgstr "Cartridge {symbol}"
+
 msgid "cartridgeRecord.sideSymbol.cartridge"
 msgstr "Cartridge {symbol}"
 
+msgid "cartridgeDesigner.cartridgeBodyTaper"
+msgstr "Cartridge body taper"
+
 msgid "states.unavailable.cartridge"
 msgstr "Cartridge data is unavailable right now."
+
+msgid "cartridgeDesigner.cartridgeDesign"
+msgstr "Cartridge design"
 
 msgid "page.cartridgesDesigner"
 msgstr "Cartridge designer"
@@ -1057,11 +1084,20 @@ msgstr "Cartridge list"
 msgid "cartridges.column.caseLengthHelp"
 msgstr "Cartridge maximum of the CIP sheet, shortest variant."
 
+msgid "cartridgeDesigner.cartridgeNeckLength"
+msgstr "Cartridge neck length"
+
 msgid "logSummary.cartridgeUnknown"
 msgstr "Cartridge not known"
 
+msgid "cartridgeDesigner.cartridgeShoulderAngle"
+msgstr "Cartridge shoulder angle"
+
 msgid "cartridges.column.maxBulletDiameterHelp"
 msgstr "Cartridge value of the CIP sheet, smallest variant."
+
+msgid "cartridgeDesigner.cartridgeUnit"
+msgstr "Cartridge, {unit}"
 
 msgid "cartridgeRecord.sideNotes.cartridge"
 msgstr "Cartridge: {notes}"
@@ -1072,10 +1108,10 @@ msgstr "Cartridge: derived, not dimensioned"
 msgid "bulletRecord.cartridges"
 msgstr "Cartridges"
 
-msgid "powderRecord.cartridges"
+msgid "page.cartridges"
 msgstr "Cartridges"
 
-msgid "page.cartridges"
+msgid "powderRecord.cartridges"
 msgstr "Cartridges"
 
 msgid "cartridges.filtered"
@@ -1099,6 +1135,9 @@ msgstr "Case length L3"
 msgid "cartridges.column.type"
 msgstr "Case type"
 
+msgid "cartridgeDesigner.caseVolumeApproximate"
+msgstr "Case volume (approximate)"
+
 msgid "values.caseContact"
 msgstr "case-contact"
 
@@ -1108,13 +1147,13 @@ msgstr "Case: the case type, derived from the record"
 msgid "values.cast"
 msgstr "cast"
 
+msgid "disciplines.column.category"
+msgstr "Category"
+
 msgid "disciplines.facet.category"
 msgstr "Category"
 
 msgid "disciplines.strip.category"
-msgstr "Category"
-
-msgid "disciplines.column.category"
 msgstr "Category"
 
 msgid "federationRecord.column.category"
@@ -1144,8 +1183,14 @@ msgstr "Chamber"
 msgid "cartridgeRecord.sideMeaning.chamber"
 msgstr "chamber {meaning}"
 
+msgid "cartridgeDesigner.chamberSymbol"
+msgstr "Chamber {symbol}"
+
 msgid "cartridgeRecord.sideSymbol.chamber"
 msgstr "Chamber {symbol}"
+
+msgid "cartridgeDesigner.chamberBodyTaper"
+msgstr "Chamber body taper"
 
 msgid "cartridgeRecord.dimensions.chamber"
 msgstr "Chamber dimensions"
@@ -1158,6 +1203,15 @@ msgstr "Chamber length unit"
 
 msgid "cartridgeRecord.clearanceMeaning"
 msgstr "chamber minimum minus cartridge maximum"
+
+msgid "cartridgeDesigner.chamberNeckLength"
+msgstr "Chamber neck length"
+
+msgid "cartridgeDesigner.chamberShoulderAngle"
+msgstr "Chamber shoulder angle"
+
+msgid "cartridgeDesigner.chamberUnit"
+msgstr "Chamber, {unit}"
 
 msgid "cartridgeRecord.sideNotes.chamber"
 msgstr "Chamber: {notes}"
@@ -1177,11 +1231,20 @@ msgstr "Change the scale"
 msgid "holeDetection.changeTarget"
 msgstr "Change the target"
 
+msgid "cartridgeDesigner.changedValuesDrawnEntered"
+msgstr "Changed values are drawn as entered, without the record's tolerances."
+
 msgid "bulletDesigner.changedCatalog"
 msgstr "Changed; catalog {value}"
 
 msgid "bulletDesigner.changedCatalogValueNotGiven"
 msgstr "Changed; catalog value not given"
+
+msgid "cartridgeDesigner.changedRecord"
+msgstr "Changed; record {value}"
+
+msgid "cartridgeDesigner.changedRecordValueNotPrinted"
+msgstr "Changed; record value not printed"
 
 msgid "powderCompare.charge"
 msgstr "Charge"
@@ -1267,6 +1330,9 @@ msgstr "Clearance {value}"
 msgid "cartridgeRecord.clearanceLine"
 msgstr "Clearance: {meaning}"
 
+msgid "cartridgeDesigner.clearedRecord"
+msgstr "Cleared; record {value}"
+
 msgid "targetEditor.clickHoleAddShot"
 msgstr "Click a hole to add a shot to the active group."
 
@@ -1348,16 +1414,16 @@ msgstr "Compare bullets"
 msgid "bulletCompare.compareOthers"
 msgstr "Compare the others"
 
-msgid "log.competitionEvent"
-msgstr "Competition event"
-
 msgid "log.column.event"
 msgstr "Competition event"
 
-msgid "page.events"
-msgstr "Competition events"
+msgid "log.competitionEvent"
+msgstr "Competition event"
 
 msgid "events.title"
+msgstr "Competition events"
+
+msgid "page.events"
 msgstr "Competition events"
 
 msgid "logSummary.competitions"
@@ -1405,10 +1471,10 @@ msgstr "Computing powders."
 msgid "firearms.column.configuration"
 msgstr "Configuration"
 
-msgid "log.confirmedBy"
+msgid "log.column.confirmed"
 msgstr "Confirmed by"
 
-msgid "log.column.confirmed"
+msgid "log.confirmedBy"
 msgstr "Confirmed by"
 
 msgid "log.confirmedOn"
@@ -1468,9 +1534,6 @@ msgstr "Core hardness (HBW)"
 msgid "units.quantity.correction"
 msgstr "Corrections"
 
-msgid "federations.facet.country"
-msgstr "Country"
-
 msgid "cartridgeRecord.country"
 msgstr "Country"
 
@@ -1478,6 +1541,9 @@ msgid "disciplines.column.country"
 msgstr "Country"
 
 msgid "federationRecord.country"
+msgstr "Country"
+
+msgid "federations.facet.country"
 msgstr "Country"
 
 msgid "fieldStrip.country"
@@ -1561,16 +1627,16 @@ msgstr "Dashed: drawn from an assumed shape. Derived and assumed values are not 
 msgid "cartridgeRecord.conflict"
 msgstr "data conflict between published cartridge maximum and chamber minimum (check source)"
 
-msgid "events.date"
-msgstr "Date"
-
 msgid "events.column.date"
 msgstr "Date"
 
-msgid "log.date"
+msgid "events.date"
 msgstr "Date"
 
 msgid "log.column.date"
+msgstr "Date"
+
+msgid "log.date"
 msgstr "Date"
 
 msgid "sessionSummary.date"
@@ -1639,6 +1705,12 @@ msgstr "Derived"
 msgid "bulletDesigner.derivedAssumedNotDimensioned"
 msgstr "Derived and assumed values are not dimensioned."
 
+msgid "cartridgeDesigner.derivedDrawing"
+msgstr "Derived by the drawing: {value}"
+
+msgid "cartridgeDesigner.derivedDesign"
+msgstr "Derived from the design"
+
 msgid "disciplines.classBasis.derived"
 msgstr "Derived from the range or gauge the rule book states"
 
@@ -1647,6 +1719,9 @@ msgstr "Derived, not dimensioned"
 
 msgid "bulletDesigner.derived"
 msgstr "Derived: {value}"
+
+msgid "cartridgeDesigner.designFrom"
+msgstr "design from {name}"
 
 msgid "holeDetection.detect"
 msgstr "Detect"
@@ -1672,10 +1747,10 @@ msgstr "Device: {device}"
 msgid "bulletDesigner.diameter"
 msgstr "Diameter"
 
-msgid "recordFields.diameter"
+msgid "bullets.column.diameter"
 msgstr "Diameter"
 
-msgid "bullets.column.diameter"
+msgid "recordFields.diameter"
 msgstr "Diameter"
 
 msgid "cartridgeRecord.meaning.diameterAtL"
@@ -1693,13 +1768,10 @@ msgstr "Diameter, caliper (optional)"
 msgid "bulletCompare.difference"
 msgstr "difference to the first bullet"
 
-msgid "targets.facet.discipline"
+msgid "disciplineRecord.data"
 msgstr "Discipline"
 
 msgid "events.discipline"
-msgstr "Discipline"
-
-msgid "disciplineRecord.data"
 msgstr "Discipline"
 
 msgid "faceRecord.column.discipline"
@@ -1708,10 +1780,13 @@ msgstr "Discipline"
 msgid "federationRecord.column.discipline"
 msgstr "Discipline"
 
+msgid "log.column.discipline"
+msgstr "Discipline"
+
 msgid "log.discipline"
 msgstr "Discipline"
 
-msgid "log.column.discipline"
+msgid "targets.facet.discipline"
 msgstr "Discipline"
 
 msgid "states.unavailable.discipline"
@@ -1723,10 +1798,10 @@ msgstr "Disciplines"
 msgid "federationRecord.column.disciplines"
 msgstr "Disciplines"
 
-msgid "targets.column.disciplines"
+msgid "page.disciplines"
 msgstr "Disciplines"
 
-msgid "page.disciplines"
+msgid "targets.column.disciplines"
 msgstr "Disciplines"
 
 msgid "federationRecord.disciplines"
@@ -1747,19 +1822,13 @@ msgstr "Display only; the file is unchanged."
 msgid "events.disqualifiedNoTotal"
 msgstr "Disqualified: no total."
 
+msgid "disciplines.column.distance"
+msgstr "Distance"
+
 msgid "disciplines.facet.dist"
 msgstr "Distance"
 
 msgid "disciplines.strip.distance"
-msgstr "Distance"
-
-msgid "targets.facet.dist"
-msgstr "Distance"
-
-msgid "targets.row.distance"
-msgstr "Distance"
-
-msgid "disciplines.column.distance"
 msgstr "Distance"
 
 msgid "faceRecord.column.distance"
@@ -1769,6 +1838,12 @@ msgid "federationRecord.column.distance"
 msgstr "Distance"
 
 msgid "targets.column.distance"
+msgstr "Distance"
+
+msgid "targets.facet.dist"
+msgstr "Distance"
+
+msgid "targets.row.distance"
 msgstr "Distance"
 
 msgid "bulletPhoto.distanceAB"
@@ -1795,10 +1870,19 @@ msgstr "Drawing"
 msgid "bulletRecord.drawing"
 msgstr "Drawing"
 
+msgid "cartridgeDesigner.drawing"
+msgstr "Drawing"
+
 msgid "bulletDesigner.drawingEarlierInputsFix"
 msgstr "Drawing for earlier inputs. Fix {field}: {reason}"
 
+msgid "cartridgeDesigner.drawingEarlierInputsFix"
+msgstr "Drawing for earlier inputs. Fix {label}: {reason}"
+
 msgid "bulletDesigner.drawingNotUpdated"
+msgstr "Drawing not updated: {reason}"
+
+msgid "cartridgeDesigner.drawingNotUpdated"
 msgstr "Drawing not updated: {reason}"
 
 msgid "recordActions.drawingNotes"
@@ -1813,8 +1897,17 @@ msgstr "Drawing opacity"
 msgid "bulletPhoto.drawingOpacityValue"
 msgstr "Drawing over the photograph, {percent, decimal} %"
 
+msgid "cartridgeDesigner.drawingRulesCipTable"
+msgstr "Drawing rules of CIP table"
+
 msgid "bulletDesigner.drawingUpdated"
 msgstr "Drawing updated."
+
+msgid "cartridgeDesigner.drawingUpdated"
+msgstr "Drawing updated."
+
+msgid "cartridgeDesigner.drawingUpdatedDerived"
+msgstr "Drawing updated. {derived}."
 
 msgid "bulletCompare.drawings"
 msgstr "Drawings"
@@ -1909,6 +2002,9 @@ msgstr "Enter a target above 0{unit}."
 msgid "chargeTarget.enterTargetAtMost"
 msgstr "Enter a target of at most {max}{unit}."
 
+msgid "cartridgeDesigner.enterLeastToDraw"
+msgstr "Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw."
+
 msgid "log.enterDate"
 msgstr "Enter the date."
 
@@ -1927,16 +2023,19 @@ msgstr "Enter who confirmed the entry, or clear the day of the confirmation."
 msgid "bulletDesigner.entered"
 msgstr "Entered"
 
+msgid "cartridgeDesigner.entered"
+msgstr "Entered"
+
 msgid "sourceLink.entry.range"
 msgstr "Entered at the range"
 
 msgid "sourceLink.entry.targetDesigner"
 msgstr "Entered in the target designer"
 
-msgid "logSummary.entries"
+msgid "log.entries"
 msgstr "Entries"
 
-msgid "log.entries"
+msgid "logSummary.entries"
 msgstr "Entries"
 
 msgid "states.error"
@@ -1972,10 +2071,10 @@ msgstr "Event total: add a series."
 msgid "events.totalFromResult"
 msgstr "Event total: enter the stage points from the official result."
 
-msgid "events.eventType"
+msgid "events.column.type"
 msgstr "Event type"
 
-msgid "events.column.type"
+msgid "events.eventType"
 msgstr "Event type"
 
 msgid "states.unavailable.eventType"
@@ -2027,19 +2126,19 @@ msgstr "Export CSV"
 msgid "firearms.exportCsv"
 msgstr "Export CSV"
 
-msgid "sessionSummary.exportCsv"
+msgid "log.exportCsv"
 msgstr "Export CSV"
 
-msgid "log.exportCsv"
+msgid "sessionSummary.exportCsv"
 msgstr "Export CSV"
 
 msgid "events.exportJson"
 msgstr "Export JSON"
 
-msgid "sessionSummary.exportJson"
+msgid "log.exportJson"
 msgstr "Export JSON"
 
-msgid "log.exportJson"
+msgid "sessionSummary.exportJson"
 msgstr "Export JSON"
 
 msgid "logSummary.exportSummaryCsv"
@@ -2063,22 +2162,16 @@ msgstr "Factory ammunition"
 msgid "powderRecord.faster"
 msgstr "Faster ({unit})"
 
-msgid "disciplines.facet.org"
-msgstr "Federation"
-
-msgid "disciplines.strip.federation"
-msgstr "Federation"
-
-msgid "targets.facet.org"
-msgstr "Federation"
-
-msgid "targets.row.federation"
+msgid "disciplineRecord.federation"
 msgstr "Federation"
 
 msgid "disciplines.column.federation"
 msgstr "Federation"
 
-msgid "disciplineRecord.federation"
+msgid "disciplines.facet.org"
+msgstr "Federation"
+
+msgid "disciplines.strip.federation"
 msgstr "Federation"
 
 msgid "faceRecord.column.federation"
@@ -2088,6 +2181,12 @@ msgid "federationRecord.data"
 msgstr "Federation"
 
 msgid "targets.column.organization"
+msgstr "Federation"
+
+msgid "targets.facet.org"
+msgstr "Federation"
+
+msgid "targets.row.federation"
 msgstr "Federation"
 
 msgid "states.unavailable.federation"
@@ -2138,10 +2237,10 @@ msgstr "Firearm"
 msgid "events.firearm"
 msgstr "Firearm"
 
-msgid "log.firearm"
+msgid "log.column.firearm"
 msgstr "Firearm"
 
-msgid "log.column.firearm"
+msgid "log.firearm"
 msgstr "Firearm"
 
 msgid "log.filterFirearm"
@@ -2201,6 +2300,9 @@ msgstr "Fitted: plus and minus {k, decimal} standard uncertainties, a lower boun
 msgid "bullets.fitting"
 msgstr "fitting {name}"
 
+msgid "cartridgeDesigner.fix"
+msgstr "Fix {label}: {reason}"
+
 msgid "recordFields.fixedInputsFilter"
 msgstr "Fixed inputs"
 
@@ -2213,10 +2315,10 @@ msgstr "Flags"
 msgid "values.flake"
 msgstr "flake"
 
-msgid "recordFields.flameTemperature"
+msgid "powderDesigner.flameTemperature"
 msgstr "Flame temperature"
 
-msgid "powderDesigner.flameTemperature"
+msgid "recordFields.flameTemperature"
 msgstr "Flame temperature"
 
 msgid "powderDesigner.flameTemperatureMax"
@@ -2243,13 +2345,13 @@ msgstr "Flip nose"
 msgid "bulletPhoto.needScale"
 msgstr "For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length."
 
-msgid "recordFields.form"
-msgstr "Form"
-
 msgid "powderCompare.form"
 msgstr "Form"
 
 msgid "powders.column.form"
+msgstr "Form"
+
+msgid "recordFields.form"
 msgstr "Form"
 
 msgid "powderDesigner.formA"
@@ -2296,6 +2398,9 @@ msgstr "From the catalog record"
 
 msgid "events.stagePointsHint"
 msgstr "From the official result, where published."
+
+msgid "cartridgeDesigner.fromRecord"
+msgstr "From the record"
 
 msgid "powderDesigner.frozenRatioSpecificHeats"
 msgstr "Frozen ratio of specific heats at the flame temperature."
@@ -2501,10 +2606,10 @@ msgstr "Ignition pressure"
 msgid "recordFields.ignitionPressure"
 msgstr "Ignition pressure"
 
-msgid "recordFields.impetus"
+msgid "powderDesigner.impetus"
 msgstr "Impetus"
 
-msgid "powderDesigner.impetus"
+msgid "recordFields.impetus"
 msgstr "Impetus"
 
 msgid "powderDesigner.impetusMax"
@@ -2543,6 +2648,12 @@ msgstr "In this browser"
 msgid "bulletDesigner.includeDesign"
 msgstr "Include the design"
 
+msgid "cartridgeDesigner.includeDesign"
+msgstr "Include the design"
+
+msgid "cartridgeDesigner.includedAngleP1Drawn"
+msgstr "included angle from P1 at its drawn station to P2 at L1"
+
 msgid "cartridgeRecord.meaning.forcingConeAngle"
 msgstr "included angle of the forcing cone"
 
@@ -2551,6 +2662,9 @@ msgstr "included angle of the h cone"
 
 msgid "cartridgeRecord.meaning.shoulderAngle"
 msgstr "included shoulder angle"
+
+msgid "cartridgeDesigner.included2AtanP2"
+msgstr "included, 2 atan((P2 - H1) / 2 / (L2 - L1))"
 
 msgid "powderDesigner.ingredient"
 msgstr "Ingredient"
@@ -2699,10 +2813,10 @@ msgstr "left"
 msgid "bulletDesigner.length"
 msgstr "Length"
 
-msgid "recordFields.length"
+msgid "bullets.column.length"
 msgstr "Length"
 
-msgid "bullets.column.length"
+msgid "recordFields.length"
 msgstr "Length"
 
 msgid "cartridgeRecord.meaning.throatConeLength"
@@ -2717,10 +2831,10 @@ msgstr "Length unit of the page: drawings and table"
 msgid "units.quantity.length"
 msgstr "Lengths"
 
-msgid "events.level"
+msgid "events.column.level"
 msgstr "Level"
 
-msgid "events.column.level"
+msgid "events.level"
 msgstr "Level"
 
 msgid "disciplines.rule.leverAction"
@@ -2762,10 +2876,10 @@ msgstr "Load a photo first."
 msgid "sessionSummary.loadExample"
 msgstr "Load example"
 
-msgid "log.loadAmmunition"
+msgid "log.column.ammunition"
 msgstr "Load or ammunition"
 
-msgid "log.column.ammunition"
+msgid "log.loadAmmunition"
 msgstr "Load or ammunition"
 
 msgid "chargeTarget.loadRatio"
@@ -2906,10 +3020,10 @@ msgstr "low right"
 msgid "disciplines.row.maxMagnification"
 msgstr "Magnification up to"
 
-msgid "recordFields.magnum"
+msgid "primers.column.magnum"
 msgstr "Magnum"
 
-msgid "primers.column.magnum"
+msgid "recordFields.magnum"
 msgstr "Magnum"
 
 msgid "events.major"
@@ -2923,9 +3037,6 @@ msgstr "Making the sample photograph…"
 
 msgid "recordSources.origin.manufacturer"
 msgstr "manufacturer"
-
-msgid "recordFields.manufacturer"
-msgstr "Manufacturer"
 
 msgid "bulletDesigner.manufacturer"
 msgstr "Manufacturer"
@@ -2943,6 +3054,9 @@ msgid "powders.column.manufacturer"
 msgstr "Manufacturer"
 
 msgid "primers.column.manufacturer"
+msgstr "Manufacturer"
+
+msgid "recordFields.manufacturer"
 msgstr "Manufacturer"
 
 msgid "powders.search"
@@ -2981,13 +3095,13 @@ msgstr "marker"
 msgid "bulletDesigner.mass"
 msgstr "Mass"
 
-msgid "recordFields.mass"
-msgstr "Mass"
-
 msgid "bullets.column.mass"
 msgstr "Mass"
 
 msgid "cases.column.mass"
+msgstr "Mass"
+
+msgid "recordFields.mass"
 msgstr "Mass"
 
 msgid "powderDesigner.massPerVolumeLoose"
@@ -3005,10 +3119,10 @@ msgstr "Mass, diameter and length"
 msgid "lists.matching"
 msgstr "matching \"{query}\""
 
-msgid "recordFields.material"
+msgid "cases.column.material"
 msgstr "Material"
 
-msgid "cases.column.material"
+msgid "recordFields.material"
 msgstr "Material"
 
 msgid "powderDesigner.max"
@@ -3131,10 +3245,10 @@ msgstr "Model output from fitted M3 parameters, not manufacturer data."
 msgid "powderRecord.modelParameters"
 msgstr "Model parameters"
 
-msgid "recordFields.molarMass"
+msgid "powderDesigner.molarMass"
 msgstr "Molar mass"
 
-msgid "powderDesigner.molarMass"
+msgid "recordFields.molarMass"
 msgstr "Molar mass"
 
 msgid "powderDesigner.molarMassMax"
@@ -3203,25 +3317,31 @@ msgstr "Name"
 msgid "bullets.column.name"
 msgstr "Name"
 
+msgid "cartridgeDesigner.name"
+msgstr "Name"
+
 msgid "cartridges.column.name"
 msgstr "Name"
 
 msgid "cases.column.name"
 msgstr "Name"
 
-msgid "events.name"
+msgid "disciplines.column.name"
 msgstr "Name"
 
 msgid "events.column.name"
 msgstr "Name"
 
-msgid "disciplines.column.name"
+msgid "events.name"
 msgstr "Name"
 
 msgid "fieldTable.searchName"
 msgstr "Name"
 
 msgid "firearms.column.name"
+msgstr "Name"
+
+msgid "logSummary.name"
 msgstr "Name"
 
 msgid "powderDesigner.name"
@@ -3231,9 +3351,6 @@ msgid "powders.column.name"
 msgstr "Name"
 
 msgid "primers.column.name"
-msgstr "Name"
-
-msgid "logSummary.name"
 msgstr "Name"
 
 msgid "targets.column.name"
@@ -3281,6 +3398,12 @@ msgstr "New bullet"
 msgid "bullets.new"
 msgstr "New bullet"
 
+msgid "cartridgeDesigner.newCartridgeName"
+msgstr "new cartridge"
+
+msgid "cartridgeDesigner.newCartridge"
+msgstr "New cartridge"
+
 msgid "cartridges.new"
 msgstr "New cartridge"
 
@@ -3314,13 +3437,13 @@ msgstr "Nickel plated brass"
 msgid "values.no"
 msgstr "no"
 
-msgid "values.noTitle"
+msgid "primers.no"
 msgstr "No"
 
 msgid "targets.no"
 msgstr "No"
 
-msgid "primers.no"
+msgid "values.noTitle"
 msgstr "No"
 
 msgid "cases.noneOwn"
@@ -3349,6 +3472,9 @@ msgstr "No bullets match these filters."
 
 msgid "holeDetection.noCanvas"
 msgstr "No canvas to read the photo."
+
+msgid "cartridgeDesigner.noCartridgeFound"
+msgstr "No cartridge found"
 
 msgid "bulletRecord.noCartridge"
 msgstr "No cartridge matches {query}."
@@ -3382,6 +3508,9 @@ msgstr "No disciplines match these filters."
 
 msgid "bulletDrawing.none"
 msgstr "No drawing for this record."
+
+msgid "cartridgeDesigner.noDrawingYet"
+msgstr "No drawing yet"
 
 msgid "bulletCompare.noDrawing"
 msgstr "No drawing: {reason}"
@@ -3506,13 +3635,13 @@ msgstr "none"
 msgid "powderCompare.none"
 msgstr "none"
 
-msgid "powderRecord.none"
-msgstr "None"
-
 msgid "events.none"
 msgstr "None"
 
 msgid "log.none"
+msgstr "None"
+
+msgid "powderRecord.none"
 msgstr "None"
 
 msgid "targetEditor.none"
@@ -3554,6 +3683,15 @@ msgstr "not given"
 msgid "bulletDesigner.notGiven"
 msgstr "Not given"
 
+msgid "cartridgeDesigner.notGiven"
+msgstr "Not given"
+
+msgid "cartridgeDesigner.notGivenCartridgeDrawing"
+msgstr "Not given: a drawing of the cartridge, which the seating needs."
+
+msgid "cartridgeDesigner.notGivenCartridgeL3"
+msgstr "Not given: the cartridge L3, which the seating needs."
+
 msgid "events.notImported"
 msgstr "Not imported: {reason}"
 
@@ -3571,6 +3709,9 @@ msgstr "Not in this browser"
 
 msgid "log.notInBrowser"
 msgstr "Not in this browser"
+
+msgid "cartridgeDesigner.notPrintedRecord"
+msgstr "Not printed in the record"
 
 msgid "targetEditor.notRestoredStoreRefused"
 msgstr "Not restored: the browser store refused."
@@ -3590,13 +3731,13 @@ msgstr "Not saved: the browser store could not be read. {reason}"
 msgid "targetEditor.notSavedStoreRefused"
 msgstr "Not saved: the browser store refused the sheet. {reason} Free browser storage or allow site storage for this page, then edit the sheet again."
 
-msgid "targets.notStated"
-msgstr "Not stated"
-
 msgid "matchRounds.notStated"
 msgstr "Not stated"
 
 msgid "powderDesigner.notStated"
+msgstr "Not stated"
+
+msgid "targets.notStated"
 msgstr "Not stated"
 
 msgid "fieldTable.column.note"
@@ -3629,10 +3770,10 @@ msgstr "Notes"
 msgid "holeDetection.nowCorners"
 msgstr "Now {count, decimal} corners."
 
-msgid "disciplines.row.number"
+msgid "disciplines.column.number"
 msgstr "Number"
 
-msgid "disciplines.column.number"
+msgid "disciplines.row.number"
 msgstr "Number"
 
 msgid "faceRecord.column.number"
@@ -3764,10 +3905,10 @@ msgstr "other"
 msgid "cartridgeRecord.group.other"
 msgstr "Other"
 
-msgid "targets.row.outerDiameter"
+msgid "targets.column.outer"
 msgstr "Outer diameter"
 
-msgid "targets.column.outer"
+msgid "targets.row.outerDiameter"
 msgstr "Outer diameter"
 
 msgid "targets.strip.outerDiameterWidth"
@@ -3780,6 +3921,9 @@ msgid "bulletDesigner.outline"
 msgstr "Outline, {name}"
 
 msgid "bulletDrawing.outline"
+msgstr "Outline, {name}"
+
+msgid "cartridgeDesigner.outline"
 msgstr "Outline, {name}"
 
 msgid "recordFields.computedRange"
@@ -3813,6 +3957,9 @@ msgid "bulletPhoto.brushHelp"
 msgstr "Paint over the picture to add to the bullet or erase from it. Keys: arrows move the cursor, Enter paints."
 
 msgid "bulletDesigner.parameters"
+msgstr "Parameters"
+
+msgid "cartridgeDesigner.parameters"
 msgstr "Parameters"
 
 msgid "powderDesigner.parameters"
@@ -3887,10 +4034,10 @@ msgstr "Pistol"
 msgid "events.place"
 msgstr "Place"
 
-msgid "log.place"
+msgid "log.column.place"
 msgstr "Place"
 
-msgid "log.column.place"
+msgid "log.place"
 msgstr "Place"
 
 msgid "holeDetection.placeHand"
@@ -4100,10 +4247,10 @@ msgstr "Procedurals"
 msgid "bulletRecord.product"
 msgstr "Product {number}"
 
-msgid "recordFields.productNumber"
+msgid "primers.column.number"
 msgstr "Product number"
 
-msgid "primers.column.number"
+msgid "recordFields.productNumber"
 msgstr "Product number"
 
 msgid "disciplines.rule.prone"
@@ -4208,6 +4355,9 @@ msgstr "Read {strings}, {shots}."
 msgid "bulletDesigner.readOnly"
 msgstr "Read only: {reason}"
 
+msgid "cartridgeDesigner.readOnly"
+msgstr "Read only: {reason}"
+
 msgid "powderCompare.readTargetPercentageCartridge"
 msgstr "Read the target as a percentage of the cartridge's CIP Pmax"
 
@@ -4277,10 +4427,10 @@ msgstr "Remove {label}"
 msgid "bulletCompare.remove"
 msgstr "Remove {name}"
 
-msgid "events.removeStage"
+msgid "directoryTable.removeScope"
 msgstr "Remove {name}"
 
-msgid "directoryTable.removeScope"
+msgid "events.removeStage"
 msgstr "Remove {name}"
 
 msgid "powderDesigner.removeIngredient"
@@ -4337,22 +4487,25 @@ msgstr "Reset to preset"
 msgid "bulletDesigner.resetRecord"
 msgstr "Reset to record"
 
+msgid "cartridgeDesigner.resetRecord"
+msgstr "Reset to record"
+
 msgid "disciplines.rule.rest"
 msgstr "rest"
-
-msgid "events.result"
-msgstr "Result"
 
 msgid "events.column.state"
 msgstr "Result"
 
-msgid "powderCompare.result"
+msgid "events.result"
+msgstr "Result"
+
+msgid "log.column.result"
 msgstr "Result"
 
 msgid "log.result"
 msgstr "Result"
 
-msgid "log.column.result"
+msgid "powderCompare.result"
 msgstr "Result"
 
 msgid "workspace.results"
@@ -4460,16 +4613,16 @@ msgstr "Ring, center and edge"
 msgid "targetEditor.ringThreePoints"
 msgstr "Ring, three points"
 
-msgid "targets.facet.rings"
-msgstr "Rings"
-
-msgid "targets.row.rings"
-msgstr "Rings"
-
 msgid "faceRecord.rings"
 msgstr "Rings"
 
 msgid "targets.column.rings"
+msgstr "Rings"
+
+msgid "targets.facet.rings"
+msgstr "Rings"
+
+msgid "targets.row.rings"
 msgstr "Rings"
 
 msgid "holeDetection.rotate"
@@ -4487,13 +4640,13 @@ msgstr "round-nose"
 msgid "values.roundedHollowBase"
 msgstr "rounded-hollow-base"
 
-msgid "logSummary.rounds"
+msgid "log.column.rounds"
 msgstr "Rounds"
 
 msgid "log.rounds"
 msgstr "Rounds"
 
-msgid "log.column.rounds"
+msgid "logSummary.rounds"
 msgstr "Rounds"
 
 msgid "events.roundsFired"
@@ -4618,6 +4771,9 @@ msgstr "Search"
 
 msgid "fieldTable.search"
 msgstr "Search {title}"
+
+msgid "cartridgeDesigner.seatBullet"
+msgstr "Seat a bullet"
 
 msgid "values.secant"
 msgstr "secant"
@@ -4745,10 +4901,10 @@ msgstr "Shotgun powders: the maker states shotgun use only, and the app computes
 msgid "powderCompare.shotgunOnlyPowdersLeft"
 msgstr "Shotgun-only powders left out: {shotgun, decimal}"
 
-msgid "events.shots"
+msgid "disciplineRecord.column.shots"
 msgstr "Shots"
 
-msgid "disciplineRecord.column.shots"
+msgid "events.shots"
 msgstr "Shots"
 
 msgid "faceRecord.column.shots"
@@ -4783,6 +4939,9 @@ msgstr "Shots per series"
 
 msgid "values.shotshell"
 msgstr "Shotshell"
+
+msgid "cartridgeDesigner.shotshellDimensionsCipTable"
+msgstr "Shotshell dimensions (CIP table VII) are read only; the drawing shows the record."
 
 msgid "cartridgeRecord.group.shoulder"
 msgstr "Shoulder"
@@ -4826,10 +4985,10 @@ msgstr "sitting"
 msgid "holeDetection.size"
 msgstr "size"
 
-msgid "recordFields.size"
+msgid "primers.column.size"
 msgstr "Size"
 
-msgid "primers.column.size"
+msgid "recordFields.size"
 msgstr "Size"
 
 msgid "disciplines.rule.sling"
@@ -4922,6 +5081,9 @@ msgstr "standing"
 msgid "bulletDesigner.startFromRecord"
 msgstr "Start from a record"
 
+msgid "cartridgeDesigner.startFromRecord"
+msgstr "Start from a record"
+
 msgid "powderDesigner.startPressure"
 msgstr "Start pressure"
 
@@ -4929,6 +5091,9 @@ msgid "recordFields.startPressure"
 msgstr "Start pressure"
 
 msgid "bulletDesigner.startedFrom"
+msgstr "Started from {name}."
+
+msgid "cartridgeDesigner.startedFrom"
 msgstr "Started from {name}."
 
 msgid "targetEditor.statisticsTitle"
@@ -5012,6 +5177,9 @@ msgstr "swaged"
 msgid "bulletCompare.symbol"
 msgstr "Symbol"
 
+msgid "cartridgeDesigner.symbol"
+msgstr "Symbol"
+
 msgid "cartridgeRecord.symbol"
 msgstr "Symbol"
 
@@ -5027,19 +5195,25 @@ msgstr "Symbols: {symbols}."
 msgid "cartridgeRecord.table"
 msgstr "Table"
 
+msgid "cartridgeDesigner.table"
+msgstr "Table {table}"
+
+msgid "cartridgeDesigner.tableIiiDrawsBelt"
+msgstr "Table III draws a belt; the other tables draw the same outline."
+
 msgid "cartridgeRecord.meaning.table"
 msgstr "Table: the CIP table of the record, I to XI, by cartridge class"
 
 msgid "values.tangent"
 msgstr "tangent"
 
+msgid "disciplineRecord.column.target"
+msgstr "Target"
+
 msgid "disciplines.facet.face"
 msgstr "Target"
 
-msgid "targets.group.target"
-msgstr "Target"
-
-msgid "disciplineRecord.column.target"
+msgid "faceRecord.drawing"
 msgstr "Target"
 
 msgid "federationRecord.column.target"
@@ -5048,7 +5222,7 @@ msgstr "Target"
 msgid "holeDetection.target"
 msgstr "Target"
 
-msgid "faceRecord.drawing"
+msgid "targets.group.target"
 msgstr "Target"
 
 msgctxt "charge"
@@ -5128,6 +5302,9 @@ msgstr "Terms: {terms}"
 msgid "bulletDesigner.baseRecordChangedSince"
 msgstr "The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base."
 
+msgid "cartridgeDesigner.baseRecordChangedSince"
+msgstr "The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base."
+
 msgid "photoQuality.lowContrast"
 msgstr "The black area and the paper are close in brightness."
 
@@ -5173,6 +5350,9 @@ msgstr "The cartridge has no CIP limit to compare with."
 msgid "powderCompare.noComparableLimit"
 msgstr "The cartridge has no CIP limit to compare with."
 
+msgid "cartridgeDesigner.cartridgeOutlineLessWall"
+msgstr "the cartridge outline less a wall of {wall} everywhere, from the head end (E, else R) at {head, decimal} mm to the mouth; cartridge maxima, not a measured capacity"
+
 msgid "powders.noneHint"
 msgstr "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
 
@@ -5198,6 +5378,9 @@ msgid "states.dataError"
 msgstr "The data file could not be loaded. Check the connection and retry."
 
 msgid "bulletDesigner.databaseUnreachableDesignerStill"
+msgstr "The database is unreachable. The designer still works."
+
+msgid "cartridgeDesigner.databaseUnreachableDesignerStill"
 msgstr "The database is unreachable. The designer still works."
 
 msgid "bulletPhoto.scalesApart"
@@ -5368,11 +5551,14 @@ msgstr "The targets of this discipline state no shot count."
 msgid "chargeTarget.notMonotone"
 msgstr "The value crosses the target at more than one charge."
 
+msgid "powderDesigner.thermochemistry"
+msgstr "Thermochemistry"
+
 msgid "recordFields.thermochemistry"
 msgstr "Thermochemistry"
 
-msgid "powderDesigner.thermochemistry"
-msgstr "Thermochemistry"
+msgid "cartridgeDesigner.noOutline"
+msgstr "These dimensions do not form an outline."
 
 msgid "targetEditor.pointsGiveNoScale"
 msgstr "These points give no scale: three lie on one line."
@@ -5449,10 +5635,10 @@ msgstr "Tool"
 msgid "targetEditor.tool"
 msgstr "Tool"
 
-msgid "events.totalHeading"
+msgid "events.column.total"
 msgstr "Total"
 
-msgid "events.column.total"
+msgid "events.totalHeading"
 msgstr "Total"
 
 msgid "events.partTotal"
@@ -5494,10 +5680,10 @@ msgstr "Turn left 90 degrees"
 msgid "holeDetection.turnRight90Degrees"
 msgstr "Turn right 90 degrees"
 
-msgid "recordFields.twist"
+msgid "firearms.column.twist"
 msgstr "Twist"
 
-msgid "firearms.column.twist"
+msgid "recordFields.twist"
 msgstr "Twist"
 
 msgid "bullet.millerTwist"
@@ -5506,10 +5692,10 @@ msgstr "Twist for Sg 1.5"
 msgid "cartridgeRecord.meaning.twist"
 msgstr "twist, length per turn"
 
-msgid "recordFields.type"
+msgid "bullets.column.type"
 msgstr "Type"
 
-msgid "bullets.column.type"
+msgid "recordFields.type"
 msgstr "Type"
 
 msgid "holeDetection.typed"
@@ -5677,10 +5863,10 @@ msgstr "wadcutter"
 msgid "states.warning"
 msgstr "Warning"
 
-msgid "recordFields.waterCapacity"
+msgid "cases.column.capacity"
 msgstr "Water capacity"
 
-msgid "cases.column.capacity"
+msgid "recordFields.waterCapacity"
 msgstr "Water capacity"
 
 msgid "cases.column.capacityHelp"
@@ -5725,19 +5911,19 @@ msgstr "Yearly summary of the shooting log, {year}"
 msgid "targets.color.yellow"
 msgstr "yellow"
 
-msgid "values.yes"
-msgstr "yes"
-
 msgid "sessionSummary.yes"
 msgstr "yes"
 
-msgid "values.yesTitle"
+msgid "values.yes"
+msgstr "yes"
+
+msgid "primers.yes"
 msgstr "Yes"
 
 msgid "targets.yes"
 msgstr "Yes"
 
-msgid "primers.yes"
+msgid "values.yesTitle"
 msgstr "Yes"
 
 msgid "log.ownRecord"

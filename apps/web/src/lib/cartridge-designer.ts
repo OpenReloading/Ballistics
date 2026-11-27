@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import { checkSpec } from '@rangefoundry/catalog/plausibility'
 import {
   type CartridgeOverrides,
@@ -18,8 +19,9 @@ import {
   storedValue,
 } from '@rangefoundry/svg-drawings/cartridge'
 import { chamberOf } from '@rangefoundry/svg-drawings/seating'
+import { linguiOf } from '../i18n/lingui.ts'
 import { localizeNumber } from '../i18n/number.ts'
-import { english, msg, type Translator } from '../i18n/translate.ts'
+import { english, type Translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
@@ -400,18 +402,19 @@ export interface Evaluation {
   derived: Derived[]
 }
 
-export const missingHint = msg(
-  'Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw.',
-)
+export const missingHint = /*i18n*/ {
+  id: 'cartridgeDesigner.enterLeastToDraw',
+  message: 'Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw.',
+}
 
 const sideSymbol = {
-  cartridge: msg('Cartridge {symbol}'),
-  chamber: msg('Chamber {symbol}'),
+  cartridge: /*i18n*/ { id: 'cartridgeDesigner.cartridgeSymbol', message: 'Cartridge {symbol}' },
+  chamber: /*i18n*/ { id: 'cartridgeDesigner.chamberSymbol', message: 'Chamber {symbol}' },
 } as const
 
-/** The field's label in the language of `t`: the side and the symbol. */
-export const fieldLabel = (s: CartridgeFieldSpec, t: Translator['t'] = english.t) =>
-  t(sideSymbol[s.side], { symbol: s.symbol })
+/** The field's label in the language of `i18n`: the side and the symbol. */
+export const fieldLabel = (s: CartridgeFieldSpec, i18n: I18n) =>
+  i18n._({ ...sideSymbol[s.side], values: { symbol: s.symbol } })
 
 /** Where each field's value comes from, against the record the design started from. */
 function fieldStates({ fields, origin }: Design): Evaluation['states'] {
@@ -441,14 +444,19 @@ function refuseInvalid(
   system: UnitSystem,
   last: string | undefined,
   t: Translator['t'],
+  i18n: I18n,
 ): Evaluation['refusal'] {
   const tooLarge = (s: CartridgeFieldSpec) => {
     const si = fields[s.key]?.si
     if (s.limit === undefined || si === undefined || si <= s.limit) return
-    return t('{label} must be at most {max} {unit} in the designer.', {
-      label: fieldLabel(s, t),
-      max: localizeNumber(exactFieldText(s.quantity, system, s.limit)),
-      unit: system[s.quantity].symbol,
+    return i18n._({
+      id: 'cartridgeDesigner.atMostInDesigner',
+      message: '{label} must be at most {max} {unit} in the designer.',
+      values: {
+        label: fieldLabel(s, i18n),
+        max: localizeNumber(exactFieldText(s.quantity, system, s.limit)),
+        unit: system[s.quantity].symbol,
+      },
     })
   }
   const invalid = fieldSpecs
@@ -456,7 +464,7 @@ function refuseInvalid(
       (s) =>
         [
           s.key,
-          fieldError({ ...s, label: fieldLabel(s, t) }, fields[s.key], system, t) ?? tooLarge(s),
+          fieldError({ ...s, label: fieldLabel(s, i18n) }, fields[s.key], system, t) ?? tooLarge(s),
         ] as const,
     )
     .filter(([, e]) => e !== undefined)
@@ -469,7 +477,7 @@ function refuseUnlayable(
   spec: DraftSpec,
   { fields }: Design,
   last: string | undefined,
-  t: Translator['t'],
+  i18n: I18n,
 ): { list: Figure[]; shown: Figure[] } | { refusal: NonNullable<Evaluation['refusal']> } {
   let list: Figure[]
   let shown: Figure[]
@@ -497,7 +505,10 @@ function refuseUnlayable(
   } catch {
     return {
       refusal: {
-        reason: t('These dimensions do not form an outline.'),
+        reason: i18n._({
+          id: 'cartridgeDesigner.noOutline',
+          message: 'These dimensions do not form an outline.',
+        }),
         field: last ?? nth(fieldSpecs, 0).key,
       },
     }
@@ -510,7 +521,7 @@ function refuseUnlayable(
     )
     return {
       refusal: {
-        reason: [...missing, t(missingHint)].join(' '),
+        reason: [...missing, i18n._(missingHint)].join(' '),
         field: keys.find((k) => k === last) ?? keys[0] ?? nth(fieldSpecs, 0).key,
       },
     }
@@ -564,6 +575,7 @@ export function evaluate(
   system: UnitSystem,
   last?: string,
   t: Translator['t'] = english.t,
+  i18n: I18n = linguiOf('en'),
 ): Evaluation {
   const states = fieldStates(design)
   const done = (refusal: Evaluation['refusal']): Evaluation => ({
@@ -574,18 +586,18 @@ export function evaluate(
     derived: [],
   })
 
-  const invalid = refuseInvalid(design, system, last, t)
+  const invalid = refuseInvalid(design, system, last, t, i18n)
   if (invalid) return done(invalid)
 
   const spec = draftSpec(design)
-  const laid = refuseUnlayable(spec, design, last, t)
+  const laid = refuseUnlayable(spec, design, last, i18n)
   if ('refusal' in laid) return done(laid.refusal)
   const { list, shown } = laid
 
   const checks = plausibilityChecks(spec)
   const notes = outlineNotes(shown)
   const lead = nth(shown, 0)
-  const derived = design.table === 'VII' ? [] : derive(lead, spec.values, t)
+  const derived = design.table === 'VII' ? [] : derive(lead, spec.values, i18n)
   for (const { side, p } of lead.drawn)
     if (
       side === 'cartridge' &&
@@ -598,19 +610,28 @@ export function evaluate(
 
 const derivedLabels = {
   cartridge: {
-    neck: msg('Cartridge neck length'),
-    shoulder: msg('Cartridge shoulder angle'),
-    taper: msg('Cartridge body taper'),
+    neck: /*i18n*/ {
+      id: 'cartridgeDesigner.cartridgeNeckLength',
+      message: 'Cartridge neck length',
+    },
+    shoulder: /*i18n*/ {
+      id: 'cartridgeDesigner.cartridgeShoulderAngle',
+      message: 'Cartridge shoulder angle',
+    },
+    taper: /*i18n*/ { id: 'cartridgeDesigner.cartridgeBodyTaper', message: 'Cartridge body taper' },
   },
   chamber: {
-    neck: msg('Chamber neck length'),
-    shoulder: msg('Chamber shoulder angle'),
-    taper: msg('Chamber body taper'),
+    neck: /*i18n*/ { id: 'cartridgeDesigner.chamberNeckLength', message: 'Chamber neck length' },
+    shoulder: /*i18n*/ {
+      id: 'cartridgeDesigner.chamberShoulderAngle',
+      message: 'Chamber shoulder angle',
+    },
+    taper: /*i18n*/ { id: 'cartridgeDesigner.chamberBodyTaper', message: 'Chamber body taper' },
   },
 } as const
 
 /** Neck length, shoulder angle and body taper of each drawn side, from stored values (mm, degrees); SI out. */
-function derivedAngles(figure: Figure, values: SpecValue[], t: Translator['t']): Derived[] {
+function derivedAngles(figure: Figure, values: SpecValue[], i18n: I18n): Derived[] {
   const out: Derived[] = []
   for (const { side, p } of figure.drawn) {
     const v = (symbol: string) => storedValue(values, side, symbol)?.value
@@ -619,7 +640,7 @@ function derivedAngles(figure: Figure, values: SpecValue[], t: Translator['t']):
     if (L3 !== undefined && L2 !== undefined && L3 > L2)
       out.push({
         key: `${side}.neck`,
-        label: t(label.neck),
+        label: i18n._(label.neck),
         basis: 'L3 - L2',
         quantity: 'length',
         si: toSi('length', L3 - L2),
@@ -627,8 +648,11 @@ function derivedAngles(figure: Figure, values: SpecValue[], t: Translator['t']):
     if (P2 !== undefined && H1 !== undefined && L1 !== undefined && L2 !== undefined && L2 > L1)
       out.push({
         key: `${side}.shoulder`,
-        label: t(label.shoulder),
-        basis: t('included, 2 atan((P2 - H1) / 2 / (L2 - L1))'),
+        label: i18n._(label.shoulder),
+        basis: i18n._({
+          id: 'cartridgeDesigner.included2AtanP2',
+          message: 'included, 2 atan((P2 - H1) / 2 / (L2 - L1))',
+        }),
         quantity: 'angle',
         si: 2 * Math.atan((P2 - H1) / 2 / (L2 - L1)),
       })
@@ -637,8 +661,11 @@ function derivedAngles(figure: Figure, values: SpecValue[], t: Translator['t']):
     if (P1 !== undefined && P2 !== undefined && L1 !== undefined && zP1 !== undefined && L1 > zP1)
       out.push({
         key: `${side}.taper`,
-        label: t(label.taper),
-        basis: t('included angle from P1 at its drawn station to P2 at L1'),
+        label: i18n._(label.taper),
+        basis: i18n._({
+          id: 'cartridgeDesigner.includedAngleP1Drawn',
+          message: 'included angle from P1 at its drawn station to P2 at L1',
+        }),
         quantity: 'angle',
         si: 2 * Math.atan((P1 - P2) / 2 / (L1 - zP1)),
       })
@@ -650,7 +677,7 @@ function derivedAngles(figure: Figure, values: SpecValue[], t: Translator['t']):
 function approximateCaseVolume(
   figure: Figure,
   values: SpecValue[],
-  t: Translator['t'],
+  i18n: I18n,
 ): Derived | undefined {
   const c = figure.drawn.find((d) => d.side === 'cartridge')
   if (!c) return undefined
@@ -672,26 +699,35 @@ function approximateCaseVolume(
   }
   return {
     key: 'volume',
-    label: t('Case volume (approximate)'),
+    label: i18n._({
+      id: 'cartridgeDesigner.caseVolumeApproximate',
+      message: 'Case volume (approximate)',
+    }),
     quantity: 'capacity',
     // mm3 is mm2 times mm
     si: toSi('length', toSi('area', mm3)),
-    basis: t(
-      'the cartridge outline less a wall of {wall} everywhere, from the head end (E, else R) at {head} mm to the mouth; cartridge maxima, not a measured capacity',
-      {
+    basis: i18n._({
+      id: 'cartridgeDesigner.cartridgeOutlineLessWall',
+      message:
+        'the cartridge outline less a wall of {wall} everywhere, from the head end (E, else R) at {head, decimal} mm to the mouth; cartridge maxima, not a measured capacity',
+      values: {
         wall: fromNeck
-          ? t('(H2 - G1) / 2 = {wall} mm', { wall: Number(wall.toFixed(3)) })
-          : t('0.3 mm (assumed, no G1)'),
+          ? i18n._({
+              id: 'cartridgeDesigner.wallFromG1',
+              message: '(H2 - G1) / 2 = {wall, decimal} mm',
+              values: { wall: Number(wall.toFixed(3)) },
+            })
+          : i18n._({ id: 'cartridgeDesigner.wallAssumed', message: '0.3 mm (assumed, no G1)' }),
         head,
       },
-    ),
+    }),
   }
 }
 
 /** Stored values in mm and degrees, SI out. */
-function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derived[] {
-  const volume = approximateCaseVolume(figure, values, t)
-  return [...derivedAngles(figure, values, t), ...(volume ? [volume] : [])]
+function derive(figure: Figure, values: SpecValue[], i18n: I18n): Derived[] {
+  const volume = approximateCaseVolume(figure, values, i18n)
+  return [...derivedAngles(figure, values, i18n), ...(volume ? [volume] : [])]
 }
 
 /** The name a design is saved under: the name typed, else its base's title, else `fallback`. */
