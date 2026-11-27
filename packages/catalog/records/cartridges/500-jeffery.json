@@ -343,6 +343,10 @@
       "value": 130.36
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -351,6 +355,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page153.pdf",
         "sha256": "05865f1dee0ebe3844f1ddb673f4efd34a2b8f54a6325083ee262ff391410da5",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .500 Jeffery",
+        "url": "https://en.wikipedia.org/w/index.php?title=.500_Jeffery&oldid=1358833542",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

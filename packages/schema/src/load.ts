@@ -542,6 +542,18 @@ export const catalogueLoad: z.ZodType<CatalogueLoad> = load.refine(
   },
 )
 
+/**
+ * A load the app saves: {@link load} with its cartridge. A stored or shared load without one still
+ * parses as {@link load}, so it opens and asks for the cartridge.
+ */
+export const savedLoad: z.ZodType<SavedLoad> = load.refine(
+  (l): l is SavedLoad => l.cartridge !== undefined,
+  {
+    message: 'A load names its cartridge',
+    path: ['cartridge'],
+  },
+)
+
 /** The solver values a load overrides, in stored units. */
 export interface AnalysisOverrides extends z.infer<typeof analysisOverrides> {}
 /** What a load is analyzed with. */
@@ -550,6 +562,10 @@ export interface LoadAnalysis extends z.infer<typeof loadAnalysis> {}
 export interface Load extends z.infer<typeof load> {}
 /** What a load was at one of its chronograph sessions: lots, seating, round count, dismissed notes. */
 export interface SessionSnapshot extends z.infer<typeof sessionSnapshot> {}
+/** A load the app saves: the cartridge is present. */
+export interface SavedLoad extends Load {
+  cartridge: string
+}
 /** A load of the catalogue: the fields {@link load} requires of one are present. */
 export interface CatalogueLoad extends Load {
   id: string

@@ -349,6 +349,9 @@
       "value": 23.99
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -357,6 +360,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/5-45-x-39-en.pdf",
         "sha256": "b1a1a3d86a471ea1f3bca59303cfc9d7a7597ec9a017d6c204387b7dbd92563f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 5.45×39mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=5.45%C3%9739mm&oldid=1377341771",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or Small rifle."
       }
     ]
   }

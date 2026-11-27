@@ -893,6 +893,7 @@ function FileMenuOf<K extends UserRecordKind>({
   name,
   data,
   apiData,
+  apiRecords,
   onOpen,
   note,
   problem,
@@ -917,6 +918,8 @@ function FileMenuOf<K extends UserRecordKind>({
   data: Of<K>['data']
   /** The record as the API reads it, every value resolved (the workbench): Save then offers Download and Copy JSON for the API, never saved, never the browser copy. */
   apiData?: Of<K>['data']
+  /** The records of the file for the API from its record, when it holds more than that record (the workbench's cartridge design). Stable, so the memo holds. */
+  apiRecords?: ((record: Of<K>) => UserRecord[]) | undefined
   /** `record` is the opened or saved-as record (its id and saved time). */
   onOpen: (data: Of<K>['data'], name: string, record: Of<K>) => void
   /** A line about the record the page adds to the menu's status, such as ids not loaded. */
@@ -1298,7 +1301,8 @@ function FileMenuOf<K extends UserRecordKind>({
       )
       return
     }
-    const checked = checkedUserDataText([{ ...current(), data: apiData }])
+    const record = { ...current(), data: apiData }
+    const checked = checkedUserDataText(apiRecords?.(record) ?? [record])
     if (checked.ok) return checked.text
     const { reason } = checked
     setFailure(({ t, ...tr }) =>

@@ -374,6 +374,10 @@
       "value": 51.78
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -382,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page63.pdf",
         "sha256": "294e836d726a963713e1f68394ae1c2e4f52d99b015cfdec3487776fbd8b78d2",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 8×68mm S",
+        "url": "https://en.wikipedia.org/w/index.php?title=8%C3%9768mm_S&oldid=1380510228",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

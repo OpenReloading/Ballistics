@@ -370,6 +370,9 @@
       "value": 47.55
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -378,6 +381,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page111.pdf",
         "sha256": "c0557dc9f25edfaedd5f330e797206d0cbce8de654305d17dd4d8c915ad5549e",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .30-06 Springfield",
+        "url": "https://en.wikipedia.org/w/index.php?title=.30-06_Springfield&oldid=1386369631",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

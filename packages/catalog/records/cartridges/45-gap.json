@@ -233,6 +233,9 @@
       "value": 101.33
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -241,6 +244,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/45-gap-en.pdf",
         "sha256": "5106dbc9d98fe1476b2fa788211c60a1c12ac7c936cea49a62495d107d4e7322",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .45 GAP",
+        "url": "https://en.wikipedia.org/w/index.php?title=.45_GAP&oldid=1366044950",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

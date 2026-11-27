@@ -222,6 +222,9 @@
       "value": 112.78
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/480-ruger-en.pdf",
         "sha256": "59743d1c747721ff6750203030bfc6bfd2d67d407facd564deff0cf5fc09faa0",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .480 Ruger",
+        "url": "https://en.wikipedia.org/w/index.php?title=.480_Ruger&oldid=1363127333",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

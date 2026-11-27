@@ -1,7 +1,7 @@
 import { startBundleApi } from '@rangefoundry/api/static'
-import { type Load, load as loadSchema } from '@rangefoundry/schema'
+import { type Load, load as loadSchema, type UserRecord } from '@rangefoundry/schema'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type LoadParts, toApiLoad, toLoad } from '../src/lib/load-record.ts'
+import { apiFileRecords, type LoadParts, toApiLoad, toLoad } from '../src/lib/load-record.ts'
 import { userDataText } from '../src/lib/user-data.ts'
 
 let api: Awaited<ReturnType<typeof startBundleApi>>
@@ -43,11 +43,22 @@ const parts = (over: Partial<LoadParts> = {}): LoadParts => ({
   ...over,
 })
 
+/** A load record of the file for the API holding `data`. */
+const loadRecord = (data: Load) =>
+  ({
+    kind: 'load',
+    id: crypto.randomUUID(),
+    name: 'Load',
+    saved: new Date().toISOString(),
+    data,
+  }) as const
+
 /** `POST /interior/load-file` with `data` as the one load of a file. */
-async function runFile(data: Load) {
-  const text = userDataText([
-    { kind: 'load', id: crypto.randomUUID(), name: 'Load', saved: new Date().toISOString(), data },
-  ])
+const runFile = (data: Load) => postFile([loadRecord(data)])
+
+/** `POST /interior/load-file` with a file of `records`. */
+async function postFile(records: UserRecord[]) {
+  const text = userDataText(records)
   const res = await api.app.inject({
     method: 'POST',
     url: '/v1/interior/load-file',
@@ -61,7 +72,7 @@ describe('toApiLoad', () => {
     const given = new Set(Object.keys(values))
     // the saved load stores the typed keys only: with everything given it holds none
     expect(toLoad(parts({ given })).analysis?.overrides).toBeUndefined()
-    const file = toApiLoad(parts({ given }), {})
+    const file = toApiLoad(parts({ given }), { cartridge: 'catalogue:308-win' })
     expect(Object.keys(file.analysis?.overrides ?? {})).toHaveLength(Object.keys(values).length - 1)
     expect(loadSchema.safeParse(file).success).toBe(true)
     const { status, body } = await runFile(file)
@@ -93,7 +104,33 @@ describe('toApiLoad', () => {
       'gamma',
       'vivacity',
     ])
-    expect((await runFile(toApiLoad(parts({ given, powder: undefined }), {}))).status).toBe(200)
+    expect(
+      (
+        await runFile(
+          toApiLoad(parts({ given, powder: undefined }), { cartridge: 'catalogue:308-win' }),
+        )
+      ).status,
+    ).toBe(200)
+  })
+
+  it("runs a load on the user's own cartridge with its design in the file, and refuses one without a cartridge", async () => {
+    const design = {
+      id: '5b0e6f8a-2c41-4d7e-9a13-7f2c8e4b6d01',
+      name: 'My 308',
+      data: { origin: 'user', basedOn: 'catalogue:308-win' } as const,
+    }
+    const ref = `user:${design.id}`
+    const record = loadRecord(toApiLoad(parts({ cartridge: ref }), { cartridge: ref }))
+    const records = apiFileRecords(record, design)
+    expect(records.map((r) => r.kind)).toEqual(['load', 'cartridge'])
+    const { status, body } = await postFile(records)
+    expect(status).toBe(200)
+    expect(body.summary.peakPressure).toBeGreaterThan(0)
+    // the reference alone, without the design, names nothing the server has
+    expect((await postFile([record])).status).toBe(400)
+    const bare = await runFile(toApiLoad(parts({ cartridge: undefined }), {}))
+    expect(bare.status).toBe(422)
+    expect(bare.body.field).toBe('records.0.data.cartridge')
   })
 
   it('leaves out what the API cannot read: a user reference, the firearm, the capacity, sessions and a seating ladder', () => {

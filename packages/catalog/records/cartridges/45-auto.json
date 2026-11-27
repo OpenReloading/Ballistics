@@ -235,6 +235,9 @@
       "value": 101.33
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -243,6 +246,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/45-auto-en-1.pdf",
         "sha256": "59e4951ab788aed318558cb9abcc58326b1736a522fbb64c9dbec1905f1ae28a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .45 ACP",
+        "url": "https://en.wikipedia.org/w/index.php?title=.45_ACP&oldid=1387414441",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol LP (some makers are now using small pistol SP)."
       }
     ]
   }

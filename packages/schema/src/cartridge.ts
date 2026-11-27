@@ -41,6 +41,10 @@ const cartridgeParser = z.object({
       primerSize: primerSizes
         .describe('The primer size of a load that names no primer record.')
         .optional(),
+      primerMagnum: z
+        .boolean()
+        .describe('Whether the source of `primerSize` calls for a magnum primer of that size.')
+        .optional(),
     })
     .optional(),
   provenance: provenance.optional(),
@@ -74,6 +78,7 @@ export const cartridge: z.ZodObject<{
         /** Reference to a catalogue capacity of the cartridge, whose provenance is the source of the figure. */
         capacity: z.ZodOptional<z.ZodString>
         primerSize: z.ZodOptional<typeof primerSizes>
+        primerMagnum: z.ZodOptional<z.ZodBoolean>
       },
       z.core.$strict
     >

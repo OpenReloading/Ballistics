@@ -381,6 +381,9 @@
       "value": 34.36
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -389,6 +392,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/6-5-x-55-se-en.pdf",
         "sha256": "a235f2c97a9c3fc839f4cd0da7e0b2b5ab7a190dd5460371b7d11265a5e438ec",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.5×55mm Swedish",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5%C3%9755mm_Swedish&oldid=1385625786",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

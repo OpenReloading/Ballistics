@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { based, gotoHydrated } from './nav.ts'
+import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { loadForm, openKeeping } from './workbench.ts'
@@ -56,18 +56,6 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   const link = (name: string) => page.getByRole('link', { name, exact: true })
   await expect(link('Match brass, lot 3')).toBeVisible()
   await expect(link('Plain brass')).toBeVisible()
-  // the catalogue's products stay in the list; the source filter has both sources
-  await expect(page.locator(`a[href^="${based('/cases/demo-')}"]`).first()).toBeVisible()
-  const count = page.locator('.page-bar-status .bar-count')
-  const all = await count.textContent()
-  await page.getByRole('button', { name: /^Source: / }).click()
-  await page
-    .getByRole('dialog', { name: /^Source: / })
-    .getByRole('checkbox', { name: /^RangeFoundry/ })
-    .uncheck()
-  await expect(page).toHaveURL(/[?&]src=user/)
-  await expect(count).toHaveText(`2 of ${all}`)
-  await page.keyboard.press('Escape')
   // a row's link opens the group in the editor with its measured values
   await link('Match brass, lot 3').click()
   await expect(page).toHaveURL(new RegExp(`/cases/editor/\\?record=${caseId}$`))

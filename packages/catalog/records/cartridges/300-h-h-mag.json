@@ -355,6 +355,10 @@
       "value": 47.27
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -363,6 +367,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/300-h-h-mag-en.pdf",
         "sha256": "7fe13bf023ca2adc758bdbb0bff452e90ef1443b6787282e21f55b2c5d68867c",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .300 H&H Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_H%26H_Magnum&oldid=1312344006",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: large rifle magnum."
       }
     ]
   }

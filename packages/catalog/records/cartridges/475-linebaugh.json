@@ -227,6 +227,9 @@
       "value": 112.78
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -235,6 +238,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page89.pdf",
         "sha256": "e42642c5ebb455b1518a52b1bda5a0aa4e36169abdeebed9ef1e080f64f0a6d3",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .475 Linebaugh",
+        "url": "https://en.wikipedia.org/w/index.php?title=.475_Linebaugh&oldid=1299129511",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

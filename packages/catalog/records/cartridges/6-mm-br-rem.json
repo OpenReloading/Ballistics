@@ -369,6 +369,9 @@
       "value": 29.52
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page13.pdf",
         "sha256": "5d6ec679390109423cb1e2bf92c16afc7ff7e06786a867f51e8b51b693820ca0",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6mm BR",
+        "url": "https://en.wikipedia.org/w/index.php?title=6mm_BR&oldid=1380356785",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: small rifle."
       }
     ]
   }

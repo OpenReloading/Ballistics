@@ -132,7 +132,7 @@ Measurement data imported as values carry their license: public domain in the US
 
 ## Component data sources
 
-Cited by the manufacturer and case capacity records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project license on what the makers published (`packages/catalog/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
+Cited by the manufacturer and case capacity records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities and cartridge primer sizes cite. The makers hold the rights to their publications, and the records carry no project license on what the makers published (`packages/catalog/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
 
 ### ADI World Class Powders
 
@@ -252,27 +252,218 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 
 ### Wikipedia
 
+- Wikipedia, .17 Hornet. <https://en.wikipedia.org/w/index.php?title=.17_Hornet&oldid=1315660801>
+- Wikipedia, .17 Remington Fireball. <https://en.wikipedia.org/w/index.php?title=.17_Remington_Fireball&oldid=1358562099>
+- Wikipedia, .17 Remington. <https://en.wikipedia.org/w/index.php?title=.17_Remington&oldid=1357005088>
+- Wikipedia, .204 Ruger. <https://en.wikipedia.org/w/index.php?title=.204_Ruger&oldid=1381531854>
+- Wikipedia, .218 Bee. <https://en.wikipedia.org/w/index.php?title=.218_Bee&oldid=1387944802>
+- Wikipedia, .219 Zipper. <https://en.wikipedia.org/w/index.php?title=.219_Zipper&oldid=1294700578>
+- Wikipedia, .22 Hornet. <https://en.wikipedia.org/w/index.php?title=.22_Hornet&oldid=1332690682>
+- Wikipedia, .22 PPC. <https://en.wikipedia.org/w/index.php?title=.22_PPC&oldid=1260199312>
+- Wikipedia, .22 Remington Jet. <https://en.wikipedia.org/w/index.php?title=.22_Remington_Jet&oldid=1388085979>
+- Wikipedia, .22 Savage Hi-Power. <https://en.wikipedia.org/w/index.php?title=.22_Savage_Hi-Power&oldid=1327553167>
+- Wikipedia, .22-250 Remington. <https://en.wikipedia.org/w/index.php?title=.22-250_Remington&oldid=1387949158>
+- Wikipedia, .220 Swift. <https://en.wikipedia.org/w/index.php?title=.220_Swift&oldid=1380090933>
+- Wikipedia, .221 Remington Fireball. <https://en.wikipedia.org/w/index.php?title=.221_Remington_Fireball&oldid=1336106401>
+- Wikipedia, .222 Remington Magnum. <https://en.wikipedia.org/w/index.php?title=.222_Remington_Magnum&oldid=1387959903>
+- Wikipedia, .222 Remington. <https://en.wikipedia.org/w/index.php?title=.222_Remington&oldid=1387953955>
 - Wikipedia, .223 Remington. <https://en.wikipedia.org/w/index.php?title=.223_Remington&oldid=1371182787>
+- Wikipedia, .223 Remington. <https://en.wikipedia.org/w/index.php?title=.223_Remington&oldid=1381104652>
+- Wikipedia, .223 Winchester Super Short Magnum. <https://en.wikipedia.org/w/index.php?title=.223_Winchester_Super_Short_Magnum&oldid=1388064946>
+- Wikipedia, .224 Valkyrie. <https://en.wikipedia.org/w/index.php?title=.224_Valkyrie&oldid=1285900095>
+- Wikipedia, .224 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.224_Weatherby_Magnum&oldid=1388073110>
+- Wikipedia, .225 Winchester. <https://en.wikipedia.org/w/index.php?title=.225_Winchester&oldid=1388080080>
+- Wikipedia, .240 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.240_Weatherby_Magnum&oldid=1388091544>
+- Wikipedia, .243 Winchester Super Short Magnum. <https://en.wikipedia.org/w/index.php?title=.243_Winchester_Super_Short_Magnum&oldid=1372237955>
+- Wikipedia, .243 Winchester. <https://en.wikipedia.org/w/index.php?title=.243_Winchester&oldid=1388096278>
+- Wikipedia, .25 ACP. <https://en.wikipedia.org/w/index.php?title=.25_ACP&oldid=1375461047>
+- Wikipedia, .25-06 Remington. <https://en.wikipedia.org/w/index.php?title=.25-06_Remington&oldid=1312178506>
+- Wikipedia, .25-20 Winchester. <https://en.wikipedia.org/w/index.php?title=.25-20_Winchester&oldid=1328747818>
+- Wikipedia, .25-35 Winchester. <https://en.wikipedia.org/w/index.php?title=.25-35_Winchester&oldid=1366150764>
+- Wikipedia, .250-3000 Savage. <https://en.wikipedia.org/w/index.php?title=.250-3000_Savage&oldid=1328496325>
+- Wikipedia, .256 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.256_Winchester_Magnum&oldid=1372654259>
+- Wikipedia, .257 Roberts. <https://en.wikipedia.org/w/index.php?title=.257_Roberts&oldid=1376578554>
+- Wikipedia, .257 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.257_Weatherby_Magnum&oldid=1368911244>
+- Wikipedia, .260 Remington. <https://en.wikipedia.org/w/index.php?title=.260_Remington&oldid=1356903205>
+- Wikipedia, .264 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.264_Winchester_Magnum&oldid=1360902740>
+- Wikipedia, .270 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.270_Weatherby_Magnum&oldid=1376576250>
+- Wikipedia, .270 Winchester Short Magnum. <https://en.wikipedia.org/w/index.php?title=.270_Winchester_Short_Magnum&oldid=1239176976>
+- Wikipedia, .270 Winchester. <https://en.wikipedia.org/w/index.php?title=.270_Winchester&oldid=1384013474>
+- Wikipedia, .280 Remington. <https://en.wikipedia.org/w/index.php?title=.280_Remington&oldid=1384008216>
+- Wikipedia, .284 Winchester. <https://en.wikipedia.org/w/index.php?title=.284_Winchester&oldid=1375275110>
 - Wikipedia, .30 R Blaser. <https://en.wikipedia.org/w/index.php?title=.30_R_Blaser&oldid=1316312342>
+- Wikipedia, .30 carbine. <https://en.wikipedia.org/w/index.php?title=.30_carbine&oldid=1387807771>
+- Wikipedia, .30-06 Springfield. <https://en.wikipedia.org/w/index.php?title=.30-06_Springfield&oldid=1386369631>
+- Wikipedia, .30-30 Winchester. <https://en.wikipedia.org/w/index.php?title=.30-30_Winchester&oldid=1379999716>
+- Wikipedia, .30-378 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.30-378_Weatherby_Magnum&oldid=1375428392>
+- Wikipedia, .300 AAC Blackout. <https://en.wikipedia.org/w/index.php?title=.300_AAC_Blackout&oldid=1384413294>
+- Wikipedia, .300 H&H Magnum. <https://en.wikipedia.org/w/index.php?title=.300_H%26H_Magnum&oldid=1312344006>
+- Wikipedia, .300 Lapua Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Lapua_Magnum&oldid=1366546647>
+- Wikipedia, .300 Norma Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Norma_Magnum&oldid=1382920646>
+- Wikipedia, .300 Remington Short Action Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Remington_Short_Action_Ultra_Magnum&oldid=1283801692>
 - Wikipedia, .300 Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Remington_Ultra_Magnum&oldid=1313173783>
+- Wikipedia, .300 Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Remington_Ultra_Magnum&oldid=1381575772>
+- Wikipedia, .300 Ruger Compact Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Ruger_Compact_Magnum&oldid=1365741598>
+- Wikipedia, .300 Savage. <https://en.wikipedia.org/w/index.php?title=.300_Savage&oldid=1370790949>
+- Wikipedia, .300 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Weatherby_Magnum&oldid=1270042987>
 - Wikipedia, .300 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Magnum&oldid=1368911320>
 - Wikipedia, .300 Winchester Short Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Short_Magnum&oldid=1351061051>
+- Wikipedia, .303 British. <https://en.wikipedia.org/w/index.php?title=.303_British&oldid=1380323250>
+- Wikipedia, .303 Savage. <https://en.wikipedia.org/w/index.php?title=.303_Savage&oldid=1344899128>
+- Wikipedia, .308 Marlin Express. <https://en.wikipedia.org/w/index.php?title=.308_Marlin_Express&oldid=1254072046>
+- Wikipedia, .308 Norma Magnum. <https://en.wikipedia.org/w/index.php?title=.308_Norma_Magnum&oldid=1376677482>
 - Wikipedia, .308 Winchester. <https://en.wikipedia.org/w/index.php?title=.308_Winchester&oldid=1380739300>
+- Wikipedia, .32 ACP. <https://en.wikipedia.org/w/index.php?title=.32_ACP&oldid=1363105882>
+- Wikipedia, .32 H&R Magnum. <https://en.wikipedia.org/w/index.php?title=.32_H%26R_Magnum&oldid=1372403204>
+- Wikipedia, .32 Long Colt. <https://en.wikipedia.org/w/index.php?title=.32_Long_Colt&oldid=1361037597>
+- Wikipedia, .32 S&W Long. <https://en.wikipedia.org/w/index.php?title=.32_S%26W_Long&oldid=1371894599>
+- Wikipedia, .32 S&W. <https://en.wikipedia.org/w/index.php?title=.32_S%26W&oldid=1380365574>
+- Wikipedia, .32 Winchester Self-Loading. <https://en.wikipedia.org/w/index.php?title=.32_Winchester_Self-Loading&oldid=1260643634>
+- Wikipedia, .32 Winchester Special. <https://en.wikipedia.org/w/index.php?title=.32_Winchester_Special&oldid=1315662297>
+- Wikipedia, .32-20 Winchester. <https://en.wikipedia.org/w/index.php?title=.32-20_Winchester&oldid=1368987343>
+- Wikipedia, .32-40 Ballard. <https://en.wikipedia.org/w/index.php?title=.32-40_Ballard&oldid=1297680865>
+- Wikipedia, .325 Winchester Short Magnum. <https://en.wikipedia.org/w/index.php?title=.325_Winchester_Short_Magnum&oldid=1380219985>
+- Wikipedia, .33 Winchester. <https://en.wikipedia.org/w/index.php?title=.33_Winchester&oldid=1332704969>
+- Wikipedia, .338 Federal. <https://en.wikipedia.org/w/index.php?title=.338_Federal&oldid=1352229382>
 - Wikipedia, .338 Lapua Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Lapua_Magnum&oldid=1374066412>
+- Wikipedia, .338 Lapua Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Lapua_Magnum&oldid=1386847801>
+- Wikipedia, .338 Norma Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Norma_Magnum&oldid=1358573962>
+- Wikipedia, .338 Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Remington_Ultra_Magnum&oldid=1342231560>
+- Wikipedia, .338 Ruger Compact Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Ruger_Compact_Magnum&oldid=1239909806>
+- Wikipedia, .338 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Winchester_Magnum&oldid=1358944042>
+- Wikipedia, .340 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.340_Weatherby_Magnum&oldid=1365506518>
+- Wikipedia, .348 Winchester. <https://en.wikipedia.org/w/index.php?title=.348_Winchester&oldid=1370955414>
+- Wikipedia, .35 Remington. <https://en.wikipedia.org/w/index.php?title=.35_Remington&oldid=1384920396>
+- Wikipedia, .35 Whelen. <https://en.wikipedia.org/w/index.php?title=.35_Whelen&oldid=1377872599>
+- Wikipedia, .35 Winchester Self-Loading. <https://en.wikipedia.org/w/index.php?title=.35_Winchester_Self-Loading&oldid=1358075860>
+- Wikipedia, .35 Winchester. <https://en.wikipedia.org/w/index.php?title=.35_Winchester&oldid=1339063413>
+- Wikipedia, .350 Legend. <https://en.wikipedia.org/w/index.php?title=.350_Legend&oldid=1367402762>
+- Wikipedia, .350 Remington Magnum. <https://en.wikipedia.org/w/index.php?title=.350_Remington_Magnum&oldid=1285194388>
+- Wikipedia, .351 Winchester Self-Loading. <https://en.wikipedia.org/w/index.php?title=.351_Winchester_Self-Loading&oldid=1335364039>
 - Wikipedia, .357 Magnum. <https://en.wikipedia.org/w/index.php?title=.357_Magnum&oldid=1368987349>
+- Wikipedia, .357 Magnum. <https://en.wikipedia.org/w/index.php?title=.357_Magnum&oldid=1380772377>
+- Wikipedia, .357 Remington Maximum. <https://en.wikipedia.org/w/index.php?title=.357_Remington_Maximum&oldid=1368266109>
+- Wikipedia, .357 SIG. <https://en.wikipedia.org/w/index.php?title=.357_SIG&oldid=1380166553>
+- Wikipedia, .358 Norma Magnum. <https://en.wikipedia.org/w/index.php?title=.358_Norma_Magnum&oldid=1367313877>
+- Wikipedia, .358 Winchester. <https://en.wikipedia.org/w/index.php?title=.358_Winchester&oldid=1338039834>
+- Wikipedia, .375 H&H Magnum. <https://en.wikipedia.org/w/index.php?title=.375_H%26H_Magnum&oldid=1373359791>
+- Wikipedia, .375 Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.375_Remington_Ultra_Magnum&oldid=1372169859>
+- Wikipedia, .375 Ruger. <https://en.wikipedia.org/w/index.php?title=.375_Ruger&oldid=1383683589>
+- Wikipedia, .375 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.375_Weatherby_Magnum&oldid=1283347140>
+- Wikipedia, .376 Steyr. <https://en.wikipedia.org/w/index.php?title=.376_Steyr&oldid=1369403523>
+- Wikipedia, .378 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.378_Weatherby_Magnum&oldid=1376583803>
+- Wikipedia, .38 S&W. <https://en.wikipedia.org/w/index.php?title=.38_S%26W&oldid=1375942971>
 - Wikipedia, .38 Special. <https://en.wikipedia.org/w/index.php?title=.38_Special&oldid=1376197673>
+- Wikipedia, .38 Super. <https://en.wikipedia.org/w/index.php?title=.38_Super&oldid=1375275028>
 - Wikipedia, .380 ACP. <https://en.wikipedia.org/w/index.php?title=.380_ACP&oldid=1363481298>
 - Wikipedia, .40 S&W. <https://en.wikipedia.org/w/index.php?title=.40_S%26W&oldid=1371072783>
+- Wikipedia, .40-65 Winchester. <https://en.wikipedia.org/w/index.php?title=.40-65_Winchester&oldid=1320396976>
+- Wikipedia, .400 H&H Magnum. <https://en.wikipedia.org/w/index.php?title=.400_H%26H_Magnum&oldid=1299129494>
+- Wikipedia, .401 Winchester Self-Loading. <https://en.wikipedia.org/w/index.php?title=.401_Winchester_Self-Loading&oldid=1335364329>
+- Wikipedia, .404 Jeffery. <https://en.wikipedia.org/w/index.php?title=.404_Jeffery&oldid=1356738201>
+- Wikipedia, .405 Winchester. <https://en.wikipedia.org/w/index.php?title=.405_Winchester&oldid=1292502910>
+- Wikipedia, .408 Cheyenne Tactical. <https://en.wikipedia.org/w/index.php?title=.408_Cheyenne_Tactical&oldid=1381061150>
+- Wikipedia, .41 Action Express. <https://en.wikipedia.org/w/index.php?title=.41_Action_Express&oldid=1315042640>
+- Wikipedia, .41 Remington Magnum. <https://en.wikipedia.org/w/index.php?title=.41_Remington_Magnum&oldid=1368969581>
+- Wikipedia, .416 Remington Magnum. <https://en.wikipedia.org/w/index.php?title=.416_Remington_Magnum&oldid=1366064696>
+- Wikipedia, .416 Rigby. <https://en.wikipedia.org/w/index.php?title=.416_Rigby&oldid=1386077230>
+- Wikipedia, .416 Ruger. <https://en.wikipedia.org/w/index.php?title=.416_Ruger&oldid=1384209366>
+- Wikipedia, .416 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.416_Weatherby_Magnum&oldid=1306004522>
+- Wikipedia, .44 Colt. <https://en.wikipedia.org/w/index.php?title=.44_Colt&oldid=1364515601>
 - Wikipedia, .44 Magnum. <https://en.wikipedia.org/w/index.php?title=.44_Magnum&oldid=1368987370>
+- Wikipedia, .44 Magnum. <https://en.wikipedia.org/w/index.php?title=.44_Magnum&oldid=1386865008>
+- Wikipedia, .44 Russian. <https://en.wikipedia.org/w/index.php?title=.44_Russian&oldid=1368969591>
 - Wikipedia, .44 Special. <https://en.wikipedia.org/w/index.php?title=.44_Special&oldid=1368969599>
+- Wikipedia, .44-40 Winchester. <https://en.wikipedia.org/w/index.php?title=.44-40_Winchester&oldid=1386090203>
+- Wikipedia, .444 Marlin. <https://en.wikipedia.org/w/index.php?title=.444_Marlin&oldid=1323043188>
+- Wikipedia, .45 ACP. <https://en.wikipedia.org/w/index.php?title=.45_ACP&oldid=1387414441>
+- Wikipedia, .45 Auto Rim. <https://en.wikipedia.org/w/index.php?title=.45_Auto_Rim&oldid=1368987379>
+- Wikipedia, .45 Colt. <https://en.wikipedia.org/w/index.php?title=.45_Colt&oldid=1383469621>
+- Wikipedia, .45 GAP. <https://en.wikipedia.org/w/index.php?title=.45_GAP&oldid=1366044950>
+- Wikipedia, .45 Schofield. <https://en.wikipedia.org/w/index.php?title=.45_Schofield&oldid=1386068459>
+- Wikipedia, .45 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.45_Winchester_Magnum&oldid=1350257119>
+- Wikipedia, .45-70. <https://en.wikipedia.org/w/index.php?title=.45-70&oldid=1381109965>
+- Wikipedia, .450 Marlin. <https://en.wikipedia.org/w/index.php?title=.450_Marlin&oldid=1371849595>
+- Wikipedia, .450 Rigby. <https://en.wikipedia.org/w/index.php?title=.450_Rigby&oldid=1364988259>
+- Wikipedia, .454 Casull. <https://en.wikipedia.org/w/index.php?title=.454_Casull&oldid=1363403309>
+- Wikipedia, .455 Webley. <https://en.wikipedia.org/w/index.php?title=.455_Webley&oldid=1368405372>
+- Wikipedia, .458 Lott. <https://en.wikipedia.org/w/index.php?title=.458_Lott&oldid=1384890146>
+- Wikipedia, .458 SOCOM. <https://en.wikipedia.org/w/index.php?title=.458_SOCOM&oldid=1356907990>
+- Wikipedia, .458 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.458_Winchester_Magnum&oldid=1301627955>
+- Wikipedia, .460 S&W Magnum. <https://en.wikipedia.org/w/index.php?title=.460_S%26W_Magnum&oldid=1363403247>
+- Wikipedia, .460 Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=.460_Weatherby_Magnum&oldid=1368969625>
+- Wikipedia, .465 H&H Magnum. <https://en.wikipedia.org/w/index.php?title=.465_H%26H_Magnum&oldid=1332022054>
+- Wikipedia, .475 Linebaugh. <https://en.wikipedia.org/w/index.php?title=.475_Linebaugh&oldid=1299129511>
+- Wikipedia, .480 Ruger. <https://en.wikipedia.org/w/index.php?title=.480_Ruger&oldid=1363127333>
+- Wikipedia, .50 Action Express. <https://en.wikipedia.org/w/index.php?title=.50_Action_Express&oldid=1371997058>
+- Wikipedia, .500 Jeffery. <https://en.wikipedia.org/w/index.php?title=.500_Jeffery&oldid=1358833542>
+- Wikipedia, .500 S&W Magnum. <https://en.wikipedia.org/w/index.php?title=.500_S%26W_Magnum&oldid=1371858917>
+- Wikipedia, .505 Gibbs. <https://en.wikipedia.org/w/index.php?title=.505_Gibbs&oldid=1332020780>
+- Wikipedia, .700 Nitro Express. <https://en.wikipedia.org/w/index.php?title=.700_Nitro_Express&oldid=1358591818>
 - Wikipedia, 10mm Auto. <https://en.wikipedia.org/w/index.php?title=10mm_Auto&oldid=1379060078>
+- Wikipedia, 5.45x18mm. <https://en.wikipedia.org/w/index.php?title=5.45%C3%9718mm&oldid=1203594836>
+- Wikipedia, 5.45x39mm. <https://en.wikipedia.org/w/index.php?title=5.45%C3%9739mm&oldid=1377341771>
+- Wikipedia, 5.6x50mm Magnum. <https://en.wikipedia.org/w/index.php?title=5.6%C3%9750mm_Magnum&oldid=1302857223>
+- Wikipedia, 5.6x57mm. <https://en.wikipedia.org/w/index.php?title=5.6%C3%9757mm&oldid=1330965499>
+- Wikipedia, 6 mm XC. <https://en.wikipedia.org/w/index.php?title=6_mm_XC&oldid=1380355298>
 - Wikipedia, 6.5mm Creedmoor. <https://en.wikipedia.org/w/index.php?title=6.5mm_Creedmoor&oldid=1375349834>
+- Wikipedia, 6.5mm Creedmoor. <https://en.wikipedia.org/w/index.php?title=6.5mm_Creedmoor&oldid=1379962893>
 - Wikipedia, 6.5mm Grendel. <https://en.wikipedia.org/w/index.php?title=6.5mm_Grendel&oldid=1345549433>
+- Wikipedia, 6.5mm Grendel. <https://en.wikipedia.org/w/index.php?title=6.5mm_Grendel&oldid=1379962937>
+- Wikipedia, 6.5mm Remington Magnum. <https://en.wikipedia.org/w/index.php?title=6.5mm_Remington_Magnum&oldid=1368987398>
 - Wikipedia, 6.5x47mm Lapua. <https://en.wikipedia.org/w/index.php?title=6.5%C3%9747mm_Lapua&oldid=1292319718>
+- Wikipedia, 6.5x54mm Mannlicher–Schönauer. <https://en.wikipedia.org/w/index.php?title=6.5%C3%9754mm_Mannlicher%E2%80%93Sch%C3%B6nauer&oldid=1379793861>
+- Wikipedia, 6.5x55mm Swedish. <https://en.wikipedia.org/w/index.php?title=6.5%C3%9755mm_Swedish&oldid=1385625786>
+- Wikipedia, 6.5x57mm Mauser. <https://en.wikipedia.org/w/index.php?title=6.5%C3%9757mm_Mauser&oldid=1361048897>
+- Wikipedia, 6.5x68mm. <https://en.wikipedia.org/w/index.php?title=6.5%C3%9768mm&oldid=1292891119>
+- Wikipedia, 6.8 Western. <https://en.wikipedia.org/w/index.php?title=6.8_Western&oldid=1383760718>
+- Wikipedia, 6.8mm Remington SPC. <https://en.wikipedia.org/w/index.php?title=6.8mm_Remington_SPC&oldid=1379963632>
+- Wikipedia, 6mm ARC. <https://en.wikipedia.org/w/index.php?title=6mm_ARC&oldid=1380368001>
+- Wikipedia, 6mm BR. <https://en.wikipedia.org/w/index.php?title=6mm_BR&oldid=1380356785>
+- Wikipedia, 6mm PPC. <https://en.wikipedia.org/w/index.php?title=6mm_PPC&oldid=1293129404>
+- Wikipedia, 6mm Remington. <https://en.wikipedia.org/w/index.php?title=6mm_Remington&oldid=1380356808>
+- Wikipedia, 7-30 Waters. <https://en.wikipedia.org/w/index.php?title=7-30_Waters&oldid=1377519234>
+- Wikipedia, 7.5x54mm French. <https://en.wikipedia.org/w/index.php?title=7.5%C3%9754mm_French&oldid=1380371591>
 - Wikipedia, 7.5x55mm Swiss. <https://en.wikipedia.org/w/index.php?title=7.5%C3%9755mm_Swiss&oldid=1378227189>
 - Wikipedia, 7.62x25mm Tokarev. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9725mm_Tokarev&oldid=1373994969>
+- Wikipedia, 7.62x25mm Tokarev. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9725mm_Tokarev&oldid=1387492206>
+- Wikipedia, 7.62x38mmR. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9738mmR&oldid=1316173032>
 - Wikipedia, 7.62x39mm. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9739mm&oldid=1371601372>
+- Wikipedia, 7.62x39mm. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9739mm&oldid=1386860400>
+- Wikipedia, 7.62x54mmR. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9754mmR&oldid=1378142008>
+- Wikipedia, 7.65x20mm Long. <https://en.wikipedia.org/w/index.php?title=7.65%C3%9720mm_Long&oldid=1380037056>
+- Wikipedia, 7.65x21mm Parabellum. <https://en.wikipedia.org/w/index.php?title=7.65%C3%9721mm_Parabellum&oldid=1363156061>
+- Wikipedia, 7.65x53mm Argentine. <https://en.wikipedia.org/w/index.php?title=7.65%C3%9753mm_Argentine&oldid=1385543456>
+- Wikipedia, 7.92x57mm Mauser. <https://en.wikipedia.org/w/index.php?title=7.92%C3%9757mm_Mauser&oldid=1380373195>
+- Wikipedia, 7mm BR Remington. <https://en.wikipedia.org/w/index.php?title=7mm_BR_Remington&oldid=1345183398>
+- Wikipedia, 7mm Remington Magnum. <https://en.wikipedia.org/w/index.php?title=7mm_Remington_Magnum&oldid=1382964911>
+- Wikipedia, 7mm Remington Short Action Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=7mm_Remington_Short_Action_Ultra_Magnum&oldid=1272545206>
+- Wikipedia, 7mm Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=7mm_Remington_Ultra_Magnum&oldid=1284006588>
+- Wikipedia, 7mm Shooting Times Westerner. <https://en.wikipedia.org/w/index.php?title=7mm_Shooting_Times_Westerner&oldid=1318983248>
+- Wikipedia, 7mm Weatherby Magnum. <https://en.wikipedia.org/w/index.php?title=7mm_Weatherby_Magnum&oldid=1338144913>
+- Wikipedia, 7mm Winchester Short Magnum. <https://en.wikipedia.org/w/index.php?title=7mm_Winchester_Short_Magnum&oldid=1380000686>
+- Wikipedia, 7mm-08 Remington. <https://en.wikipedia.org/w/index.php?title=7mm-08_Remington&oldid=1380433578>
+- Wikipedia, 7x33mm Sako. <https://en.wikipedia.org/w/index.php?title=7%C3%9733mm_Sako&oldid=1302857421>
+- Wikipedia, 7x57mm Mauser. <https://en.wikipedia.org/w/index.php?title=7%C3%9757mm_Mauser&oldid=1380457955>
+- Wikipedia, 7x64mm. <https://en.wikipedia.org/w/index.php?title=7%C3%9764mm&oldid=1380457975>
+- Wikipedia, 8mm Remington Magnum. <https://en.wikipedia.org/w/index.php?title=8mm_Remington_Magnum&oldid=1354917198>
+- Wikipedia, 8x50mmR Lebel. <https://en.wikipedia.org/w/index.php?title=8%C3%9750mmR_Lebel&oldid=1377633691>
+- Wikipedia, 8x56mmR. <https://en.wikipedia.org/w/index.php?title=8%C3%9756mmR&oldid=1364002947>
+- Wikipedia, 8x64mm S. <https://en.wikipedia.org/w/index.php?title=8%C3%9764mm_S&oldid=1334043393>
+- Wikipedia, 8x68mm S. <https://en.wikipedia.org/w/index.php?title=8%C3%9768mm_S&oldid=1380510228>
+- Wikipedia, 9.3x57mm Mauser. <https://en.wikipedia.org/w/index.php?title=9.3%C3%9757mm_Mauser&oldid=1380511067>
+- Wikipedia, 9.3x62mm. <https://en.wikipedia.org/w/index.php?title=9.3%C3%9762mm&oldid=1383577627>
+- Wikipedia, 9.3x64mm Brenneke. <https://en.wikipedia.org/w/index.php?title=9.3%C3%9764mm_Brenneke&oldid=1380511386>
+- Wikipedia, 9.3x74mmR. <https://en.wikipedia.org/w/index.php?title=9.3%C3%9774mmR&oldid=1380511404>
+- Wikipedia, 9mm Browning Long. <https://en.wikipedia.org/w/index.php?title=9mm_Browning_Long&oldid=1319290089>
+- Wikipedia, 9x18mm Makarov. <https://en.wikipedia.org/w/index.php?title=9%C3%9718mm_Makarov&oldid=1383776458>
 - Wikipedia, 9x19mm Parabellum. <https://en.wikipedia.org/w/index.php?title=9%C3%9719mm_Parabellum&oldid=1379172502>
+- Wikipedia, 9x19mm Parabellum. <https://en.wikipedia.org/w/index.php?title=9%C3%9719mm_Parabellum&oldid=1385278941>
+- Wikipedia, 9x21mm. <https://en.wikipedia.org/w/index.php?title=9%C3%9721mm&oldid=1327723604>
+- Wikipedia, 9x23mm Steyr. <https://en.wikipedia.org/w/index.php?title=9%C3%9723mm_Steyr&oldid=1356444708>
+- Wikipedia, 9x57mm Mauser. <https://en.wikipedia.org/w/index.php?title=9%C3%9757mm_Mauser&oldid=1196572134>
+- Wikipedia, FN 5.7x28mm. <https://en.wikipedia.org/w/index.php?title=FN_5.7%C3%9728mm&oldid=1386425189>
+- Wikipedia, HK 4.6x30mm. <https://en.wikipedia.org/w/index.php?title=HK_4.6%C3%9730mm&oldid=1347648528>
 
 ## Online references
 

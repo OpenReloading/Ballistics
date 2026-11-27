@@ -330,6 +330,10 @@
       "value": 127.14
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -338,6 +342,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page154.pdf",
         "sha256": "33234efc9e7a2fbbbbfb6b128eddc1c64a845db767d492d9798054e2bff15208",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .505 Gibbs",
+        "url": "https://en.wikipedia.org/w/index.php?title=.505_Gibbs&oldid=1332020780",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: magnum large rifle."
       }
     ]
   }

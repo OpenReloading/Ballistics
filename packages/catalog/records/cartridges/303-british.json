@@ -316,6 +316,9 @@
       "value": 48.07
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -324,6 +327,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page74.pdf",
         "sha256": "e408743ac25c1faf1b9ad70d8ddf7f6c2015c33a188ae53ac114e6d640e6e1f0",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .303 British",
+        "url": "https://en.wikipedia.org/w/index.php?title=.303_British&oldid=1380323250",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

@@ -323,6 +323,9 @@
       "value": 91.97
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -331,6 +334,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page108.pdf",
         "sha256": "e9e7969f47b980e557b5c9cf25a681bcc1f13b96bb90272c83a9cf23ccec8daa",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .44-40 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.44-40_Winchester&oldid=1386090203",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

@@ -265,6 +265,10 @@
       "value": 104.94
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -273,6 +277,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/458-lott-en.pdf",
         "sha256": "9992489179d96c98c2b555f831fea6ce33e3b1ba4be1028e26f45cbb901c717a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .458 Lott",
+        "url": "https://en.wikipedia.org/w/index.php?title=.458_Lott&oldid=1384890146",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large Rifle (Magnum)."
       }
     ]
   }

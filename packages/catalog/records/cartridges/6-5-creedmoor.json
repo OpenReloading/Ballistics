@@ -376,7 +376,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:6-5-creedmoor-wikipedia"
+    "capacity": "catalogue:6-5-creedmoor-wikipedia",
+    "primerSize": "large-rifle"
   },
   "provenance": {
     "kind": "published",
@@ -386,6 +387,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/6-5-creedmoor-200418-en.pdf",
         "sha256": "c148f41c9a3a7bea0641eb182611dea8c2d1805a504524cf1b85d8cc3eb0ba9c",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.5mm Creedmoor",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5mm_Creedmoor&oldid=1379962893",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle,."
       }
     ]
   }

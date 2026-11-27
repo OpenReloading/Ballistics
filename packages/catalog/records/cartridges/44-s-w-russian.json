@@ -222,6 +222,9 @@
       "value": 90.65
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page73.pdf",
         "sha256": "9b4a4a90defe8e14ba12becdb9fe51cd71a1cb83eee3faec1b5d5fd70496dbaf",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .44 Russian",
+        "url": "https://en.wikipedia.org/w/index.php?title=.44_Russian&oldid=1368969591",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Pistol."
       }
     ]
   }

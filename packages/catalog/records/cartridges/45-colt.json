@@ -222,6 +222,9 @@
       "value": 101.48
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page78.pdf",
         "sha256": "8a16cb1bff9cd5edecd97ca3a7989a144187918a5d4e3488ccd07ece314c7303",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-45-colt",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Pistol."
       }
     ]
   }

@@ -8,8 +8,8 @@ import { sayLingui } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 const summary: CaseSummary = {
-  id: 'demo-case-308-brass',
-  manufacturer: 'demo-cases',
+  id: 'example-case-308',
+  manufacturer: 'example-cases',
   cartridge: '308-win',
   name: '308 Win. Brass Demo',
   productNumber: 'C308',
@@ -18,15 +18,15 @@ const summary: CaseSummary = {
   waterCapacity: 3.6,
 }
 
-const names = new Map([['demo-cases', 'Demo Cases']])
-const aliases = new Map([['demo-cases', ['Old Demo']]])
+const names = new Map([['example-cases', 'Example Cases']])
+const aliases = new Map([['example-cases', ['Old Example']]])
 const cartridges = new Map([['308-win', '308 Win.']])
 const rows = caseRows([summary], names, aliases, cartridges)
 
 it('puts the manufacturer and cartridge names on each row, empty while one is unknown', () => {
   expect(defined(rows[0])).toMatchObject({
-    manufacturerName: 'Demo Cases',
-    manufacturerAliases: ['Old Demo'],
+    manufacturerName: 'Example Cases',
+    manufacturerAliases: ['Old Example'],
     cartridgeName: '308 Win.',
   })
   expect(caseRows([summary], new Map(), new Map(), new Map())[0]).toMatchObject({
@@ -37,7 +37,7 @@ it('puts the manufacturer and cartridge names on each row, empty while one is un
 
 it('searches manufacturer, its aliases, name, product number and cartridge, every word', () => {
   const row = defined(rows[0])
-  for (const q of ['demo cases', 'old demo', 'brass', 'c308', '308 win', 'cases 308'])
+  for (const q of ['example cases', 'old example', 'brass', 'c308', '308 win', 'cases 308'])
     expect(caseMatches(row, q), q).toBe(true)
   expect(caseMatches(row, 'steel')).toBe(false)
   expect(caseMatches(row, 'c308 6.5')).toBe(false)
@@ -46,7 +46,7 @@ it('searches manufacturer, its aliases, name, product number and cartridge, ever
 const record: Case = {
   origin: 'catalogue',
   name: '308 Win. Brass Demo',
-  manufacturer: 'catalogue:demo-cases',
+  manufacturer: 'catalogue:example-cases',
   cartridge: 'catalogue:308-win',
   productNumber: 'C308',
   headstamp: 'DEMO 308 WIN',
@@ -59,7 +59,7 @@ const record: Case = {
 }
 
 it('the strip has the manufacturer, material, mass and water capacity, nothing the record lacks', () => {
-  expect(caseStrip(record, 'Demo Cases').map((i) => [i.icon, i.label])).toEqual([
+  expect(caseStrip(record, 'Example Cases').map((i) => [i.icon, i.label])).toEqual([
     ['manufacturer', 'Manufacturer'],
     ['material', 'Material'],
     ['mass', 'Mass'],

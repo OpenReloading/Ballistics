@@ -937,6 +937,9 @@ msgstr "The load file lacks {n} values: {list}. Type them under analysis.overrid
 msgid "coreMessage.answer.lacksValue"
 msgstr "The load file lacks 1 value: {list}. Type them under analysis.overrides, or name catalogue records that give them."
 
+msgid "coreMessage.answer.noCartridge"
+msgstr "The load has no cartridge: choose a cartridge record to simulate it."
+
 msgid "coreMessage.request.loadGone"
 msgstr "the load is no longer in this browser"
 

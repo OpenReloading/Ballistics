@@ -247,6 +247,9 @@
       "value": 51.26
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -255,6 +258,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page82.pdf",
         "sha256": "53666b962d783f94cdd6ca894060729c92a511c3843b202e7c8f25c378d266ec",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32-40 Ballard",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32-40_Ballard&oldid=1297680865",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

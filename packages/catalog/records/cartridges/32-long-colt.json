@@ -216,6 +216,9 @@
       "value": 48.39
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -224,6 +227,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page42.pdf",
         "sha256": "8be62d72ebddd259cff9779505fa385fb1e3da8130a704a5ad728e5f57a230c4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32 Long Colt",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32_Long_Colt&oldid=1361037597",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: small pistol."
       }
     ]
   }

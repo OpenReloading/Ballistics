@@ -369,6 +369,9 @@
       "value": 63.84
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/35-rem-210510-en-1.pdf",
         "sha256": "fa4f82c4f7e7c89db16be930cdba7af1ddae6b7a843ea8b2ffa77a88da729618",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .35 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.35_Remington&oldid=1384920396",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

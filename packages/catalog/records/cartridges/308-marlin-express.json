@@ -368,6 +368,9 @@
       "value": 47.06
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -376,6 +379,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/308-marlin-express-en.pdf",
         "sha256": "40e529c108e3f5913de9aa8a7b507a873c5f660ca017d3ae007b2cb693247cbf",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .308 Marlin Express",
+        "url": "https://en.wikipedia.org/w/index.php?title=.308_Marlin_Express&oldid=1254072046",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

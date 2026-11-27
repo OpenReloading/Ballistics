@@ -249,6 +249,9 @@
       "value": 101.61
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -257,6 +260,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page88.pdf",
         "sha256": "3e4e1e3b48b4726bdd1165482272a4f1c53aca0fe08ce2be358e351aa670186f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .460 S&W Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.460_S%26W_Magnum&oldid=1363403247",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

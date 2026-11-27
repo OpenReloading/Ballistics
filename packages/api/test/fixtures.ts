@@ -13,7 +13,20 @@ import {
   userDataVersion,
 } from '@rangefoundry/schema'
 
-export { bundle } from '../../catalog/test/bundle.ts'
+import { bundle } from '../../catalog/test/bundle.ts'
+
+export { bundle }
+
+/** The test bundle with the cartridge the load-file example names, as a sheet without values. */
+export const exampleBundle: typeof bundle = {
+  ...bundle,
+  cartridges: [
+    ...bundle.cartridges,
+    ...bundle.cartridges
+      .filter((c) => c.id === 'gamma-100-percent')
+      .map((c) => ({ ...c, id: '308-win', name: '308 Win.' })),
+  ],
+}
 
 /** An M3 load shared by the interior tests; the numbers are made up. */
 export const m3Load: InteriorLoad = {
@@ -78,7 +91,15 @@ export function loadData(data: {
   }
   [key: string]: unknown
 }) {
-  const { siValues: si = {}, cartridge, bullet, powder, ladder, ...rest } = data
+  // a cartridge without values: a run needs one, and it adds no limit or bore value
+  const {
+    siValues: si = {},
+    cartridge = 'gamma-100-percent',
+    bullet,
+    powder,
+    ladder,
+    ...rest
+  } = data
   const { charge, ...typed } = si
   const overrides = Object.fromEntries(
     Object.entries(typed)

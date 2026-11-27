@@ -373,6 +373,10 @@
       "value": 38.5
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page14.pdf",
         "sha256": "20584e88df6b478711181a63910b85aa9ab953817df661ff87fc9602491f3f62",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .270 Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.270_Weatherby_Magnum&oldid=1376576250",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

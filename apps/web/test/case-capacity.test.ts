@@ -31,6 +31,22 @@ describe('the water a case holds in the workbench', () => {
     expect(usedWater({ capacities, capacityId: 'gone' })?.record?.id).toBe('cap-a')
   })
 
+  it('takes the default capacity of the cartridge for its generic brass case', () => {
+    const used = usedWater({ capacities, cartridgeDefault: capacities[1] })
+    expect(used?.grams).toBe(57)
+    expect(used?.record?.id).toBe('cap-b')
+  })
+
+  it('never falls back to an estimate', () => {
+    const estimate = {
+      id: 'cap-0',
+      waterCapacity: { value: 60 },
+      provenance: { kind: 'derived' as const, sources: [{ title: 'Seating outline' }] },
+    }
+    expect(usedWater({ capacities: [estimate, ...capacities] })?.record?.id).toBe('cap-a')
+    expect(usedWater({ capacities: [estimate] })).toBeUndefined()
+  })
+
   it('does not stand in another record for a chosen case that is not read', () => {
     expect(usedWater({ capacities, pendingCase: true })).toBeUndefined()
     expect(usedWater({ capacities, capacityId: 'cap-b', pendingCase: true })?.grams).toBe(57)

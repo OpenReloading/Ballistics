@@ -363,6 +363,10 @@
       "value": 86.61
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -371,6 +375,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/416-rigby-210225-en.pdf",
         "sha256": "2255eb743d254b403d3e066b44d04d969fd88c07cfe00476ce4fdd95338b73c4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .416 Rigby",
+        "url": "https://en.wikipedia.org/w/index.php?title=.416_Rigby&oldid=1386077230",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

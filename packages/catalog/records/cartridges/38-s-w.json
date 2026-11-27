@@ -229,6 +229,9 @@
       "note": "Present on the official CIP sheet at import; not yet checked by hand."
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -237,6 +240,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/38s-w-en.pdf",
         "sha256": "835005fdd472d94bade575c42ba8fa63ae355d20dca96db92019cf0a546d576e",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .38 S&W",
+        "url": "https://en.wikipedia.org/w/index.php?title=.38_S%26W&oldid=1375942971",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }
