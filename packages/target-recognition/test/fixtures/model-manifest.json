@@ -17,7 +17,7 @@
   "input": { "holePx": 16, "channels": "rgb", "range": [0, 1], "sizeMultiple": 16 },
   "output": { "stride": 2, "channels": 1, "threshold": 0.35, "sure": 0.6 },
   "license": {
-    "model": "CC0-1.0",
+    "model": "CC-BY-SA-4.0",
     "training": {
       "classes": { "own": 120, "third-party": 0, "synthetic": 20000 },
       "kinds": { "printed": 9000, "colored": 4000, "grid": 3000, "reactive": 4120 }

@@ -19,3 +19,6 @@ export const noDocs = process.env.NEXT_PUBLIC_NO_DOCS
 
 /** The repository's address given at build, if any. */
 export const repositoryAddress = process.env.NEXT_PUBLIC_REPOSITORY_URL
+
+/** The source of the running build, set at build by its config. */
+export const sourceAddress = process.env.NEXT_PUBLIC_SOURCE_URL

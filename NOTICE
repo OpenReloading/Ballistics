@@ -1,7 +1,7 @@
 RangeFoundry
 
-The data records (packages/catalog/records/) are licensed under CC BY 4.0
-(packages/catalog/LICENSE). CC BY 4.0 covers only the project's own selection, structure and
+The data records (packages/catalog/records/) are licensed under CC BY-SA 4.0
+(packages/catalog/LICENSE). CC BY-SA 4.0 covers only the project's own selection, structure and
 drawings. The project claims no rights in facts taken from third-party sources (C.I.P. sheets,
 federation rule books). The project is not affiliated with or endorsed by the
 Bundesverwaltungsamt (BVA), the shooting sport federations or the C.I.P.
@@ -17,34 +17,13 @@ authors of the third-party training photos; no photo, file name, source or autho
 
 The Ballistics logo files below are copied from the RangeFoundry Artwork repository,
 https://github.com/OpenReloading/Artwork, folder ballistics/, commit
-09bfdbb14e9d33cf34b75483f5b51196705e4841, under the MIT License that follows.
-The PNG icons are scaled down from ballistics-icon-1024.png.
+09bfdbb14e9d33cf34b75483f5b51196705e4841. The PNG icons are scaled down from
+ballistics-icon-1024.png. The names and logos carry no open license (LicenseRef-Brand,
+LICENSES/LicenseRef-Brand.txt).
 
 - apps/web/src/assets/ballistics-light.svg, ballistics-dark.svg (unchanged)
 - apps/web/public/opengraph-image.png (ballistics-light-1280x640.png, unchanged)
 - apps/web/src/app/icon.png (512 px), apple-icon.png (180 px), apps/web/public/icon-192.png (192 px)
-
-MIT License
-
-Copyright (c) 2026 RangeFoundry contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 ---
 
