@@ -2321,7 +2321,7 @@ msgstr "Fewer than two shots to draw."
 msgid "sessionSummary.file"
 msgstr "File: {name}"
 
-msgid "targetDesigner.fillColour"
+msgid "targetDesigner.fillColor"
 msgstr "Fill: {colour}"
 
 msgid "targetDesigner.fillNotSet"
@@ -3023,7 +3023,7 @@ msgstr "line {colour}"
 msgid "bulletRecord.line"
 msgstr "Line {line}"
 
-msgid "targetDesigner.lineColour"
+msgid "targetDesigner.lineColor"
 msgstr "Line: {colour}"
 
 msgid "targetDesigner.lineNotSet"

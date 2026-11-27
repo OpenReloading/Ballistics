@@ -72,12 +72,12 @@ const colourOptions = (part: 'fill' | 'line', i18n: I18n) => [
       label:
         part === 'fill'
           ? i18n._({
-              id: 'targetDesigner.fillColour',
+              id: 'targetDesigner.fillColor',
               message: 'Fill: {colour}',
               values: { colour },
             })
           : i18n._({
-              id: 'targetDesigner.lineColour',
+              id: 'targetDesigner.lineColor',
               message: 'Line: {colour}',
               values: { colour },
             }),

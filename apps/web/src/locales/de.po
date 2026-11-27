@@ -3093,7 +3093,7 @@ msgid "sessionSummary.file"
 msgstr "Datei: {name}"
 
 # en: "Fill: {colour}"
-msgid "targetDesigner.fillColour"
+msgid "targetDesigner.fillColor"
 msgstr "Füllung: {colour}"
 
 # en: "Fill: not set"
@@ -4029,7 +4029,7 @@ msgid "bulletRecord.line"
 msgstr "Produktlinie {line}"
 
 # en: "Line: {colour}"
-msgid "targetDesigner.lineColour"
+msgid "targetDesigner.lineColor"
 msgstr "Linie: {colour}"
 
 # en: "Line: not set"
