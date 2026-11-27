@@ -1031,6 +1031,14 @@ msgstr "Messinghülse"
 msgid "page.cases"
 msgstr "Hülsen"
 
+# en: "brass {id}"
+msgid "workbench.replacedCase"
+msgstr "Hülse {id}"
+
+# en: "Brass case {name}"
+msgid "genericCase.name"
+msgstr "Messinghülse {name}"
+
 # en: "Brass data is unavailable right now."
 msgid "states.unavailable.case"
 msgstr "Die Hülsendaten sind gerade nicht verfügbar."
@@ -3368,9 +3376,17 @@ msgstr "Stufe der Ladeleiter"
 msgid "values.largePistol"
 msgstr "Pistole, groß"
 
+# en: "Large pistol magnum"
+msgid "genericPrimer.largePistolMagnum"
+msgstr "Pistole, groß, Magnum"
+
 # en: "Large rifle"
 msgid "values.largeRifle"
 msgstr "Büchse, groß"
+
+# en: "Large rifle magnum"
+msgid "genericPrimer.largeRifleMagnum"
+msgstr "Büchse, groß, Magnum"
 
 # en: "largest"
 msgid "bulletCompare.largest"
@@ -4540,6 +4556,10 @@ msgstr "Nicht importiert: {reason}"
 msgid "chargeTarget.notInBarrel"
 msgstr "nicht im Lauf"
 
+# en: "Not in the catalogue, the generic one of the cartridge is used: {list}."
+msgid "workbench.replacedNote"
+msgstr "Nicht im Katalog, stattdessen gilt das allgemeine Bauteil der Patrone: {list}."
+
 # en: "not in the file"
 msgid "sessionSummary.notInFile"
 msgstr "nicht in der Datei"
@@ -5119,6 +5139,10 @@ msgstr "Druckbereich"
 # en: "Pressure range, {unit}"
 msgid "powderCompare.pressureRangeUnit"
 msgstr "Druckbereich, {unit}"
+
+# en: "primer {id}"
+msgid "workbench.replacedPrimer"
+msgstr "Zündhütchen {id}"
 
 # en: "Primer data is unavailable right now."
 msgid "states.unavailable.primer"
@@ -6212,9 +6236,17 @@ msgstr "Langsamster Drall"
 msgid "values.smallPistol"
 msgstr "Pistole, klein"
 
+# en: "Small pistol magnum"
+msgid "genericPrimer.smallPistolMagnum"
+msgstr "Pistole, klein, Magnum"
+
 # en: "Small rifle"
 msgid "values.smallRifle"
 msgstr "Büchse, klein"
+
+# en: "Small rifle magnum"
+msgid "genericPrimer.smallRifleMagnum"
+msgstr "Büchse, klein, Magnum"
 
 # en: "smallest"
 msgid "bulletCompare.smallest"

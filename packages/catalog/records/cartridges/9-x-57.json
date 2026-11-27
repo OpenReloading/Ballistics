@@ -368,6 +368,9 @@
       "value": 63.25
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -376,6 +379,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page67.pdf",
         "sha256": "8c4f10e3fc818a5decd9189674d8237323d695f8817064e05e83cba7d8965c65",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 9×57mm Mauser",
+        "url": "https://en.wikipedia.org/w/index.php?title=9%C3%9757mm_Mauser&oldid=1196572134",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

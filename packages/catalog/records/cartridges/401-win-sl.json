@@ -246,6 +246,9 @@
       "note": "Present on the official CIP sheet at import; not yet checked by hand."
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -254,6 +257,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page105.pdf",
         "sha256": "b4259b2d021e226e618755241547368b72bc6f27892e1616c6a28bd13c9253cb",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .401 Winchester Self-Loading",
+        "url": "https://en.wikipedia.org/w/index.php?title=.401_Winchester_Self-Loading&oldid=1335364329",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

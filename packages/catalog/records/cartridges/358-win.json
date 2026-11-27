@@ -369,6 +369,9 @@
       "value": 63.77
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page139.pdf",
         "sha256": "3e48869202ad621fd8e9d0215d1821e799f82bb6ba6586ba4b214a5d8bee231e",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .358 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.358_Winchester&oldid=1338039834",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

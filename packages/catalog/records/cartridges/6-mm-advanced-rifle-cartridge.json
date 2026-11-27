@@ -369,6 +369,9 @@
       "value": 29.52
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/6-mm-arc-en.pdf",
         "sha256": "e4e5771fd402c16b5aad4c701d4963597dd944cf206c6d7b324ef53a72edbd39",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6mm ARC",
+        "url": "https://en.wikipedia.org/w/index.php?title=6mm_ARC&oldid=1380368001",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

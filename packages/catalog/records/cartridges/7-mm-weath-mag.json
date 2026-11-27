@@ -373,6 +373,9 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +384,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page5.pdf",
         "sha256": "a7031d33680d53eb084886c6e71dadc9a0fea1308ce44a3d473372d48bf264b8",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm_Weatherby_Magnum&oldid=1338144913",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Rifle."
       }
     ]
   }

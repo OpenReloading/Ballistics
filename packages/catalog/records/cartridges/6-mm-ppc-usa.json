@@ -369,6 +369,9 @@
       "value": 29.26
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page15.pdf",
         "sha256": "f1487b02cd5473487f9286a84346326d9e1c8553b3b5a27d6578287496ef038d",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-6mm-ppc",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

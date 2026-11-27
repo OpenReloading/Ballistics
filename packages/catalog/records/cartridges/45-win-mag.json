@@ -234,6 +234,9 @@
       "value": 101.33
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -242,6 +245,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page84.pdf",
         "sha256": "2d8e3a38e88b323957374646601b9bbdf6b121f2ba31b43ee85eea7af9151312",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .45 Winchester Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.45_Winchester_Magnum&oldid=1350257119",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

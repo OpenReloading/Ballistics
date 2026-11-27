@@ -323,6 +323,9 @@
       "value": 32.57
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -331,6 +334,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page60.pdf",
         "sha256": "5bfbd5f2d9674a32f3b57b96b84449c631752d51de30451dcb90661669165e52",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .25-20 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.25-20_Winchester&oldid=1328747818",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

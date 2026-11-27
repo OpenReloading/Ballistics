@@ -375,6 +375,10 @@
       "value": 70.16
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +387,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page142.pdf",
         "sha256": "291edd264aeb26b45ae9f721bf19d1e8b69a4f56737053107ebac914d57d63d9",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .375 Remington Ultra Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.375_Remington_Ultra_Magnum&oldid=1372169859",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

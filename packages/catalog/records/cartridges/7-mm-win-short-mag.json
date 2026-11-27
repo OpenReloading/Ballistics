@@ -368,6 +368,10 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -376,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/7-mm-win-short-mag-en.pdf",
         "sha256": "f50b5353acce2671a411fdd69f9d3dc8d6bc29199fac2719a4fbaaa8dcdf399a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm Winchester Short Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm_Winchester_Short_Magnum&oldid=1380000686",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: large rifle magnum."
       }
     ]
   }

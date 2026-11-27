@@ -375,6 +375,9 @@
       "value": 25.03
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page83.pdf",
         "sha256": "1e6ebd372501d2f4205bff5d3e361ad22209aaea26b2baa39a39ab7d260d13ff",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .220 Swift",
+        "url": "https://en.wikipedia.org/w/index.php?title=.220_Swift&oldid=1380090933",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

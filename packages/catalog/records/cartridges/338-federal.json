@@ -368,6 +368,9 @@
       "value": 56.92
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -376,6 +379,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/338-federal-en.pdf",
         "sha256": "bf8bc41de0ee68788f2f061505616b3c587e4dc29db7f4b6b6c10e17586e90c9",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .338 Federal",
+        "url": "https://en.wikipedia.org/w/index.php?title=.338_Federal&oldid=1352229382",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

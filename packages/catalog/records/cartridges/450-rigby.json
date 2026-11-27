@@ -334,6 +334,10 @@
       "value": 104.8
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -342,6 +346,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/450-rigby-en.pdf",
         "sha256": "b62f17242b214186fea0ce9606e9a8f63952b6d47226a3e438e4c3432f4ed406",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .450 Rigby",
+        "url": "https://en.wikipedia.org/w/index.php?title=.450_Rigby&oldid=1364988259",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle (magnum)."
       }
     ]
   }

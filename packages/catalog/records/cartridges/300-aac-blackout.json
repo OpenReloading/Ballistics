@@ -382,6 +382,9 @@
       "value": 47.54
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -390,6 +393,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/300-aac-blackout-180801-en.pdf",
         "sha256": "42b8665dd921417e6bc8a157d8e231f34f38ea9c97638d28ac0603e76334b9d9",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .300 AAC Blackout",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_AAC_Blackout&oldid=1384413294",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

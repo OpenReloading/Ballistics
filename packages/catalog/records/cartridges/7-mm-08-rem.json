@@ -375,6 +375,9 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page35.pdf",
         "sha256": "6aa5cd5682656eb992be7b0ad70721b3c80ea90dd012bbbea725c1fb37b38ba5",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm-08 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm-08_Remington&oldid=1380433578",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

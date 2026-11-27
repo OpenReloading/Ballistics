@@ -222,6 +222,9 @@
       "value": 47.91
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page41.pdf",
         "sha256": "ca0114ccd9022f085f68cd57f996173290f15b3d3473532cb02a20424384a568",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32 H&R Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32_H%26R_Magnum&oldid=1372403204",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

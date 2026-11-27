@@ -363,6 +363,9 @@
       "value": 83.15
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -371,6 +374,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/408-chey-tac-en.pdf",
         "sha256": "164adf8895f4d64a069c11fdd52d84a9b5efbec0d80ec8244f75afb7874b6f9d",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .408 Cheyenne Tactical",
+        "url": "https://en.wikipedia.org/w/index.php?title=.408_Cheyenne_Tactical&oldid=1381061150",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

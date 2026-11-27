@@ -296,6 +296,9 @@
       "value": 81.92
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -304,6 +307,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/40-65-win-170428-en.pdf",
         "sha256": "f31da79e155f9c72976734d3083b1c9fe3bbf4a9a2ece511ba3e70945cfae0d2",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .40-65 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.40-65_Winchester&oldid=1320396976",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: large rifle."
       }
     ]
   }

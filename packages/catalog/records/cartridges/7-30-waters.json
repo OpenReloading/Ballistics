@@ -329,6 +329,9 @@
       "value": 40.26
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -337,6 +340,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page20.pdf",
         "sha256": "b8f39832239f7365e92854ae20d7e3bb1c2f796af3ecd99b1827a8805c565080",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7-30 Waters",
+        "url": "https://en.wikipedia.org/w/index.php?title=7-30_Waters&oldid=1377519234",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

@@ -16,6 +16,7 @@ export const loadFileExample: LoadFileRequest = {
       saved: '2026-01-01T00:00:00.000Z',
       data: {
         origin: 'user',
+        cartridge: 'catalogue:308-win',
         charge: { value: 2.8 },
         analysis: {
           overrides: {

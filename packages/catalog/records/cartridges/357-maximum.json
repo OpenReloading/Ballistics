@@ -222,6 +222,10 @@
       "value": 62.57
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +234,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page52.pdf",
         "sha256": "fc20d41c47afcf96e2387015d0be6ef477a48406266eba6c2a3359a37d324b10",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .357 Remington Maximum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.357_Remington_Maximum&oldid=1368266109",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Small Pistol Magnum."
       }
     ]
   }

@@ -370,6 +370,9 @@
       "value": 29.25
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -378,6 +381,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page89.pdf",
         "sha256": "8eee436d446310a669af711012d0f0b74cac62e4308c19e1be330fc153fb74c6",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .243 Winchester Super Short Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.243_Winchester_Super_Short_Magnum&oldid=1372237955",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

@@ -316,6 +316,9 @@
       "value": 25.37
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -324,6 +327,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page57.pdf",
         "sha256": "7965d7aa41e07fcd08cf052c8999f3a17acb94141492415f7c9842e8f6894879",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-22-savage-hi-power",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: large rifle."
       }
     ]
   }

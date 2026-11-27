@@ -375,6 +375,9 @@
       "value": 47.32
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/300-rcm-en.pdf",
         "sha256": "06ba3787139e68afaeb670f65eba98e6453f0fc0d3b61db56c6cdd09bff9baff",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .300 Ruger Compact Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Ruger_Compact_Magnum&oldid=1365741598",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

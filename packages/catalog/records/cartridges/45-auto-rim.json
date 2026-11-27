@@ -216,6 +216,9 @@
       "value": 102.12
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -224,6 +227,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page77.pdf",
         "sha256": "4960345b456915dfbe1fc0225c435ee084b4188e8623fc8a4cbb4cb9e0cc85ca",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .45 Auto Rim",
+        "url": "https://en.wikipedia.org/w/index.php?title=.45_Auto_Rim&oldid=1368987379",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

@@ -248,6 +248,9 @@
       "value": 64.82
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -256,6 +259,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page25.pdf",
         "sha256": "710abdab2f4108cb544744b3d9f1ff91cd1c0c024b64653ca238690f1b3f53bf",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 9mm Browning Long",
+        "url": "https://en.wikipedia.org/w/index.php?title=9mm_Browning_Long&oldid=1319290089",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

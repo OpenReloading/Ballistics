@@ -215,6 +215,10 @@
             "shotshell"
           ],
           "description": "The primer size of a load that names no primer record."
+        },
+        "primerMagnum": {
+          "type": "boolean",
+          "description": "Whether the source of `primerSize` calls for a magnum primer of that size."
         }
       },
       "additionalProperties": false

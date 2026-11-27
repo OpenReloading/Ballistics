@@ -329,6 +329,9 @@
       "value": 25.03
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -337,6 +340,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page54.pdf",
         "sha256": "e461bf4ee63dfe62f31e7e3089aa142f181028b8f0165813519be198d1917b81",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .218 Bee",
+        "url": "https://en.wikipedia.org/w/index.php?title=.218_Bee&oldid=1387944802",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

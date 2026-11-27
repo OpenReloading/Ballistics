@@ -232,6 +232,7 @@ export const cartridge: z.ZodObject<{
     defaults: z.ZodOptional<z.ZodObject<{
         capacity: z.ZodOptional<z.ZodString>;
         primerSize: z.ZodOptional<typeof primerSizes>;
+        primerMagnum: z.ZodOptional<z.ZodBoolean>;
     }, z.core.$strict>>;
     provenance: z.ZodOptional<typeof provenance>;
 }>;
@@ -1469,6 +1470,15 @@ export const ringScoring: z.ZodObject<{
     discipline: z.ZodOptional<typeof recordId>;
     seriesShots: z.ZodOptional<z.ZodInt>;
 }, z.core.$strict>;
+
+// @public
+export interface SavedLoad extends Load {
+    // (undocumented)
+    cartridge: string;
+}
+
+// @public
+export const savedLoad: z.ZodType<SavedLoad>;
 
 // @public
 export function score(key: string, query: string): number | undefined;

@@ -380,6 +380,10 @@
       "footnotes": ["2", "3"]
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -388,6 +392,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page3.pdf",
         "sha256": "b2a9144ef97c109cb35530f8f99ab8704041f9444ca933019fa0edd08c36a597",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm Remington Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm_Remington_Magnum&oldid=1382964911",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

@@ -361,6 +361,9 @@
       "value": 29.21
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -369,6 +372,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page17.pdf",
         "sha256": "787aa48b215822daa39fad6088429a20bfe6ccec5c6951a656a4eb0c02f40c16",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6 mm XC",
+        "url": "https://en.wikipedia.org/w/index.php?title=6_mm_XC&oldid=1380355298",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: large rifle."
       }
     ]
   }

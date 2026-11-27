@@ -329,6 +329,9 @@
       "value": 24.53
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -337,6 +340,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page56.pdf",
         "sha256": "70075db50e99322e102d93eebd1aa9c5afcdac51fc26cf8a1e6d85c25f7ac9a4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .22 Hornet",
+        "url": "https://en.wikipedia.org/w/index.php?title=.22_Hornet&oldid=1332690682",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

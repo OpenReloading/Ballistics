@@ -54,14 +54,6 @@ test('the federation list links each federation to its record', async ({ page })
   )
 })
 
-test('the brass list links each case to its record', async ({ page }) => {
-  await gotoHydrated(page, '/cases')
-  await expect(page.getByRole('link', { name: /308 Win\. Brass Demo/ })).toHaveAttribute(
-    'href',
-    /\/cases\/demo-case-308-brass\/?$/,
-  )
-})
-
 test('a discipline record links its federation', async ({ page }) => {
   await gotoHydrated(page, '/disciplines/dsb-25m-pistole-revolver')
   await expect(

@@ -373,6 +373,10 @@
       "value": 57.22
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page24.pdf",
         "sha256": "e387a5ce69651cda5a7c9d46132fdcaea6ab06eef09b2c161c951a7bdb7079b3",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .340 Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.340_Weatherby_Magnum&oldid=1365506518",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: large rifle magnum."
       }
     ]
   }

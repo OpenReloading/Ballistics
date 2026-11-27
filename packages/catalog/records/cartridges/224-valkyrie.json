@@ -375,6 +375,9 @@
       "value": 25.03
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/224-valkyrie-230324-en.pdf",
         "sha256": "4efb47a8df58ede84b432f74c92b4a769e29a21b52347bd41d730c08eed1007b",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .224 Valkyrie",
+        "url": "https://en.wikipedia.org/w/index.php?title=.224_Valkyrie&oldid=1285900095",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small Rifle."
       }
     ]
   }

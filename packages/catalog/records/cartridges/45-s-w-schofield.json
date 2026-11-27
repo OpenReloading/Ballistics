@@ -222,6 +222,9 @@
       "value": 101.48
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page82.pdf",
         "sha256": "6348b18e67e3be39dbc6280c0ee64eae7ab2c236b70d89a53a5e5d4eed63b7a8",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-45-schofield",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

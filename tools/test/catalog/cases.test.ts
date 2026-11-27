@@ -124,10 +124,4 @@ describe('case records', () => {
       caseErrors({ cartridge: 'catalogue:other-cartridge', record: 'catalogue:test-case' }),
     ).toEqual(['loads/test-load.json: case "catalogue:test-case" is a case of another cartridge'])
   })
-
-  it('accepts the demo case of the committed records', () => {
-    const { bundle, errors } = readRecords()
-    expect(errors).toEqual([])
-    expect(bundle.cases.map((c) => c.id)).toContain('demo-case-308-brass')
-  })
 })

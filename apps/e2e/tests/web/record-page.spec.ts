@@ -41,22 +41,6 @@ const records: {
     description: 'Recorded properties of Demo Powder Co. DP40, with sources.',
   },
   {
-    route: 'cases',
-    data: 'cases',
-    id: 'demo-case-308-brass',
-    name: 'Demo Cases 308 Win. Brass Demo',
-    title: 'Demo Cases 308 Win. Brass Demo',
-    description: 'Recorded properties of the brass Demo Cases 308 Win. Brass Demo, with sources.',
-  },
-  {
-    route: 'primers',
-    data: 'primers',
-    id: 'demo-primer-large-rifle',
-    name: 'Demo Primers Large Rifle Demo',
-    title: 'Demo Primers Large Rifle Demo',
-    description: 'Recorded properties of the primer Demo Primers Large Rifle Demo, with sources.',
-  },
-  {
     route: 'targets',
     data: 'target-faces',
     id: 'issf-25m-precision-50m-pistol',

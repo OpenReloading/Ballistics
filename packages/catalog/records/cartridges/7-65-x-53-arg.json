@@ -369,6 +369,9 @@
       "value": 48.36
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page50.pdf",
         "sha256": "203ffaa7d902d56455b720580723a41e6d05649d5e96ac58c89bae3894068227",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.65×53mm Argentine",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.65%C3%9753mm_Argentine&oldid=1385543456",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

@@ -236,6 +236,9 @@
       "value": 62.85
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -244,6 +247,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page61.pdf",
         "sha256": "07cab9cfab9a55c797b3bcdba5fb3b7b97941101a8f9e063ef38f6dc894e9ec9",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .38 Super",
+        "url": "https://en.wikipedia.org/w/index.php?title=.38_Super&oldid=1375275028",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

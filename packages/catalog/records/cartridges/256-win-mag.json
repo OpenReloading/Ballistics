@@ -329,6 +329,9 @@
       "value": 32.59
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -337,6 +340,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/256-win-mag-en.pdf",
         "sha256": "59ca89eb589f01c383eddf4479485fecd540460b5e847d67fedff9d484f2ff6e",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .256 Winchester Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.256_Winchester_Magnum&oldid=1372654259",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

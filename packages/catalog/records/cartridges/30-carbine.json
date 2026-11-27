@@ -244,6 +244,9 @@
       "value": 47.4
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -252,6 +255,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page106.pdf",
         "sha256": "19d55a498da1745862c85fd70333b4d2d7124b13d0253e30452789e8f5f830bf",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .30 carbine",
+        "url": "https://en.wikipedia.org/w/index.php?title=.30_carbine&oldid=1387807771",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

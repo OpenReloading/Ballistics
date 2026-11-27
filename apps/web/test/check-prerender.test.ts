@@ -6,7 +6,6 @@ import { checkPages } from '../scripts/check-prerender.mts'
 import { sampleIds } from '../src/lib/prerender-sample.ts'
 import { type RecordKind, recordHeadText } from '../src/lib/record-metadata.ts'
 import { titleTemplate } from '../src/lib/title-template.ts'
-import { defined } from './defined.ts'
 
 const kinds = [
   ['cartridges', 'cartridge'],
@@ -19,7 +18,7 @@ const kinds = [
   ['federations', 'federation'],
 ] as const
 const routeOf = (dir: string) => (dir === 'target-faces' ? 'targets' : dir)
-const first = (what: string) => defined(defined(sampleIds[what])[0])
+const first = (what: string) => sampleIds[what]?.[0] ?? 'x-0'
 
 const dirs: string[] = []
 afterEach(() => {
@@ -77,6 +76,14 @@ it('finds every list and record page of a full export', () => {
   expect(expected).toHaveLength(8 * 3)
   expect(missing).toEqual([])
   expect(noHead).toEqual([])
+})
+
+it('accepts a kind without data files only where the catalogue index lists none of it', () => {
+  const dir = site()
+  rmSync(path.join(dir, 'api', 'primers'), { recursive: true })
+  expect(() => checkPages(dir, { PRERENDER: 'full' })).toThrow('no primer data files')
+  put(path.join(dir, 'api', 'catalogue', 'index.json'), JSON.stringify({ primers: [] }))
+  expect(checkPages(dir, { PRERENDER: 'full' }).missing).toEqual([])
 })
 
 it('names a record page the export lacks, and one that has only its HTML', () => {

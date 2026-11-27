@@ -243,6 +243,9 @@
       "value": 31.14
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -251,6 +254,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page4.pdf",
         "sha256": "9c7980d2a5e4ec7148cb69c901e261ee124b8130a971d1224b00c84e1c21d9e1",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .25 ACP",
+        "url": "https://en.wikipedia.org/w/index.php?title=.25_ACP&oldid=1375461047",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

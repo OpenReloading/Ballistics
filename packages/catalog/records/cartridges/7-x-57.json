@@ -362,6 +362,9 @@
       "value": 40.41
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -370,6 +373,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page33.pdf",
         "sha256": "8f00b72e388f05cb1768752c314c8546219bee8898d951f0c8df75ebc8c34b1e",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7×57mm Mauser",
+        "url": "https://en.wikipedia.org/w/index.php?title=7%C3%9757mm_Mauser&oldid=1380457955",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

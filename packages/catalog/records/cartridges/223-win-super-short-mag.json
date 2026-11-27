@@ -370,6 +370,9 @@
       "value": 25.09
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -378,6 +381,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page87.pdf",
         "sha256": "fb0483281f42db5066f1072bdb53a8c545257eb6129eec0835959d66e850bdcb",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .223 Winchester Super Short Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.223_Winchester_Super_Short_Magnum&oldid=1388064946",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

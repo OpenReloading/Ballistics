@@ -222,6 +222,9 @@
       "value": 52.91
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page16.pdf",
         "sha256": "205cbec8eee76d0a6d5eed8dddce2d643ab5e4603dcb9e2267d6123764d8c77b",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 8×50mmR Lebel",
+        "url": "https://en.wikipedia.org/w/index.php?title=8%C3%9750mmR_Lebel&oldid=1377633691",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }
