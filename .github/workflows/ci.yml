@@ -35,7 +35,7 @@ env:
 # The jobs stay in this file until a shared gates workflow is released; then they
 # become a call pinned by commit SHA, and `check` stays here (it names this file's jobs).
 jobs:
-  # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only), `e2e` and `e2e-next` (no
+  # Which jobs run and what the e2e jobs export: only a pull request may skip `check` (prose only), `e2e` and `e2e-next` (no
   # change to what the API, the web app, the export scripts or the e2e specs read) or `docs` (no change to the docs
   # site or to what the plan lists as read by its image build), test only the workspaces it reaches (pnpm's
   # `--filter "...[<base>]"`, which adds every workspace that depends on a changed one), or export a sample of the
@@ -214,11 +214,11 @@ jobs:
       - run: uv run pytest
 
   # The one check the ruleset requires: it waits for every other job of this workflow and fails when one failed or
-  # was cancelled, or was skipped where the plan cannot skip it (only `static`, `test`, `docs` and `hole-model` may be, and `e2e` and `e2e-next` when the plan's `e2e` is false). It
+  # was cancelled, or was skipped where the plan cannot skip it (only `static`, `test`, `docs` and `hole-model` may be, and the e2e jobs when the plan's `e2e` is false). It
   # also checks the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run: the
   # plan skips `static` for prose that no other check reads, which is where a word breaks.
   check:
-    needs: [changes, static, test, docs, e2e, e2e-next, hole-model, workflows, dependency-review]
+    needs: [changes, static, test, docs, e2e-checks, e2e-shard, e2e, e2e-next, hole-model, workflows, dependency-review]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -247,7 +247,7 @@ jobs:
           NEEDS: ${{ toJSON(needs) }}
         run: |
           jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<< "$NEEDS"
-          jq -e '.changes.outputs.e2e as $e2e | to_entries | all(.value.result == "success" or (.value.result == "skipped" and ((.key | IN("static", "test", "docs", "hole-model")) or ($e2e == "false" and (.key | IN("e2e", "e2e-next"))))))' <<< "$NEEDS" > /dev/null
+          jq -e '.changes.outputs.e2e as $e2e | to_entries | all(.value.result == "success" or (.value.result == "skipped" and ((.key | IN("static", "test", "docs", "hole-model")) or ($e2e == "false" and (.key | IN("e2e-checks", "e2e-shard", "e2e", "e2e-next"))))))' <<< "$NEEDS" > /dev/null
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:
@@ -288,14 +288,15 @@ jobs:
   # The API runs from its compose service, as shipped: Schemathesis checks it against its document and the load
   # file spec posts to it. The tests, the drawing baseline, the JavaScript budget and the prerender check run on the
   # static export (`pnpm --filter @rangefoundry/tools run pages`, served at the site root by `pages-serve`), which holds
-  # no API: the smoke spec compares its data files and its workbench with the API's answers.
-  e2e:
+  # no API: the smoke spec compares its data files and its workbench with the API's answers. `e2e-checks` runs the
+  # steps that run once (Schemathesis, the budget, the prerender check, the drawing baseline), `e2e-shard` the
+  # Playwright specs in three shards, each with its own API and export, and `e2e` is the required check of both.
+  e2e-checks:
     needs: changes
     # a failed `changes` job still runs e2e, with empty outputs: every record page is exported
     if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
-    # at least 10 minutes above the slowest run of main (32 minutes)
-    timeout-minutes: 45
+    timeout-minutes: 25
     permissions:
       contents: read
     env:
@@ -312,8 +313,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - uses: ./.github/actions/pnpm
-      # The tests run in the Playwright image, which holds the browsers and the fonts they render with: nothing is
-      # installed from apt or the browser CDN on the runner. Its browsers are those of the lockfile's @playwright/test.
+      # The drawing baseline runs in the Playwright image, which holds the browsers and the fonts they render with:
+      # nothing is installed from apt or the browser CDN on the runner. Its browsers are those of the lockfile's
+      # @playwright/test.
       - name: Pull the Playwright image of the locked @playwright/test
         uses: ./.github/actions/playwright-image
         with:
@@ -339,7 +341,8 @@ jobs:
       # The Turbopack compile cache only (.next/cache/fetch-cache holds API responses, so it never leaves the run).
       # A pull request restores the newest cache of its own branch or of the default branch (GitHub scopes caches
       # that way, so a fork's cache cannot reach another branch). A merge queue run builds from nothing and saves
-      # nothing: its cache is scoped to the queue branch, which no pull request reads.
+      # nothing: its cache is scoped to the queue branch, which no pull request reads. This job saves it, the shards
+      # only restore it.
       - name: Key of the Turbopack cache
         id: next
         run: |
@@ -376,14 +379,6 @@ jobs:
           node tools/src/pages-serve.ts &
           for _ in $(seq 1 30); do curl --silent --fail http://localhost:3003/ > /dev/null && exit 0; sleep 1; done
           exit 1
-      # `pnpm run test:e2e` as scripts/baseline.sh runs it: as the runner's user, so the results stay writable for the
-      # later steps; every project but `next-chromium` (NEXT_EDITION=off), which the `e2e-next` job runs
-      - name: End-to-end tests in the Playwright image
-        run: |
-          docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
-            --env CI --env GITHUB_ACTIONS --env API_URL --env WEB_URL --env NEXT_PUBLIC_REPOSITORY_URL \
-            --env NEXT_EDITION=off --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
-            "$PLAYWRIGHT_IMAGE" npx playwright test
       - name: Drawing baseline in the Playwright image
         run: pnpm --filter @rangefoundry/e2e run drawing-baseline
       - name: Paired contact sheet of the baseline drawings when drawing code changed
@@ -418,14 +413,116 @@ jobs:
         with:
           name: drawing-contact-sheet
           path: sheet/out
+      - name: Keep the drawing baseline results (actual and diff images) of a failed run
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-checks-test-results
+          path: apps/e2e/test-results
+      - if: always()
+        run: docker compose down --volumes
+
+  # The Playwright specs of every project but `next-chromium` (NEXT_EDITION=off), which the `e2e-next` job runs, split
+  # by Playwright's `--shard`. Three shards: the specs took 25 minutes on one runner, and `e2e-next` takes longer than
+  # a third of that plus the setup of a shard.
+  e2e-shard:
+    name: e2e (shard ${{ matrix.shard }}/3)
+    needs: changes
+    # the plan of `e2e-checks`: a failed `changes` job still runs it
+    if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
+    runs-on: ubuntu-latest
+    # at least 10 minutes above the slowest shard
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    env:
+      API_URL: http://localhost:3000
+      WEB_URL: http://localhost:3003
+      PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}
+      NEXT_PUBLIC_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+      SHARD: ${{ matrix.shard }}/3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/pnpm
+      - name: Pull the Playwright image of the locked @playwright/test
+        uses: ./.github/actions/playwright-image
+        with:
+          package: apps/e2e/node_modules/@playwright/test/package.json
+      - run: pnpm --filter "@rangefoundry/web^..." run build
+      - run: docker compose up --detach --build api
+      - name: Wait for the API
+        run: |
+          for _ in $(seq 1 60); do
+            curl --silent --fail http://localhost:3000/ && exit 0
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+      - name: Key of the Turbopack cache
+        id: next
+        run: |
+          next=$(node -p "require('./apps/web/package.json').dependencies.next")
+          echo "prefix=next-export-$RUNNER_OS-$RUNNER_ARCH-$next" >> "$GITHUB_OUTPUT"
+      - name: Restore the Turbopack cache
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/web/.next/cache/turbopack
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'pnpm-lock.yaml', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+          restore-keys: |
+            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'pnpm-lock.yaml', 'apps/web/next.config.ts') }}-
+      - name: Export the static site
+        run: |
+          if [ "$PRERENDER" = sample ]; then
+            pnpm --filter @rangefoundry/tools run pages --sample
+          else
+            pnpm --filter @rangefoundry/tools run pages --no-docs
+          fi
+      - name: Serve the export
+        run: |
+          node tools/src/pages-serve.ts &
+          for _ in $(seq 1 30); do curl --silent --fail http://localhost:3003/ > /dev/null && exit 0; sleep 1; done
+          exit 1
+      # `pnpm run test:e2e` as scripts/baseline.sh runs it: as the runner's user, so the results stay writable for the
+      # upload of a failed run
+      - name: End-to-end tests in the Playwright image
+        run: |
+          docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
+            --env CI --env GITHUB_ACTIONS --env API_URL --env WEB_URL --env NEXT_PUBLIC_REPOSITORY_URL \
+            --env NEXT_EDITION=off --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
+            "$PLAYWRIGHT_IMAGE" npx playwright test --shard="$SHARD"
       - name: Keep the e2e results (actual and diff images) of a failed run
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: e2e-test-results
+          name: e2e-test-results-${{ matrix.shard }}
           path: apps/e2e/test-results
       - if: always()
         run: docker compose down --volumes
+
+  # The required check `e2e`: it fails unless `e2e-checks` and every shard succeeded, and is skipped with them when
+  # the plan skips the e2e suite.
+  e2e:
+    needs: [changes, e2e-checks, e2e-shard]
+    if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Results of the e2e jobs
+        env:
+          CHECKS: ${{ needs.e2e-checks.result }}
+          SHARDS: ${{ needs.e2e-shard.result }}
+        run: |
+          echo "e2e-checks: $CHECKS, e2e-shard: $SHARDS"
+          [ "$CHECKS" = success ] && [ "$SHARDS" = success ]
 
   # The web specs of the routes the Start app has ported, on its next edition (project `next-chromium`), apart from
   # `e2e` so that job keeps its timeout headroom. Playwright's `webServer` builds and serves the Start site; no API.
