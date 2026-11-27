@@ -31,6 +31,9 @@ msgstr "{count, decimal} proposed, {maybe, decimal} maybe"
 msgid "holeDetection.proposedMaybeAcceptThem"
 msgstr "{count, decimal} proposed, {maybe, decimal} maybe: accept them to add shots."
 
+msgid "targetDesigner.drawingLabel"
+msgstr "{count, plural, one {{name}: # ring, {size, decimal} mm across} other {{name}: # rings, {size, decimal} mm across}}"
+
 msgid "lists.countShown.cases"
 msgstr "{count, plural, one {{shown} of # brass} other {{shown} of # brass}}"
 
@@ -116,6 +119,9 @@ msgid "lists.count.federations"
 msgstr "{count, plural, one {# federation} other {# federations}}"
 
 msgid "powderDesigner.fieldsToFix"
+msgstr "{count, plural, one {# field to fix.} other {# fields to fix.}}"
+
+msgid "targetDesigner.fieldsToFix"
 msgstr "{count, plural, one {# field to fix.} other {# fields to fix.}}"
 
 msgid "recordSources.fieldCount"
@@ -358,6 +364,9 @@ msgstr "{offset} standard uncertainties from the fit"
 msgid "recordFields.burnRateOrder"
 msgstr "{order} of {total}"
 
+msgid "targetDesigner.partMessage"
+msgstr "{part}: {message}"
+
 msgid "holeDetection.percent"
 msgstr "{pct, decimal} %"
 
@@ -472,6 +481,9 @@ msgstr "A group holds at most 1000 shots."
 msgid "targetEditor.groupHoldsMost1000"
 msgstr "A group holds at most 1000 shots."
 
+msgid "targetDesigner.heightNeedsOval"
+msgstr "a height needs oval rings"
+
 msgid "holeDetection.knownDistanceTargetSize"
 msgstr "A known distance on the target or the size of a target ring, marked on the photo in Calibrate."
 
@@ -501,6 +513,18 @@ msgstr "A sheet holds at most 20 references."
 
 msgid "targetEditor.shotPointAimOrigin"
 msgstr "A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields."
+
+msgid "targetDesigner.squareNoHeight"
+msgstr "a square has no height"
+
+msgid "targetDesigner.stadiumInnerTenHeight"
+msgstr "a stadium inner ten needs a height"
+
+msgid "targetDesigner.stadiumHighAsWide"
+msgstr "a stadium is at least as high as it is wide"
+
+msgid "targetDesigner.stadiumNeedsHeight"
+msgstr "a stadium needs a height"
 
 msgid "disciplines.column.abbreviation"
 msgstr "Abbreviation"
@@ -547,6 +571,9 @@ msgstr "Add a string, or open this page from the Measurements tab of a load with
 msgid "bulletCompare.add"
 msgstr "Add bullet"
 
+msgid "targetDesigner.addEvent"
+msgstr "Add event"
+
 msgid "targetEditor.addGroup"
 msgstr "Add group"
 
@@ -558,6 +585,9 @@ msgstr "Add photo"
 
 msgid "burnRateCompare.add"
 msgstr "Add powder"
+
+msgid "targetDesigner.addRing"
+msgstr "Add ring"
 
 msgid "events.addSeries"
 msgstr "Add series"
@@ -655,6 +685,9 @@ msgstr "Aluminum"
 msgid "powderTune.inputLeftOutPressureRange"
 msgstr "An input left out of the pressure range"
 
+msgid "targetEditor.targetAxisAngleHelp"
+msgstr "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes."
+
 msgid "recordFields.annealed"
 msgstr "Annealed"
 
@@ -696,6 +729,9 @@ msgstr "At constant volume; min and max over the composition ranges."
 
 msgid "powderDesigner.constantVolume"
 msgstr "At constant volume."
+
+msgid "targetDesigner.atLeastNeeded"
+msgstr "at least {n} needed."
 
 msgid "listSources.lastOn"
 msgstr "At least one source stays on"
@@ -823,14 +859,26 @@ msgstr "black"
 msgid "targets.row.blackArea"
 msgstr "Black area"
 
+msgid "targetDesigner.blackAreaDiameter"
+msgstr "Black area diameter"
+
+msgid "targetDesigner.blackAreaHeight"
+msgstr "Black area height"
+
 msgid "targets.row.blackAreaHeight"
 msgstr "Black area height"
 
 msgid "targets.strip.blackAreaWidth"
 msgstr "Black area width"
 
+msgid "holeDetection.blackDiameter"
+msgstr "Black diameter"
+
 msgid "values.blackOxide"
 msgstr "black oxide"
+
+msgid "targetDesigner.blackZonesAdjacent"
+msgstr "black zones must be adjacent rings"
 
 msgid "targets.color.blue"
 msgstr "blue"
@@ -1477,6 +1525,9 @@ msgstr "Color"
 msgid "targetEditor.colorName"
 msgstr "Color {color}"
 
+msgid "targetDesigner.fillHelp"
+msgstr "Color of the zone this ring line bounds on the outside."
+
 msgid "recordSources.origin.community"
 msgstr "community"
 
@@ -1615,6 +1666,9 @@ msgstr "Core hardness (HBW)"
 msgid "units.quantity.correction"
 msgstr "Corrections"
 
+msgid "holeDetection.photoAngleHelp"
+msgstr "Counter-clockwise turn of the photo on screen; type a small angle to straighten it. Holes, scale and aim point turn with the photo, the target axes do not."
+
 msgid "cartridgeRecord.country"
 msgstr "Country"
 
@@ -1641,6 +1695,12 @@ msgstr "Counts when touched"
 
 msgid "disciplineRecord.column.course"
 msgstr "Course of fire"
+
+msgid "targetDesigner.coverCounts"
+msgstr "Cover counts"
+
+msgid "targetDesigner.coverCircularInnerTen"
+msgstr "cover needs a circular inner ten"
 
 msgid "recordSources.column.covers"
 msgstr "Covers"
@@ -1722,6 +1782,9 @@ msgstr "Date"
 
 msgid "sessionSummary.date"
 msgstr "Date: {date}"
+
+msgid "targetDesigner.decimalScoring"
+msgstr "Decimal scoring"
 
 msgid "firearms.delete"
 msgstr "Delete"
@@ -1834,6 +1897,9 @@ msgstr "Diameter"
 msgid "recordFields.diameter"
 msgstr "Diameter"
 
+msgid "targetDesigner.diameter"
+msgstr "Diameter"
+
 msgid "cartridgeRecord.meaning.diameterAtL"
 msgstr "diameter at L"
 
@@ -1842,6 +1908,15 @@ msgstr "diameter at L1"
 
 msgid "cartridgeRecord.meaning.mouthDiameter"
 msgstr "diameter at the mouth (l)"
+
+msgid "holeDetection.blackDiameterHelp"
+msgstr "Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo)."
+
+msgid "targetDesigner.gaugeHelp"
+msgstr "Diameter of the scored hole."
+
+msgid "targetDesigner.diameterUnit"
+msgstr "Diameter, {unit}"
 
 msgid "bulletPhoto.caliperDiameter"
 msgstr "Diameter, caliper (optional)"
@@ -1918,6 +1993,12 @@ msgstr "Distance"
 msgid "federationRecord.column.distance"
 msgstr "Distance"
 
+msgid "targetDesigner.distance"
+msgstr "Distance"
+
+msgid "targetEditor.distance"
+msgstr "Distance"
+
 msgid "targets.column.distance"
 msgstr "Distance"
 
@@ -1932,6 +2013,9 @@ msgstr "Distance A to B"
 
 msgid "bulletPhoto.distanceCD"
 msgstr "Distance C to D (optional)"
+
+msgid "targetDesigner.distanceUnit"
+msgstr "Distance, {unit}"
 
 msgid "events.division"
 msgstr "Division"
@@ -1952,6 +2036,9 @@ msgid "bulletRecord.drawing"
 msgstr "Drawing"
 
 msgid "cartridgeDesigner.drawing"
+msgstr "Drawing"
+
+msgid "targetDesigner.drawing"
 msgstr "Drawing"
 
 msgid "bulletDesigner.drawingEarlierInputsFix"
@@ -2080,6 +2167,9 @@ msgstr "Enter a name and the values you have."
 msgid "targetEditor.enterName"
 msgstr "Enter a name."
 
+msgid "targetDesigner.enterRingDiameter"
+msgstr "Enter a ring diameter."
+
 msgid "chargeTarget.enterTargetAbove0"
 msgstr "Enter a target above 0{unit}."
 
@@ -2146,6 +2236,18 @@ msgstr "Even light, no reflection"
 msgid "disciplineRecord.column.event"
 msgstr "Event"
 
+msgid "targetDesigner.eventNDistance"
+msgstr "Event {n} distance"
+
+msgid "targetDesigner.eventNGauge"
+msgstr "Event {n} gauge"
+
+msgid "targetDesigner.eventNName"
+msgstr "Event {n} name"
+
+msgid "targetDesigner.eventName"
+msgstr "Event name"
+
 msgid "events.total"
 msgstr "Event total: {total}"
 
@@ -2170,6 +2272,9 @@ msgstr "Events"
 
 msgid "faceRecord.events"
 msgstr "Events ({count})"
+
+msgid "targetDesigner.events"
+msgstr "Events of the target"
 
 msgid "faceRecord.eventsTable"
 msgstr "Events table"
@@ -2197,6 +2302,12 @@ msgstr "Excluded: left out of the statistics, still shown and counted"
 
 msgid "targetEditor.expand"
 msgstr "Expand"
+
+msgid "holeDetection.holeSizeTypedHelp"
+msgstr "Expected hole diameter; a typed size overrides the bullet and the marker. Detection runs once it is entered."
+
+msgid "holeDetection.holeSizeHelp"
+msgstr "Expected hole diameter; an example hole sets it to its measured size. Empty: the median of 3 or more accepted single holes, else the bullet diameter, else the marker."
 
 msgid "burnRate.exponentDetail"
 msgstr "exponent {exponent, decimal}"
@@ -2293,6 +2404,12 @@ msgstr "Fewer than two shots to draw."
 
 msgid "sessionSummary.file"
 msgstr "File: {name}"
+
+msgid "targetDesigner.fillColor"
+msgstr "Fill: {colour}"
+
+msgid "targetDesigner.fillNotSet"
+msgstr "Fill: not set"
 
 msgid "log.fillsResult"
 msgstr "Fills an empty result with the event's total."
@@ -2444,6 +2561,9 @@ msgstr "flat-nose"
 msgid "bulletPhoto.flipNose"
 msgstr "Flip nose"
 
+msgid "targetDesigner.ovalHelp"
+msgstr "For an oval; empty for a circle."
+
 msgid "bulletPhoto.needScale"
 msgstr "For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length."
 
@@ -2549,6 +2669,12 @@ msgstr "Gauge"
 msgid "faceRecord.column.gauge"
 msgstr "Gauge"
 
+msgid "targetDesigner.gauge"
+msgstr "Gauge"
+
+msgid "targetDesigner.gaugeUnit"
+msgstr "Gauge, {unit}"
+
 msgid "values.gildingMetal"
 msgstr "gilding metal"
 
@@ -2636,6 +2762,18 @@ msgstr "Head, rim and groove"
 msgid "recordFields.headstamp"
 msgstr "Headstamp"
 
+msgid "targetDesigner.height"
+msgstr "Height"
+
+msgid "targetEditor.height"
+msgstr "Height"
+
+msgid "targetDesigner.heightAllOrNone"
+msgstr "height on all rings or on none"
+
+msgid "targetDesigner.heightUnit"
+msgstr "Height, {unit}"
+
 msgid "comparePicks.hiddenTitle"
 msgstr "Hidden by the search or a filter"
 
@@ -2671,6 +2809,9 @@ msgstr "Hole edge"
 
 msgid "faceRecord.scoredBy.outward"
 msgstr "Hole edge, outward"
+
+msgid "holeDetection.holeSize"
+msgstr "Hole size"
 
 msgid "holeDetection.holes"
 msgstr "Holes"
@@ -2801,11 +2942,23 @@ msgstr "Ingredient {n, decimal} min percent"
 msgid "powderDesigner.ingredientName"
 msgstr "Ingredient {n, decimal} name"
 
+msgid "targetDesigner.innerTen"
+msgstr "Inner ten"
+
 msgid "targets.row.innerTen"
 msgstr "Inner ten"
 
+msgid "targetDesigner.innerTenDiameter"
+msgstr "Inner ten diameter"
+
+msgid "targetDesigner.innerTenHeight"
+msgstr "Inner ten height"
+
 msgid "targets.row.innerTenHeight"
 msgstr "Inner ten height"
+
+msgid "targetDesigner.innerTenRule"
+msgstr "Inner ten rule"
 
 msgid "targets.row.innerTenRule"
 msgstr "Inner ten rule"
@@ -2860,6 +3013,9 @@ msgstr "Kind"
 
 msgid "disciplines.rule.kneeling"
 msgstr "kneeling"
+
+msgid "targetEditor.knownLength"
+msgstr "Known length"
 
 msgid "cartridgeRecord.meaning.leadeEnd"
 msgstr "L3 to the end of the leade"
@@ -2983,6 +3139,12 @@ msgstr "line {colour}"
 
 msgid "bulletRecord.line"
 msgstr "Line {line}"
+
+msgid "targetDesigner.lineColor"
+msgstr "Line: {colour}"
+
+msgid "targetDesigner.lineNotSet"
+msgstr "Line: not set"
 
 msgid "recordActions.linkCopied"
 msgstr "Link copied"
@@ -3224,6 +3386,9 @@ msgstr "Mark on photo"
 msgid "holeDetection.marker"
 msgstr "marker"
 
+msgid "targetEditor.marker"
+msgstr "Marker"
+
 msgid "bulletDesigner.mass"
 msgstr "Mass"
 
@@ -3413,6 +3578,21 @@ msgstr "More than one target fits these rings: choose one in Target."
 msgid "photoQuality.fix.moveCloser"
 msgstr "Move closer so the target fills more of the frame, or use the full resolution of the camera."
 
+msgid "targetDesigner.belowOuterRing"
+msgstr "must be below the ring outside it"
+
+msgid "targetDesigner.oneAboveOuterRing"
+msgstr "must be one above the ring outside it"
+
+msgid "targetDesigner.uniqueInTarget"
+msgstr "must be unique within the target"
+
+msgid "targetDesigner.equalOuterBlackRing"
+msgstr "must equal the diameter of the outermost black ring"
+
+msgid "targetDesigner.notOverInnermostRing"
+msgstr "must not exceed the innermost ring"
+
 msgid "sessionSummary.muzzleDistance"
 msgstr "Muzzle distance: {distance}"
 
@@ -3421,6 +3601,9 @@ msgstr "Muzzle energy from"
 
 msgid "values.muzzleLoader"
 msgstr "Muzzle loader"
+
+msgid "targetEditor.distanceHelp"
+msgstr "Muzzle to target; the angles use it."
 
 msgid "chargeTarget.muzzleVelocity"
 msgstr "Muzzle velocity"
@@ -3489,6 +3672,9 @@ msgid "powders.column.name"
 msgstr "Name"
 
 msgid "primers.column.name"
+msgstr "Name"
+
+msgid "targetDesigner.name"
 msgstr "Name"
 
 msgid "targets.column.name"
@@ -3565,6 +3751,9 @@ msgstr "New powder"
 
 msgid "targetEditor.newSheet"
 msgstr "New sheet"
+
+msgid "targetDesigner.newTarget"
+msgstr "New target"
 
 msgid "targets.new"
 msgstr "New target"
@@ -3651,6 +3840,9 @@ msgid "bulletDrawing.none"
 msgstr "No drawing for this record."
 
 msgid "cartridgeDesigner.noDrawingYet"
+msgstr "No drawing yet"
+
+msgid "targetDesigner.noDrawingYet"
 msgstr "No drawing yet"
 
 msgid "bulletCompare.noDrawing"
@@ -3896,6 +4088,9 @@ msgstr "Not stated"
 msgid "powderDesigner.notStated"
 msgstr "Not stated"
 
+msgid "targetDesigner.notStated"
+msgstr "Not stated"
+
 msgid "targets.notStated"
 msgstr "Not stated"
 
@@ -4094,6 +4289,9 @@ msgstr "Outline, {name}"
 msgid "cartridgeDesigner.outline"
 msgstr "Outline, {name}"
 
+msgid "targetDesigner.blackDiameterHelp"
+msgstr "Outside of the outermost black zone."
+
 msgid "powderTune.outsideLadder"
 msgstr "Outside the ladder"
 
@@ -4136,6 +4334,9 @@ msgstr "Parameters"
 msgid "powderDesigner.parameters"
 msgstr "Parameters"
 
+msgid "targetDesigner.parameters"
+msgstr "Parameters"
+
 msgid "powderDesigner.parametersFitMoved"
 msgstr "Parameters the fit moved"
 
@@ -4165,6 +4366,9 @@ msgstr "Percent of maximum"
 
 msgid "targetEditor.photo"
 msgstr "Photo"
+
+msgid "holeDetection.photoAngle"
+msgstr "Photo angle"
 
 msgid "targetEditor.photoCamera"
 msgstr "Photo from the camera"
@@ -4619,11 +4823,17 @@ msgstr "Remove {name}"
 msgid "events.removeStage"
 msgstr "Remove {name}"
 
+msgid "targetDesigner.removeEventN"
+msgstr "Remove event {n}"
+
 msgid "powderDesigner.removeIngredient"
 msgstr "Remove ingredient {n, decimal}"
 
 msgid "targetEditor.removePhoto"
 msgstr "Remove photo"
+
+msgid "targetDesigner.removeRingN"
+msgstr "Remove ring {n}"
 
 msgid "events.removeSeries"
 msgstr "Remove series {n}"
@@ -4666,6 +4876,9 @@ msgstr "Replace photo"
 
 msgid "targetEditor.replacePhotoQuestion"
 msgstr "Replace the photo?"
+
+msgid "targetDesigner.required"
+msgstr "Required."
 
 msgid "matchRounds.reserve"
 msgstr "Reserve, %"
@@ -4784,6 +4997,21 @@ msgstr "rimless"
 msgid "values.rimmed"
 msgstr "rimmed"
 
+msgid "targetDesigner.ringNDiameter"
+msgstr "Ring {n} diameter"
+
+msgid "targetDesigner.ringNFill"
+msgstr "Ring {n} fill"
+
+msgid "targetDesigner.ringNHeight"
+msgstr "Ring {n} height"
+
+msgid "targetDesigner.ringNLine"
+msgstr "Ring {n} line"
+
+msgid "targetDesigner.ringNValue"
+msgstr "Ring {n} value"
+
 msgid "targets.ring"
 msgstr "Ring {value}"
 
@@ -4793,11 +5021,17 @@ msgstr "Ring {value} ({colours})"
 msgid "targets.ringHeight"
 msgstr "Ring {value} height"
 
+msgid "targetEditor.ringDiameter"
+msgstr "Ring diameter"
+
 msgid "targets.group.ringDiameters"
 msgstr "Ring diameters"
 
 msgid "targets.group.ringDiametersWidth"
 msgstr "Ring diameters width"
+
+msgid "targetDesigner.ringValue"
+msgstr "Ring value"
 
 msgid "targetEditor.ringValueTenthsWhere"
 msgstr "Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total."
@@ -4814,6 +5048,9 @@ msgstr "Ring, three points"
 msgid "faceRecord.rings"
 msgstr "Rings"
 
+msgid "targetDesigner.rings"
+msgstr "Rings"
+
 msgid "targets.column.rings"
 msgstr "Rings"
 
@@ -4822,6 +5059,9 @@ msgstr "Rings"
 
 msgid "targets.row.rings"
 msgstr "Rings"
+
+msgid "targetDesigner.ringsOuterToInner"
+msgstr "Rings, outer to inner"
 
 msgid "holeDetection.rotate"
 msgstr "Rotate"
@@ -5078,6 +5318,9 @@ msgstr "Sheet"
 msgid "targetEditor.sheetName"
 msgstr "Sheet name"
 
+msgid "targetDesigner.distanceHelp"
+msgstr "Shooting distance."
+
 msgid "events.shootingLog"
 msgstr "Shooting log"
 
@@ -5110,6 +5353,9 @@ msgstr "Shot groups"
 
 msgid "page.groups"
 msgstr "Shot groups"
+
+msgid "targetEditor.markerHelp"
+msgstr "Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen."
 
 msgid "powderTune.shotVelocities"
 msgstr "Shot velocities ({unit})"
@@ -5294,6 +5540,9 @@ msgstr "Specific energy (moved by the fit)"
 msgid "targetEditor.spread"
 msgstr "Spread"
 
+msgid "targetDesigner.stadiumAllOrNone"
+msgstr "stadium on all rings or on none"
+
 msgid "disciplineRecord.column.stage"
 msgstr "Stage"
 
@@ -5474,6 +5723,9 @@ msgstr "Target"
 msgid "holeDetection.target"
 msgstr "Target"
 
+msgid "targetDesigner.target"
+msgstr "Target"
+
 msgid "targets.group.target"
 msgstr "Target"
 
@@ -5484,6 +5736,9 @@ msgstr "Target"
 msgctxt "charge"
 msgid "powderCompare.target"
 msgstr "Target"
+
+msgid "targetEditor.targetAxisAngle"
+msgstr "Target axis angle"
 
 msgid "states.unavailable.targetFace"
 msgstr "Target data is unavailable right now."
@@ -5553,6 +5808,9 @@ msgstr "Temperature the parameters were fitted at."
 
 msgid "targets.row.tenthRingValues"
 msgstr "Tenth-ring values"
+
+msgid "targetDesigner.tenthRingsCircular"
+msgstr "tenth-ring values need circular rings"
 
 msgid "recordSources.terms"
 msgstr "Terms"
@@ -5794,6 +6052,9 @@ msgstr "The rule books the records cite"
 msgid "holeDetection.ruleBookTargetFound"
 msgstr "The rule-book target, found from the black area and the ring lines. It sets the scale and center and scores the group. If several fit, choose one; without a fit, targets are ranked by how well their rings match."
 
+msgid "targetDesigner.ringValueHelp"
+msgstr "The score of a hole in this ring."
+
 msgid "chargeTarget.toleranceNotReached"
 msgstr "The search did not reach its tolerance."
 
@@ -5947,6 +6208,9 @@ msgstr "Total"
 msgid "events.partTotal"
 msgstr "Total {total}"
 
+msgid "targetDesigner.touchCounts"
+msgstr "Touch counts"
+
 msgid "powders.column.rows"
 msgstr "Training rows"
 
@@ -6073,6 +6337,9 @@ msgstr "Up to {max}"
 msgid "units.preset.us"
 msgstr "US customary"
 
+msgid "targetDesigner.usableAs"
+msgstr "Usable in the shot groups and hit probability tools as {owner} {name}."
+
 msgid "powderDesigner.usableWorkbenchYourDesign"
 msgstr "Usable in the workbench as {name} (your design)."
 
@@ -6116,6 +6383,9 @@ msgid "powderDesigner.value"
 msgstr "Value"
 
 msgid "powderTune.value"
+msgstr "Value"
+
+msgid "targetDesigner.value"
 msgstr "Value"
 
 msgid "targetEditor.value"
@@ -6216,6 +6486,15 @@ msgstr "white"
 
 msgid "recordSources.wholeRecord"
 msgstr "whole record"
+
+msgid "targetEditor.width"
+msgstr "Width"
+
+msgid "targetDesigner.innerTenDiameterHelp"
+msgstr "Width of the inner ten circle."
+
+msgid "targetDesigner.ringDiameterHelp"
+msgstr "Width of the ring to the outside edge of its line."
 
 msgid "units.quantity.windSpeed"
 msgstr "Wind speed"

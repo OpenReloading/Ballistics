@@ -32,7 +32,6 @@ import {
 } from 'react'
 import { storedPhoto } from '@/platform/user-store.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
-import { msg } from '../i18n/translate.ts'
 import { commonCaliber } from '../lib/caliber.ts'
 import {
   type CandidateClass,
@@ -1248,10 +1247,12 @@ function ResultLine({
         <SiField
           spec={{
             key: 'expectedHoleDiameter',
-            label: msg('Hole size'),
-            help: msg(
-              'Expected hole diameter; a typed size overrides the bullet and the marker. Detection runs once it is entered.',
-            ),
+            label: /*i18n*/ { id: 'holeDetection.holeSize', message: 'Hole size' },
+            help: /*i18n*/ {
+              id: 'holeDetection.holeSizeTypedHelp',
+              message:
+                'Expected hole diameter; a typed size overrides the bullet and the marker. Detection runs once it is entered.',
+            },
             quantity: 'length',
             min: 0,
             positive: true,
@@ -1436,10 +1437,12 @@ function RotateStep({
       <SiField
         spec={{
           key: 'photoRotation',
-          label: msg('Photo angle'),
-          help: msg(
-            'Counter-clockwise turn of the photo on screen; type a small angle to straighten it. Holes, scale and aim point turn with the photo, the target axes do not.',
-          ),
+          label: /*i18n*/ { id: 'holeDetection.photoAngle', message: 'Photo angle' },
+          help: /*i18n*/ {
+            id: 'holeDetection.photoAngleHelp',
+            message:
+              'Counter-clockwise turn of the photo on screen; type a small angle to straighten it. Holes, scale and aim point turn with the photo, the target axes do not.',
+          },
           quantity: 'angle',
         }}
         si={turn || undefined}
@@ -1534,10 +1537,12 @@ function ScaleStep({
       <SiField
         spec={{
           key: 'blackDiameter',
-          label: msg('Black diameter'),
-          help: msg(
-            'Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo).',
-          ),
+          label: /*i18n*/ { id: 'holeDetection.blackDiameter', message: 'Black diameter' },
+          help: /*i18n*/ {
+            id: 'holeDetection.blackDiameterHelp',
+            message:
+              'Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo).',
+          },
           quantity: 'length',
           min: 0,
           positive: true,
@@ -1591,11 +1596,13 @@ function ExampleStep({
       <SiField
         spec={{
           key: 'expectedHoleDiameter',
-          label: msg('Hole size'),
+          label: /*i18n*/ { id: 'holeDetection.holeSize', message: 'Hole size' },
           // the 3 is MIN_HOLES_TO_LEARN_SIZE: a spec's help takes no placeholder
-          help: msg(
-            'Expected hole diameter; an example hole sets it to its measured size. Empty: the median of 3 or more accepted single holes, else the bullet diameter, else the marker.',
-          ),
+          help: /*i18n*/ {
+            id: 'holeDetection.holeSizeHelp',
+            message:
+              'Expected hole diameter; an example hole sets it to its measured size. Empty: the median of 3 or more accepted single holes, else the bullet diameter, else the marker.',
+          },
           quantity: 'length',
           min: 0,
           positive: true,
