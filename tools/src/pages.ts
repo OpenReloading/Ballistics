@@ -41,6 +41,8 @@ rmSync(site, { recursive: true, force: true })
 renameSync(at('apps/web/dist/client'), site)
 // GitHub Pages answers every miss with 404.html: the app shell, whose router shows the path's page or Not found
 cpSync(`${site}/_shell.html`, `${site}/404.html`)
+// the next edition registered its worker below next/: the same cleanup worker replaces it
+cpSync(`${site}/sw.js`, `${site}/next/sw.js`)
 const bytes = globSync('assets/**', { cwd: site })
   .map((file) => statSync(`${site}/${file}`))
   .filter((stat) => stat.isFile())

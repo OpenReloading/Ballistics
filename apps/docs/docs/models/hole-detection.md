@@ -371,7 +371,7 @@ The detection worker of the web app runs the learned detector through ONNX Runti
 
 - the manifest `models/hole-model-0.1.0.json`;
 - the model file at the manifest's `file.url`, refused when its size or SHA-256 differs from the manifest's `bytes` and `sha256`;
-- the runtime's `ort-wasm-simd-threaded.mjs` and `ort-wasm-simd-threaded.wasm` from `onnxruntime-web/dist` of the version the app pins, in the manifest's `runtime.wasmPaths`. They are not in the repository: `scripts/model-runtime.mts` of the web app copies them from the installed package into `public/` at that path before `pnpm run dev`, `build` and `build:start` (and in `tools/src/start-site.ts`), and fails when the installed version is not the manifest's `runtime.version`.
+- the runtime's `ort-wasm-simd-threaded.mjs` and `ort-wasm-simd-threaded.wasm` from `onnxruntime-web/dist` of the version the app pins, in the manifest's `runtime.wasmPaths`. They are not in the repository: `scripts/model-runtime.mts` of the web app copies them from the installed package into `public/` at that path before `pnpm run dev` and `build`, and fails when the installed version is not the manifest's `runtime.version`.
 
 The whole load has a limit of 60 s: the model and the runtime, 4.6 MB with gzip, take about 23 s over a 1.6 Mbit/s mobile link. When the manifest, the model or the runtime does not load, does not match or passes the limit, the worker logs the error to the console, the classical detector answers, and the Detect step says so until the next run or another sheet, photo or group.
 

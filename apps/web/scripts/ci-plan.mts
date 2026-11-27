@@ -61,7 +61,7 @@ const recordInputs = [
   /^packages\/api\//,
   ...rootInputs,
   /^apps\/web\/(package\.json|vite\.config\.mts|tsconfig\.json)$/,
-  /^apps\/web\/scripts\/(ci-plan|check-prerender)\.mts$/,
+  /^apps\/web\/scripts\/(ci-plan|check-prerender|prerender-list)\.mts$/,
   /^apps\/web\/src\/lib\/prerender-sample\.ts$/,
 ]
 
