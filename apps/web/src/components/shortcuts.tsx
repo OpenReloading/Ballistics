@@ -1,8 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Kbd, Table } from '@mantine/core'
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import {
   isSingleKey,
   parseSingleKeys,
@@ -13,7 +15,10 @@ import {
   singleKeysKey,
 } from '../lib/shortcuts.ts'
 import { storedChoice } from '../lib/stored-choice.ts'
+import englishMessages from '../locales/en/components/shortcuts.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
+
+loadEnglish(englishMessages)
 
 /** The shortcuts mounted now, counted per id, for the help dialog. */
 const mounted = new Map<ShortcutId, number>()
@@ -111,14 +116,20 @@ export function ShortcutsHelp() {
     () => '',
   ).split(' ')
   const singleKeys = useSingleKeys()
+  // the actions are the shortcut table's, which the workbench also reads
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <AppModal opened={opened} onClose={() => setOpened(false)} title={t('Keyboard shortcuts')}>
+    <AppModal
+      opened={opened}
+      onClose={() => setOpened(false)}
+      title={i18n._({ id: 'shortcuts.title', message: 'Keyboard shortcuts' })}
+    >
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>{t('Keys')}</Table.Th>
-            <Table.Th>{t('Action')}</Table.Th>
+            <Table.Th>{i18n._({ id: 'shortcuts.keys', message: 'Keys' })}</Table.Th>
+            <Table.Th>{i18n._({ id: 'shortcuts.action', message: 'Action' })}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -131,7 +142,7 @@ export function ShortcutsHelp() {
                     .split(' or ')
                     .map((k, i) => (
                       <span key={k}>
-                        {i > 0 && ` ${t('or')} `}
+                        {i > 0 && ` ${i18n._({ id: 'shortcuts.or', message: 'or' })} `}
                         <Kbd size="xs">{k}</Kbd>
                       </span>
                     ))}
@@ -143,11 +154,16 @@ export function ShortcutsHelp() {
       </Table>
       {!singleKeys && (
         <p className="note">
-          {t('Single-key shortcuts are off. Turn them on in Settings, General.')}
+          {i18n._({
+            id: 'shortcuts.singleKeysOff',
+            message: 'Single-key shortcuts are off. Turn them on in Settings, General.',
+          })}
         </p>
       )}
       {active.includes('redo') && (
-        <p className="note">{t('On macOS, Cmd for Ctrl, except Ctrl+Y.')}</p>
+        <p className="note">
+          {i18n._({ id: 'shortcuts.macCmd', message: 'On macOS, Cmd for Ctrl, except Ctrl+Y.' })}
+        </p>
       )}
     </AppModal>
   )

@@ -1,9 +1,12 @@
+import { useLingui } from '@lingui/react'
 import { ActionIcon, NavLink } from '@mantine/core'
 import { CodeXml } from 'lucide-react'
-import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/repository-link.json' with { type: 'json' }
 
-const label = msg('Source code on GitHub')
+loadEnglish(englishMessages)
+
+const label = /*i18n*/ { id: 'repositoryLink.label', message: 'Source code on GitHub' }
 
 /** An icon next to the theme switch from 75em, a labeled row in the phone drawer; nothing without a URL. */
 export function RepositoryLink({
@@ -13,14 +16,14 @@ export function RepositoryLink({
   url?: string | undefined
   drawer?: boolean | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!url) return null
   if (drawer)
     return (
       <NavLink
         component="a"
         href={url}
-        label={t(label)}
+        label={i18n._(label)}
         leftSection={<CodeXml size={20} aria-hidden="true" />}
       />
     )
@@ -30,7 +33,7 @@ export function RepositoryLink({
       href={url}
       variant="default"
       visibleFrom="lg"
-      aria-label={t(label)}
+      aria-label={i18n._(label)}
       className="repository-link"
     >
       <CodeXml size={20} aria-hidden="true" />

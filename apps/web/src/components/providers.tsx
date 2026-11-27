@@ -1,16 +1,17 @@
 'use client'
 
-import { I18nProvider } from '@lingui/react'
+import { I18nProvider, useLingui } from '@lingui/react'
 import { Button, Group, localStorageColorSchemeManager, MantineProvider } from '@mantine/core'
 import { LucideProvider } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { startLanguage, useTranslation } from '../i18n/language.ts'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { decimalMark } from '../i18n/number.ts'
 import { useRoute } from './use-route.ts'
 import '../lib/navigation-guard.ts'
 import { colorSchemeKey, iconDefaults, themeFor } from '../lib/theme.ts'
+import englishMessages from '../locales/en/components/providers.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
 import { ConfirmHost } from './confirm.tsx'
 import { SettingsDialog, type SettingsTab } from './settings-dialog.ts'
@@ -23,11 +24,13 @@ const SettingsSections = dynamic(
   { ssr: false, loading: () => <Loading what="the settings" /> },
 )
 
+loadEnglish(englishMessages)
+
 const colorSchemeManager = localStorageColorSchemeManager({ key: colorSchemeKey })
 
 /** The settings dialog over any page: every Settings and Units button opens it through `SettingsDialog`. */
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [opened, setOpened] = useState(false)
   const [tab, setTab] = useState<SettingsTab>('units')
   const close = () => setOpened(false)
@@ -46,13 +49,15 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
         opened={opened}
         onClose={close}
         size="xl"
-        title={t('Settings')}
+        title={i18n._({ id: 'shell.settings', message: 'Settings' })}
         className="settings-dialog"
-        closeButton={{ 'aria-label': t('Close settings') }}
+        closeButton={{
+          'aria-label': i18n._({ id: 'settingsDialog.close', message: 'Close settings' }),
+        }}
         footer={
           <Group justify="flex-end" className="settings-foot">
             <Button variant="default" onClick={close}>
-              {t('Close')}
+              {i18n._({ id: 'settingsDialog.done', message: 'Close' })}
             </Button>
           </Group>
         }

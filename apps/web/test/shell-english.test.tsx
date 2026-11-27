@@ -3,14 +3,20 @@ import { AppShell, MantineProvider } from '@mantine/core'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
+import { ContinueStrip } from '../src/components/continue-strip.tsx'
+import { ReportIssueButton, ReportIssueDialog } from '../src/components/report-issue.tsx'
+import { ContentSkipLink, ResultsSkipLink } from '../src/components/results-skip-link.tsx'
+import { SafetyBarButton } from '../src/components/safety-dialog.tsx'
 import { useShellActions } from '../src/components/shell-actions.ts'
 import { SiteHeader } from '../src/components/site-header.tsx'
+import { ThemeSwitch } from '../src/components/theme-switch.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
 import { AppError } from '../src/routes/-error.tsx'
 
-// no router is mounted: the shell renders at the home route
+// no router is mounted: the shell renders at `route.path`, the home route unless a test sets another
+const route = vi.hoisted(() => ({ path: '/' }))
 vi.mock('@/platform/navigation.ts', () => ({
-  usePathname: () => '/',
+  usePathname: () => route.path,
   useRouter: () => ({ push: () => {} }),
   useSearchParams: () => new URLSearchParams(),
 }))
@@ -21,7 +27,12 @@ function english(node: ReactNode) {
   const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
   const html = renderToStaticMarkup(
     <I18nProvider i18n={linguiOf('en')}>
-      <MantineProvider>{node}</MantineProvider>
+      {/* a dialog renders in place: the server render has no portal */}
+      <MantineProvider
+        theme={{ components: { ModalRoot: { defaultProps: { withinPortal: false } } } }}
+      >
+        {node}
+      </MantineProvider>
     </I18nProvider>,
   )
   stop()
@@ -61,4 +72,50 @@ it("the Start frame's error page has its English without another page", () => {
   expect(html).toContain('<h1>Something went wrong</h1>')
   expect(html).toContain('RangeFoundry Workbench could not be shown.')
   expect(html).toContain('Try again')
+})
+
+it('the skip links, theme switch, Safety buttons, report button and continue strip have their English without a page', () => {
+  route.path = '/workbench'
+  const { html, missing } = english(
+    <>
+      <ContentSkipLink />
+      <ResultsSkipLink />
+      <ThemeSwitch />
+      <SafetyBarButton />
+      <SafetyBarButton iconOnly />
+      <ReportIssueButton url="https://example.org/repo" onOpen={() => {}} />
+      <ContinueStrip />
+    </>,
+  )
+  route.path = '/'
+  expect(missing).toEqual([])
+  for (const text of [
+    '>Skip to content<',
+    '>Skip to results<',
+    'aria-label="Dark theme"',
+    '>Safety<',
+    'aria-label="Safety notice"',
+    'aria-label="Report an issue"',
+    'aria-label="Continue"',
+  ])
+    expect(html).toContain(text)
+})
+
+it('the Report an issue dialog has its English without a page', () => {
+  const { html, missing } = english(
+    <ReportIssueDialog repository="https://example.org/repo" opened onClose={() => {}} />,
+  )
+  expect(missing).toEqual([])
+  for (const text of [
+    'Report an issue',
+    '>Cancel<',
+    '>Open on GitHub<',
+    'Area',
+    '>Type<',
+    'What happened?',
+    'Wrong data',
+    'Sent with the report',
+    'Public on GitHub. No photos, files or other records of this browser.',
+  ])
+    expect(html).toContain(text)
 })
