@@ -54,7 +54,6 @@ import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } fr
 import { resolveCartridge } from '../lib/variants.ts'
 import { verbatim } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/cartridge-designer.json' with { type: 'json' }
-import englishSpecs from '../locales/en/lib/cartridge-designer.json' with { type: 'json' }
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -69,7 +68,7 @@ import { UnitsIconButton, useFieldUnits } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
 import { Workspace } from './workspace.tsx'
 
-loadEnglish(englishMessages, englishSpecs)
+loadEnglish(englishMessages)
 
 const SeatingPreview = dynamic(
   () => import('./seating-preview.tsx').then((m) => m.SeatingPreview),

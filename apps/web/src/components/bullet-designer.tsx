@@ -46,7 +46,6 @@ import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '..
 import { resolveBullet } from '../lib/variants.ts'
 import { sayLingui, verbatim } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/bullet-designer.json' with { type: 'json' }
-import englishSpecs from '../locales/en/lib/bullet-designer.json' with { type: 'json' }
 import { description } from './bullet-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -66,7 +65,7 @@ import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
 import { Workspace } from './workspace.tsx'
 
-loadEnglish(englishMessages, englishSpecs)
+loadEnglish(englishMessages)
 
 /** The photo tool, fetched when it is first opened: its image maths and the sample stay out of the designer's first load. */
 const BulletPhoto = dynamic(() => import('./bullet-photo.tsx').then((m) => m.BulletPhoto), {

@@ -19,9 +19,10 @@ import {
   storedValue,
 } from '@rangefoundry/svg-drawings/cartridge'
 import { chamberOf } from '@rangefoundry/svg-drawings/seating'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { localizeNumber } from '../i18n/number.ts'
 import { english, type Translator } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/lib/cartridge-designer.json' with { type: 'json' }
 import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
@@ -38,6 +39,8 @@ import { designReduce, type History as H, historyOf, mapHistory, pushHistory } f
 import { nth } from './nth.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
 import { type ResolvedCartridge, revisionOf } from './variants.ts'
+
+loadEnglish(englishMessages)
 
 /** The field groups of the designer, in order. */
 export const groups = {

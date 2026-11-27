@@ -15,9 +15,10 @@ import {
   bulletProfile,
   bulletScreenEm,
 } from '@rangefoundry/svg-drawings/bullet'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { untranslated } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/lib/bullet-designer.json' with { type: 'json' }
 import { computedBulletRows } from './bullet.ts'
 import {
   close,
@@ -35,6 +36,8 @@ import { nth } from './nth.ts'
 import type { FieldRow } from './record-fields.ts'
 import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
 import { dropPath, type ResolvedBullet, revisionOf, setPath } from './variants.ts'
+
+loadEnglish(englishMessages)
 
 /** The field groups of the designer, in order. */
 export const groups = {
