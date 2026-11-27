@@ -1,12 +1,12 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantine/core'
 import { FunnelX, Info, OctagonExclamationPoint, TriangleExclamationPoint } from 'lucide-react'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
 import { useRouter } from '@/platform/navigation.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
-import type { Message as Marked } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'
 import englishMessages from '../locales/en/components/states.json' with { type: 'json' }
 import { LibraryTabs } from './library-tabs.tsx'
@@ -341,7 +341,7 @@ export function ListError({
   what,
   retry,
 }: {
-  title: Marked
+  title: MessageDescriptor
   what: DataKind
   retry: () => void
 }) {

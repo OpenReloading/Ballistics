@@ -6673,6 +6673,9 @@ msgstr "wax lube"
 msgid "powderTune.weakPrior"
 msgstr "Weak prior"
 
+msgid "homeNews.title"
+msgstr "What's new"
+
 msgid "holeDetection.whereLookRectangleTwo"
 msgstr "Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group."
 

@@ -3,7 +3,6 @@ import { Suspense } from 'react'
 import { CompetitionEvents } from '../../components/competition-events.tsx'
 import { PageBar } from '../../components/page-bar.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
-import { msg } from '../../i18n/translate.ts'
 import { getEventType, listEventTypes } from '../../lib/api.ts'
 
 export const metadata: Metadata = {
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
     'Your competition events with ring series or practical stages and their totals, kept in this browser; print an event, export CSV and JSON.',
 }
 
-const title = msg('Competition events')
+const title = /*i18n*/ { id: 'page.events', message: 'Competition events' }
 
 async function Events() {
   const list = await listEventTypes()

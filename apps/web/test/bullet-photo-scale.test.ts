@@ -1,18 +1,17 @@
 import type { BulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { english } from '../src/i18n/translate.ts'
 import { scaleOf } from '../src/lib/bullet-photo.ts'
 import { segmentPhoto } from '../src/lib/bullet-photo-colour.ts'
 import { measureOutline } from '../src/lib/bullet-photo-measure.ts'
 import { fitOutline } from '../src/lib/bullet-photo-outline.ts'
 import { renderPhoto } from '../src/lib/bullet-photo-sample.ts'
 import { resolveScale, withBasis } from '../src/lib/bullet-photo-scale.ts'
-import { say, type Wording } from '../src/lib/wording.ts'
+import { type LinguiWording, sayLingui } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 /** The English text of sentences for the user. */
-const text = (w: readonly Wording[]) => w.map((x) => say(linguiOf('en'), english.t, x)).join(' ')
+const text = (w: readonly LinguiWording[]) => w.map((x) => sayLingui(linguiOf('en'), x)).join(' ')
 
 const shape: BulletDimensions = {
   diameter: 7.82,
