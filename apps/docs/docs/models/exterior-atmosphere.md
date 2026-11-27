@@ -54,7 +54,7 @@ Code: `packages/ballistics/src/exterior/atmosphere.ts`, `airDensity` (`vapourGas
 
 ### Speed of sound in moist air
 
-With the vapor mole fraction $x_v = e/p$, the mixture gas constant follows from the mean molar mass, and the molar heat capacity at constant pressure is the mole-weighted mean of rigid diatomic dry air ($3.5\,R^_$) and rigid triatomic vapor ($4\,R^_$):
+With the vapor mole fraction $x_v = e/p$, the mixture gas constant follows from the mean molar mass, and the molar heat capacity at constant pressure is the mole-weighted mean of rigid diatomic dry air ($3.5\,R^\ast$) and rigid triatomic vapor ($4\,R^\ast$):
 
 $$
 R_m = \frac{R_d}{1 - x_v + x_v M_v/M_d}, \qquad \frac{c_p}{R^*} = 3.5 + 0.5\,x_v, \qquad a = \sqrt{\frac{c_p}{c_p - R^*}\,R_m T}
