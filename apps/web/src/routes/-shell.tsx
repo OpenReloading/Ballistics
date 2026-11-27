@@ -34,7 +34,7 @@ import { repositoryUrl } from '../lib/repository-url.ts'
 import { isToolRoute, pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
-import { docsAddress, noDocs, repositoryAddress } from '../platform/edition.ts'
+import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '../platform/edition.ts'
 import Link from '../platform/link.tsx'
 
 // the search loads on its first use, so pages ship without it
@@ -147,7 +147,7 @@ function Navigation({
         </a>
       )}
       <Box hiddenFrom="lg">
-        <RepositoryLink url={repository} drawer />
+        <RepositoryLink url={sourceAddress} drawer />
       </Box>
     </>
   )
@@ -182,7 +182,7 @@ function BarEnd({ route, onReport }: { route: string; onReport: () => void }) {
         <SafetyBarButton iconOnly />
       </Box>
       <ReportIssueButton url={repository} onOpen={onReport} />
-      <RepositoryLink url={repository} />
+      <RepositoryLink url={sourceAddress} />
       <ThemeSwitch />
     </div>
   )

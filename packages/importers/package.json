@@ -9,7 +9,7 @@
     "csv",
     "importer"
   ],
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/importers/",
   "repository": {
     "type": "git",

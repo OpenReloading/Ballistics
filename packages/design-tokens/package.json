@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "The Brand palette and sizes as CSS variables, typed constants and the Mantine theme.",
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

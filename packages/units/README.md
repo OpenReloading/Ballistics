@@ -10,4 +10,4 @@ fromSi('pressure', 3.8e8) // 3800 (bar)
 parseNumber('1,5', '.') // { kind: 'number', value: 1.5, text: '1.5' }
 ```
 
-License: ISC
+License: AGPL-3.0-only

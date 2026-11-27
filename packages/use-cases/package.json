@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "The computations the web app, the command line and the API run: input checks, runs and answers, without a framework.",
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

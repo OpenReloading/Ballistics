@@ -2,7 +2,7 @@
   "name": "@rangefoundry/e2e",
   "version": "0.0.1",
   "private": true,
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "test": "playwright test",
     "smoke": "START_SITE=off playwright test --project=full tests/web/smoke.spec.ts",

@@ -4,7 +4,7 @@
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-eikelandin-db61a2?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/eikelandin)
 [![CI](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml)
-[![License: ISC](https://img.shields.io/badge/license-ISC-blue)](LICENSE)
+[![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
 
 Simulate a handload before you take it to the range: muzzle velocity, peak pressure against the C.I.P. limit, and the bullet's trajectory, from cartridge, bullet, powder and firearm records that each name their source. The same app summarizes a chronograph session and measures group size from a target photo.
@@ -54,6 +54,8 @@ Reloading and shooting are at your own risk: you are responsible for your inputs
 
 ## License
 
-- Code: ISC, see [LICENSE](LICENSE).
-- Data records (`packages/catalog/records/`): an entry with a `license` field uses that license, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see [packages/catalog/LICENSE](packages/catalog/LICENSE)).
-- The Ballistics logo: from the RangeFoundry Artwork repository (MIT), see [NOTICE](NOTICE).
+- Code (apps, packages, tools, tests, scripts and the training code): AGPL-3.0-only, see [LICENSE](LICENSE). The design tokens (`packages/design-tokens/`), which other projects use, are MIT.
+- Documentation (`apps/docs/docs/` and the Markdown files, except the `*.api.md` API reports generated from the code): MIT, see [LICENSES/MIT.txt](LICENSES/MIT.txt).
+- Data records (`packages/catalog/records/`): each source states its license in its `license` field, data from a source without one is CC BY-SA 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see [packages/catalog/LICENSE](packages/catalog/LICENSE)).
+- The Ballistics name and logo: no open license, see [LICENSES/LicenseRef-Brand.txt](LICENSES/LicenseRef-Brand.txt) and [NOTICE](NOTICE).
+- The hole-detection model weights and the synthetic training photos: CC-BY-SA-4.0, see [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt).

@@ -109,6 +109,9 @@ msgstr "{count, plural, one {# event} other {# events}}"
 msgid "lists.count.federations"
 msgstr "{count, plural, one {# federation} other {# federations}}"
 
+msgid "powderDesigner.fieldsToFix"
+msgstr "{count, plural, one {# field to fix.} other {# fields to fix.}}"
+
 msgid "recordSources.fieldCount"
 msgstr "{count, plural, one {# field} other {# fields}}"
 
@@ -294,6 +297,9 @@ msgstr "{n, decimal} {unit} per stage"
 
 msgid "construction.drivingBands"
 msgstr "{n} driving bands"
+
+msgid "powderDesigner.userDesignNotCatalogue"
+msgstr "{name} (user design, not a catalogue record)"
 
 msgid "burnRateCompare.userDesign"
 msgstr "{name} (user design)"
@@ -481,6 +487,9 @@ msgstr "Add bullet"
 msgid "targetEditor.addGroup"
 msgstr "Add group"
 
+msgid "powderDesigner.addIngredient"
+msgstr "Add ingredient"
+
 msgid "targetEditor.addPhoto"
 msgstr "Add photo"
 
@@ -516,6 +525,9 @@ msgstr "Air rifle"
 
 msgid "recordFields.aliases"
 msgstr "Aliases"
+
+msgid "powderDesigner.aliasesOnePerLine"
+msgstr "Aliases, one per line"
 
 msgid "fieldTable.allGroups"
 msgstr "All"
@@ -600,6 +612,12 @@ msgstr "Arrow keys move the cursor, Shift for single pixels, Control for large s
 
 msgid "recordFields.asPrinted"
 msgstr "As printed: {printed}"
+
+msgid "powderDesigner.constantVolumeMinMax"
+msgstr "At constant volume; min and max over the composition ranges."
+
+msgid "powderDesigner.constantVolume"
+msgstr "At constant volume."
 
 msgid "listSources.lastOn"
 msgstr "At least one source stays on"
@@ -790,6 +808,9 @@ msgstr "Brush: erase"
 msgid "recordFields.build"
 msgstr "Build"
 
+msgid "powderDesigner.bulkDensity"
+msgstr "Bulk density"
+
 msgid "recordFields.bulkDensity"
 msgstr "Bulk density"
 
@@ -859,6 +880,9 @@ msgstr "Burn form z1"
 msgid "recordFields.burnFormGroup"
 msgstr "Burn form, two-stage"
 
+msgid "powderDesigner.burnLawInteriorModel"
+msgstr "Burn law (interior model)"
+
 msgid "recordFields.burnRate"
 msgstr "Burn rate"
 
@@ -867,6 +891,9 @@ msgstr "Burn rate"
 
 msgid "powderRecord.burnRate"
 msgstr "Burn rate (model output)"
+
+msgid "powderDesigner.burnRateScaleVivacity"
+msgstr "Burn rate scale of the vivacity law at the reference pressure."
 
 msgid "powders.burnRates"
 msgstr "Burn rates"
@@ -882,6 +909,9 @@ msgstr "Burnout"
 
 msgid "powderCompare.burntMuzzle"
 msgstr "Burnt at the muzzle"
+
+msgid "powderDesigner.burntFractionWhichFirst"
+msgstr "Burnt fraction at which the first stage ends; above 0, at most 1."
 
 msgid "bullets.column.cal"
 msgstr "Caliber"
@@ -1138,6 +1168,9 @@ msgstr "Choose photograph"
 msgid "targetEditor.chooseDropPastePhoto"
 msgstr "Choose, drop or paste a photo; it stays in this browser and is never uploaded."
 
+msgid "powderDesigner.choose"
+msgstr "Choose…"
+
 msgid "sessionSummary.chronoFile"
 msgstr "Chronograph file"
 
@@ -1282,6 +1315,9 @@ msgstr "Competitions"
 msgid "recordFields.composition"
 msgstr "Composition"
 
+msgid "powderDesigner.compositionMassPercent"
+msgstr "Composition, mass percent"
+
 msgid "primers.column.compound"
 msgstr "Compound"
 
@@ -1293,6 +1329,9 @@ msgstr "computed"
 
 msgid "recordFields.computed"
 msgstr "Computed"
+
+msgid "powderDesigner.computedModel"
+msgstr "Computed by a model"
 
 msgid "bullet.sectionalDensityMethod"
 msgstr "Computed: mass over diameter squared."
@@ -1405,8 +1444,26 @@ msgstr "Course of fire"
 msgid "recordSources.column.covers"
 msgstr "Covers"
 
+msgid "powderDesigner.covolume"
+msgstr "Covolume"
+
 msgid "recordFields.covolume"
 msgstr "Covolume"
+
+msgid "powderDesigner.covolumeMax"
+msgstr "Covolume max"
+
+msgid "powderDesigner.covolumeMin"
+msgstr "Covolume min"
+
+msgid "powderDesigner.covolumeCombustionGasExtremes"
+msgstr "Covolume of the combustion gas, with its extremes."
+
+msgid "powderDesigner.covolumeGas"
+msgstr "Covolume of the gas."
+
+msgid "powderDesigner.covolumeValue"
+msgstr "Covolume value"
 
 msgid "values.crusher"
 msgstr "crusher"
@@ -1515,6 +1572,9 @@ msgstr "Deleted {name}."
 
 msgid "recordSources.kind.derived"
 msgstr "derived"
+
+msgid "powderDesigner.derived"
+msgstr "Derived"
 
 msgid "disciplines.classBasis.derived"
 msgstr "Derived from the range or gauge the rule book states"
@@ -1729,6 +1789,9 @@ msgstr "Edit event"
 msgid "federationRecord.column.edition"
 msgstr "Edition"
 
+msgid "powderDesigner.emptySameValue"
+msgstr "Empty: same as Value."
+
 msgid "events.nameHint"
 msgstr "Empty: the event type and the day."
 
@@ -1749,6 +1812,9 @@ msgstr "Energy ratio"
 
 msgid "cartridgeRecord.meaning.energy"
 msgstr "energy, as printed under Pressures (Energies)"
+
+msgid "powderDesigner.enterNameValuesYou"
+msgstr "Enter a name and the values you have."
 
 msgid "targetEditor.enterName"
 msgstr "Enter a name."
@@ -1864,6 +1930,9 @@ msgstr "Expand"
 
 msgid "burnRate.exponentDetail"
 msgstr "exponent {exponent, decimal}"
+
+msgid "powderDesigner.exponentPressureBurnLaw"
+msgstr "Exponent of the pressure in the burn law."
 
 msgid "events.exportCsv"
 msgstr "Export CSV"
@@ -2006,6 +2075,9 @@ msgstr "Firearms"
 msgid "firearms.titleFiltered"
 msgstr "Firearms, {filters}"
 
+msgid "powderDesigner.fitPowderChronographStrings"
+msgstr "Fit a powder from chronograph strings"
+
 msgid "burnRate.unresolvedReason"
 msgstr "Fit unresolved: the interval of the fitted vivacity ({value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}) reaches 0, so the powder is not placed."
 
@@ -2033,6 +2105,9 @@ msgstr "Fitted energy over thermochemistry energy (impetus over gamma minus 1). 
 msgid "powderRecord.fittedCurve"
 msgstr "Fitted M3 curve"
 
+msgid "powderDesigner.fittedData"
+msgstr "Fitted to data"
+
 msgid "recordFields.fittedNote"
 msgstr "Fitted: plus and minus {k, decimal} standard uncertainties, a lower bound (the rows of one load table are correlated)."
 
@@ -2053,6 +2128,18 @@ msgstr "flake"
 
 msgid "recordFields.flameTemperature"
 msgstr "Flame temperature"
+
+msgid "powderDesigner.flameTemperature"
+msgstr "Flame temperature"
+
+msgid "powderDesigner.flameTemperatureMax"
+msgstr "Flame temperature max"
+
+msgid "powderDesigner.flameTemperatureMin"
+msgstr "Flame temperature min"
+
+msgid "powderDesigner.flameTemperatureValue"
+msgstr "Flame temperature value"
 
 msgid "recordFields.flashHole"
 msgstr "Flash hole diameter"
@@ -2078,6 +2165,30 @@ msgstr "Form"
 msgid "powders.column.form"
 msgstr "Form"
 
+msgid "powderDesigner.formA"
+msgstr "Form a"
+
+msgid "powderDesigner.formAMovedFit"
+msgstr "Form a (moved by the fit)"
+
+msgid "powderDesigner.formM"
+msgstr "Form m"
+
+msgid "powderDesigner.formParameterATwo"
+msgstr "Form parameter a of the two-stage burn form."
+
+msgid "powderDesigner.formParameterMTwo"
+msgstr "Form parameter m of the two-stage burn form."
+
+msgid "powderDesigner.formParameterQTwo"
+msgstr "Form parameter q of the two-stage burn form; not negative."
+
+msgid "powderDesigner.formQ"
+msgstr "Form q"
+
+msgid "powderDesigner.formZ1"
+msgstr "Form z1"
+
 msgid "sessionSummary.format"
 msgstr "Format: {name}"
 
@@ -2093,6 +2204,9 @@ msgstr "From"
 msgid "events.stagePointsHint"
 msgstr "From the official result, where published."
 
+msgid "powderDesigner.frozenRatioSpecificHeats"
+msgstr "Frozen ratio of specific heats at the flame temperature."
+
 msgid "disciplines.rule.fullMetalJacket"
 msgstr "full metal jacket"
 
@@ -2104,6 +2218,18 @@ msgstr "G1"
 
 msgid "bullets.column.g7"
 msgstr "G7"
+
+msgid "powderDesigner.gamma"
+msgstr "Gamma"
+
+msgid "powderDesigner.gammaMax"
+msgstr "Gamma max"
+
+msgid "powderDesigner.gammaMin"
+msgstr "Gamma min"
+
+msgid "powderDesigner.gammaValue"
+msgstr "Gamma value"
 
 msgid "standardBadge.gap"
 msgstr "Gap"
@@ -2125,6 +2251,12 @@ msgstr "gilding metal"
 
 msgid "log.loadOrAmmunition"
 msgstr "Give a load or factory ammunition, not both."
+
+msgid "powderDesigner.grainDensity"
+msgstr "Grain density"
+
+msgid "powderDesigner.grainForm"
+msgstr "Grain form"
 
 msgid "targets.color.green"
 msgstr "green"
@@ -2255,11 +2387,29 @@ msgstr "How to take a photo the app can score"
 msgid "values.hybrid"
 msgstr "hybrid"
 
+msgid "powderDesigner.ignitionPressure"
+msgstr "Ignition pressure"
+
 msgid "recordFields.ignitionPressure"
 msgstr "Ignition pressure"
 
 msgid "recordFields.impetus"
 msgstr "Impetus"
+
+msgid "powderDesigner.impetus"
+msgstr "Impetus"
+
+msgid "powderDesigner.impetusMax"
+msgstr "Impetus max"
+
+msgid "powderDesigner.impetusMin"
+msgstr "Impetus min"
+
+msgid "powderDesigner.impetusBurningExtremes"
+msgstr "Impetus of the burning, with its extremes."
+
+msgid "powderDesigner.impetusValue"
+msgstr "Impetus value"
 
 msgid "events.importJson"
 msgstr "Import JSON"
@@ -2290,6 +2440,21 @@ msgstr "included angle of the h cone"
 
 msgid "cartridgeRecord.meaning.shoulderAngle"
 msgstr "included shoulder angle"
+
+msgid "powderDesigner.ingredient"
+msgstr "Ingredient"
+
+msgid "powderDesigner.ingredientCasNumber"
+msgstr "Ingredient {n, decimal} CAS number"
+
+msgid "powderDesigner.ingredientMaxPercent"
+msgstr "Ingredient {n, decimal} max percent"
+
+msgid "powderDesigner.ingredientMinPercent"
+msgstr "Ingredient {n, decimal} min percent"
+
+msgid "powderDesigner.ingredientName"
+msgstr "Ingredient {n, decimal} name"
 
 msgid "targets.row.innerTen"
 msgstr "Inner ten"
@@ -2525,8 +2690,14 @@ msgstr "Loading cartridges"
 msgid "states.loading.curves"
 msgstr "Loading curves"
 
+msgid "powderDesigner.loadingDensity"
+msgstr "Loading density"
+
 msgid "recordFields.loadingDensity"
 msgstr "Loading density"
+
+msgid "powderDesigner.loadingDensityConstantVolume"
+msgstr "Loading density of the constant-volume burn the values below apply to."
 
 msgid "states.loading.discipline"
 msgstr "Loading discipline"
@@ -2705,6 +2876,15 @@ msgstr "Mass"
 msgid "cases.column.mass"
 msgstr "Mass"
 
+msgid "powderDesigner.massPerVolumeLoose"
+msgstr "Mass per volume of loose powder, voids included."
+
+msgid "powderDesigner.massPercentMax"
+msgstr "Mass percent max"
+
+msgid "powderDesigner.massPercentMin"
+msgstr "Mass percent min"
+
 msgid "lists.matching"
 msgstr "matching \"{query}\""
 
@@ -2713,6 +2893,9 @@ msgstr "Material"
 
 msgid "cases.column.material"
 msgstr "Material"
+
+msgid "powderDesigner.max"
+msgstr "Max"
 
 msgid "sessionSummary.column.max"
 msgstr "Max"
@@ -2744,6 +2927,9 @@ msgstr "Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval.
 msgid "targetEditor.meanExtremeSpreadPer"
 msgstr "Mean extreme spread per ladder step as an angle, so groups at different distances compare, against charge; the table lists the values."
 
+msgid "powderDesigner.meanMolarMassCombustion"
+msgstr "Mean molar mass of the combustion gas."
+
 msgid "targetEditor.meanRadius"
 msgstr "Mean radius"
 
@@ -2758,6 +2944,9 @@ msgstr "Mean, n = {n}"
 
 msgid "recordSources.kind.measured"
 msgstr "measured"
+
+msgid "powderDesigner.measured"
+msgstr "Measured"
 
 msgid "bulletPhoto.measuredFrom"
 msgstr "Measured from a photograph ({width} × {height} px, {scale} px/mm ± {uncertainty} %, no image stored)."
@@ -2788,6 +2977,9 @@ msgstr "Metric (SI)"
 
 msgid "units.preset.metricGrains"
 msgstr "Metric, common use"
+
+msgid "powderDesigner.min"
+msgstr "Min"
 
 msgid "sessionSummary.column.min"
 msgstr "Min"
@@ -2821,6 +3013,18 @@ msgstr "Model parameters"
 
 msgid "recordFields.molarMass"
 msgstr "Molar mass"
+
+msgid "powderDesigner.molarMass"
+msgstr "Molar mass"
+
+msgid "powderDesigner.molarMassMax"
+msgstr "Molar mass max"
+
+msgid "powderDesigner.molarMassMin"
+msgstr "Molar mass min"
+
+msgid "powderDesigner.molarMassValue"
+msgstr "Molar mass value"
 
 msgid "values.moly"
 msgstr "moly"
@@ -2897,6 +3101,9 @@ msgstr "Name"
 msgid "firearms.column.name"
 msgstr "Name"
 
+msgid "powderDesigner.name"
+msgstr "Name"
+
 msgid "powders.column.name"
 msgstr "Name"
 
@@ -2956,6 +3163,9 @@ msgstr "New event"
 
 msgid "firearms.newFirearm"
 msgstr "New firearm"
+
+msgid "powderDesigner.newPowder"
+msgstr "New powder"
 
 msgid "powders.new"
 msgstr "New powder"
@@ -3113,6 +3323,9 @@ msgstr "No powder in the overlay."
 msgid "burnRateCompare.noMatch"
 msgstr "No powder with a curve matches"
 
+msgid "powderDesigner.noPowderYet"
+msgstr "No powder yet"
+
 msgid "states.noMatch.powders"
 msgstr "No powders match these filters."
 
@@ -3242,7 +3455,13 @@ msgstr "Not stated"
 msgid "matchRounds.notStated"
 msgstr "Not stated"
 
+msgid "powderDesigner.notStated"
+msgstr "Not stated"
+
 msgid "fieldTable.column.note"
+msgstr "Note"
+
+msgid "powderDesigner.note"
 msgstr "Note"
 
 msgid "recordSources.column.note"
@@ -3440,6 +3659,12 @@ msgstr "paint"
 msgid "bulletPhoto.brushHelp"
 msgstr "Paint over the picture to add to the bullet or erase from it. Keys: arrows move the cursor, Enter paints."
 
+msgid "powderDesigner.parameters"
+msgstr "Parameters"
+
+msgid "powderDesigner.parametersFitMoved"
+msgstr "Parameters the fit moved"
+
 msgid "values.partitioned"
 msgstr "partitioned"
 
@@ -3557,6 +3782,9 @@ msgstr "Positions"
 msgid "powderCompare.powder"
 msgstr "Powder"
 
+msgid "powderDesigner.powder"
+msgstr "Powder"
+
 msgid "page.powdersBurnRates"
 msgstr "Powder burn rates"
 
@@ -3598,6 +3826,18 @@ msgstr "Preset"
 
 msgid "units.quantity.pressure"
 msgstr "Pressure"
+
+msgid "powderDesigner.pressureWhichBulletStarts"
+msgstr "Pressure at which the bullet starts to move. Empty: solver default."
+
+msgid "powderDesigner.pressureWhichGrainsStart"
+msgstr "Pressure at which the grains start to burn."
+
+msgid "powderDesigner.pressureWhichVivacityHolds"
+msgstr "Pressure at which the vivacity holds."
+
+msgid "powderDesigner.pressureExponent"
+msgstr "Pressure exponent"
 
 msgid "recordFields.pressureExponent"
 msgstr "Pressure exponent"
@@ -3716,6 +3956,12 @@ msgstr "prone"
 msgid "cartridgeRecord.meaning.proofPressure"
 msgstr "proof pressure"
 
+msgid "powderDesigner.propellantBase"
+msgstr "Propellant base"
+
+msgid "powderDesigner.propellantTemperature"
+msgstr "Propellant temperature"
+
 msgid "recordFields.propellantTemperature"
 msgstr "Propellant temperature"
 
@@ -3737,6 +3983,9 @@ msgstr "Proposal {n, decimal}, confidence {pct, decimal} %, one of {count, decim
 msgid "holeDetection.proposalsDashedNoneCounts"
 msgstr "Proposals are dashed; none counts until accepted. On the photo, double-click or Enter accepts one, drag or arrow keys move it, Delete removes it."
 
+msgid "powderDesigner.provenance"
+msgstr "Provenance"
+
 msgid "recordSources.origin.public"
 msgstr "public"
 
@@ -3744,6 +3993,9 @@ msgid "recordSources.kind.published"
 msgstr "published"
 
 msgid "cartridgeRecord.published"
+msgstr "Published"
+
+msgid "powderDesigner.published"
 msgstr "Published"
 
 msgid "targetEditor.purple"
@@ -3791,6 +4043,9 @@ msgstr "RangeFoundry"
 msgid "recordFields.gamma"
 msgstr "Ratio of specific heats"
 
+msgid "powderDesigner.ratioSpecificHeatsGas"
+msgstr "Ratio of specific heats of the gas; above 1."
+
 msgid "sessionSummary.read"
 msgstr "Read {strings}, {shots}."
 
@@ -3818,6 +4073,9 @@ msgstr "rebated-boat-tail"
 msgid "recordFields.recommendedTwist"
 msgstr "Recommended twist"
 
+msgid "powderDesigner.record"
+msgstr "Record"
+
 msgid "holeDetection.rect"
 msgstr "Rect."
 
@@ -3832,6 +4090,9 @@ msgstr "Redo ({shortcut})"
 
 msgid "targetEditor.reference"
 msgstr "Reference"
+
+msgid "powderDesigner.referencePressure"
+msgstr "Reference pressure"
 
 msgid "recordFields.referencePressure"
 msgstr "Reference pressure"
@@ -3862,6 +4123,9 @@ msgstr "Remove {name}"
 
 msgid "directoryTable.removeScope"
 msgstr "Remove {name}"
+
+msgid "powderDesigner.removeIngredient"
+msgstr "Remove ingredient {n, decimal}"
 
 msgid "targetEditor.removePhoto"
 msgstr "Remove photo"
@@ -4433,6 +4697,9 @@ msgstr "soft-point"
 msgid "recordFields.solidDensity"
 msgstr "Solid density"
 
+msgid "powderDesigner.solidDensityGrains"
+msgstr "Solid density of the grains."
+
 msgid "bulletCompare.notFound"
 msgstr "Some bullets were not found."
 
@@ -4463,6 +4730,12 @@ msgstr "Sources ({kind})"
 msgid "recordSources.table"
 msgstr "Sources table"
 
+msgid "powderDesigner.specificEnergy"
+msgstr "Specific energy"
+
+msgid "powderDesigner.specificEnergyMovedFit"
+msgstr "Specific energy (moved by the fit)"
+
 msgid "targetEditor.spread"
 msgstr "Spread"
 
@@ -4486,6 +4759,9 @@ msgstr "Stages"
 
 msgid "disciplines.rule.standing"
 msgstr "standing"
+
+msgid "powderDesigner.startPressure"
+msgstr "Start pressure"
 
 msgid "recordFields.startPressure"
 msgstr "Start pressure"
@@ -4516,6 +4792,9 @@ msgstr "Steel"
 
 msgid "targetEditor.step"
 msgstr "Step"
+
+msgid "powderDesigner.stillNeededPowderRecord"
+msgstr "Still needed for a powder record"
 
 msgid "powderCompare.stoppedReason"
 msgstr "Stopped. {reason}"
@@ -4665,6 +4944,9 @@ msgstr "Technical drawing of the bullet, full section about the axis, base at th
 
 msgid "units.quantity.temperature"
 msgstr "Temperature"
+
+msgid "powderDesigner.temperatureParametersWereFitted"
+msgstr "Temperature the parameters were fitted at."
 
 msgid "targets.row.tenthRingValues"
 msgstr "Tenth-ring values"
@@ -4915,6 +5197,9 @@ msgstr "The value crosses the target at more than one charge."
 msgid "recordFields.thermochemistry"
 msgstr "Thermochemistry"
 
+msgid "powderDesigner.thermochemistry"
+msgstr "Thermochemistry"
+
 msgid "targetEditor.pointsGiveNoScale"
 msgstr "These points give no scale: three lie on one line."
 
@@ -5107,6 +5392,12 @@ msgstr "Up to {max}"
 msgid "units.preset.us"
 msgstr "US customary"
 
+msgid "powderDesigner.usableWorkbenchYourDesign"
+msgstr "Usable in the workbench as {name} (your design)."
+
+msgid "powderDesigner.usableWorkbenchNoBurnLaw"
+msgstr "Usable in the workbench as {name} (your design). Without burn-law parameters it fills no model values."
+
 msgid "bulletCompare.useInWorkbench"
 msgstr "Use in workbench"
 
@@ -5122,6 +5413,9 @@ msgstr "Use in workbench: {name}"
 msgid "powderCompare.usePowderWorkbench"
 msgstr "Use this powder in the workbench"
 
+msgid "powderDesigner.userDesignWorkbenchMarks"
+msgstr "User design: the workbench marks every result computed with it."
+
 msgid "bulletPhoto.value"
 msgstr "Value"
 
@@ -5134,8 +5428,14 @@ msgstr "Value"
 msgid "fieldTable.column.value"
 msgstr "Value"
 
+msgid "powderDesigner.value"
+msgstr "Value"
+
 msgid "targetEditor.value"
 msgstr "Value"
+
+msgid "powderDesigner.valuesCameAbout"
+msgstr "Values came about by"
 
 msgid "bulletPhoto.valuesTable"
 msgstr "Values measured from the photograph"
@@ -5179,8 +5479,14 @@ msgstr "Velocity per shot"
 msgid "sessionSummary.chartTitle"
 msgstr "Velocity per shot, {name}"
 
+msgid "powderDesigner.vivacity"
+msgstr "Vivacity"
+
 msgid "recordFields.vivacity"
 msgstr "Vivacity"
+
+msgid "powderDesigner.vivacityMovedFit"
+msgstr "Vivacity (moved by the fit)"
 
 msgid "burnRate.unresolvedDetail"
 msgstr "vivacity {value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}"

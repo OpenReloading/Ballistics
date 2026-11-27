@@ -30,7 +30,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary } from '../lib/api-types.ts'
 import { dayText } from '../lib/dates.ts'
-import { close, type FieldSpec, fieldError, specText } from '../lib/field-spec.ts'
+import { close, type FieldSpec, fieldError, type SpecText, specText } from '../lib/field-spec.ts'
 import {
   cylinderGapField,
   fieldSi,
@@ -61,7 +61,7 @@ export const opticKinds = [
 const empty = undefined as unknown as QuantityValue
 
 /** A field's help on hover, focus and touch; the field shows no description line. */
-function Tip({ help, children }: { help?: string | undefined; children: ReactElement }) {
+function Tip({ help, children }: { help?: SpecText | undefined; children: ReactElement }) {
   const { t } = useTranslation()
   if (!help) return children
   return (

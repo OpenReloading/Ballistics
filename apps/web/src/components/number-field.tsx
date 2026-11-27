@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react'
 import { ActionIcon, Menu, NumberInput, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
 import {
   CircleExclamationPoint,
@@ -383,7 +384,8 @@ export function NumberField({
   const value = given ?? noValue
   // the language shown: the field writes its decimal mark and reads text in it
   const { t } = useTranslation()
-  const specLabel = specText(t, spec.label)
+  const { i18n } = useLingui()
+  const specLabel = specText(t, spec.label, i18n)
   // typed text that differs from the value's text (a point under a decimal comma, no number) until the field is left with a value; `text` is the state's text it gave
   const [draft, setDraft] = useState<{ raw: string; text: string }>()
   // the message of a pasted text that could be read two ways
@@ -400,7 +402,7 @@ export function NumberField({
   const symbol = unit === 'none' ? '' : label
   const at = <T,>(v: OfShown<T>): T =>
     typeof v === 'function' ? (v as (s: UnitSystem) => T)(shown) : v
-  const helpText = help ? help(shown) : spec.help && specText(t, spec.help)
+  const helpText = help ? help(shown) : spec.help && specText(t, spec.help, i18n)
   const markText = at(mark)
   const actionText = action && at(action.text)
   const shownFlag = flagBeside(action, flag)
