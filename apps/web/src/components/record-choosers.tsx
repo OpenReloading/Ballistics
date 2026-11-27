@@ -12,7 +12,7 @@ import { notMetallic, powderRowIncomplete, shotgunOnly } from '../lib/complete-r
 import { countryName, parseCountries } from '../lib/countries.ts'
 import type { FirearmRow } from '../lib/firearm.ts'
 import { baseText, caseTypeText, grainFormText, kebabValue, scopeText } from '../lib/list-values.ts'
-import type { PowderDesign } from '../lib/powder-designer.ts'
+import type { PowderDesign } from '../lib/powder-designs.ts'
 import type { PrimerRow } from '../lib/primer-rows.ts'
 import {
   type CaseRow,

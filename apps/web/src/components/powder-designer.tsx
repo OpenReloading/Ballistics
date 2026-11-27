@@ -23,7 +23,6 @@ import {
   type Action,
   checkDesign,
   type Design,
-  fallbackName,
   fieldAt,
   fileData,
   fittedKeys,
@@ -39,6 +38,7 @@ import {
   rowId,
   specOf,
 } from '../lib/powder-designer.ts'
+import { fallbackName } from '../lib/powder-designs.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { controlSize } from '../lib/theme.ts'
 import { tunePowderHref } from '../lib/tune-href.ts'
