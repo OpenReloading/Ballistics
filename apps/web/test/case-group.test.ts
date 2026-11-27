@@ -1,4 +1,4 @@
-import { english } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import 'fake-indexeddb/auto'
 import {
   type Case,
@@ -8,13 +8,8 @@ import {
   userRecord,
 } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
-import {
-  blankCaseGroup,
-  caseGroupProblem,
-  groupCapacity,
-  ownCases,
-  withCapacity,
-} from '../src/lib/case-group.ts'
+import { blankCaseGroup, groupCapacity, ownCases, withCapacity } from '../src/lib/case-group.ts'
+import { caseGroupProblem } from '../src/lib/case-group-fields.ts'
 import {
   capacityRecord,
   measuredCapacityId,
@@ -43,15 +38,15 @@ const caseRecord = (data: Case): UserRecord =>
   userRecord.parse({ kind: 'case', id: caseId, name: data.name, saved, data })
 
 it('asks for a name and a cartridge, then names the field the schema refuses', () => {
-  expect(caseGroupProblem('', group, english.t)).toBe('Enter a name.')
-  expect(caseGroupProblem('x', { ...group, cartridge: '' }, english.t)).toBe(
+  expect(caseGroupProblem('', group, linguiOf('en'))).toBe('Enter a name.')
+  expect(caseGroupProblem('x', { ...group, cartridge: '' }, linguiOf('en'))).toBe(
     'Choose the cartridge.',
   )
-  expect(caseGroupProblem('x', group, english.t)).toBeUndefined()
-  expect(caseGroupProblem('x', { ...group, casesMeasured: 0 }, english.t)).toBe(
+  expect(caseGroupProblem('x', group, linguiOf('en'))).toBeUndefined()
+  expect(caseGroupProblem('x', { ...group, casesMeasured: 0 }, linguiOf('en'))).toBe(
     'Cases measured: not valid.',
   )
-  expect(caseGroupProblem('x', { ...group, neckWall: { value: -1 } }, english.t)).toBe(
+  expect(caseGroupProblem('x', { ...group, neckWall: { value: -1 } }, linguiOf('en'))).toBe(
     'Neck wall: not valid.',
   )
 })

@@ -12,7 +12,8 @@ import { msg } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import { type FaceSummary, fetchFace, fetchFaceSummaries } from '../lib/face-records.ts'
-import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import { type FieldSpec, type Fields, initialFields } from '../lib/field-spec.ts'
 import { faceZones, hitFailureText, impactSensitivity } from '../lib/hit-probability.ts'
 import { nth } from '../lib/nth.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
@@ -129,7 +130,7 @@ export function HitProbability({
   }, [faceId])
 
   const errors = Object.fromEntries(
-    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t)]),
+    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t, i18n)]),
   )
   const v = (key: string) => fields[key]?.si
   const point = points[at]

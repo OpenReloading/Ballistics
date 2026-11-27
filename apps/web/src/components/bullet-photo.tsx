@@ -21,7 +21,8 @@ import { fixedNumber } from '../i18n/number.ts'
 import type { Design } from '../lib/bullet-designer.ts'
 import { paintPhoto } from '../lib/bullet-photo-canvas.ts'
 import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design.ts'
-import { type FieldValue, fieldError } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import type { FieldValue } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { sayLingui } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/bullet-photo.json' with { type: 'json' }
@@ -149,7 +150,7 @@ export function DistanceField({
       system={system}
       value={value}
       onChange={onChange}
-      error={(shown) => fieldError(spec, value, shown, t)}
+      error={(shown) => fieldError(spec, value, shown, t, i18n)}
     />
   )
 }

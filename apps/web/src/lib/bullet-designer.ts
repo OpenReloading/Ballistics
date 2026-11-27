@@ -20,12 +20,12 @@ import { untranslated } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import englishMessages from '../locales/en/lib/bullet-designer.json' with { type: 'json' }
 import { computedBulletRows } from './bullet.ts'
+import { fieldError } from './field-error.ts'
 import {
   close,
   type FieldSpec,
   type Fields,
   type FieldValue,
-  fieldError,
   fieldOf,
   siToStored,
   storedToSi,
