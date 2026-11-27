@@ -370,7 +370,9 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:300-win-short-mag-wikipedia"
+    "capacity": "catalogue:300-win-short-mag-wikipedia",
+    "primerSize": "large-rifle",
+    "primerMagnum": true
   },
   "provenance": {
     "kind": "published",
@@ -380,6 +382,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page122.pdf",
         "sha256": "f6cc61e9ebb0c5a827f8aafc18dba89e3448a219d2305cd8c0c3c765b01d054f",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-300-winchester-short-magnum",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

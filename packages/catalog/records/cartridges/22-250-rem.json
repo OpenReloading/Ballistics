@@ -375,6 +375,9 @@
       "value": 25.09
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -383,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page82.pdf",
         "sha256": "26a7711a6ffadc2f8de982c73a316cc4c83c602456e2419d5866d896482fc34d",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .22-250 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.22-250_Remington&oldid=1387949158",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

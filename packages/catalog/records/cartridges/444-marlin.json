@@ -247,6 +247,9 @@
       "value": 92.52
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -255,6 +258,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page109.pdf",
         "sha256": "f02e9c9fccf9eeb53d33f0ca4d30f8fb119c345f37559a09a7058bd3677e0cca",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .444 Marlin",
+        "url": "https://en.wikipedia.org/w/index.php?title=.444_Marlin&oldid=1323043188",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

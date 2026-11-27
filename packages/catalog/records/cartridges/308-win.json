@@ -377,7 +377,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:308-win-wikipedia"
+    "capacity": "catalogue:308-win-wikipedia",
+    "primerSize": "large-rifle"
   },
   "provenance": {
     "kind": "published",
@@ -387,6 +388,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page125.pdf",
         "sha256": "428efd5c2ffdda8fd7844d870523fa2df40f60a1810b3a2f175eba0c26ccadef",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-308-winchester",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

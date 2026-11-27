@@ -334,6 +334,9 @@
       "value": 14.8
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -342,6 +345,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/17-hornet-en.pdf",
         "sha256": "4cbaf972b408043435e6e38501a2e03ade7487510e6b54469286740440abaa2b",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .17 Hornet",
+        "url": "https://en.wikipedia.org/w/index.php?title=.17_Hornet&oldid=1315660801",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

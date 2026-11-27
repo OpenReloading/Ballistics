@@ -323,6 +323,9 @@
       "value": 47.06
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -331,6 +334,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page70.pdf",
         "sha256": "a1ce3d5a780cbe359e7e133f570c28af341002e9107d1508bbc0d12532b4075c",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .30-30 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.30-30_Winchester&oldid=1379999716",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

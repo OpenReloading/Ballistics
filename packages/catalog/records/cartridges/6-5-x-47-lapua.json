@@ -376,7 +376,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:6-5-x-47-lapua-wikipedia"
+    "capacity": "catalogue:6-5-x-47-lapua-wikipedia",
+    "primerSize": "small-rifle"
   },
   "provenance": {
     "kind": "published",
@@ -386,6 +387,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/6-5-x-47-lapua-en.pdf",
         "sha256": "4208688fb722ca0c1a9caa7df64dae069ea061661eeb2b7d7da8e409e096af4d",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.5×47mm Lapua",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5%C3%9747mm_Lapua&oldid=1292319718",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle for prototypes, small rifle since start of production."
       }
     ]
   }

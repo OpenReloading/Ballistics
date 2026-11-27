@@ -4,7 +4,7 @@ import { useLingui } from '@lingui/react'
 
 import { Anchor, NativeSelect } from '@mantine/core'
 import { cartridgeDiameters } from '@rangefoundry/ballistics'
-import { type Bullet, fromSi, toSi } from '@rangefoundry/schema'
+import { type Bullet, defaultCapacity, fromSi, toSi } from '@rangefoundry/schema'
 import { fullSection, svgPath, toPartFrame } from '@rangefoundry/svg-drawings'
 import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { drawnTables } from '@rangefoundry/svg-drawings/cartridge'
@@ -53,6 +53,7 @@ import { capacityGuide } from '../lib/docs-url.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViewBuilder } from '../lib/figure-views.ts'
 import type { Cylinder, LandsContact } from '../lib/firearm.ts'
+import { genericCase } from '../lib/generic-case.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
@@ -1024,6 +1025,7 @@ function watersOf<T extends Parameters<typeof usedWater>[0]['capacities'][number
   measured: number | undefined
   capacities: readonly T[]
   capacityId: string | undefined
+  cartridgeDefault: T | undefined
   stated: number | undefined
   pendingCase: boolean
 }) {
@@ -1148,6 +1150,8 @@ function useSeatingModel(p: PreviewProps) {
     measured,
     capacities,
     capacityId,
+    cartridgeDefault:
+      detail.status === 'ok' ? defaultCapacity(detail.value, capacities) : undefined,
     stated: chosenCase?.waterCapacity,
     pendingCase,
   })
@@ -1554,6 +1558,7 @@ function BulletStatus({ m }: { m: Model }) {
 /** The user's groups of cases (`user:` ids) and the case products; a product's stated capacity becomes the default. */
 function CaseChoice({ m }: { m: Model }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const dialog = useChooser()
   const { caseList, names } = m
   const own = m.p.ownCases
@@ -1583,7 +1588,10 @@ function CaseChoice({ m }: { m: Model }) {
     },
     [rows],
   )
-  if (rows.length === 0 && !ownId) return null
+  // a catalogue cartridge always has its generic brass case, so the choice shows even with no case product
+  const generic =
+    m.detail.status === 'ok' && !m.designed ? genericCase(m.name, m.detail.value) : undefined
+  if (rows.length === 0 && !ownId && !generic) return null
   const ownCase = own?.find((c) => c.id === ownId)
   const choose = (id: string) => {
     if (id.startsWith('user:')) m.p.onOwnCaseId?.(id.slice('user:'.length))
@@ -1602,7 +1610,12 @@ function CaseChoice({ m }: { m: Model }) {
         chevron
         label={t('Brass record')}
         picked={!!chosen}
-        chosen={chosen || t('Search brass (optional)')}
+        chosen={
+          chosen ||
+          (generic
+            ? i18n._(generic.name.id, generic.values, { message: generic.name.message })
+            : t('Search brass (optional)'))
+        }
         describe={(c) =>
           c.id.startsWith('user:')
             ? t('{name} (your brass)', { name: c.name })

@@ -373,6 +373,10 @@
       "value": 86.38
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page31.pdf",
         "sha256": "caed2c8e98d1da8b8b4ab84c30840e74c0e087be80c048d3f6ee2099179b53c2",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .416 Remington Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.416_Remington_Magnum&oldid=1366064696",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

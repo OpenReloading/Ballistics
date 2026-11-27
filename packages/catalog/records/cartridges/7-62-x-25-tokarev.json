@@ -358,7 +358,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:7-62-x-25-tokarev-wikipedia"
+    "capacity": "catalogue:7-62-x-25-tokarev-wikipedia",
+    "primerSize": "small-pistol"
   },
   "provenance": {
     "kind": "published",
@@ -368,6 +369,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page9.pdf",
         "sha256": "cfd6d196708c09a0cef37fa0e7d61f423eb011535ebc9a4268a1f6f55e165744",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7.62×25mm Tokarev",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.62%C3%9725mm_Tokarev&oldid=1387492206",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Berdan or boxer small pistol."
       }
     ]
   }

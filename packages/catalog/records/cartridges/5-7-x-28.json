@@ -373,6 +373,9 @@
       "value": 24.61
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +384,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page7.pdf",
         "sha256": "63afaccfafe9fbbc699946da08f352e34aea6a5498865adcc0ebf25900a70547",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, FN 5.7×28mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=FN_5.7%C3%9728mm&oldid=1386425189",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Boxer Small Rifle."
       }
     ]
   }

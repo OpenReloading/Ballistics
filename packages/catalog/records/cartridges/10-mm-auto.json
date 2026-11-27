@@ -241,7 +241,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:10-mm-auto-wikipedia"
+    "capacity": "catalogue:10-mm-auto-wikipedia",
+    "primerSize": "large-pistol"
   },
   "provenance": {
     "kind": "published",
@@ -251,6 +252,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/10-mm-auto-en.pdf",
         "sha256": "f0de81068839ea129836047decf1cbd8abf141e96610bcff5f4776a56b5e61f4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-10mm-auto",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

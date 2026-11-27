@@ -223,6 +223,9 @@
       "value": 47.91
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -231,6 +234,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/32s-w-long-190829-en.pdf",
         "sha256": "32aa668e24b20f84483876e2a053f2cda22f82f3e8212b59aeb5ae1b32e7ffdd",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-32-s-w-long",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

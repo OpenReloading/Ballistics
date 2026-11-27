@@ -329,6 +329,9 @@
       "value": 60.5
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -337,6 +340,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page85.pdf",
         "sha256": "111b006c89a477c60cff88399477b9732e54d91e6ffe4aab80b6ac60987fc58a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .348 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.348_Winchester&oldid=1370955414",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

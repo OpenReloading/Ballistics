@@ -5,7 +5,7 @@ import { Button, Menu } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { spotlight } from '@mantine/spotlight'
 import { bulletWindow } from '@rangefoundry/ballistics'
-import { toSi } from '@rangefoundry/schema'
+import { savedLoad, toSi } from '@rangefoundry/schema'
 import { Play, Printer, Search as SearchIcon } from 'lucide-react'
 import {
   type KeyboardEvent,
@@ -678,13 +678,26 @@ function frameKeyDown(inputs: Load['inputs'], run: Load['run']) {
   }
 }
 
-/** What the File menu could not load, as its note. */
-function fileNote(unresolved: string[], dropped: string[], t: Translator['t']) {
+const replacedNote = /*i18n*/ {
+  id: 'workbench.replacedNote',
+  message: 'Not in the catalogue, the generic one of the cartridge is used: {list}.',
+}
+
+/** What the File menu could not load, and the cartridge an opened load lacks, as its note. */
+function fileNote(
+  unresolved: string[],
+  dropped: string[],
+  t: Translator['t'],
+  cartridgeNote: string | undefined,
+  replacedNote?: string,
+) {
   return (
     [
+      cartridgeNote,
       unresolved.length &&
         t('Not loaded, kept in the file: {list}.', { list: unresolved.join(', ') }),
       dropped.length && t('Not a record id, left out: {list}.', { list: dropped.join(', ') }),
+      replacedNote,
     ]
       .filter(Boolean)
       .join(' ') || undefined
@@ -1107,6 +1120,7 @@ export function Workbench() {
     designs,
     fields,
     apiData,
+    apiRecords,
     fileData,
     fileMenu,
     firearm,
@@ -1148,6 +1162,7 @@ export function Workbench() {
     todo,
     trajectory,
     unresolved,
+    cartridgeNote,
     dropped,
     workspace,
   } = load
@@ -1430,7 +1445,13 @@ export function Workbench() {
                       name={load.name}
                       nameKey={customNameKey(load.customName)}
                       data={fileData}
+                      problem={
+                        savedLoad.safeParse(fileData).success
+                          ? undefined
+                          : t('Choose the cartridge.')
+                      }
                       apiData={apiData}
+                      apiRecords={apiRecords}
                       store={storeLoad}
                       onOpen={onOpenFile}
                       onStored={stored}
@@ -1438,7 +1459,19 @@ export function Workbench() {
                       onUnsaved={tabs.setUnsaved}
                       onList={openList}
                       starts={startItems}
-                      note={fileNote(unresolved, dropped, t)}
+                      note={fileNote(
+                        unresolved,
+                        dropped,
+                        t,
+                        cartridgeNote,
+                        load.standIns.length > 0
+                          ? i18n._(
+                              replacedNote.id,
+                              { list: load.standIns.join(', ') },
+                              { message: replacedNote.message },
+                            )
+                          : undefined,
+                      )}
                     />
                   }
                   after={

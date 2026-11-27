@@ -369,6 +369,10 @@
       "value": 38.52
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +381,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page100.pdf",
         "sha256": "7b483846243a843a1ffaa771adf14bc17b3bdcff992530c5ce66224683dc8570",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .270 Winchester Short Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.270_Winchester_Short_Magnum&oldid=1239176976",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

@@ -303,6 +303,10 @@ const sentences: readonly Described[] = [
       'ladder output of {n} points is above {max}: fewer steps or a larger options.outputStep',
   },
   /*i18n*/ {
+    id: 'coreMessage.answer.noCartridge',
+    message: 'The load has no cartridge: choose a cartridge record to simulate it.',
+  },
+  /*i18n*/ {
     id: 'coreMessage.answer.ladderKind',
     message: 'ladder.kind: a {kind} ladder runs in the workbench, not in this route',
   },

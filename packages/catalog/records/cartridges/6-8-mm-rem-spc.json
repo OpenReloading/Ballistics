@@ -373,6 +373,9 @@
       "value": 38.52
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +384,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page31.pdf",
         "sha256": "acccd41c9ec0e20f9b8f8a032c3d809c1efdad5692f8f27d63cd348a6b95e5d1",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.8mm Remington SPC",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.8mm_Remington_SPC&oldid=1379963632",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Rifle."
       }
     ]
   }

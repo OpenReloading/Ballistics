@@ -316,6 +316,9 @@
       "value": 56.94
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -324,6 +327,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page83.pdf",
         "sha256": "0ac058a11050a439d18acc59ddfb31d3d58e11c57477906abb009b43e48dd572",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .33 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.33_Winchester&oldid=1332704969",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: large rifle."
       }
     ]
   }

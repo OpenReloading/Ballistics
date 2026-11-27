@@ -363,6 +363,10 @@
       "value": 56.95
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -371,6 +375,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page134.pdf",
         "sha256": "d491acd483080956a31a90052c0caa227739d617e57d8f73a8acd5e43426d24a",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .338 Remington Ultra Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.338_Remington_Ultra_Magnum&oldid=1342231560",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

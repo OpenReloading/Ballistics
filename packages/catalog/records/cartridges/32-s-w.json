@@ -222,6 +222,9 @@
       "value": 47.91
     }
   ],
+  "defaults": {
+    "primerSize": "small-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page44.pdf",
         "sha256": "c5f6ebc9c96820cd6ff8defa4bf47e822a71f80c1c285b51de0772958c91a566",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .32 S&W",
+        "url": "https://en.wikipedia.org/w/index.php?title=.32_S%26W&oldid=1380365574",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small pistol."
       }
     ]
   }

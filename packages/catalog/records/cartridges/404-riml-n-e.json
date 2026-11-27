@@ -331,6 +331,10 @@
       "value": 89.25
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -339,6 +343,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/404-riml-ne-en.pdf",
         "sha256": "b74adaaf9b854b966c9845fea68befd44e8e9a939b8ceaf9dd07bfae516455ab",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .404 Jeffery",
+        "url": "https://en.wikipedia.org/w/index.php?title=.404_Jeffery&oldid=1356738201",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }

@@ -79,16 +79,28 @@ function hasOwnHead(
   })
 }
 
+/** How many records the export's catalogue index lists of the data folder `dir`; undefined without an index or a list. */
+function listedCount(site: string, dir: string) {
+  const file = path.join(site, 'api', 'catalogue', 'index.json')
+  if (!existsSync(file)) return
+  const index = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown[] | undefined>
+  return index[dir.replace(/-(\w)/g, (_, c: string) => c.toUpperCase())]?.length
+}
+
 /** The routes the export must hold that have no `index.html` or no `index.txt`, and the record pages whose HTML lacks one of the record's own head values. */
 export function checkPages(site: string, env: Record<string, string | undefined> = process.env) {
   const expected: string[] = []
   const records: { route: string; kind: RecordKind; id: string }[] = []
   for (const [dir, what, route = dir] of lists) {
-    const ids = readdirSync(path.join(site, 'api', dir))
-      .filter((f) => f.endsWith('.json'))
-      .map((f) => f.slice(0, -'.json'.length))
-    // an empty folder would pass without checking a record
-    if (ids.length === 0) throw new Error(`no ${what} data files in ${site}/api/${dir}`)
+    const folder = path.join(site, 'api', dir)
+    const ids = existsSync(folder)
+      ? readdirSync(folder)
+          .filter((f) => f.endsWith('.json'))
+          .map((f) => f.slice(0, -'.json'.length))
+      : []
+    // an empty folder would pass without checking a record, unless the catalogue lists none of the kind
+    if (ids.length === 0 && listedCount(site, dir) !== 0)
+      throw new Error(`no ${what} data files in ${site}/api/${dir}`)
     const exported = exportIds(what, ids, env)
     expected.push(route, ...exported.map((id) => `${route}/${id}`))
     records.push(...exported.map((id) => ({ route, kind: dir, id })))

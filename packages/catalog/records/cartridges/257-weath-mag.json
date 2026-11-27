@@ -373,6 +373,10 @@
       "value": 33.07
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -381,6 +385,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/257-weath-mag-180803-en.pdf",
         "sha256": "572c593b7e26665456f9b8b8d038a47c77a1c972fd6ccdea3a43524088dcea7c",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .257 Weatherby Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.257_Weatherby_Magnum&oldid=1368911244",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large Rifle (magnum)."
       }
     ]
   }

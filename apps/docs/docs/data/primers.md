@@ -26,7 +26,17 @@ A primer record describes one primer product as its manufacturer sells it. A loa
 
 Every data field needs a source that lists it in `fields`. A value a source does not state is left out, never estimated. A source other than a fact source (a standard, an official specification) needs a `license` or the maker's `terms` in its record.
 
-`packages/catalog/records/primers/` holds the synthetic demo records (CC0-1.0), invented for tests and the example. No record of a real product is in the catalogue yet.
+`packages/catalog/records/primers/` holds no record yet: the catalogue lists primer products only from a cited source.
+
+## Generic primer
+
+A load that names no primer record uses the generic primer of its cartridge: the size in the cartridge's `defaults.primerSize`, a standard primer or, where the cartridge's source calls for one (`defaults.primerMagnum`), a magnum primer. A generic primer is no product and no record: it has no manufacturer, product number, cup, compound or intended use, and the app names it by its size, such as "Large rifle" or "Large rifle magnum". A cartridge without a sourced primer size has no generic primer.
+
+The primer choice of the workbench offers the generic primer and the catalogue's primer records of that size.
+
+## In the simulation
+
+No primer value enters the simulation, neither of a primer record nor of the generic primer: the interior ballistics model reads the case's water capacity, not the primer.
 
 ## In a load
 

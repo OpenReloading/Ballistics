@@ -374,6 +374,10 @@
       "value": 84.39
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle",
+    "primerMagnum": true
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -382,6 +386,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/tabiiical-en-page30.pdf",
         "sha256": "fc3281088cc35c9db1bbfe6946bf7a075a68d8289cc174fd52efc15bdb58257e",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .400 H&H Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.400_H%26H_Magnum&oldid=1299129494",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle, magnum."
       }
     ]
   }

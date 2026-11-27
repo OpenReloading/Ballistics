@@ -223,7 +223,8 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:44-s-w-special-wikipedia"
+    "capacity": "catalogue:44-s-w-special-wikipedia",
+    "primerSize": "large-pistol"
   },
   "provenance": {
     "kind": "published",
@@ -233,6 +234,12 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page74.pdf",
         "sha256": "f1e55a0e35feaf12cb2fe19edeccd879a7276d49f72c682a4df874799a0f3d28",
         "retrieved": "2026-10-08"
+      },
+      {
+        "source": "wikipedia-44-special",
+        "retrieved": "2026-11-26",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

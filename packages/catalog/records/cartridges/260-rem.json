@@ -369,6 +369,9 @@
       "value": 34.74
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page97.pdf",
         "sha256": "5cb6749c1b68f9c785b7788d931f9ab977a198f0f8b0e12bd29ced9a091bfbb4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .260 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.260_Remington&oldid=1356903205",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

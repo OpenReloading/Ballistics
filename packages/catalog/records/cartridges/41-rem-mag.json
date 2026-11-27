@@ -222,6 +222,9 @@
       "value": 82.71
     }
   ],
+  "defaults": {
+    "primerSize": "large-pistol"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -230,6 +233,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page69.pdf",
         "sha256": "841269c279c50774789765a049612936c6f0019f5ea4551d65a6f6cfb345ada5",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .41 Remington Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.41_Remington_Magnum&oldid=1368969581",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large pistol."
       }
     ]
   }

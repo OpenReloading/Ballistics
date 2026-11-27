@@ -361,14 +361,14 @@ describe('the measured case capacity of a load', () => {
   it('names a case record next to the lot, and leaves the record out of the API file', () => {
     const base = parts({
       cartridge: 'catalogue:308-win',
-      caseRecord: 'catalogue:demo-case-308-brass',
+      caseRecord: 'catalogue:example-case-308',
       lots: { powder: '', primer: '', case: 'L7', bullet: '' },
     })
     const l = toLoad(base)
     expect(loadSchema.safeParse(l).success).toBe(true)
-    expect(l.case).toEqual({ record: 'catalogue:demo-case-308-brass', lot: 'L7' })
-    expect(toLoad(parts({ caseRecord: 'catalogue:demo-case-308-brass' })).case).toEqual({
-      record: 'catalogue:demo-case-308-brass',
+    expect(l.case).toEqual({ record: 'catalogue:example-case-308', lot: 'L7' })
+    expect(toLoad(parts({ caseRecord: 'catalogue:example-case-308' })).case).toEqual({
+      record: 'catalogue:example-case-308',
     })
     expect(toApiLoad(base, { cartridge: 'catalogue:308-win' }).case).toBeUndefined()
   })
@@ -376,11 +376,11 @@ describe('the measured case capacity of a load', () => {
   it('names a primer record next to the lot, keeps both through a saved file and refuses the older text', () => {
     const base = parts({
       cartridge: 'catalogue:308-win',
-      primerRecord: 'catalogue:demo-primer-large-rifle',
+      primerRecord: 'catalogue:example-primer-lr',
       lots: { powder: '', primer: 'R1', case: '', bullet: '' },
     })
     const l = toLoad(base)
-    expect(l.primer).toEqual({ record: 'catalogue:demo-primer-large-rifle', lot: 'R1' })
+    expect(l.primer).toEqual({ record: 'catalogue:example-primer-lr', lot: 'R1' })
     const reopened = loadSchema.parse(JSON.parse(JSON.stringify(l)))
     expect(reopened.primer).toEqual(l.primer)
     expect(

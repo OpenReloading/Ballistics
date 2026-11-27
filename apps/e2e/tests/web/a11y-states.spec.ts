@@ -19,13 +19,13 @@ test.beforeEach(({ page }) => storeUnits(page))
 
 const appDir = path.join(__dirname, '../../../web/src/app')
 
-/** One fixed record per `[id]` route; each is in the export's sample (`prerender-sample.ts`). */
-const records: Record<string, string> = {
+/** One fixed record per `[id]` route, each in the export's sample (`prerender-sample.ts`); undefined where the catalogue holds no record of the kind. */
+const records: Record<string, string | undefined> = {
   cartridges: '308-win',
   bullets: 'demo-bullet-168',
   powders: 'demo-powder-dp40',
-  cases: 'demo-case-308-brass',
-  primers: 'demo-primer-large-rifle',
+  cases: undefined,
+  primers: undefined,
   targets: 'issf-25m-precision-50m-pistol',
   disciplines: 'dsb-25m-pistole-revolver',
   federations: 'dsb',
@@ -106,16 +106,18 @@ type State = {
 const dialogOf = (name: string) => (page: Page) => settled(page.getByRole('dialog', { name }))
 
 const states: State[] = [
-  ...Object.entries(records).map(([dir, id]) => ({
-    name: `/${dir}/${id}`,
-    scrolls: true as const,
-    open: async (page: Page, check: (view: string) => Promise<void>) => {
-      await gotoHydrated(page, `/${dir}/${id}`)
-      // the record page renders from its data files once they are read
-      await expect(page.locator('#record-sources')).toBeVisible()
-      await check('page')
-    },
-  })),
+  ...Object.entries(records)
+    .flatMap(([dir, id]) => (id === undefined ? [] : [{ dir, id }]))
+    .map(({ dir, id }) => ({
+      name: `/${dir}/${id}`,
+      scrolls: true as const,
+      open: async (page: Page, check: (view: string) => Promise<void>) => {
+        await gotoHydrated(page, `/${dir}/${id}`)
+        // the record page renders from its data files once they are read
+        await expect(page.locator('#record-sources')).toBeVisible()
+        await check('page')
+      },
+    })),
   ...[
     ['German list', '/cartridges/', 'tab'],
     ['German record', '/cartridges/308-win/', 'sources'],

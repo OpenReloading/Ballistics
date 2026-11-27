@@ -330,6 +330,9 @@
       "value": 32.58
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -338,6 +341,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/25-35-win-220214-en.pdf",
         "sha256": "fbca8d9faa6cf62c4511b2037d951cde1ad179f6436964e1043905d5ce82dab5",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .25-35 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.25-35_Winchester&oldid=1366150764",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large Rifle."
       }
     ]
   }

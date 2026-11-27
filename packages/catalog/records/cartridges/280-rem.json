@@ -369,6 +369,9 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page103.pdf",
         "sha256": "4043672b770f11b2e16e3071bbc7827ab23648f072a0906ded534513c33a3ae4",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .280 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.280_Remington&oldid=1384008216",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

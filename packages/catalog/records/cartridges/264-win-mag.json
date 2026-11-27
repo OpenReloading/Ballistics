@@ -367,6 +367,9 @@
       "value": 34.66
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -375,6 +378,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iii/264-win-mag-220214-en.pdf",
         "sha256": "ff3fa063a7c7972ec1bb9e9366ef1d7d76f07897ad7566930019fdf366f6c4fc",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .264 Winchester Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.264_Winchester_Magnum&oldid=1360902740",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

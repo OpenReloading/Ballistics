@@ -213,6 +213,9 @@
       "value": 85.13
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -221,6 +224,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page106.pdf",
         "sha256": "274ba20719d29853b4a09b25014a9c25ec50f0df0e013043844c943e6fe08670",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .405 Winchester",
+        "url": "https://en.wikipedia.org/w/index.php?title=.405_Winchester&oldid=1292502910",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: large rifle."
       }
     ]
   }

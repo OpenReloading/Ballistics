@@ -8,10 +8,10 @@ import {
 import { buildCatalogue, openCatalogue, sha256 } from '@rangefoundry/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
-import { bundle } from './fixtures.ts'
+import { bundle, exampleBundle } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'
 
-const api = withApi()
+const api = withApi({ seed: exampleBundle })
 const hex64 = /^[0-9a-f]{64}$/
 
 /** The same object with its keys in the reverse order, at every depth. */

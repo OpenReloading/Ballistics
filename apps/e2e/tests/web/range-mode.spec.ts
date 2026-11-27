@@ -257,7 +257,6 @@ test('the chosen load names its components, the statistics follow Add shot, and 
       cartridge: 'catalogue:308-win',
       bullet: 'catalogue:demo-bullet-168',
       powder: 'catalogue:demo-powder-dp40',
-      primer: { record: 'catalogue:demo-primer-large-rifle' },
       seating: { by: 'overallLength', value: { value: 71.12 } },
       analysis: { ladder: { stepCount: 5, step: 0.05, direction: 'around' } },
     },
@@ -272,12 +271,10 @@ test('the chosen load names its components, the statistics follow Add shot, and 
     await gotoHydrated(page, '/range')
     await putRecords(page, [{ ...named, id }])
     await openRange(page, id)
-    // the select may cut the name: the lines under it name the cartridge, bullet, powder, primer and COAL
+    // the select may cut the name: the lines under it name the cartridge, bullet, powder and COAL
     const summary = page.locator('[data-load-summary]')
     await expect(summary).toContainText('308 Win., Demo Bullets 30 Cal 168 gr HPBT Demo')
-    await expect(summary).toContainText(
-      'Demo Powder Co. DP40 2.90 g, Demo Primers Large Rifle Demo, COAL 71.12 mm',
-    )
+    await expect(summary).toContainText('Demo Powder Co. DP40 2.90 g, COAL 71.12 mm')
     // five steps: cells of one width
     const widths = await page
       .getByRole('group', { name: 'Ladder step' })

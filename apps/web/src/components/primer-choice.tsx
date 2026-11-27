@@ -1,8 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import type { GenericPrimer } from '../lib/generic-primer.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import type { PrimerRow } from '../lib/primer-rows.ts'
 import { titleFromKebab } from '../lib/record-fields.ts'
@@ -16,17 +18,20 @@ const PrimerChooser = dynamic(() => import('./record-choosers.tsx').then((m) => 
   ssr: false,
 })
 
-/** An `id` the list lacks stays chosen under a generic label, so a saved reference is never dropped. */
+/** Without a chosen record the load uses `generic`, the generic primer of its cartridge; an `id` the list lacks stays chosen under a generic label, so a saved reference is never dropped. */
 export function PrimerChoice({
   id,
+  generic,
   onChange,
   system,
 }: {
   id: string | undefined
+  generic: GenericPrimer | undefined
   onChange: (id: string | undefined) => void
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const names = useManufacturerNames()
   const dialog = useChooser()
   const [items, setItems] = useState<PrimerRow[]>()
@@ -43,15 +48,17 @@ export function PrimerChoice({
       live = false
     }
   }, [])
+  const size = generic?.size
   const find = useMemo(
     () => async (text: string, limit: number) => {
       const { listMatches, primerKeys } = await import('../lib/record-choosers.ts')
-      return listMatches(items ?? [], text, limit, primerKeys)
+      const sized = (items ?? []).filter((p) => !size || p.size === size)
+      return listMatches(sized, text, limit, primerKeys)
     },
-    [items],
+    [items, size],
   )
   const listed = items ?? []
-  if (listed.length === 0 && !id) return null
+  if (listed.length === 0 && !id && !generic) return null
   const describe = (p: PrimerRow) =>
     `${productLabel(p, names)}, ${titleFromKebab(p.size).toLowerCase()}`
   const chosen = listed.find((p) => p.id === id)
@@ -70,7 +77,9 @@ export function PrimerChoice({
               ? failed
                 ? t('A primer (catalogue unavailable)')
                 : unlisted
-              : t('Search primers (optional)')
+              : generic
+                ? i18n._(generic.name)
+                : t('Search primers (optional)')
         }
         describe={describe}
         onSelect={(p) => onChange(p.id)}

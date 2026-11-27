@@ -775,6 +775,12 @@ msgstr "Brass"
 msgid "page.cases"
 msgstr "Brass"
 
+msgid "workbench.replacedCase"
+msgstr "brass {id}"
+
+msgid "genericCase.name"
+msgstr "Brass case {name}"
+
 msgid "states.unavailable.case"
 msgstr "Brass data is unavailable right now."
 
@@ -2528,8 +2534,14 @@ msgstr "Ladder step"
 msgid "values.largePistol"
 msgstr "Large pistol"
 
+msgid "genericPrimer.largePistolMagnum"
+msgstr "Large pistol magnum"
+
 msgid "values.largeRifle"
 msgstr "Large rifle"
+
+msgid "genericPrimer.largeRifleMagnum"
+msgstr "Large rifle magnum"
 
 msgid "bulletCompare.largest"
 msgstr "largest"
@@ -3407,6 +3419,9 @@ msgstr "Not imported: {reason}"
 msgid "chargeTarget.notInBarrel"
 msgstr "not in the barrel"
 
+msgid "workbench.replacedNote"
+msgstr "Not in the catalogue, the generic one of the cartridge is used: {list}."
+
 msgid "sessionSummary.notInFile"
 msgstr "not in the file"
 
@@ -3841,6 +3856,9 @@ msgstr "Pressure range"
 
 msgid "powderCompare.pressureRangeUnit"
 msgstr "Pressure range, {unit}"
+
+msgid "workbench.replacedPrimer"
+msgstr "primer {id}"
 
 msgid "states.unavailable.primer"
 msgstr "Primer data is unavailable right now."
@@ -4661,8 +4679,14 @@ msgstr "Slowest twist"
 msgid "values.smallPistol"
 msgstr "Small pistol"
 
+msgid "genericPrimer.smallPistolMagnum"
+msgstr "Small pistol magnum"
+
 msgid "values.smallRifle"
 msgstr "Small rifle"
+
+msgid "genericPrimer.smallRifleMagnum"
+msgstr "Small rifle magnum"
 
 msgid "bulletCompare.smallest"
 msgstr "smallest"

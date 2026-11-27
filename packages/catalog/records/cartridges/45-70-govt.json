@@ -207,6 +207,9 @@
       "value": 104.25
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -215,6 +218,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page112.pdf",
         "sha256": "499235e771c32bba9660af8195c00848b15560ad8bcb9a0a0d221c7f11d1382b",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .45-70",
+        "url": "https://en.wikipedia.org/w/index.php?title=.45-70&oldid=1381109965",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

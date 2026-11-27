@@ -364,6 +364,9 @@
       "value": 25.09
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -372,6 +375,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page37.pdf",
         "sha256": "8c9619ba1d28761af94ba227ca77fa20a41b21f9c74ad96f920b87503c170672",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .221 Remington Fireball",
+        "url": "https://en.wikipedia.org/w/index.php?title=.221_Remington_Fireball&oldid=1336106401",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

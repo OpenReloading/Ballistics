@@ -246,6 +246,9 @@
       "value": 62.46
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -254,6 +257,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/350-legend-200421-en.pdf",
         "sha256": "d214af31023dd8bcb17989e4edb996412e3b89e999f2362325bf40eff6304fb8",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .350 Legend",
+        "url": "https://en.wikipedia.org/w/index.php?title=.350_Legend&oldid=1367402762",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Small rifle."
       }
     ]
   }

@@ -368,6 +368,9 @@
       "value": 38.29
     }
   ],
+  "defaults": {
+    "primerSize": "large-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -376,6 +379,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/6-8-western-221020-en.pdf",
         "sha256": "0ec659ad6616e225fab39cf47cd6761f1d707699e302cf27a2424a3d6a057bfd",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 6.8 Western",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.8_Western&oldid=1383760718",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: Large rifle."
       }
     ]
   }

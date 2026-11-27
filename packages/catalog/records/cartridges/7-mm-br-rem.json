@@ -369,6 +369,9 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "primerSize": "small-rifle"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -377,6 +380,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page37.pdf",
         "sha256": "eac0509f2ad71c9603f6cef00920889eb47d57a507cf9c22185468e03c730ea3",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, 7mm BR Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=7mm_BR_Remington&oldid=1345183398",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize"],
+        "note": "Infobox, Primer type: small rifle."
       }
     ]
   }

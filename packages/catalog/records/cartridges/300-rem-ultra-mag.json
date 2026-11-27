@@ -363,7 +363,9 @@
     }
   ],
   "defaults": {
-    "capacity": "catalogue:300-rem-ultra-mag-wikipedia"
+    "capacity": "catalogue:300-rem-ultra-mag-wikipedia",
+    "primerSize": "large-rifle",
+    "primerMagnum": true
   },
   "provenance": {
     "kind": "published",
@@ -373,6 +375,14 @@
         "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/tabical-en-page119.pdf",
         "sha256": "492a7d0db4f340d57dbd3de42a70262c545e4fc5b5db1d2369d3d11853b7e30e",
         "retrieved": "2026-10-08"
+      },
+      {
+        "title": "Wikipedia, .300 Remington Ultra Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Remington_Ultra_Magnum&oldid=1381575772",
+        "retrieved": "2026-11-26",
+        "license": "CC-BY-SA-4.0",
+        "fields": ["defaults.primerSize", "defaults.primerMagnum"],
+        "note": "Infobox, Primer type: Large rifle magnum."
       }
     ]
   }
