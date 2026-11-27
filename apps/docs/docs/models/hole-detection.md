@@ -48,6 +48,24 @@ A learned model file comes with a manifest in the format of `packages/target-rec
 
 Code: `packages/target-recognition/src/hole-matching.ts`, `matchHoles`, `corrections`, `correctionStats`.
 
+### Accuracy gate
+
+`packages/target-recognition/scripts/holdout-gate.mts` scores the classical and the learned detector on a sealed holdout against the default bar. It runs locally, never in CI, and reads only the photos its label set lists:
+
+```sh
+node scripts/holdout-gate.mts freeze --photos <photo folder> --labels <label set> --freeze <freeze file>
+node scripts/holdout-gate.mts score --photos <photo folder> --labels <label set> --freeze <freeze file> --model <model.onnx> --manifest <manifest.json>
+```
+
+1. `freeze`, before any model runs on the photos, writes the SHA-256 of the label set file and of every photo it lists. It refuses to overwrite a freeze file.
+2. `score` stops with an error, before it scores, when the freeze file is missing, a hash differs from it, a photo differs from its label's hash or size, or the model file differs from its manifest's hash. It then counts the look in `.gate-looks` in the photo folder.
+3. Each usable, complete photo is read with its EXIF rotation. Both detectors run on the whole photo (auto run) with the label's visible hole diameter as the hole size. The gate passes no face, while the app's auto run passes the face it found. The sure proposals (confidence 0.5 or more) are matched to the label's holes, and the corrections per photo give the statistics above, overall and per kind.
+4. The gate is met when the overall median is 1 or fewer and the 90th percentile 3 or fewer (below 20 photos, the maximum). The reference is one labeler's marks, so no labeler agreement widens the bar.
+
+It prints the look number, the photo counts (listed, unusable, usable but incomplete) and each detector's statistics, overall and per kind, with no file name, hash or per-photo figure. A kind with fewer than 20 scored photos gives only its photo count; an error names a photo by its position in the label set. The learned detector runs on `onnxruntime-web` in Node on one thread. The look counter counts the looks at the holdout and refuses none; the model's threshold comes from the validation split.
+
+`packages/target-recognition/test/decode-parity.test.ts` checks that the decoder finds the peaks of the training project's scoring (`training/hole-model`, `find`) within 1 px on one photo and model of `test/fixtures/decode-parity/make.py`. The scoring places a peak half a working pixel up and left of the decoder's cell center.
+
 ## Equations
 
 ### Working image

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Number, unit and date formatting on Intl and the display unit tables.",
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

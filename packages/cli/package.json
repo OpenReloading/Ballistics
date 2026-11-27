@@ -2,7 +2,7 @@
   "name": "@rangefoundry/cli",
   "version": "0.0.3",
   "private": true,
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "bin": {
     "ballistics": "dist/bin.js"

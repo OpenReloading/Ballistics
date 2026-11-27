@@ -4,11 +4,11 @@ Trains the hole center heatmap net of the target photo editor from random weight
 
 ## License rule
 
-The trained weights are to be published as CC0, so nothing in this project may carry third-party terms into them:
+The trained weights are to be published as CC-BY-SA-4.0, so nothing in this project may carry third-party terms into them:
 
 - No `ultralytics` package: its AGPL-3.0 also covers models trained from scratch with its code (https://www.ultralytics.com/license).
 - No pretrained weights: no `torchvision`, `timm`, `huggingface-hub` or `safetensors` package, no use of `torch.hub` or `torchvision.models` (aliases included), no `torch.load`, `from_pretrained` or URL downloads of weights, and no checkpoint files in the project. Training always starts from random weights and never loads a checkpoint.
-- Training photos only under a license that allows CC0 weights.
+- Training photos only under a license that allows CC-BY-SA-4.0 weights.
 
 `uv run license-check` enforces the first two points on `pyproject.toml`, `uv.lock` and every Python file and weight file in the project (outside `.venv/`, `runs/` and `data/`), and exits 1 with a list of findings.
 

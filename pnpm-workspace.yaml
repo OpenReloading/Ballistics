@@ -54,6 +54,7 @@ allowBuilds:
   "@swc/core": false
   core-js: false
   esbuild: false
+  protobufjs: false
   vue-demi: false
 
 # eslint-plugin-regexp runs inside Oxlint (jsPlugins), which needs no ESLint: its ESLint peer stays out.

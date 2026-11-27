@@ -2,7 +2,7 @@
 name = "hole-model"
 version = "0.1.0"
 description = "Trains the hole center heatmap net from scratch, exports it to ONNX and scores it."
-license = "ISC"
+license = "AGPL-3.0-only"
 requires-python = "==3.13.*"
 dependencies = [
   "numpy==2.5.5",

@@ -10,4 +10,4 @@ expect({ v: 0.1 + 0.2 }).toEqual({ v: near(0.3, { absolute: 1e-15 }) })
 assert(property(probability(), (p) => p > 0 && p < 1))
 ```
 
-License: ISC
+License: AGPL-3.0-only
