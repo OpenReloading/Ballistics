@@ -1,9 +1,13 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { useSyncExternalStore } from 'react'
-import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/install-button.json' with { type: 'json' }
 import { NavIcon } from './nav-icons.tsx'
+
+loadEnglish(englishMessages)
 
 /** Chromium's install offer (https://developer.mozilla.org/en-US/docs/Web/API/BeforeInstallPromptEvent). */
 type InstallOffer = Event & { prompt(): Promise<void> }
@@ -46,11 +50,18 @@ export function useInstall() {
 /** Install: shown only while the browser offers to install the app; one offer, one prompt. */
 export function InstallButton({ position }: { position: 'right' | 'bottom' }) {
   const install = useInstall()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!install) return null
   return (
-    <Tooltip label={t('Install as an app')} position={position}>
-      <ActionIcon variant="default" aria-label={t('Install')} onClick={install}>
+    <Tooltip
+      label={i18n._({ id: 'install.tooltip', message: 'Install as an app' })}
+      position={position}
+    >
+      <ActionIcon
+        variant="default"
+        aria-label={i18n._({ id: 'install.label', message: 'Install' })}
+        onClick={install}
+      >
         <NavIcon name="install" />
       </ActionIcon>
     </Tooltip>
