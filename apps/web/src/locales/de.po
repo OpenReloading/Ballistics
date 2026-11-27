@@ -39,6 +39,10 @@ msgstr "{count, decimal} vorgeschlagen, {maybe, decimal} vielleicht"
 msgid "holeDetection.proposedMaybeAcceptThem"
 msgstr "{count, decimal} vorgeschlagen, {maybe, decimal} vielleicht: übernehmen Sie sie, um Schüsse hinzuzufügen."
 
+# en: "{count, plural, one {{name}: # ring, {size, decimal} mm across} other {{name}: # rings, {size, decimal} mm across}}"
+msgid "targetDesigner.drawingLabel"
+msgstr "{count, plural, one {{name}: # Ring, {size, decimal} mm Durchmesser} other {{name}: # Ringe, {size, decimal} mm Durchmesser}}"
+
 # en: "{count, plural, one {{shown} of # brass} other {{shown} of # brass}}"
 msgid "lists.countShown.cases"
 msgstr "{count, plural, one {{shown} von # Hülse} other {{shown} von # Hülsen}}"
@@ -149,6 +153,10 @@ msgstr "{count, plural, one {# Verband} other {# Verbände}}"
 
 # en: "{count, plural, one {# field to fix.} other {# fields to fix.}}"
 msgid "powderDesigner.fieldsToFix"
+msgstr "{count, plural, one {# Feld zu korrigieren.} other {# Felder zu korrigieren.}}"
+
+# en: "{count, plural, one {# field to fix.} other {# fields to fix.}}"
+msgid "targetDesigner.fieldsToFix"
 msgstr "{count, plural, one {# Feld zu korrigieren.} other {# Felder zu korrigieren.}}"
 
 # en: "{count, plural, one {# field} other {# fields}}"
@@ -447,6 +455,10 @@ msgstr "{name}, CIP-Tabelle {table}"
 msgid "recordFields.burnRateOrder"
 msgstr "{order} von {total}"
 
+# en: "{part}: {message}"
+msgid "targetDesigner.partMessage"
+msgstr "{part}: {message}"
+
 # en: "{pct, decimal} %"
 msgid "holeDetection.percent"
 msgstr "{pct, decimal} %"
@@ -599,6 +611,10 @@ msgstr "Ein Schussbild enthält höchstens 1000 Schüsse."
 msgid "targetEditor.groupHoldsMost1000"
 msgstr "Ein Schussbild enthält höchstens 1000 Schüsse."
 
+# en: "a height needs oval rings"
+msgid "targetDesigner.heightNeedsOval"
+msgstr "eine Höhe braucht ovale Ringe"
+
 # en: "A known distance on the target or the size of a target ring, marked on the photo in Calibrate."
 msgid "holeDetection.knownDistanceTargetSize"
 msgstr "Eine bekannte Entfernung auf der Zielscheibe oder die Größe eines Scheibenrings, auf dem Foto unter „Kalibrieren“ markiert."
@@ -626,6 +642,22 @@ msgstr "Ein Blatt enthält höchstens 20 Referenzen."
 # en: "A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields."
 msgid "targetEditor.shotPointAimOrigin"
 msgstr "Ein Schuss am Haltepunkt (oder am Ursprung); mit Alt und den Pfeiltasten oder über die Felder verschieben."
+
+# en: "a square has no height"
+msgid "targetDesigner.squareNoHeight"
+msgstr "ein Quadrat hat keine Höhe"
+
+# en: "a stadium inner ten needs a height"
+msgid "targetDesigner.stadiumInnerTenHeight"
+msgstr "eine Innen-10 in Stadionform braucht eine Höhe"
+
+# en: "a stadium is at least as high as it is wide"
+msgid "targetDesigner.stadiumHighAsWide"
+msgstr "eine Stadionform ist mindestens so hoch wie breit"
+
+# en: "a stadium needs a height"
+msgid "targetDesigner.stadiumNeedsHeight"
+msgstr "eine Stadionform braucht eine Höhe"
 
 # en: "Abbreviation"
 msgid "disciplines.column.abbreviation"
@@ -679,6 +711,10 @@ msgstr "Hinzufügen"
 msgid "bulletCompare.add"
 msgstr "Geschoss hinzufügen"
 
+# en: "Add event"
+msgid "targetDesigner.addEvent"
+msgstr "Wettbewerb hinzufügen"
+
 # en: "Add group"
 msgid "targetEditor.addGroup"
 msgstr "Schussbild hinzufügen"
@@ -694,6 +730,10 @@ msgstr "Foto hinzufügen"
 # en: "Add powder"
 msgid "burnRateCompare.add"
 msgstr "Treibladungspulver hinzufügen"
+
+# en: "Add ring"
+msgid "targetDesigner.addRing"
+msgstr "Ring hinzufügen"
 
 # en: "Add series"
 msgid "events.addSeries"
@@ -811,6 +851,10 @@ msgstr "Höhenlage"
 msgid "values.aluminum"
 msgstr "Aluminium"
 
+# en: "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes."
+msgid "targetEditor.targetAxisAngleHelp"
+msgstr "Winkel der x-Achse der Zielscheibe auf dem Foto, gegen den Uhrzeigersinn. Die Schüsse bleiben auf ihren Schusslöchern."
+
 # en: "Annealed"
 msgid "recordFields.annealed"
 msgstr "Geglüht"
@@ -866,6 +910,10 @@ msgstr "Bei konstantem Volumen; Min und Max über die Bereiche der Zusammensetzu
 # en: "At constant volume."
 msgid "powderDesigner.constantVolume"
 msgstr "Bei konstantem Volumen."
+
+# en: "at least {n} needed."
+msgid "targetDesigner.atLeastNeeded"
+msgstr "mindestens {n} nötig."
 
 # en: "At least one source stays on"
 msgid "listSources.lastOn"
@@ -1019,6 +1067,14 @@ msgstr "schwarz"
 msgid "targets.row.blackArea"
 msgstr "Spiegel"
 
+# en: "Black area diameter"
+msgid "targetDesigner.blackAreaDiameter"
+msgstr "Spiegeldurchmesser"
+
+# en: "Black area height"
+msgid "targetDesigner.blackAreaHeight"
+msgstr "Spiegelhöhe"
+
 # en: "Black area height"
 msgid "targets.row.blackAreaHeight"
 msgstr "Spiegelhöhe"
@@ -1027,9 +1083,17 @@ msgstr "Spiegelhöhe"
 msgid "targets.strip.blackAreaWidth"
 msgstr "Spiegel (Breite)"
 
+# en: "Black diameter"
+msgid "holeDetection.blackDiameter"
+msgstr "Spiegeldurchmesser"
+
 # en: "black oxide"
 msgid "values.blackOxide"
 msgstr "Schwarzoxid"
+
+# en: "black zones must be adjacent rings"
+msgid "targetDesigner.blackZonesAdjacent"
+msgstr "Spiegelzonen müssen benachbarte Ringe sein"
 
 # en: "blue"
 msgid "targets.color.blue"
@@ -1867,6 +1931,10 @@ msgstr "Farbe"
 msgid "targetEditor.colorName"
 msgstr "Farbe {color}"
 
+# en: "Color of the zone this ring line bounds on the outside."
+msgid "targetDesigner.fillHelp"
+msgstr "Farbe der Zone, die diese Ringlinie außen begrenzt."
+
 # en: "community"
 msgid "recordSources.origin.community"
 msgstr "Community"
@@ -2051,6 +2119,10 @@ msgstr "Kernhärte (HBW)"
 msgid "units.quantity.correction"
 msgstr "Korrekturen"
 
+# en: "Counter-clockwise turn of the photo on screen; type a small angle to straighten it. Holes, scale and aim point turn with the photo, the target axes do not."
+msgid "holeDetection.photoAngleHelp"
+msgstr "Drehung des Fotos auf dem Bildschirm gegen den Uhrzeigersinn; mit einem kleinen Winkel richten Sie es gerade. Schusslöcher, Maßstab und Haltepunkt drehen sich mit dem Foto, die Achsen der Zielscheibe nicht."
+
 # en: "Country"
 msgid "cartridgeRecord.country"
 msgstr "Land"
@@ -2086,6 +2158,14 @@ msgstr "Zählt bei Berührung"
 # en: "Course of fire"
 msgid "disciplineRecord.column.course"
 msgstr "Schießprogramm"
+
+# en: "Cover counts"
+msgid "targetDesigner.coverCounts"
+msgstr "Überdeckung zählt"
+
+# en: "cover needs a circular inner ten"
+msgid "targetDesigner.coverCircularInnerTen"
+msgstr "Überdeckung braucht eine kreisförmige Innen-10"
 
 # en: "Covers"
 msgid "recordSources.column.covers"
@@ -2194,6 +2274,10 @@ msgstr "Datum"
 # en: "Date: {date}"
 msgid "sessionSummary.date"
 msgstr "Datum: {date}"
+
+# en: "Decimal scoring"
+msgid "targetDesigner.decimalScoring"
+msgstr "Zehntelwertung"
 
 # en: "Delete"
 msgid "firearms.delete"
@@ -2343,6 +2427,10 @@ msgstr "Durchmesser"
 msgid "recordFields.diameter"
 msgstr "Durchmesser"
 
+# en: "Diameter"
+msgid "targetDesigner.diameter"
+msgstr "Durchmesser"
+
 # en: "diameter at L"
 msgid "cartridgeRecord.meaning.diameterAtL"
 msgstr "Durchmesser bei L"
@@ -2354,6 +2442,18 @@ msgstr "Durchmesser bei L1"
 # en: "diameter at the mouth (l)"
 msgid "cartridgeRecord.meaning.mouthDiameter"
 msgstr "Durchmesser an der Mündung (l)"
+
+# en: "Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo)."
+msgid "holeDetection.blackDiameterHelp"
+msgstr "Durchmesser des Spiegels, verwendet, wenn keine Scheibe passt: Er legt Maßstab und Mitte allein aus dem Spiegel fest (Mitte bei einem geneigten Foto angenähert)."
+
+# en: "Diameter of the scored hole."
+msgid "targetDesigner.gaugeHelp"
+msgstr "Durchmesser des gewerteten Schusslochs."
+
+# en: "Diameter, {unit}"
+msgid "targetDesigner.diameterUnit"
+msgstr "Durchmesser, {unit}"
 
 # en: "Diameter, caliper (optional)"
 msgid "bulletPhoto.caliperDiameter"
@@ -2456,6 +2556,14 @@ msgid "federationRecord.column.distance"
 msgstr "Entfernung"
 
 # en: "Distance"
+msgid "targetDesigner.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
+msgid "targetEditor.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
 msgid "targets.column.distance"
 msgstr "Entfernung"
 
@@ -2474,6 +2582,10 @@ msgstr "Abstand A bis B"
 # en: "Distance C to D (optional)"
 msgid "bulletPhoto.distanceCD"
 msgstr "Abstand C bis D (optional)"
+
+# en: "Distance, {unit}"
+msgid "targetDesigner.distanceUnit"
+msgstr "Entfernung, {unit}"
 
 # en: "Division"
 msgid "events.division"
@@ -2501,6 +2613,10 @@ msgstr "Zeichnung"
 
 # en: "Drawing"
 msgid "cartridgeDesigner.drawing"
+msgstr "Zeichnung"
+
+# en: "Drawing"
+msgid "targetDesigner.drawing"
 msgstr "Zeichnung"
 
 # en: "Drawing for earlier inputs. Fix {field}: {reason}"
@@ -2667,6 +2783,10 @@ msgstr "Geben Sie einen Namen und die Werte ein, die Sie haben."
 msgid "targetEditor.enterName"
 msgstr "Geben Sie einen Namen ein."
 
+# en: "Enter a ring diameter."
+msgid "targetDesigner.enterRingDiameter"
+msgstr "Geben Sie einen Ringdurchmesser ein."
+
 # en: "Enter a target above 0{unit}."
 msgid "chargeTarget.enterTargetAbove0"
 msgstr "Geben Sie eine Zielgröße über 0{unit} ein."
@@ -2755,6 +2875,22 @@ msgstr "Gleichmäßiges Licht, keine Spiegelung"
 msgid "disciplineRecord.column.event"
 msgstr "Wettbewerb"
 
+# en: "Event {n} distance"
+msgid "targetDesigner.eventNDistance"
+msgstr "Entfernung von Wettbewerb {n}"
+
+# en: "Event {n} gauge"
+msgid "targetDesigner.eventNGauge"
+msgstr "Messring von Wettbewerb {n}"
+
+# en: "Event {n} name"
+msgid "targetDesigner.eventNName"
+msgstr "Name von Wettbewerb {n}"
+
+# en: "Event name"
+msgid "targetDesigner.eventName"
+msgstr "Name des Wettbewerbs"
+
 # en: "Event total: {total}"
 msgid "events.total"
 msgstr "Gesamtergebnis: {total}"
@@ -2787,6 +2923,10 @@ msgstr "Durchgänge"
 # en: "Events ({count})"
 msgid "faceRecord.events"
 msgstr "Wettbewerbe ({count})"
+
+# en: "Events of the target"
+msgid "targetDesigner.events"
+msgstr "Wettbewerbe der Scheibe"
 
 # en: "Events table"
 msgid "faceRecord.eventsTable"
@@ -2823,6 +2963,14 @@ msgstr "Ausgeschlossen: nicht in der Statistik, aber weiterhin angezeigt und gez
 # en: "Expand"
 msgid "targetEditor.expand"
 msgstr "Vergrößern"
+
+# en: "Expected hole diameter; a typed size overrides the bullet and the marker. Detection runs once it is entered."
+msgid "holeDetection.holeSizeTypedHelp"
+msgstr "Erwarteter Schusslochdurchmesser; eine eingegebene Größe geht dem Geschoss und der Markierung vor. Die Erkennung läuft, sobald sie eingegeben ist."
+
+# en: "Expected hole diameter; an example hole sets it to its measured size. Empty: the median of 3 or more accepted single holes, else the bullet diameter, else the marker."
+msgid "holeDetection.holeSizeHelp"
+msgstr "Erwarteter Schusslochdurchmesser; ein Beispiel-Schussloch setzt ihn auf seine gemessene Größe. Leer: der Median von 3 oder mehr übernommenen einzelnen Schusslöchern, sonst der Geschossdurchmesser, sonst die Markierung."
 
 # en: "exponent {exponent, decimal}"
 msgid "burnRate.exponentDetail"
@@ -2943,6 +3091,14 @@ msgstr "Weniger als zwei Schüsse zum Zeichnen."
 # en: "File: {name}"
 msgid "sessionSummary.file"
 msgstr "Datei: {name}"
+
+# en: "Fill: {colour}"
+msgid "targetDesigner.fillColor"
+msgstr "Füllung: {colour}"
+
+# en: "Fill: not set"
+msgid "targetDesigner.fillNotSet"
+msgstr "Füllung: nicht gesetzt"
 
 # en: "Fills an empty result with the event's total."
 msgid "log.fillsResult"
@@ -3128,6 +3284,10 @@ msgstr "Flachkopf"
 msgid "bulletPhoto.flipNose"
 msgstr "Kopf umdrehen"
 
+# en: "For an oval; empty for a circle."
+msgid "targetDesigner.ovalHelp"
+msgstr "Für ein Oval; leer für einen Kreis."
+
 # en: "For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length."
 msgid "bulletPhoto.needScale"
 msgstr "Für Werte setzen Sie zwei Punkte auf das Lineal und geben ihren Abstand ein, oder geben Sie Durchmesser oder Gesamtlänge vom Messschieber ein."
@@ -3264,6 +3424,14 @@ msgstr "Messring"
 msgid "faceRecord.column.gauge"
 msgstr "Messring"
 
+# en: "Gauge"
+msgid "targetDesigner.gauge"
+msgstr "Messring"
+
+# en: "Gauge, {unit}"
+msgid "targetDesigner.gaugeUnit"
+msgstr "Messring, {unit}"
+
 # en: "gilding metal"
 msgid "values.gildingMetal"
 msgstr "Tombak"
@@ -3372,6 +3540,22 @@ msgstr "Boden, Rand und Rille"
 msgid "recordFields.headstamp"
 msgstr "Bodenstempel"
 
+# en: "Height"
+msgid "targetDesigner.height"
+msgstr "Höhe"
+
+# en: "Height"
+msgid "targetEditor.height"
+msgstr "Höhe"
+
+# en: "height on all rings or on none"
+msgid "targetDesigner.heightAllOrNone"
+msgstr "Höhe an allen Ringen oder an keinem"
+
+# en: "Height, {unit}"
+msgid "targetDesigner.heightUnit"
+msgstr "Höhe, {unit}"
+
 # en: "Hidden by the search or a filter"
 msgid "comparePicks.hiddenTitle"
 msgstr "Von der Suche oder einem Filter ausgeblendet"
@@ -3419,6 +3603,10 @@ msgstr "Lochrand"
 # en: "Hole edge, outward"
 msgid "faceRecord.scoredBy.outward"
 msgstr "Lochrand, nach außen gemessen"
+
+# en: "Hole size"
+msgid "holeDetection.holeSize"
+msgstr "Schusslochgröße"
 
 # en: "Holes"
 msgid "holeDetection.holes"
@@ -3581,12 +3769,28 @@ msgid "powderDesigner.ingredientName"
 msgstr "Name von Bestandteil {n, decimal}"
 
 # en: "Inner ten"
+msgid "targetDesigner.innerTen"
+msgstr "Innen-10"
+
+# en: "Inner ten"
 msgid "targets.row.innerTen"
 msgstr "Innen-10"
+
+# en: "Inner ten diameter"
+msgid "targetDesigner.innerTenDiameter"
+msgstr "Durchmesser der Innen-10"
+
+# en: "Inner ten height"
+msgid "targetDesigner.innerTenHeight"
+msgstr "Höhe der Innen-10"
 
 # en: "Inner ten height"
 msgid "targets.row.innerTenHeight"
 msgstr "Höhe der Innen-10"
+
+# en: "Inner ten rule"
+msgid "targetDesigner.innerTenRule"
+msgstr "Regel für die Innen-10"
 
 # en: "Inner ten rule"
 msgid "targets.row.innerTenRule"
@@ -3659,6 +3863,10 @@ msgstr "Art"
 # en: "kneeling"
 msgid "disciplines.rule.kneeling"
 msgstr "kniend"
+
+# en: "Known length"
+msgid "targetEditor.knownLength"
+msgstr "Bekannte Länge"
 
 # en: "L3 to the end of the leade"
 msgid "cartridgeRecord.meaning.leadeEnd"
@@ -3819,6 +4027,14 @@ msgstr "Linie {colour}"
 # en: "Line {line}"
 msgid "bulletRecord.line"
 msgstr "Produktlinie {line}"
+
+# en: "Line: {colour}"
+msgid "targetDesigner.lineColor"
+msgstr "Linie: {colour}"
+
+# en: "Line: not set"
+msgid "targetDesigner.lineNotSet"
+msgstr "Linie: nicht gesetzt"
 
 # en: "Link copied"
 msgid "recordActions.linkCopied"
@@ -4136,6 +4352,10 @@ msgstr "Auf dem Foto markieren"
 msgid "holeDetection.marker"
 msgstr "Markierung"
 
+# en: "Marker"
+msgid "targetEditor.marker"
+msgstr "Markierung"
+
 # en: "Mass"
 msgid "bulletDesigner.mass"
 msgstr "Masse"
@@ -4380,6 +4600,26 @@ msgstr "Mehr als eine Scheibe passt zu diesen Ringen: Wählen Sie die Zielscheib
 msgid "photoQuality.fix.moveCloser"
 msgstr "Näher herangehen, damit die Zielscheibe mehr vom Bild füllt, oder die volle Auflösung der Kamera nutzen."
 
+# en: "must be below the ring outside it"
+msgid "targetDesigner.belowOuterRing"
+msgstr "muss kleiner sein als der Ring außerhalb"
+
+# en: "must be one above the ring outside it"
+msgid "targetDesigner.oneAboveOuterRing"
+msgstr "muss um eins höher sein als der Ring außerhalb"
+
+# en: "must be unique within the target"
+msgid "targetDesigner.uniqueInTarget"
+msgstr "muss auf der Scheibe eindeutig sein"
+
+# en: "must equal the diameter of the outermost black ring"
+msgid "targetDesigner.equalOuterBlackRing"
+msgstr "muss dem Durchmesser des äußersten Spiegelrings entsprechen"
+
+# en: "must not exceed the innermost ring"
+msgid "targetDesigner.notOverInnermostRing"
+msgstr "darf den innersten Ring nicht überschreiten"
+
 # en: "Muzzle distance: {distance}"
 msgid "sessionSummary.muzzleDistance"
 msgstr "Entfernung zur Mündung: {distance}"
@@ -4391,6 +4631,10 @@ msgstr "Mündungsenergie ab"
 # en: "Muzzle loader"
 msgid "values.muzzleLoader"
 msgstr "Vorderlader"
+
+# en: "Muzzle to target; the angles use it."
+msgid "targetEditor.distanceHelp"
+msgstr "Von der Mündung bis zur Zielscheibe; die Winkel verwenden sie."
 
 # en: "Muzzle velocity"
 msgid "chargeTarget.muzzleVelocity"
@@ -4482,6 +4726,10 @@ msgstr "Name"
 
 # en: "Name"
 msgid "primers.column.name"
+msgstr "Name"
+
+# en: "Name"
+msgid "targetDesigner.name"
 msgstr "Name"
 
 # en: "Name"
@@ -4579,6 +4827,10 @@ msgstr "Neues Treibladungspulver"
 # en: "New sheet"
 msgid "targetEditor.newSheet"
 msgstr "Neues Blatt"
+
+# en: "New target"
+msgid "targetDesigner.newTarget"
+msgstr "Neue Scheibe"
 
 # en: "New target"
 msgid "targets.new"
@@ -4694,6 +4946,10 @@ msgstr "Keine Zeichnung für diesen Datensatz."
 
 # en: "No drawing yet"
 msgid "cartridgeDesigner.noDrawingYet"
+msgstr "Noch keine Zeichnung"
+
+# en: "No drawing yet"
+msgid "targetDesigner.noDrawingYet"
 msgstr "Noch keine Zeichnung"
 
 # en: "No drawing: {reason}"
@@ -5001,6 +5257,10 @@ msgid "powderDesigner.notStated"
 msgstr "Nicht angegeben"
 
 # en: "Not stated"
+msgid "targetDesigner.notStated"
+msgstr "Nicht angegeben"
+
+# en: "Not stated"
 msgid "targets.notStated"
 msgstr "Nicht angegeben"
 
@@ -5252,6 +5512,10 @@ msgstr "Umriss, {name}"
 msgid "cartridgeDesigner.outline"
 msgstr "Umriss, {name}"
 
+# en: "Outside of the outermost black zone."
+msgid "targetDesigner.blackDiameterHelp"
+msgstr "Außenrand der äußersten Spiegelzone."
+
 # en: "Over the composition ranges: {min, decimal} to {max, decimal}."
 msgid "recordFields.computedRange"
 msgstr "Über den Bereichen der Zusammensetzung: {min, decimal} bis {max, decimal}."
@@ -5304,6 +5568,10 @@ msgstr "Parameter"
 msgid "powderDesigner.parameters"
 msgstr "Parameter"
 
+# en: "Parameters"
+msgid "targetDesigner.parameters"
+msgstr "Parameter"
+
 # en: "Parameters the fit moved"
 msgid "powderDesigner.parametersFitMoved"
 msgstr "Von der Anpassung verschobene Parameter"
@@ -5343,6 +5611,10 @@ msgstr "Prozent vom Maximum"
 # en: "Photo"
 msgid "targetEditor.photo"
 msgstr "Foto"
+
+# en: "Photo angle"
+msgid "holeDetection.photoAngle"
+msgstr "Fotowinkel"
 
 # en: "Photo from the camera"
 msgid "targetEditor.photoCamera"
@@ -5932,6 +6204,10 @@ msgstr "{name} entfernen"
 msgid "events.removeStage"
 msgstr "{name} entfernen"
 
+# en: "Remove event {n}"
+msgid "targetDesigner.removeEventN"
+msgstr "Wettbewerb {n} entfernen"
+
 # en: "Remove ingredient {n, decimal}"
 msgid "powderDesigner.removeIngredient"
 msgstr "Bestandteil {n, decimal} entfernen"
@@ -5939,6 +6215,10 @@ msgstr "Bestandteil {n, decimal} entfernen"
 # en: "Remove photo"
 msgid "targetEditor.removePhoto"
 msgstr "Foto entfernen"
+
+# en: "Remove ring {n}"
+msgid "targetDesigner.removeRingN"
+msgstr "Ring {n} entfernen"
 
 # en: "Remove series {n}"
 msgid "events.removeSeries"
@@ -5987,6 +6267,10 @@ msgstr "Foto ersetzen"
 # en: "Replace the photo?"
 msgid "targetEditor.replacePhotoQuestion"
 msgstr "Das Foto ersetzen?"
+
+# en: "Required."
+msgid "targetDesigner.required"
+msgstr "Erforderlich."
 
 # en: "Reserve, %"
 msgid "matchRounds.reserve"
@@ -6136,6 +6420,26 @@ msgstr "randlos"
 msgid "values.rimmed"
 msgstr "mit Rand"
 
+# en: "Ring {n} diameter"
+msgid "targetDesigner.ringNDiameter"
+msgstr "Durchmesser von Ring {n}"
+
+# en: "Ring {n} fill"
+msgid "targetDesigner.ringNFill"
+msgstr "Füllung von Ring {n}"
+
+# en: "Ring {n} height"
+msgid "targetDesigner.ringNHeight"
+msgstr "Höhe von Ring {n}"
+
+# en: "Ring {n} line"
+msgid "targetDesigner.ringNLine"
+msgstr "Linie von Ring {n}"
+
+# en: "Ring {n} value"
+msgid "targetDesigner.ringNValue"
+msgstr "Wertung von Ring {n}"
+
 # en: "Ring {value}"
 msgid "targets.ring"
 msgstr "Ring {value}"
@@ -6148,6 +6452,10 @@ msgstr "Ring {value} ({colours})"
 msgid "targets.ringHeight"
 msgstr "Ring {value} Höhe"
 
+# en: "Ring diameter"
+msgid "targetEditor.ringDiameter"
+msgstr "Ringdurchmesser"
+
 # en: "Ring diameters"
 msgid "targets.group.ringDiameters"
 msgstr "Ringdurchmesser"
@@ -6155,6 +6463,10 @@ msgstr "Ringdurchmesser"
 # en: "Ring diameters width"
 msgid "targets.group.ringDiametersWidth"
 msgstr "Ringdurchmesser (Breite)"
+
+# en: "Ring value"
+msgid "targetDesigner.ringValue"
+msgstr "Wertung"
 
 # en: "Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total."
 msgid "targetEditor.ringValueTenthsWhere"
@@ -6177,6 +6489,10 @@ msgid "faceRecord.rings"
 msgstr "Ringe"
 
 # en: "Rings"
+msgid "targetDesigner.rings"
+msgstr "Ringe"
+
+# en: "Rings"
 msgid "targets.column.rings"
 msgstr "Ringe"
 
@@ -6187,6 +6503,10 @@ msgstr "Ringe"
 # en: "Rings"
 msgid "targets.row.rings"
 msgstr "Ringe"
+
+# en: "Rings, outer to inner"
+msgid "targetDesigner.ringsOuterToInner"
+msgstr "Ringe, von außen nach innen"
 
 # en: "Rotate"
 msgid "holeDetection.rotate"
@@ -6500,6 +6820,10 @@ msgstr "Blatt"
 msgid "targetEditor.sheetName"
 msgstr "Name des Blatts"
 
+# en: "Shooting distance."
+msgid "targetDesigner.distanceHelp"
+msgstr "Entfernung, auf die geschossen wird."
+
 # en: "Shooting log"
 msgid "events.shootingLog"
 msgstr "Schießbuch"
@@ -6543,6 +6867,10 @@ msgstr "Schussbilder"
 # en: "Shot groups"
 msgid "page.groups"
 msgstr "Schussbilder"
+
+# en: "Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen."
+msgid "targetEditor.markerHelp"
+msgstr "Durchmesser der Schussmarkierungen; der Geschossdurchmesser zentriert eine Markierung auf einem ausgerissenen Schussloch. Leer: feste Größe auf dem Bildschirm."
 
 # en: "Shot: add shots to the active group by click or tap"
 msgid "targetEditor.shotAddShotsActive"
@@ -6772,6 +7100,10 @@ msgstr "Spezifische Energie (von der Anpassung verschoben)"
 msgid "targetEditor.spread"
 msgstr "Spannweite"
 
+# en: "stadium on all rings or on none"
+msgid "targetDesigner.stadiumAllOrNone"
+msgstr "Stadionform an allen Ringen oder an keinem"
+
 # en: "Stage"
 msgid "disciplineRecord.column.stage"
 msgstr "Programmteil"
@@ -6993,6 +7325,10 @@ msgid "holeDetection.target"
 msgstr "Scheibe"
 
 # en: "Target"
+msgid "targetDesigner.target"
+msgstr "Scheibe"
+
+# en: "Target"
 msgid "targets.group.target"
 msgstr "Scheibe"
 
@@ -7005,6 +7341,10 @@ msgstr "Zielgröße"
 msgctxt "charge"
 msgid "powderCompare.target"
 msgstr "Zielgröße"
+
+# en: "Target axis angle"
+msgid "targetEditor.targetAxisAngle"
+msgstr "Achsenwinkel der Zielscheibe"
 
 # en: "Target data is unavailable right now."
 msgid "states.unavailable.targetFace"
@@ -7085,6 +7425,10 @@ msgstr "Temperatur, bei der die Parameter angepasst wurden."
 # en: "Tenth-ring values"
 msgid "targets.row.tenthRingValues"
 msgstr "Wertungen in Zehnteln"
+
+# en: "tenth-ring values need circular rings"
+msgid "targetDesigner.tenthRingsCircular"
+msgstr "Zehntelwertungen brauchen kreisförmige Ringe"
 
 # en: "Terms"
 msgid "recordSources.terms"
@@ -7382,6 +7726,10 @@ msgstr "Die Sportordnungen, auf die sich die Datensätze beziehen"
 msgid "holeDetection.ruleBookTargetFound"
 msgstr "Die Scheibe der Sportordnung, aus dem Spiegel und den Ringlinien gefunden. Sie legt Maßstab und Mitte fest und wertet das Schussbild. Passen mehrere, wählen Sie eine; ohne Passung werden die Scheiben danach gereiht, wie gut ihre Ringe übereinstimmen."
 
+# en: "The score of a hole in this ring."
+msgid "targetDesigner.ringValueHelp"
+msgstr "Die Wertung eines Schusslochs in diesem Ring."
+
 # en: "The search did not reach its tolerance."
 msgid "chargeTarget.toleranceNotReached"
 msgstr "Die Suche hat die geforderten Toleranzen nicht erreicht."
@@ -7558,6 +7906,10 @@ msgstr "Summe"
 msgid "events.partTotal"
 msgstr "Summe {total}"
 
+# en: "Touch counts"
+msgid "targetDesigner.touchCounts"
+msgstr "Berührung zählt"
+
 # en: "Training rows"
 msgid "powders.column.rows"
 msgstr "Trainingszeilen"
@@ -7706,6 +8058,10 @@ msgstr "Bis zu {max}"
 msgid "units.preset.us"
 msgstr "US-amerikanisch"
 
+# en: "Usable in the shot groups and hit probability tools as {owner} {name}."
+msgid "targetDesigner.usableAs"
+msgstr "Nutzbar in den Werkzeugen Schussbilder und Trefferwahrscheinlichkeit als {owner} {name}."
+
 # en: "Usable in the workbench as {name} (your design)."
 msgid "powderDesigner.usableWorkbenchYourDesign"
 msgstr "In der Werkbank nutzbar als {name} (Ihr Entwurf)."
@@ -7756,6 +8112,10 @@ msgstr "Wert"
 
 # en: "Value"
 msgid "powderDesigner.value"
+msgstr "Wert"
+
+# en: "Value"
+msgid "targetDesigner.value"
 msgstr "Wert"
 
 # en: "Value"
@@ -7877,6 +8237,18 @@ msgstr "weiß"
 # en: "whole record"
 msgid "recordSources.wholeRecord"
 msgstr "ganzer Datensatz"
+
+# en: "Width"
+msgid "targetEditor.width"
+msgstr "Breite"
+
+# en: "Width of the inner ten circle."
+msgid "targetDesigner.innerTenDiameterHelp"
+msgstr "Breite des Kreises der Innen-10."
+
+# en: "Width of the ring to the outside edge of its line."
+msgid "targetDesigner.ringDiameterHelp"
+msgstr "Breite des Rings bis zur Außenkante seiner Linie."
 
 # en: "Wind speed"
 msgid "units.quantity.windSpeed"

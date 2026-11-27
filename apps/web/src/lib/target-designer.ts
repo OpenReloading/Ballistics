@@ -1,9 +1,10 @@
 /** The target face designer: the draft, its file data, the face it builds and the problems it reports. */
 
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { faceColour, type TargetFace, type TargetFaceDesign } from '@rangefoundry/schema'
 import type { FaceShape } from '@rangefoundry/svg-drawings/target'
-import { untranslated } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/target-designer.json' with { type: 'json' }
 import {
   type FieldSpec,
   type Fields,
@@ -24,6 +25,8 @@ import {
 } from './history.ts'
 import { roundedFieldText, type UnitSystem } from './units.ts'
 import { buildFace } from './user-faces.ts'
+
+loadEnglish(englishMessages)
 
 /** Colors a ring zone or line can take, the face schema's. */
 export const colours = faceColour.options
@@ -63,15 +66,36 @@ export function specOf(key: string): FieldSpec {
   const common = { key, positive: true }
   switch (last) {
     case 'value':
-      return { ...common, label: msg('Ring value'), quantity: 'ratio', integer: true }
+      return {
+        ...common,
+        label: /*i18n*/ { id: 'targetDesigner.ringValue', message: 'Ring value' },
+        quantity: 'ratio',
+        integer: true,
+      }
     case 'diameter':
-      return { ...common, label: msg('Diameter'), quantity: 'length' }
+      return {
+        ...common,
+        label: /*i18n*/ { id: 'targetDesigner.diameter', message: 'Diameter' },
+        quantity: 'length',
+      }
     case 'height':
-      return { ...common, label: msg('Height'), quantity: 'length' }
+      return {
+        ...common,
+        label: /*i18n*/ { id: 'targetDesigner.height', message: 'Height' },
+        quantity: 'length',
+      }
     case 'distance':
-      return { ...common, label: msg('Distance'), quantity: 'range' }
+      return {
+        ...common,
+        label: /*i18n*/ { id: 'targetDesigner.distance', message: 'Distance' },
+        quantity: 'range',
+      }
     default:
-      return { ...common, label: msg('Gauge'), quantity: 'length' }
+      return {
+        ...common,
+        label: /*i18n*/ { id: 'targetDesigner.gauge', message: 'Gauge' },
+        quantity: 'length',
+      }
   }
 }
 
@@ -205,49 +229,101 @@ const fieldKeyOf = (d: Design, path: PropertyKey[]): string | undefined => {
   if (head === 'blackHeight') return 'black.height'
 }
 
-const labels: Record<string, Message> = {
-  rings: msg('Rings'),
-  events: msg('Events of the target'),
-  blackDiameter: msg('Black area diameter'),
-  blackHeight: msg('Black area height'),
-  innerTen: msg('Inner ten'),
+const labels: Record<string, MessageDescriptor> = {
+  rings: /*i18n*/ { id: 'targetDesigner.rings', message: 'Rings' },
+  events: /*i18n*/ { id: 'targetDesigner.events', message: 'Events of the target' },
+  blackDiameter: /*i18n*/ {
+    id: 'targetDesigner.blackAreaDiameter',
+    message: 'Black area diameter',
+  },
+  blackHeight: /*i18n*/ { id: 'targetDesigner.blackAreaHeight', message: 'Black area height' },
+  innerTen: /*i18n*/ { id: 'targetDesigner.innerTen', message: 'Inner ten' },
 }
 
 /** The refusals of the face schema and of the face builder, by their text, as messages the catalogue holds. */
-const faceMessages: Record<string, Message> = {
-  'Required.': msg('Required.'),
-  'must be one above the ring outside it': msg('must be one above the ring outside it'),
-  'must be below the ring outside it': msg('must be below the ring outside it'),
-  'must not exceed the innermost ring': msg('must not exceed the innermost ring'),
-  'a square has no height': msg('a square has no height'),
-  'height on all rings or on none': msg('height on all rings or on none'),
-  'tenth-ring values need circular rings': msg('tenth-ring values need circular rings'),
-  'cover needs a circular inner ten': msg('cover needs a circular inner ten'),
-  'a height needs oval rings': msg('a height needs oval rings'),
-  'stadium on all rings or on none': msg('stadium on all rings or on none'),
-  'a stadium needs a height': msg('a stadium needs a height'),
-  'a stadium is at least as high as it is wide': msg('a stadium is at least as high as it is wide'),
-  'a stadium inner ten needs a height': msg('a stadium inner ten needs a height'),
-  'must be unique within the face': msg('must be unique within the target'),
-  'black zones must be adjacent rings': msg('black zones must be adjacent rings'),
-  'must equal the diameter of the outermost black ring': msg(
-    'must equal the diameter of the outermost black ring',
-  ),
+const faceMessages: Record<string, MessageDescriptor> = {
+  'Required.': /*i18n*/ { id: 'targetDesigner.required', message: 'Required.' },
+  'must be one above the ring outside it': /*i18n*/ {
+    id: 'targetDesigner.oneAboveOuterRing',
+    message: 'must be one above the ring outside it',
+  },
+  'must be below the ring outside it': /*i18n*/ {
+    id: 'targetDesigner.belowOuterRing',
+    message: 'must be below the ring outside it',
+  },
+  'must not exceed the innermost ring': /*i18n*/ {
+    id: 'targetDesigner.notOverInnermostRing',
+    message: 'must not exceed the innermost ring',
+  },
+  'a square has no height': /*i18n*/ {
+    id: 'targetDesigner.squareNoHeight',
+    message: 'a square has no height',
+  },
+  'height on all rings or on none': /*i18n*/ {
+    id: 'targetDesigner.heightAllOrNone',
+    message: 'height on all rings or on none',
+  },
+  'tenth-ring values need circular rings': /*i18n*/ {
+    id: 'targetDesigner.tenthRingsCircular',
+    message: 'tenth-ring values need circular rings',
+  },
+  'cover needs a circular inner ten': /*i18n*/ {
+    id: 'targetDesigner.coverCircularInnerTen',
+    message: 'cover needs a circular inner ten',
+  },
+  'a height needs oval rings': /*i18n*/ {
+    id: 'targetDesigner.heightNeedsOval',
+    message: 'a height needs oval rings',
+  },
+  'stadium on all rings or on none': /*i18n*/ {
+    id: 'targetDesigner.stadiumAllOrNone',
+    message: 'stadium on all rings or on none',
+  },
+  'a stadium needs a height': /*i18n*/ {
+    id: 'targetDesigner.stadiumNeedsHeight',
+    message: 'a stadium needs a height',
+  },
+  'a stadium is at least as high as it is wide': /*i18n*/ {
+    id: 'targetDesigner.stadiumHighAsWide',
+    message: 'a stadium is at least as high as it is wide',
+  },
+  'a stadium inner ten needs a height': /*i18n*/ {
+    id: 'targetDesigner.stadiumInnerTenHeight',
+    message: 'a stadium inner ten needs a height',
+  },
+  'must be unique within the face': /*i18n*/ {
+    id: 'targetDesigner.uniqueInTarget',
+    message: 'must be unique within the target',
+  },
+  'black zones must be adjacent rings': /*i18n*/ {
+    id: 'targetDesigner.blackZonesAdjacent',
+    message: 'black zones must be adjacent rings',
+  },
+  'must equal the diameter of the outermost black ring': /*i18n*/ {
+    id: 'targetDesigner.equalOuterBlackRing',
+    message: 'must equal the diameter of the outermost black ring',
+  },
 }
 
-/** A refusal in the language of `t`: a text the table lacks (a zod message) stays as it is. */
-function faceMessage(text: string, t: Translator['t']) {
+/** A refusal in the language of `i18n`: a text the table lacks (a zod message) stays as it is. */
+function faceMessage(text: string, i18n: I18n) {
   const known = faceMessages[text]
-  if (known) return t(known)
+  if (known) return i18n._(known)
   const needed = /^at least (\d+) needed\.$/.exec(text)
-  return needed ? t('at least {n} needed.', { n: Number(needed[1]) }) : text
+  return needed
+    ? i18n._({
+        id: 'targetDesigner.atLeastNeeded',
+        message: 'at least {n} needed.',
+        values: { n: Number(needed[1]) },
+      })
+    : text
 }
 
 /** A field's problems carry its key; the others name the part of the face. */
 export function faceOf(
   d: Design,
   id: string,
-  t: Translator['t'] = untranslated(),
+  i18n: I18n = linguiOf('en'),
 ): { face: TargetFace } | { problems: Problem[] } {
   const built = buildFace(fileData(d), id, d.name.trim() || 'Target design')
   if ('face' in built) return built
@@ -255,10 +331,16 @@ export function faceOf(
     problems: built.issues.map(({ path, message: given }) => {
       const key = fieldKeyOf(d, path)
       const part = typeof path[0] === 'string' ? labels[path[0]] : undefined
-      const message = faceMessage(given, t)
+      const message = faceMessage(given, i18n)
       return key || !part
         ? { key, message }
-        : { message: t('{part}: {message}', { part: t(part), message }) }
+        : {
+            message: i18n._({
+              id: 'targetDesigner.partMessage',
+              message: '{part}: {message}',
+              values: { part: i18n._(part), message },
+            }),
+          }
     }),
   }
 }
