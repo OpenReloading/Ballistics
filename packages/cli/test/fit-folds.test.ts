@@ -10,7 +10,8 @@ vi.mock('@rangefoundry/tools/catalog', async (original) =>
   ),
 )
 
-describe('--folds', { timeout: 60_000 }, () => {
+// the fit files run side by side on the CI runner, which measures coverage: a test here took 64 s there
+describe('--folds', { timeout: 180_000 }, () => {
   const cartridges = ['30-br', '308-win', '30-06-spring', '6-5-creedmoor', '308-match']
   /** dp40 at four charges in four training cartridges and the validation cartridge 308-match, sp20 in 30-br only, and sp21 in the test cartridge 307-win only. */
   const folded = {

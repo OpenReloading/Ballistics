@@ -202,7 +202,7 @@ describe('--energy prior', { timeout: 120_000 }, () => {
   })
 })
 
-describe('--energy family', { timeout: 60_000 }, () => {
+describe('--energy family', { timeout: 120_000 }, () => {
   it("pulls a sparse powder's energy to the impetus of the reference powders", async () => {
     // sp20's rows are printed at its record 3.7e6 J/kg, which three rows do not separate from its burn coefficient; the prior is dp40's impetus over the same gamma, 3.95e6
     const reference = [
