@@ -5,6 +5,7 @@ import type { UserThemeConfig } from '@docusaurus/theme-common'
 import type { Config } from '@docusaurus/types'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import { failOnMathErrors, katexOptions } from './scripts/math.mts'
 import { repoFacts } from './scripts/repo-facts.mts'
 
 const baseUrl = process.env.DOCS_BASE_URL ?? '/'
@@ -41,7 +42,7 @@ const config = async (): Promise<Config> => ({
         routeBasePath: '/',
         sidebarPath: './sidebars.ts',
         remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex],
+        rehypePlugins: [[rehypeKatex, katexOptions], failOnMathErrors],
         breadcrumbs: true,
       },
     ],
