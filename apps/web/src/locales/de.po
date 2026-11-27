@@ -6120,6 +6120,10 @@ msgstr "Treibladungspulver-Editor"
 msgid "powderTune.powderName"
 msgstr "Name des Treibladungspulvers"
 
+# en: "Powder values from the user design {name}, not a catalogue record."
+msgid "powderDesigns.valuesFromUserDesign"
+msgstr "Werte des Treibladungspulvers aus dem eigenen Entwurf {name}, nicht aus einem Katalogeintrag."
+
 # en: "Powders"
 msgid "page.powders"
 msgstr "Treibladungspulver"

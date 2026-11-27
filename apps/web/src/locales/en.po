@@ -4592,6 +4592,9 @@ msgstr "Powder designer"
 msgid "powderTune.powderName"
 msgstr "Powder name"
 
+msgid "powderDesigns.valuesFromUserDesign"
+msgstr "Powder values from the user design {name}, not a catalogue record."
+
 msgid "page.powders"
 msgstr "Powders"
 

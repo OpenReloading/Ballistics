@@ -26,26 +26,28 @@ import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail, CartridgeSummary } from '../lib/api-types.ts'
 import {
   type Action,
-  type CartridgeFieldSpec,
   type Derived,
-  type Design,
   designFileName,
   draws,
   type Evaluation,
   evaluate,
   type FieldState,
   fieldLabel,
-  fieldSpecs,
   fileData,
   fromRecord,
-  fromUser,
-  type Group,
-  groups,
   missingHint,
   newDesign,
   reduce,
   tables,
 } from '../lib/cartridge-designer.ts'
+import {
+  type CartridgeFieldSpec,
+  type Design,
+  fieldSpecs,
+  fromUser,
+  type Group,
+  groups,
+} from '../lib/cartridge-draft.ts'
 import { groupLabel, meaningText, symbolText } from '../lib/cartridge-record.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'

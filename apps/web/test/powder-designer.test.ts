@@ -10,12 +10,10 @@ import {
   fromFile,
   issueText,
   newDesign,
-  powderDesignNote,
-  powderDesigns,
-  powderOf,
   reduce,
   specOf,
 } from '../src/lib/powder-designer.ts'
+import { powderDesignNote, powderDesigns, powderOf } from '../src/lib/powder-designs.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
 import { defined, missing } from './defined.ts'
@@ -346,6 +344,14 @@ describe('the user design mark', () => {
     expect(powderDesignNote('Sample powder')).toBe(
       'Powder values from the user design Sample powder, not a catalogue record.',
     )
+  })
+
+  it('has the English of the note without the designer page', () => {
+    const missing: string[] = []
+    const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+    powderDesignNote('Sample powder')
+    stop()
+    expect(missing).toEqual([])
   })
 
   it('offers the valid designs of the records, in order', () => {

@@ -33,7 +33,7 @@ import { interiorFields } from '../lib/interior-input.ts'
 import { lotsLine } from '../lib/load-notes.ts'
 import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
-import { powderDesignNote } from '../lib/powder-designer.ts'
+import { powderDesignNote } from '../lib/powder-designs.ts'
 import { loadFitMark } from '../lib/powder-record.ts'
 import { printedField, printedValue } from '../lib/print-format.ts'
 import type { PrintChoice } from '../lib/print-sections.ts'
@@ -941,7 +941,7 @@ function PrintViews({
         t('Case values from the user design {name}, not a catalogue record.', {
           name: ok.cartridgeDesign,
         }),
-      ok?.powderDesign && powderDesignNote(ok.powderDesign, t),
+      ok?.powderDesign && powderDesignNote(ok.powderDesign, i18n),
     ]
       .filter(Boolean)
       .join(' ') || undefined

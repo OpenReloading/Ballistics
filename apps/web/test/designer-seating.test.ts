@@ -3,13 +3,12 @@ import { chamberOf, jumpNote, seat } from '@rangefoundry/svg-drawings/seating'
 import { describe, expect, it } from 'vitest'
 import {
   type Action,
-  draftSpec,
-  fieldSpecs,
   fromRecord,
   type History,
   historyOf,
   reduce,
 } from '../src/lib/cartridge-designer.ts'
+import { draftSpec, fieldSpecs } from '../src/lib/cartridge-draft.ts'
 import { cavityVolumeFraction } from '../src/lib/cavity-range.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits, unitsOf, waterDensityGramsPerCm3 } from '../src/lib/units.ts'

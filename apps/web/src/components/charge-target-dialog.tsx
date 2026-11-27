@@ -17,7 +17,7 @@ import {
   targetUnit,
 } from '../lib/charge-target.ts'
 import { translateMessage } from '../lib/core-messages.ts'
-import { powderDesignNote } from '../lib/powder-designer.ts'
+import { powderDesignNote } from '../lib/powder-designs.ts'
 import { typedSpec } from '../lib/record-specs.ts'
 import { formatQuantity, msText, withUnit } from '../lib/units.ts'
 import englishMessages from '../locales/en/components/charge-target-dialog.json' with {
@@ -245,7 +245,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
             )}
             {powderDesign && (
               <Text size="xs" className="user-design">
-                {powderDesignNote(powderDesign.name, t)}
+                {powderDesignNote(powderDesign.name, i18n)}
               </Text>
             )}
             {found.warnings

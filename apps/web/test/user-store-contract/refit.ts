@@ -1,6 +1,6 @@
 import type { Powder, UserPowderFit } from '@rangefoundry/schema'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { newerFit, type PowderDesign } from '../../src/lib/powder-designer.ts'
+import { newerFit, type PowderDesign } from '../../src/lib/powder-designs.ts'
 import type { UserStoreImplementation } from './implementation.ts'
 
 export function refit({ store, reset }: UserStoreImplementation) {

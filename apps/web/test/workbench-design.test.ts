@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import {
-  fileData,
-  fromRecord,
-  historyOf,
-  reduce,
-  workbenchDesign,
-} from '../src/lib/cartridge-designer.ts'
+import { fileData, fromRecord, historyOf, reduce } from '../src/lib/cartridge-designer.ts'
+import { workbenchDesign } from '../src/lib/cartridge-draft.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { sheetRecord } from './records.ts'

@@ -3,20 +3,17 @@ import { seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   type Action,
-  type Design,
   designFileName,
-  draftSpec,
   draws,
   evaluate,
-  fieldSpecs,
   fileData,
   fromRecord,
-  fromUser,
   type History,
   historyOf,
   newDesign,
   reduce,
 } from '../src/lib/cartridge-designer.ts'
+import { type Design, draftSpec, fieldSpecs, fromUser } from '../src/lib/cartridge-draft.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedCartridge } from '../src/lib/variants.ts'
