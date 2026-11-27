@@ -14,6 +14,8 @@ export type ChargeFill =
       charge: number
       /** Charge bulk volume over the free volume behind the bullet (`loadRatio`), the case fill. */
       ratio: number
+      /** The free volume behind the bullet, m³: the case capacity less the seated bullet's share. */
+      volume: number
       /** Charge over the free volume, kg/m³. */
       loadingDensity: number
       /** The charge level from the head, mm in the part frame. */
@@ -41,6 +43,7 @@ export function chargeFill(o: {
   return {
     charge,
     ratio,
+    volume,
     loadingDensity: charge / volume,
     // shortcut: the free volume is even from head to bullet base (no case interior, web or taper), upgrade when the case interior is modeled.
     level: o.base * Math.min(ratio, 1),
