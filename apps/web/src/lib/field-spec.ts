@@ -1,8 +1,8 @@
-/** Form fields: specs, typed text and SI values, validation messages. */
+/** Form fields: specs, typed text and SI values. */
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import { fromSi, type QuantityKind, toSi } from '@rangefoundry/schema'
 import { linguiOf } from '../i18n/lingui.ts'
-import { ambiguousMessage, type NumberRange, parseNumber, untranslated } from '../i18n/number.ts'
+import { type NumberRange, parseNumber } from '../i18n/number.ts'
 import type { Message, Translator } from '../i18n/translate.ts'
 import {
   exactFieldText,
@@ -132,43 +132,3 @@ export function siValues(fields: Fields): Record<string, number | undefined> {
 /** A spec marks its texts as messages where it is defined, so the catalogue has them; `i18n` is in the language of `t`. */
 export const specText = (t: Translator['t'], text: SpecText, i18n: I18n = linguiOf('en')) =>
   typeof text === 'string' ? t(text as Message) : i18n._(text)
-
-/** Undefined when valid; bounds inclusive in display units, as the HTML attributes; the message names the field's own unit, not the Settings. */
-export function fieldError(
-  spec: FieldSpec,
-  value: FieldValue | undefined,
-  shown: UnitSystem,
-  t: Translator['t'] = untranslated(),
-  i18n?: I18n,
-): string | undefined {
-  const text = value?.text.trim() ?? ''
-  const label = specText(t, spec.label, i18n)
-  if (text === '') return spec.required ? t('Enter a number for {label}.', { label }) : undefined
-  if (value?.si === undefined) {
-    if (spec.quantity === 'twist') return t('Enter a twist as 1:8 or 8.')
-    const p = parseNumber(text, rangeOf(spec))
-    return p.kind === 'ambiguous'
-      ? ambiguousMessage(p, t)
-      : t('Enter a number for {label}.', { label })
-  }
-  const symbol = shown[spec.quantity].symbol
-  const unit = symbol ? ` ${symbol}` : ''
-  const x = spec.quantity === 'twist' ? (parseTwist(text) ?? Number.NaN) : Number(text)
-  return rangeError(spec, label, x, unit, t)
-}
-
-/** The message of the first bound that the number `x` breaks, undefined when it holds them all. */
-function rangeError(
-  spec: FieldSpec,
-  label: string,
-  x: number,
-  unit: string,
-  t: Translator['t'],
-): string | undefined {
-  if (spec.min !== undefined && x < spec.min)
-    return t('{label} must be at least {min}{unit}.', { label, min: spec.min, unit })
-  if (spec.max !== undefined && x > spec.max)
-    return t('{label} must be at most {max}{unit}.', { label, max: spec.max, unit })
-  if (spec.positive && x <= 0) return t('{label} must be greater than 0{unit}.', { label, unit })
-  if (spec.integer && !Number.isInteger(x)) return t('{label} must be a whole number.', { label })
-}

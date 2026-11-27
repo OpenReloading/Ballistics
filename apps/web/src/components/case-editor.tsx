@@ -17,7 +17,7 @@ import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from 
 import { loadEnglish } from '../i18n/lingui.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeSummary, CaseSummary } from '../lib/api-types.ts'
-import { caseGroupCapacitySpec, caseGroupFields } from '../lib/case-group.ts'
+import { caseGroupCapacitySpec, caseGroupFields } from '../lib/case-group-fields.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
 import { fieldSi, fieldStored } from '../lib/firearm.ts'
 import { kebabValue } from '../lib/list-values.ts'
