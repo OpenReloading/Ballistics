@@ -1,123 +1,58 @@
 import assert from 'node:assert/strict'
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { inspect, isDeepStrictEqual } from 'node:util'
 import { runInThisContext } from 'node:vm'
-import ts from 'typescript'
 
+// the examples are type-checked by `tsc -p examples` (the typecheck script); this file runs them and checks that each is shown
 const docs = fileURLToPath(new URL('../', import.meta.url))
 const pagesDir = `${docs}docs/libraries/`
-// gitignored; inside apps/docs so an example resolves the workspace packages as a reader's install would
-const scratch = `${docs}.examples/`
+const examplesDir = `${docs}examples/`
 
-interface Example {
-  page: string
-  // page line of the first code line
-  line: number
-  file: string
-  code: string[]
-  skip?: string
-}
-
-function examplesOf(page: string): Example[] {
-  const lines = readFileSync(`${pagesDir}${page}`, 'utf8').split('\n')
-  const found: Example[] = []
-  let inExample = false
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i] ?? ''
-    if (line.startsWith('## ')) inExample = line === '## Example'
-    if (!line.startsWith('```')) continue
-    const end = lines.indexOf('```', i + 1)
-    assert.ok(end > i, `${page}:${i + 1}: unclosed code block`)
-    const fence = /^```(js|ts)(?: (.*))?$/.exec(line)
-    if (inExample && fence) {
-      const skip = /^no-run(.*)$/.exec(fence[2] ?? '')?.[1]?.trim()
-      assert.notEqual(
-        skip,
-        '',
-        `${page}:${i + 1}: a no-run block names its reason beside the marker`,
-      )
-      const name = `${page.replace(/\.md$/, '')}-${i + 2}.${fence[1] === 'ts' ? 'mts' : 'mjs'}`
-      found.push({
-        page,
-        line: i + 2,
-        file: `${scratch}${name}`,
-        code: lines.slice(i + 1, end),
-        skip,
-      })
-    }
-    i = end
-  }
-  return found
-}
+const shown =
+  /^import (\w+) from '!\.\.\/\.\.\/examples\/([^']+\.ts)\?raw'\n\n<CodeBlock language="ts">\{\1\}<\/CodeBlock>$/gm
 
 const pages = readdirSync(pagesDir)
-  .filter((name) => name.endsWith('.md'))
+  .filter((name) => /\.mdx?$/.test(name))
   .sort()
-const examples = pages.flatMap(examplesOf)
+const shownOn = new Map(
+  pages.map((page) => [
+    page,
+    [...readFileSync(`${pagesDir}${page}`, 'utf8').matchAll(shown)].map((match) => match[2]),
+  ]),
+)
+const examples = readdirSync(examplesDir, { recursive: true, encoding: 'utf8' })
+  .filter((name) => name.endsWith('.ts') && !name.endsWith('.d.ts'))
+  .sort()
 
 for (const page of pages) {
-  test(`${page}: has a js or ts block under ## Example`, () => {
+  test(`${page}: shows an example of examples/`, () => {
     assert.ok(
-      examples.some((example) => example.page === page),
-      `${page}: no js or ts block under ## Example`,
+      (shownOn.get(page) ?? []).length > 0,
+      `${page}: shows no file of examples/ in a CodeBlock`,
     )
   })
 }
 
-// examples print with console.log only, one value per call, so no Node types are needed
-const consoleTypes = `${scratch}console.d.ts`
-mkdirSync(scratch, { recursive: true })
-writeFileSync(consoleTypes, 'declare const console: { log(value: unknown): void }\n')
-for (const example of examples) writeFileSync(example.file, `${example.code.join('\n')}\n`)
-
-const program = ts.createProgram(
-  [consoleTypes, ...examples.filter((example) => !example.skip).map((example) => example.file)],
-  {
-    strict: true,
-    noEmit: true,
-    allowJs: true,
-    checkJs: true,
-    resolveJsonModule: true,
-    skipLibCheck: true,
-    module: ts.ModuleKind.NodeNext,
-    moduleResolution: ts.ModuleResolutionKind.NodeNext,
-    target: ts.ScriptTarget.ESNext,
-    lib: ['lib.esnext.d.ts'],
-    types: [],
-  },
-)
-
-test('the example compiler options are valid', () => {
-  const problems = [...program.getOptionsDiagnostics(), ...program.getGlobalDiagnostics()]
-  assert.deepEqual(
-    problems.map((d) => ts.flattenDiagnosticMessageText(d.messageText, '\n')),
-    [],
-  )
-})
-
 const logged = /^\s*console\.log\(.*\) \/\/ (.*)$/
 
 for (const example of examples) {
-  const where = (offset: number) => `${example.page}:${example.line + offset}`
+  test(`examples/${example}: a page shows it`, () => {
+    assert.ok(
+      [...shownOn.values()].some((files) => files.includes(example)),
+      `examples/${example}: no page of docs/libraries/ shows it in a CodeBlock`,
+    )
+  })
 
-  test(`${where(0)}: the example type-checks and prints what its comments say`, {
-    skip: example.skip,
-  }, async () => {
-    const source = program.getSourceFile(example.file)
-    assert.ok(source, `${example.file} not in the program`)
-    const errors = ts.getPreEmitDiagnostics(program, source).map((d) => {
-      const at =
-        d.file && d.start !== undefined ? d.file.getLineAndCharacterOfPosition(d.start).line : 0
-      return `${where(at)}: ${ts.flattenDiagnosticMessageText(d.messageText, '\n')}`
-    })
-    assert.deepEqual(errors, [], `type errors:\n${errors.join('\n')}`)
-
-    const expected = example.code.flatMap((line, offset) => {
-      const comment = logged.exec(line)?.[1]
-      return comment === undefined ? [] : [{ at: where(offset), comment }]
-    })
+  test(`examples/${example}: prints what its comments say`, async () => {
+    const where = (line: number) => `examples/${example}:${line + 1}`
+    const expected = readFileSync(`${examplesDir}${example}`, 'utf8')
+      .split('\n')
+      .flatMap((line, n) => {
+        const comment = logged.exec(line)?.[1]
+        return comment === undefined ? [] : [{ at: where(n), comment }]
+      })
     assert.ok(
       expected.length > 0,
       `${where(0)}: no console.log line with its output in a trailing comment`,
@@ -129,7 +64,7 @@ for (const example of examples) {
       printed.push(values.length === 1 ? values[0] : values)
     }
     try {
-      await import(pathToFileURL(example.file).href)
+      await import(pathToFileURL(`${examplesDir}${example}`).href)
     } finally {
       console.log = log
     }
