@@ -1872,6 +1872,8 @@
   "fill\u0004Loading density": "Ladungsdichte",
   "Hatched: the charge of {charge} at a case fill of {fill} %.": "Schraffiert: die Treibladung von {charge} bei einer Ladedichte von {fill} %.",
   "Hatched: the charge of {charge} at a case fill of {fill} %, compressed by the bullet.": "Schraffiert: die Treibladung von {charge} bei einer Ladedichte von {fill} %, vom Geschoss verdichtet.",
+  "Case fill {fill} % of the usable case volume, {volume}": "Ladedichte {fill} % des Hülsennutzraums, {volume}",
+  "Compressed load: case fill {fill} % of the usable case volume, {volume}": "Verdichtete Ladung: Ladedichte {fill} % des Hülsennutzraums, {volume}",
   "Message": "Meldung",
   "Messages": "Meldungen",
   "result\u0004Notes": "Hinweise",

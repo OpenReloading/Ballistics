@@ -274,10 +274,21 @@ function SeatedBullet({
   )
 }
 
-/** The powder charge in the case, in the part frame (mm): from the head to its level, tinted and hatched. */
-function ChargeLevel({ id, level }: { id: string; level: number }) {
+/** The powder charge in the case, in the part frame (mm): from the head to its level, tinted and hatched; a compressed one in the flag color. */
+function ChargeLevel({
+  id,
+  level,
+  compressed,
+}: {
+  id: string
+  level: number
+  compressed: boolean
+}) {
   return (
-    <g className="seating-charge" clipPath={`url(#${id}-cartridge)`}>
+    <g
+      className={compressed ? 'seating-charge compressed' : 'seating-charge'}
+      clipPath={`url(#${id}-cartridge)`}
+    >
       <pattern
         id={`${id}-hatch`}
         width="1"
@@ -1915,6 +1926,23 @@ function fillText(fill: ChargeFill, system: UnitSystem, t: T) {
     : t('Hatched: the charge of {charge} at a case fill of {fill} %.', values)
 }
 
+/** The case fill under the workbench card's drawing: the share of the usable case volume the charge takes, or the inputs it needs. */
+function FillLabel({ fill, system }: { fill: ChargeFill; system: UnitSystem }) {
+  const { t } = useTranslation()
+  if ('missing' in fill) return <p className="seating-fill">{fillText(fill, system, t)}</p>
+  const values = {
+    fill: fillPercent(fill.ratio),
+    volume: withUnit('capacity', system, fill.volume),
+  }
+  return (
+    <p className="seating-fill" data-compressed={fill.compressed || undefined}>
+      {fill.compressed
+        ? t('Compressed load: case fill {fill} % of the usable case volume, {volume}', values)
+        : t('Case fill {fill} % of the usable case volume, {volume}', values)}
+    </p>
+  )
+}
+
 /** The figure's title: `design` is the name of the user design seated, none for a record's bullet. */
 function captionOf(view: Model['view'], design: string | undefined, where: string, t: T) {
   if (view === 'chamber') return t('Chamber, {where}', { where })
@@ -1954,7 +1982,7 @@ function DrawnFigure({
       level={shown.medium === 'print'}
     >
       {seating && m.fill && 'level' in m.fill && shown.cartridge && (
-        <ChargeLevel id={id} level={m.fill.level} />
+        <ChargeLevel id={id} level={m.fill.level} compressed={m.fill.compressed} />
       )}
       {seating && (
         <SeatedBullet
@@ -2337,6 +2365,10 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
       {card && put(slots, <BarrelField m={m} />, slots?.gun)}
       {put(slots, <SeatingControls m={m} />, slots?.cartridge)}
       <SeatingFigure m={m} spec={spec} chamber={chamber} />
+      {/* the card's drawing fills it and its legend goes to More: the case fill stays in view under it */}
+      {card && m.view !== 'chamber' && m.figureSeating && m.fill && (
+        <FillLabel fill={m.fill} system={m.system} />
+      )}
       {seating &&
         put(slots, <SeatingValues m={m} seating={seating} chamber={chamber} />, slots?.cartridge)}
       {/* in the workbench the notes (staying below L6 says nothing about pressure or safety) sit in the Cartridge card's More, beside the further values */}

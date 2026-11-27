@@ -2337,6 +2337,24 @@ td.nowrap {
   stroke-width: 0.12px;
 }
 
+.drawing .seating-charge.compressed .tint {
+  fill: var(--draw-flag);
+  fill-opacity: 0.45;
+}
+
+.seating-fill {
+  flex: none;
+  margin: var(--space-xs) 0 0;
+  color: var(--muted);
+  font-size: 0.875em;
+  text-align: center;
+}
+
+.seating-fill[data-compressed] {
+  color: var(--warn-text);
+  font-weight: 600;
+}
+
 .figure-values {
   margin-top: var(--space-xs);
   font-size: 0.875em;
@@ -6426,6 +6444,7 @@ main .library-head.page-panel-head > .page-panel-title {
     position: absolute;
     inset: 0;
     display: flex;
+    flex-direction: column;
   }
 
   .workbench :is(.figure-host, .figure-tab) .seating-figure {
