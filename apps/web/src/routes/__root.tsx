@@ -44,7 +44,7 @@ export const Route = createRootRoute({
       // ui's own rules before the app's: the app's styles bring Mantine's in cascade layers, the tokens and the font
       { rel: 'stylesheet', href: uiCss },
       { rel: 'stylesheet', href: appCss },
-      // the UI faces load before the first paint, as next/font preloads them: a swap after it shifts the text
+      // the UI faces load before the first paint: a swap after it shifts the text
       ...[interRegular, interSemiBold].map((href) => ({
         rel: 'preload',
         href,

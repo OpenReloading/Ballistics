@@ -2903,7 +2903,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
           ) : (
             <Button
               variant="default"
-              // a plain import() on first use: next/dynamic would count it in the route's weight
+              // a plain import() on first use keeps it out of the route's first load
               onClick={() =>
                 import('./zero-target.tsx').then((m) => setZero(() => m.ZeroTargetMenu))
               }

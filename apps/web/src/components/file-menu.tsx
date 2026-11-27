@@ -1478,7 +1478,7 @@ function FileMenuOf<K extends UserRecordKind>({
   async function importFiles() {
     const picked = await pickFiles(true, ready, [...loadFileFormats, ...tableFormats])
     if (!picked.length) return
-    // a plain import() after the pick: the picker needs the click's activation, and next/dynamic would count the Import entry in the weight of every route with a File menu
+    // a plain import() after the pick: the picker needs the click's activation, and it keeps the Import entry out of the first load of every route with a File menu
     const { routeImport } = await import('./import-entry.tsx')
     await routeImport(picked, setTables, importData)
   }

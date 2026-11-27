@@ -65,7 +65,7 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
             size={controlSize.row.button}
             aria-haspopup="dialog"
             onClick={() =>
-              // a plain import() on first open: next/dynamic would count the dialog in the route's weight
+              // a plain import() on first open keeps the dialog out of the route's first load
               Dialog
                 ? setOpen(true)
                 : import('./result-notes-dialog.tsx').then((m) => {

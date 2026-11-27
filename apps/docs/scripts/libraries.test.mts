@@ -14,7 +14,7 @@ const libraries = [
 ]
 
 for (const { page: pageName, name } of libraries) {
-  const page = readFileSync(`${docs}docs/libraries/${pageName}.md`, 'utf8')
+  const page = readFileSync(`${docs}docs/libraries/${pageName}.mdx`, 'utf8')
 
   test(`${name}: install line, entry points, reference link and homepage`, () => {
     const manifest = JSON.parse(readFileSync(`${root}packages/${name}/package.json`, 'utf8'))

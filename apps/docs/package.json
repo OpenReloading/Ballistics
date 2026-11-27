@@ -5,6 +5,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "check": "node check.mjs",
+    "typecheck": "tsc -p examples",
     "site:build": "pnpm run site:openapi && pnpm run site:library && pnpm run site:research && docusaurus build",
     "site:research": "node scripts/research-index.mts",
     "site:library": "typedoc",
