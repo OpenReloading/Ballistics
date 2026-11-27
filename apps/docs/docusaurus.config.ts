@@ -46,6 +46,13 @@ const config = async (): Promise<Config> => ({
       },
     ],
     ['@docusaurus/plugin-sitemap', {} satisfies SitemapOptions],
+    // `?raw` imports a file's text (the doc examples) with webpack's built-in asset type in place of raw-loader; `!` before the path skips the TypeScript loader (`!!` would also drop the asset type)
+    () => ({
+      name: 'raw-source',
+      configureWebpack: () => ({
+        module: { rules: [{ resourceQuery: /raw/, type: 'asset/source' }] },
+      }),
+    }),
     // the search index of the built site, docs and both reference sites (scripts/search.mts), in its own process, as the config loader cannot require the ESM-only pagefind package
     ({ siteDir }) => ({
       name: 'search-index',

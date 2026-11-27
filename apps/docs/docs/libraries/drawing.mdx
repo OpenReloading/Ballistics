@@ -31,13 +31,10 @@ Each library has its own [Semantic Versioning](../release.md#versions) version.
 
 A length as inch text, and the volume in mm³ of a cylinder of 4 mm radius and 10 mm length from its half profile (radius, axial position):
 
-```js
-import { lengthText } from '@rangefoundry/svg-drawings'
-import { revolutionVolume } from '@rangefoundry/svg-drawings/bullet'
+import CodeBlock from '@theme/CodeBlock'
+import example from '!../../examples/drawing/length-and-volume.ts?raw'
 
-console.log(lengthText(25.4, 'in')) // 1.0000
-console.log(revolutionVolume([[0, 0], [4, 0], [4, 10], [0, 10]], 10).toFixed(1)) // 502.7
-```
+<CodeBlock language="ts">{example}</CodeBlock>
 
 ## Reference
 
