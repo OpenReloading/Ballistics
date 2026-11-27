@@ -3,6 +3,9 @@ import path from 'node:path'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
+import packageJson from './package.json' with { type: 'json' }
+import { headCommit } from './scripts/git-head.ts'
+import { sourceUrl } from './src/lib/repository-url.ts'
 import { webManifest } from './src/lib/web-manifest.ts'
 import { checkRecordPaths, staticPaths } from './src/routes/-static-paths.ts'
 
@@ -63,6 +66,11 @@ export default defineConfig(({ command }) => {
     NEXT_PUBLIC_DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL,
     NEXT_PUBLIC_NO_DOCS: process.env.NEXT_PUBLIC_NO_DOCS,
     NEXT_PUBLIC_REPOSITORY_URL: process.env.NEXT_PUBLIC_REPOSITORY_URL,
+    NEXT_PUBLIC_SOURCE_URL: sourceUrl(
+      process.env.NEXT_PUBLIC_REPOSITORY_URL,
+      headCommit(path.join(import.meta.dirname, '../..')),
+      packageJson.version,
+    ),
     PAGES_URL: site,
   }
   return {

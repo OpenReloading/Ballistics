@@ -94,11 +94,11 @@ Upstream issues to recheck: TanStack/router#8741: drop the `/?root` entry when i
 
 Publishing is off until the settings below exist, `pnpm run pack:check` passes and the repository variable `NPM_PUBLISH` is set to `true`. `pnpm run pack:check` fails while a published library depends on a private workspace package that npm does not have: today `schema` depends on `@rangefoundry/units` and `@rangefoundry/statistics`, and `importers` on both as well. Settings outside the repository, once per library (see the [npm documentation on trusted publishers](https://docs.npmjs.com/trusted-publishers)):
 
-1. The npm organization `rangefoundry` exists. If npm offers trusted publishing only for an existing package, publish the first version by hand from a clean checkout of `main`: `pnpm install && pnpm run build`, then `pnpm --filter @rangefoundry/<name> publish` for `schema`, `svg-drawings`, `importers` and `catalog`, signed in with two-factor authentication. The `publish` job skips that version.
+1. The npm organization `rangefoundry` exists. If npm offers trusted publishing only for an existing package, publish the first version by hand for `schema`, `svg-drawings`, `importers` and `catalog`, each from a clean checkout of the release tag of that version (`git checkout <name>-vX.Y.Z`): `pnpm install && pnpm run build`, then `pnpm --filter @rangefoundry/<name> publish`, signed in with two-factor authentication. Then add the line `Published to npm from tag <name>-vX.Y.Z, commit <full commit SHA>` to the GitHub Release of that tag: without a provenance statement, the release notes name the source the published files were built from. The `publish` job skips that version.
 2. On npmjs.com, package Settings, Trusted Publisher, GitHub Actions: organization `OpenReloading`, repository `Ballistics`, workflow `release.yml`.
 3. Publishing access: "Require two-factor authentication and disallow tokens".
 
-`pnpm --filter @rangefoundry/<name> pack --dry-run` lists the package contents: `dist` without source maps and the license files (`catalog`: `LICENSE` for CC BY 4.0 and `LICENSE-ISC`), no sources, tests or records folder.
+`pnpm --filter @rangefoundry/<name> pack --dry-run` lists the package contents: `dist` without source maps and the license files (`catalog`: `LICENSE` for CC BY-SA 4.0 and `LICENSE-AGPL`), no sources, tests or records folder.
 
 ## Contract baselines
 

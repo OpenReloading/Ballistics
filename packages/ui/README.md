@@ -29,4 +29,4 @@ Commands, in this folder:
 
 A story goes in `stories/`; its `play` function holds the checks a story needs beyond axe.
 
-License: ISC
+License: AGPL-3.0-only

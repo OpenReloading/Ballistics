@@ -15,4 +15,4 @@ try {
 reviveError(message.error)
 ```
 
-License: ISC
+License: AGPL-3.0-only
