@@ -31,6 +31,10 @@ msgstr "{added, decimal} Einträge hinzugefügt, {equal, decimal} schon in diese
 msgid "events.imported"
 msgstr "{added} Wettkämpfe hinzugefügt, {equal} schon in diesem Browser, {replaced} ersetzt."
 
+# en: "{address} was never opened on this device, so it is not stored. The tools, your own records and pages you opened before work offline."
+msgid "offline.notStored"
+msgstr "{address} wurde auf diesem Gerät noch nie geöffnet und ist daher nicht gespeichert. Die Werkzeuge, Ihre eigenen Datensätze und zuvor geöffnete Seiten funktionieren offline."
+
 # en: "{count, decimal} proposed, {maybe, decimal} maybe"
 msgid "holeDetection.proposedMaybe"
 msgstr "{count, decimal} vorgeschlagen, {maybe, decimal} vielleicht"
@@ -962,6 +966,10 @@ msgstr "Alle Jahre"
 # en: "Allowed"
 msgid "disciplines.allowed"
 msgstr "Erlaubt"
+
+# en: "Alpha version: breaking changes are to be expected."
+msgid "shell.alphaNote"
+msgstr "Alpha-Version: inkompatible Änderungen sind zu erwarten."
 
 # en: "Also printed as: {aliases}"
 msgid "cartridgeRecord.alsoPrintedAs"
@@ -2115,6 +2123,10 @@ msgstr "Schließen"
 msgid "photoQuality.rule.closeEnough"
 msgstr "Nah genug"
 
+# en: "Close navigation"
+msgid "shell.closeNavigation"
+msgstr "Navigation schließen"
+
 # en: "Close the photograph tool"
 msgid "bulletPhoto.close"
 msgstr "Foto-Werkzeug schließen"
@@ -2810,6 +2822,10 @@ msgstr "Entfernung, {unit}"
 # en: "Division"
 msgid "events.division"
 msgstr "Division"
+
+# en: "Documentation"
+msgid "shell.documentation"
+msgstr "Dokumentation"
 
 # en: "double"
 msgid "values.double"
@@ -3781,7 +3797,7 @@ msgid "targetEditor.groupPanels"
 msgstr "Bereiche des Schussbilds"
 
 # en: "Group size and dispersion from a target photo or a drawn target; the photo stays in your browser."
-msgid "sections.groups.about"
+msgid "home.about.groups"
 msgstr "Streukreis und Streuung aus einem Foto der Zielscheibe oder einer gezeichneten Zielscheibe; das Foto bleibt in Ihrem Browser."
 
 # en: "Groups"
@@ -3939,6 +3955,10 @@ msgstr "Durchmesser der Hohlspitzenöffnung"
 # en: "Hollow-point mouth diameter"
 msgid "recordFields.hollowPointMouthDiameter"
 msgstr "Durchmesser der Hohlspitzenöffnung"
+
+# en: "Home"
+msgid "shellActions.home"
+msgstr "Startseite"
 
 # en: "Homepage"
 msgid "disciplines.column.website"
@@ -4183,6 +4203,10 @@ msgstr "Kennwerte der Statistik"
 # en: "Key values"
 msgid "bulletCompare.keyValues"
 msgstr "Kennwerte"
+
+# en: "Keyboard shortcuts"
+msgid "shellActions.keyboardShortcuts"
+msgstr "Tastenkürzel"
 
 # en: "Kind"
 msgid "faceRecord.column.kind"
@@ -4615,6 +4639,10 @@ msgstr "Magnum"
 # en: "Magnum"
 msgid "recordFields.magnum"
 msgstr "Magnum"
+
+# en: "Main"
+msgid "shell.main"
+msgstr "Hauptnavigation"
 
 # en: "Major"
 msgid "events.major"
@@ -5132,6 +5160,10 @@ msgstr "In der Sportordnung genannt"
 msgid "powderTune.narrowLadder"
 msgstr "Schmale Ladeleiter"
 
+# en: "Navigation"
+msgid "shell.navigation"
+msgstr "Navigation"
+
 # en: "NE"
 msgid "targetEditor.compassNE"
 msgstr "NO"
@@ -5568,6 +5600,10 @@ msgstr "Kein Treibladungspulver für Metallpatronen"
 msgid "disciplines.notAllowed"
 msgstr "Nicht erlaubt"
 
+# en: "Not available offline"
+msgid "offline.notStoredTitle"
+msgstr "Offline nicht verfügbar"
+
 # en: "Not computed: {reason}"
 msgid "powderCompare.notComputedReason"
 msgstr "Nicht berechnet: {reason}"
@@ -5715,6 +5751,10 @@ msgstr "Notizen"
 # en: "Notes"
 msgid "targetEditor.notes"
 msgstr "Notizen"
+
+# en: "Nothing at this address"
+msgid "notFound.title"
+msgstr "Unter dieser Adresse gibt es nichts"
 
 # en: "Now {count, decimal} corners."
 msgid "holeDetection.nowCorners"
@@ -5995,6 +6035,14 @@ msgstr "Seitenaktionen"
 # en: "Page not found"
 msgid "page.notFound"
 msgstr "Seite nicht gefunden"
+
+# en: "Pages"
+msgid "notFound.links"
+msgstr "Seiten"
+
+# en: "Pages kept on this device"
+msgid "offline.links"
+msgstr "Auf diesem Gerät gespeicherte Seiten"
 
 # en: "paint"
 msgid "values.paint"
@@ -6548,6 +6596,10 @@ msgstr "Entfernung"
 msgid "sources.rangefoundry"
 msgstr "RangeFoundry"
 
+# en: "RangeFoundry Workbench could not be shown."
+msgid "appError.notShown"
+msgstr "RangeFoundry Workbench konnte nicht angezeigt werden."
+
 # en: "Ratio of specific heats"
 msgid "recordFields.gamma"
 msgstr "Verhältnis der spezifischen Wärmen"
@@ -7088,6 +7140,10 @@ msgstr "Regeln"
 msgid "targetEditor.compassS"
 msgstr "S"
 
+# en: "Safety notice"
+msgid "shellActions.safetyNotice"
+msgstr "Sicherheitsregeln"
+
 # en: "Save as a powder"
 msgid "powderTune.saveAsPowder"
 msgstr "Als Treibladungspulver speichern"
@@ -7208,6 +7264,10 @@ msgstr "SO"
 msgid "directoryTable.search"
 msgstr "Suchen"
 
+# en: "Search"
+msgid "shell.search"
+msgstr "Suchen"
+
 # en: "Search {title}"
 msgid "fieldTable.search"
 msgstr "{title} durchsuchen"
@@ -7324,6 +7384,10 @@ msgstr "Stellen Sie zuerst den Maßstab ein (Schritt 2)."
 msgid "powderDesigner.setFittedData"
 msgstr "Setzen Sie Herkunft der Werte auf An Daten angepasst."
 
+# en: "Settings"
+msgid "shell.settings"
+msgstr "Einstellungen"
+
 # en: "Shank"
 msgid "bulletDesigner.shank"
 msgstr "Schaft"
@@ -7437,7 +7501,7 @@ msgid "targetEditor.shotsCount"
 msgstr "Schüsse ({count, decimal})"
 
 # en: "Shots and statistics per string from a chronograph export, read in your browser."
-msgid "sections.session.about"
+msgid "home.about.session"
 msgstr "Schüsse und Statistik je Schussreihe aus einem Chronograph-Export, in Ihrem Browser gelesen."
 
 # en: "Shots in the statistics; excluded shots are shown and counted, not measured."
@@ -7517,7 +7581,7 @@ msgid "powderTune.simulated"
 msgstr "Simuliert ({unit})"
 
 # en: "Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser."
-msgid "sections.workbench.about"
+msgid "home.about.workbench"
 msgstr "Simulierte Geschwindigkeit, Druck im Vergleich zu den CIP-Grenzwerten und Flugbahn für Ihre Patrone, Ihr Geschoss, Ihr Treibladungspulver und Ihre Schusswaffe, berechnet in Ihrem Browser."
 
 # en: "simulation parameters, hand-tuned"
@@ -8319,7 +8383,7 @@ msgid "powderTune.powderNotSaved"
 msgstr "Das Treibladungspulver wurde nicht gespeichert."
 
 # en: "The published records, each with its source, and your own beside them."
-msgid "sections.database.about"
+msgid "home.about.database"
 msgstr "Die veröffentlichten Datensätze, jeweils mit ihrer Quelle, und Ihre eigenen daneben."
 
 # en: "The records of this browser could not be read."
@@ -8434,9 +8498,25 @@ msgstr "Die Zielscheiben dieser Disziplin nennen keine Schusszahl."
 msgid "powderTune.temperatureFactorNeedsTwo"
 msgstr "Der Temperaturfaktor braucht Schussreihen bei zwei oder mehr Treibladungspulvertemperaturen."
 
+# en: "The tools, your own records and pages you opened before work offline."
+msgid "offline.about"
+msgstr "Die Werkzeuge, Ihre eigenen Datensätze und zuvor geöffnete Seiten funktionieren offline."
+
 # en: "The value crosses the target at more than one charge."
 msgid "chargeTarget.notMonotone"
 msgstr "Der Wert schneidet die Zielgröße bei mehr als einer Treibladung."
+
+# en: "Theme: dark"
+msgid "shellActions.theme.dark"
+msgstr "Farbschema: Dunkel"
+
+# en: "Theme: light"
+msgid "shellActions.theme.light"
+msgstr "Farbschema: Hell"
+
+# en: "Theme: system"
+msgid "shellActions.theme.system"
+msgstr "Farbschema: System"
 
 # en: "Thermochemistry"
 msgid "powderDesigner.thermochemistry"
@@ -8477,6 +8557,10 @@ msgstr "Diese Datei ist kein Bild, das dieser Browser lesen kann."
 # en: "This link is not valid."
 msgid "bulletCompare.invalid"
 msgstr "Dieser Link ist ungültig."
+
+# en: "This page could not be found. Search the records, or open one of these pages."
+msgid "notFound.about"
+msgstr "Diese Seite wurde nicht gefunden. Durchsuchen Sie die Datensätze oder öffnen Sie eine dieser Seiten."
 
 # en: "This page could not be shown."
 msgid "pageError.title"
@@ -8618,6 +8702,10 @@ msgstr "Beispiel ausprobieren"
 msgid "holeDetection.trySmallerPhotoAnother"
 msgstr "Versuchen Sie ein kleineres Foto oder einen anderen Browser."
 
+# en: "Try again"
+msgid "appError.tryAgain"
+msgstr "Erneut versuchen"
+
 # en: "Try the other values anyway"
 msgid "powderTune.tryOtherValuesAnyway"
 msgstr "Die anderen Werte trotzdem versuchen"
@@ -8729,6 +8817,10 @@ msgstr "Einheit, falls die Datei keine nennt"
 # en: "Unit: {units}"
 msgid "sessionSummary.unit"
 msgstr "Einheit: {units}"
+
+# en: "Units settings"
+msgid "shellActions.unitsSettings"
+msgstr "Einstellungen der Einheiten"
 
 # en: "Units: {preset}"
 msgid "units.name"
@@ -8986,9 +9078,17 @@ msgstr "Windgeschwindigkeit"
 msgid "burnRateCompare.noCurve"
 msgstr "Ohne Kurve"
 
+# en: "Workbench settings"
+msgid "shellActions.workbenchSettings"
+msgstr "Einstellungen der Werkbank"
+
 # en: "Working out the pressure range"
 msgid "powderTune.workingOutPressureRange"
 msgstr "Druckbereich wird berechnet"
+
+# en: "Works offline"
+msgid "offline.title"
+msgstr "Funktioniert offline"
 
 # en: "Writes the charge into the charge field"
 msgid "chargeTarget.applyHelp"

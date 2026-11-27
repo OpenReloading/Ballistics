@@ -4,16 +4,16 @@ import { useLingui } from '@lingui/react'
 import { useMantineColorScheme } from '@mantine/core'
 import { useContext } from 'react'
 import { useRouter } from '@/platform/navigation.ts'
-import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { sections } from '../lib/sections.ts'
 import { shortcutLabel } from '../lib/shortcuts.ts'
+import englishMessages from '../locales/en/components/shell-actions.json' with { type: 'json' }
 import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
 import { openSafety } from './safety-dialog.tsx'
 import { SettingsDialog } from './settings-dialog.ts'
 import { openShortcuts, useSingleKeys } from './shortcuts.tsx'
 
-loadEnglish(sectionsEnglish)
+loadEnglish(englishMessages, sectionsEnglish)
 
 /** A command of the search; `keys` names its shortcut, shown beside it. */
 export type Command = { label: string; run: () => void; keys?: string }
@@ -24,11 +24,10 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
   const openSettings = useContext(SettingsDialog)
   const { setColorScheme } = useMantineColorScheme()
   const singleKeys = useSingleKeys()
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   return {
     pages: [
-      { label: t('Home'), run: () => router.push('/') },
+      { label: i18n._({ id: 'shellActions.home', message: 'Home' }), run: () => router.push('/') },
       // the pages, and each tab of the Library pages by its own name (Powders, Firearms…)
       ...sections.flatMap((s) =>
         s.pages.flatMap((p) =>
@@ -40,18 +39,36 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
       ),
     ],
     commands: [
-      { label: t('Settings'), run: () => openSettings() },
-      { label: t('Units settings'), run: () => openSettings('units') },
-      { label: t('Workbench settings'), run: () => openSettings('workbench') },
-      { label: t('Safety notice'), run: openSafety },
+      { label: i18n._({ id: 'shell.settings', message: 'Settings' }), run: () => openSettings() },
       {
-        label: t('Keyboard shortcuts'),
+        label: i18n._({ id: 'shellActions.unitsSettings', message: 'Units settings' }),
+        run: () => openSettings('units'),
+      },
+      {
+        label: i18n._({ id: 'shellActions.workbenchSettings', message: 'Workbench settings' }),
+        run: () => openSettings('workbench'),
+      },
+      {
+        label: i18n._({ id: 'shellActions.safetyNotice', message: 'Safety notice' }),
+        run: openSafety,
+      },
+      {
+        label: i18n._({ id: 'shellActions.keyboardShortcuts', message: 'Keyboard shortcuts' }),
         run: openShortcuts,
         ...(singleKeys && { keys: shortcutLabel('help') }),
       },
-      { label: t('Theme: system'), run: () => setColorScheme('auto') },
-      { label: t('Theme: light'), run: () => setColorScheme('light') },
-      { label: t('Theme: dark'), run: () => setColorScheme('dark') },
+      {
+        label: i18n._({ id: 'shellActions.theme.system', message: 'Theme: system' }),
+        run: () => setColorScheme('auto'),
+      },
+      {
+        label: i18n._({ id: 'shellActions.theme.light', message: 'Theme: light' }),
+        run: () => setColorScheme('light'),
+      },
+      {
+        label: i18n._({ id: 'shellActions.theme.dark', message: 'Theme: dark' }),
+        run: () => setColorScheme('dark'),
+      },
     ],
   }
 }

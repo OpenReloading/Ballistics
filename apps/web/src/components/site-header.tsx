@@ -27,13 +27,14 @@ import Image from '@/platform/image.tsx'
 import Link from '@/platform/link.tsx'
 import dark from '../assets/ballistics-dark.svg'
 import light from '../assets/ballistics-light.svg'
-import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { alphaNote } from '../lib/alpha.ts'
 import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
 import { pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
+import englishMessages from '../locales/en/components/site-header.json' with { type: 'json' }
+import alphaEnglish from '../locales/en/lib/alpha.json' with { type: 'json' }
 import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
 import { useBarEnd } from './bar-end.ts'
 import { DocsLink } from './docs-link.tsx'
@@ -48,7 +49,12 @@ import { openShortcuts, ShortcutsHelp, useShortcuts } from './shortcuts.tsx'
 import { ThemeSwitch } from './theme-switch.tsx'
 import { useRoute } from './use-route.ts'
 
-loadEnglish(sectionsEnglish)
+loadEnglish(englishMessages, alphaEnglish, sectionsEnglish)
+
+const navigationLabel = /*i18n*/ { id: 'shell.navigation', message: 'Navigation' }
+const mainLabel = /*i18n*/ { id: 'shell.main', message: 'Main' }
+const searchLabel = /*i18n*/ { id: 'shell.search', message: 'Search' }
+const settingsLabel = /*i18n*/ { id: 'shell.settings', message: 'Settings' }
 
 // the search loads on its first use, so pages ship without it
 const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteSearch), {
@@ -66,10 +72,10 @@ type Section = (typeof sections)[number]
 /** The theme's wordmark picked by CSS before hydration as in `ThemeSwitch`, the alpha badge laid over its foot so it takes no room in the bar (globals.css); `full` shows the whole wordmark, else its mark. */
 export function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
   const note = useId()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <>
-      <Tooltip label={t(alphaNote)} position="bottom-start" transitionProps={{ duration: 0 }}>
+      <Tooltip label={i18n._(alphaNote)} position="bottom-start" transitionProps={{ duration: 0 }}>
         <Anchor
           component={Link}
           href="/"
@@ -87,7 +93,7 @@ export function Brand({ onClick, full }: { onClick?: () => void; full?: boolean 
       </Tooltip>
       {/* the tooltip renders only while open: screen readers get the note from here */}
       <span id={note} className="visually-hidden">
-        {t(alphaNote)}
+        {i18n._(alphaNote)}
       </span>
     </>
   )
@@ -214,7 +220,7 @@ function SectionLinks({
 /** Settings and Search open as dialogs over the page, so the page and its inputs stay, and Ctrl+K opens Search on every page; the rail follows Mantine UI's NavbarMinimal. */
 export function SiteHeader() {
   const route = useRoute()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [opened, { toggle, close }] = useDisclosure(false)
   // the drawer is only hidden by CSS from 75em: left open, its scroll lock and focus trap would stay
   const wide = useMediaQuery('(width >= 75em)')
@@ -273,7 +279,7 @@ export function SiteHeader() {
             size={28}
             opened={opened}
             onClick={toggle}
-            aria-label={t('Navigation')}
+            aria-label={i18n._(navigationLabel)}
             aria-expanded={opened}
           />
           <Brand full={route === '/'} />
@@ -283,12 +289,12 @@ export function SiteHeader() {
       </AppShellHeader>
       <AppShellNavbar component="div" visibleFrom="lg" p="sm" className="sidebar">
         {/* hidden below 75em, so one navigation "Main" is in the tree at any width; the foot (Install, Settings) sits outside the box of scrolling links, so it stays in view and nothing pressed at the box's edge makes it scroll (globals.css) */}
-        <AppShellSection grow component="nav" aria-label={t('Main')} className="rail">
+        <AppShellSection grow component="nav" aria-label={i18n._(mainLabel)} className="rail">
           <Stack gap="xs" className="rail-links">
             <Stack gap={0} align="center">
               <PageLink
                 href="search"
-                label={t('Search')}
+                label={i18n._(searchLabel)}
                 route={route}
                 rail
                 onOpen={openSearch}
@@ -307,7 +313,7 @@ export function SiteHeader() {
             </div>
             <PageLink
               href="settings"
-              label={t('Settings')}
+              label={i18n._(settingsLabel)}
               route={route}
               rail
               onOpen={() => openSettings()}
@@ -328,19 +334,22 @@ export function SiteHeader() {
       >
         <Drawer.Overlay />
         {/* named by its own label: the wordmark's alpha badge and note would join a title's name */}
-        <Drawer.Content aria-label={t('Navigation')}>
+        <Drawer.Content aria-label={i18n._(navigationLabel)}>
           {/* a div: a second <header> outside the page header would be another banner landmark */}
           <Drawer.Header component="div">
             <Brand onClick={close} />
             {/* focus starts here: on the wordmark it would open the alpha tooltip over the links */}
-            <Drawer.CloseButton aria-label={t('Close navigation')} data-autofocus />
+            <Drawer.CloseButton
+              aria-label={i18n._({ id: 'shell.closeNavigation', message: 'Close navigation' })}
+              data-autofocus
+            />
           </Drawer.Header>
           <Drawer.Body>
             {/* the sidebar's list with the current page marked, rows 44 px high */}
-            <Stack component="nav" aria-label={t('Main')} gap="md" className="drawer-nav">
+            <Stack component="nav" aria-label={i18n._(mainLabel)} gap="md" className="drawer-nav">
               <PageLink
                 href="search"
-                label={t('Search')}
+                label={i18n._(searchLabel)}
                 route={route}
                 rail={false}
                 onOpen={fromDrawer(openSearch)}
@@ -357,7 +366,7 @@ export function SiteHeader() {
               <Divider />
               <PageLink
                 href="settings"
-                label={t('Settings')}
+                label={i18n._(settingsLabel)}
                 route={route}
                 rail={false}
                 onOpen={fromDrawer(() => openSettings())}
