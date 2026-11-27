@@ -1,5 +1,4 @@
 import { expect, type Page, test } from '@playwright/test'
-import type { Message } from '../../../web/src/i18n/translate.ts'
 import { sections } from '../../../web/src/lib/sections.ts'
 import { exported, gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
@@ -21,10 +20,12 @@ for (const path of ['/powders', '/cartridges/308-win'])
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await open(page)
     await expect(search(page)).toHaveCount(1)
-    const pages = sections.flatMap((s): readonly { label: Message }[] => s.pages)
+    const pages = sections.flatMap((s): readonly { label: { message: string } }[] => s.pages)
     expect(pages.length).toBeGreaterThan(0)
     for (const { label } of pages)
-      await expect(search(page).getByRole('button', { name: label, exact: true })).toBeVisible()
+      await expect(
+        search(page).getByRole('button', { name: label.message, exact: true }),
+      ).toBeVisible()
     for (const name of ['Settings', 'Safety notice', 'Theme: dark'])
       await expect(search(page).getByRole('button', { name, exact: true })).toBeVisible()
     await page.keyboard.press('Escape')

@@ -1,19 +1,20 @@
+import type { MessageDescriptor } from '@lingui/core'
 import { type Message, msg } from '../i18n/translate.ts'
 
 /** A tab of a library page: another route of it, listed in the page's tab bar. */
 interface LibraryTab {
   href: string
-  label: Message
+  label: MessageDescriptor
   description: Message
 }
 
 /** A page of the sidebar, drawer, search and home cards. */
 export interface PageEntry {
   href: string
-  label: Message
+  label: MessageDescriptor
   /** The icon's name in `nav-icons.tsx`. */
   icon: string
-  description: Message
+  description: MessageDescriptor
   /** The routes the page shows as tabs, in the tab bar's order; each is current under this page. */
   tabs?: readonly LibraryTab[]
   /** Routes under no tab that the page links to and that link back to it (`/events`). */
@@ -24,105 +25,114 @@ export interface PageEntry {
 export const databaseTabs: readonly LibraryTab[] = [
   {
     href: '/firearms',
-    label: msg('Firearms'),
+    label: /*i18n*/ { id: 'page.firearms', message: 'Firearms' },
     description: msg(
       "Your firearms with their optics and zeros, kept in this browser; they fill the workbench's firearm fields.",
     ),
   },
   {
     href: '/cartridges',
-    label: msg('Cartridges'),
+    label: /*i18n*/ { id: 'page.cartridges', message: 'Cartridges' },
     description: msg('CIP dimensions, drawings and maximum pressures.'),
   },
   {
     href: '/cases',
-    label: msg('Brass'),
+    label: /*i18n*/ { id: 'page.cases', message: 'Brass' },
     description: msg(
       'Cartridge case products with material, primer pocket and stated water capacity.',
     ),
   },
   {
     href: '/primers',
-    label: msg('Primers'),
+    label: /*i18n*/ { id: 'page.primers', message: 'Primers' },
     description: msg('Primer products with size, cup and priming compound.'),
   },
   {
     href: '/powders',
-    label: msg('Powders'),
+    label: /*i18n*/ { id: 'page.powders', message: 'Powders' },
     description: msg('Propellants and their recorded properties.'),
   },
   {
     href: '/bullets',
-    label: msg('Bullets'),
+    label: /*i18n*/ { id: 'page.bullets', message: 'Bullets' },
     description: msg('Diameters, masses, lengths and ballistic coefficients.'),
   },
   {
     href: '/targets',
-    label: msg('Targets'),
+    label: /*i18n*/ { id: 'page.targets', message: 'Targets' },
     description: msg(
       'Rule-book targets: ring diameters, black area and the disciplines shot on them.',
     ),
   },
   {
     href: '/disciplines',
-    label: msg('Disciplines'),
+    label: /*i18n*/ { id: 'page.disciplines', message: 'Disciplines' },
     description: msg('Rule-book disciplines: federation, distance, caliber classes and targets.'),
   },
   {
     href: '/federations',
-    label: msg('Federations'),
+    label: /*i18n*/ { id: 'page.federations', message: 'Federations' },
     description: msg(
       'Shooting federations and the rule books their disciplines and targets come from.',
     ),
   },
 ]
 
-/** Information architecture (two groups, tools first): the sidebar, drawer, search, home cards and not-found page read it. */
+/** Information architecture (two groups, tools first): the sidebar, drawer, search, home cards and not-found page read it, each loading its English (`locales/en/lib/sections.json`), as the e2e specs import this module outside the app. */
 export const sections = [
   {
-    title: msg('Tools'),
+    title: /*i18n*/ { id: 'sections.tools', message: 'Tools' },
     pages: [
       {
         href: '/workbench',
-        label: msg('Load workbench'),
+        label: /*i18n*/ { id: 'page.workbench', message: 'Load workbench' },
         icon: '/workbench',
-        description: msg(
-          'Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser.',
-        ),
+        description: /*i18n*/ {
+          id: 'sections.workbench.about',
+          message:
+            'Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser.',
+        },
       },
       {
         href: '/session',
-        label: msg('Session summary'),
+        label: /*i18n*/ { id: 'page.session', message: 'Session summary' },
         icon: '/session',
-        description: msg(
-          'Shots and statistics per string from a chronograph export, read in your browser.',
-        ),
+        description: /*i18n*/ {
+          id: 'sections.session.about',
+          message:
+            'Shots and statistics per string from a chronograph export, read in your browser.',
+        },
         covers: ['/range'],
       },
       {
         href: '/groups',
-        label: msg('Shot groups'),
+        label: /*i18n*/ { id: 'page.groups', message: 'Shot groups' },
         icon: '/groups',
-        description: msg(
-          'Group size and dispersion from a target photo or a drawn target; the photo stays in your browser.',
-        ),
+        description: /*i18n*/ {
+          id: 'sections.groups.about',
+          message:
+            'Group size and dispersion from a target photo or a drawn target; the photo stays in your browser.',
+        },
       },
     ],
   },
   {
-    title: msg('Library'),
+    title: /*i18n*/ { id: 'sections.library', message: 'Library' },
     pages: [
       {
         href: '/cartridges',
-        label: msg('Database'),
+        label: /*i18n*/ { id: 'sections.database', message: 'Database' },
         icon: 'database',
-        description: msg('The published records, each with its source, and your own beside them.'),
+        description: /*i18n*/ {
+          id: 'sections.database.about',
+          message: 'The published records, each with its source, and your own beside them.',
+        },
         tabs: databaseTabs,
         covers: ['/events'],
       },
     ],
   },
-] as const satisfies readonly { title: Message; pages: readonly PageEntry[] }[]
+] as const satisfies readonly { title: MessageDescriptor; pages: readonly PageEntry[] }[]
 
 /** Tool pages: no reading measure on their text; every other page is a document page. */
 export const toolRoutes = [

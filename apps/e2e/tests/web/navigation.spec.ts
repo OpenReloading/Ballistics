@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
-import type { Message } from '../../../web/src/i18n/translate.ts'
 import { sections } from '../../../web/src/lib/sections.ts'
 import { exported, followNav, gotoHydrated } from './nav.ts'
 
-const pages = sections.flatMap((s): readonly { href: string; label: Message }[] => s.pages)
+const pages = sections
+  .flatMap((s): readonly { href: string; label: { message: string } }[] => s.pages)
+  .map(({ href, label }) => ({ href, label: label.message }))
 // a tool page and a data page: the links all come from `sections`, the lists below check every one
 const visited = pages.filter(({ href }) => href === '/workbench' || href === '/cartridges')
 // the value the web app was built with: set, the shell shows Report an issue and the repository link
@@ -50,8 +51,8 @@ test('at 390 px the drawer lists every section page under its section, and two p
   // the sidebar's groups in order, each page under its group
   for (const s of sections)
     await expect(
-      nav.getByRole('list', { name: s.title, exact: true }).getByRole('link'),
-    ).toHaveText(s.pages.map((p) => p.label))
+      nav.getByRole('list', { name: s.title.message, exact: true }).getByRole('link'),
+    ).toHaveText(s.pages.map((p) => p.label.message))
   // Search first and Settings last: no pages, buttons opening their dialogs
   await expect(nav.getByRole('button')).toHaveText([
     'Search',
@@ -73,13 +74,13 @@ test('the home page lists the tools and the library with its counts, and opens t
 }) => {
   await gotoHydrated(page, '/')
   const [tools, library] = sections
-  const toolPanel = page.getByRole('region', { name: tools.title, exact: true })
+  const toolPanel = page.getByRole('region', { name: tools.title.message, exact: true })
   await expect(toolPanel.getByRole('heading', { level: 3 })).toHaveText(
-    tools.pages.map((p) => p.label),
+    tools.pages.map((p) => p.label.message),
   )
-  const libraryPanel = page.getByRole('region', { name: library.title, exact: true })
+  const libraryPanel = page.getByRole('region', { name: library.title.message, exact: true })
   await expect(libraryPanel.getByRole('heading', { level: 3 })).toHaveText(
-    library.pages.map((p) => p.label),
+    library.pages.map((p) => p.label.message),
   )
   // the record counts are the API's, at build time
   for (const label of ['Cartridges', 'Bullets', 'Powders', 'Targets', 'Disciplines'])

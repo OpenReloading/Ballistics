@@ -145,6 +145,9 @@ msgstr "{count, plural, one {# record of another kind left out; Import of a File
 msgid "log.otherKinds"
 msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
 
+msgid "home.recordCount"
+msgstr "{count, plural, one {# record} other {# records}}"
+
 msgid "holeDetection.referenceCount"
 msgstr "{count, plural, one {# reference} other {# references}}"
 
@@ -474,6 +477,9 @@ msgstr "1:{twist} L"
 
 msgid "firearms.twistRight"
 msgstr "1:{twist} R"
+
+msgid "home.lead"
+msgstr "A ballistics database with interior and exterior ballistics simulations"
 
 msgid "cases.noneOwnHint"
 msgstr "A brass group keeps the cases you measured, with their water capacity, in this browser."
@@ -1849,6 +1855,9 @@ msgstr "Dashed: drawn from an assumed shape. Derived and assumed values are not 
 msgid "cartridgeRecord.conflict"
 msgstr "data conflict between published cartridge maximum and chamber minimum (check source)"
 
+msgid "sections.database"
+msgstr "Database"
+
 msgid "events.column.date"
 msgstr "Date"
 
@@ -2828,6 +2837,9 @@ msgstr "Group name"
 msgid "targetEditor.groupPanels"
 msgstr "Group panels"
 
+msgid "sections.groups.about"
+msgstr "Group size and dispersion from a target photo or a drawn target; the photo stays in your browser."
+
 msgid "targetEditor.groups"
 msgstr "Groups"
 
@@ -3247,6 +3259,9 @@ msgstr "lever action"
 
 msgid "values.leverAction"
 msgstr "Lever action"
+
+msgid "sections.library"
+msgstr "Library"
 
 msgid "recordSources.column.license"
 msgstr "License"
@@ -4373,6 +4388,15 @@ msgstr "Open in designer"
 msgid "recordActions.openInShotGroups"
 msgstr "Open in shot groups"
 
+msgid "home.open.workbench"
+msgstr "Open load workbench"
+
+msgid "home.open.session"
+msgstr "Open session summary"
+
+msgid "home.open.groups"
+msgstr "Open shot groups"
+
 msgid "powderTune.openWorkbench"
 msgstr "Open the workbench"
 
@@ -4468,6 +4492,9 @@ msgstr "Page"
 
 msgid "recordSources.page"
 msgstr "Page {page}"
+
+msgid "pageBar.actions"
+msgstr "Page actions"
 
 msgid "page.notFound"
 msgstr "Page not found"
@@ -5552,6 +5579,9 @@ msgstr "Shots"
 msgid "targetEditor.shotsCount"
 msgstr "Shots ({count, decimal})"
 
+msgid "sections.session.about"
+msgstr "Shots and statistics per string from a chronograph export, read in your browser."
+
 msgid "targetEditor.shotsStatisticsExcludedShots"
 msgstr "Shots in the statistics; excluded shots are shown and counted, not measured."
 
@@ -5608,6 +5638,9 @@ msgstr "Simplified drawing from the record; only values with a source are dimens
 
 msgid "powderTune.simulated"
 msgstr "Simulated ({unit})"
+
+msgid "sections.workbench.about"
+msgstr "Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser."
 
 msgid "powderRecord.handTuned"
 msgstr "simulation parameters, hand-tuned"
@@ -6208,6 +6241,9 @@ msgstr "The powder record was not found."
 msgid "powderTune.powderNotSaved"
 msgstr "The powder was not saved."
 
+msgid "sections.database.about"
+msgstr "The published records, each with its source, and your own beside them."
+
 msgid "events.readFailed"
 msgstr "The records of this browser could not be read."
 
@@ -6325,6 +6361,9 @@ msgstr "This file is not an image this browser can read."
 msgid "bulletCompare.invalid"
 msgstr "This link is not valid."
 
+msgid "pageError.title"
+msgstr "This page could not be shown."
+
 msgid "recordView.needsJavaScript"
 msgstr "This page needs JavaScript."
 
@@ -6393,6 +6432,9 @@ msgstr "Tool"
 
 msgid "targetEditor.tool"
 msgstr "Tool"
+
+msgid "sections.tools"
+msgstr "Tools"
 
 msgid "events.column.total"
 msgstr "Total"
@@ -6741,6 +6783,9 @@ msgstr "Yes"
 
 msgid "log.ownRecord"
 msgstr "Your own record; a club or authority decides whether to accept it."
+
+msgid "pageError.kept"
+msgstr "Your saved records stay in this browser. Reload the page; if the error comes back, report an issue with the message below."
 
 msgid "powderRecord.z1"
 msgstr "z1 {z}"

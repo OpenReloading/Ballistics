@@ -14,11 +14,14 @@ import {
   useRef,
   useState,
 } from 'react'
-import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { tipEvents } from '../lib/theme.ts'
 import { titleTemplate } from '../lib/title-template.ts'
+import englishMessages from '../locales/en/components/page-bar.json' with { type: 'json' }
 import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
+
+loadEnglish(englishMessages)
 
 /** `FileMenu` portals its state here; undefined outside a bar, null until the line is mounted. */
 export const BarStatus = createContext<HTMLElement | null | undefined>(undefined)
@@ -162,7 +165,6 @@ export function PageBar({
       translated: true
     }
 )) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const title = translated ? i18n._(given) : given
   // React writes Next's English metadata title back after hydration: keep the tab in the language shown
@@ -245,7 +247,7 @@ export function PageBar({
             ref={toggle}
             className="page-bar-toggle"
             variant="default"
-            aria-label={t('Page actions')}
+            aria-label={i18n._({ id: 'pageBar.actions', message: 'Page actions' })}
             aria-expanded={open}
             // what it shows and hides: the folded box where the other actions stay in the bar
             aria-controls={folds ? foldId : id}

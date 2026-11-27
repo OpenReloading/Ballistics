@@ -5,7 +5,6 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import RootError from '../src/app/error.tsx'
 import GlobalError from '../src/app/global-error.tsx'
-import { ErrorNote } from '../src/components/states.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
 
@@ -41,10 +40,7 @@ it('the error page keeps the shell: one h1, one message with the error, Retry ca
   expect(html).toContain('saved records stay in this browser')
   expect(html).toContain('render failed')
   expect(html).toContain('Retry')
-  const note = Children.toArray(RootError({ error, retry }).props.children).find(
-    (c): c is ReactElement<{ onRetry: () => void }> => isValidElement(c) && c.type === ErrorNote,
-  )
-  note?.props.onRetry()
+  RootError({ error, retry }).props.retry()
   expect(retry).toHaveBeenCalledOnce()
 })
 

@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react'
 import { Box, Container, Text } from '@mantine/core'
 import { useHotkeys, useMediaQuery } from '@mantine/hooks'
 import { AppFrame } from '@rangefoundry/ui'
@@ -29,13 +30,17 @@ import { Brand } from '../components/site-header.tsx'
 import { ThemeSwitch } from '../components/theme-switch.tsx'
 import { useRoute } from '../components/use-route.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
 import { isToolRoute, pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
+import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
 import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '../platform/edition.ts'
 import Link from '../platform/link.tsx'
+
+loadEnglish(sectionsEnglish)
 
 // the search loads on its first use, so pages ship without it
 const SiteSearch = lazy(() =>
@@ -88,6 +93,7 @@ function Navigation({
   onReport: () => void
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const openSettings = useContext(SettingsDialog)
   const id = useId()
   return (
@@ -100,7 +106,7 @@ function Navigation({
         afterDrawer={afterDrawer}
       />
       {sections.map((section, i) => (
-        <div key={section.title}>
+        <div key={section.title.id}>
           <Text
             id={`${id}-${i}`}
             size="xs"
@@ -110,7 +116,7 @@ function Navigation({
             mb={4}
             className="nav-section-title"
           >
-            {t(section.title)}
+            {i18n._(section.title)}
           </Text>
           <ul aria-labelledby={`${id}-${i}`} className="nav-section">
             {section.pages.map((p) => (
@@ -121,7 +127,7 @@ function Navigation({
                   aria-current={pageCoversRoute(p.href, route) ? 'page' : undefined}
                 >
                   <NavIcon name={p.icon} />
-                  <span>{t(p.label)}</span>
+                  <span>{i18n._(p.label)}</span>
                 </Link>
               </li>
             ))}

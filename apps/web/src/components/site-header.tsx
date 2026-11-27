@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Anchor,
@@ -27,11 +28,13 @@ import Link from '@/platform/link.tsx'
 import dark from '../assets/ballistics-dark.svg'
 import light from '../assets/ballistics-light.svg'
 import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { alphaNote } from '../lib/alpha.ts'
 import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
 import { pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
+import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
 import { useBarEnd } from './bar-end.ts'
 import { DocsLink } from './docs-link.tsx'
 import { InstallButton } from './install-button.tsx'
@@ -44,6 +47,8 @@ import { SettingsDialog } from './settings-dialog.ts'
 import { openShortcuts, ShortcutsHelp, useShortcuts } from './shortcuts.tsx'
 import { ThemeSwitch } from './theme-switch.tsx'
 import { useRoute } from './use-route.ts'
+
+loadEnglish(sectionsEnglish)
 
 // the search loads on its first use, so pages ship without it
 const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteSearch), {
@@ -167,7 +172,7 @@ function SectionLinks({
 }) {
   // the sidebar stays in the document beside the drawer: ids of their own
   const id = useId()
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <div>
       <Text
@@ -178,7 +183,7 @@ function SectionLinks({
         mb={4}
         className={rail ? 'visually-hidden' : undefined}
       >
-        {t(section.title)}
+        {i18n._(section.title)}
       </Text>
       <Stack
         component="ul"
@@ -193,7 +198,7 @@ function SectionLinks({
           <li key={p.href}>
             <PageLink
               href={p.href}
-              label={t(p.label)}
+              label={i18n._(p.label)}
               icon={p.icon}
               route={route}
               rail={rail}
@@ -291,7 +296,7 @@ export function SiteHeader() {
               />
             </Stack>
             {sections.map((s) => (
-              <SectionLinks key={s.title} section={s} route={route} rail />
+              <SectionLinks key={s.title.id} section={s} route={route} rail />
             ))}
           </Stack>
           <Stack gap="xs" align="center" pt="sm" className="rail-foot">
@@ -342,7 +347,7 @@ export function SiteHeader() {
               />
               {sections.map((s) => (
                 <SectionLinks
-                  key={s.title}
+                  key={s.title.id}
                   section={s}
                   route={route}
                   rail={false}
