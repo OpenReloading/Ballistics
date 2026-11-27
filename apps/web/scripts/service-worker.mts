@@ -18,6 +18,8 @@ const constants = {
 const helpers = Object.entries({ ...constants, ...offline }).map(
   ([name, v]) => `const ${name} = ${typeof v === 'function' ? String(v) : JSON.stringify(v)}`,
 )
+const modelFiles = constants.precache.filter(offline.isModelFile)
+if (modelFiles.length) throw new Error(`out/sw.js would precache ${modelFiles.join(', ')}`)
 mkdirSync(at('out'), { recursive: true })
 writeFileSync(
   at('out/sw.js'),

@@ -1,3 +1,4 @@
+export { MAYBE_BELOW } from './confidence-tier.ts'
 export { type Grid, grayGrid, shareInside } from './face-image.ts'
 export { findFace } from './face-search.ts'
 export {
@@ -26,7 +27,6 @@ export {
 export { type LabeledHole, type LabeledPhoto, type LabelSet, labelSet } from './label-set.ts'
 export {
   learnedDetector,
-  MAYBE_BELOW,
   ModelContractError,
   type ModelTensor,
   type RunModel,

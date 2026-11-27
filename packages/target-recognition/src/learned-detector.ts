@@ -1,6 +1,7 @@
 /** A learned hole detector behind the inference port; the model runs through an injected function, so the package keeps no I/O. */
 import type { Point } from '@rangefoundry/shot-groups'
 import { nth } from '@rangefoundry/statistics'
+import { MAYBE_BELOW } from './confidence-tier.ts'
 import { checkScales, cropBox, type HoleProposal, MAX_WORK_PIXELS } from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
 import type { InferencePort, ProposalRequest, Proposals } from './inference-port.ts'
@@ -24,8 +25,6 @@ export class ModelContractError extends Error {
   override name = 'ModelContractError'
 }
 
-/** The confidence tier edge: a proposal below it is a maybe, at or above it sure; the manifest's `sure` peak maps onto it. */
-export const MAYBE_BELOW = 0.5
 // the classical detector's margin around the region, in expected hole diameters
 const MARGIN = 3
 
