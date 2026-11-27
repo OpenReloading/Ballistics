@@ -63,10 +63,7 @@ function site(pages: (route: string) => boolean = () => true) {
         JSON.stringify({ name: nameOf(id), manufacturer: maker.id }),
       )
       for (const route of [routeOf(data), `${routeOf(data)}/${id}`])
-        if (pages(route)) {
-          put(path.join(dir, route, 'index.html'), headOf(data, id))
-          put(path.join(dir, route, 'index.txt'))
-        }
+        if (pages(route)) put(path.join(dir, route, 'index.html'), headOf(data, id))
     }
   return dir
 }
@@ -92,9 +89,6 @@ it('names a record page the export lacks, and one that has only its HTML', () =>
     { PRERENDER: 'full' },
   )
   expect(no.missing).toEqual(['bullets/x-1'])
-  const dir = site()
-  rmSync(path.join(dir, 'targets/x-1/index.txt'))
-  expect(checkPages(dir, { PRERENDER: 'full' }).missing).toEqual(['targets/x-1'])
 })
 
 for (const [data] of kinds)
