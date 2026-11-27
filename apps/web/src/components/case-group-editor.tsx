@@ -6,11 +6,11 @@ import { Button } from '@mantine/core'
 import type { Case, UserCaseRecord, UserRecord } from '@rangefoundry/schema'
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react'
 import { putRecords, storedRecords } from '@/platform/user-store.ts'
-import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
-import { blankCaseGroup, caseGroupProblem, groupCapacity, withCapacity } from '../lib/case-group.ts'
+import { blankCaseGroup, groupCapacity, withCapacity } from '../lib/case-group.ts'
+import { caseGroupProblem } from '../lib/case-group-fields.ts'
 import { catalogueCartridgeId } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { capacityRecord } from '../lib/load-record.ts'
@@ -73,7 +73,6 @@ interface Draft {
 
 /** A new group, or the stored one that `?record=` names; every valid change is kept in the browser, and the File menu opens the browser's groups. */
 export function CaseGroupEditor() {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   const [data, setData] = useState<Case>(blankCaseGroup)
@@ -91,7 +90,7 @@ export function CaseGroupEditor() {
   const groupKey = namedKey(group, '')
   // the record format refuses a group without a name or cartridge: the last valid one stays kept
   const [draft, setDraft] = useState<Draft>({ data: blankData, key: blankKey, m3: undefined })
-  if (groupKey !== draft.key && !caseGroupProblem(group.name ?? '', group, t))
+  if (groupKey !== draft.key && !caseGroupProblem(group.name ?? '', group, i18n))
     setDraft({ data: group, key: groupKey, m3: capacity })
   const [recordId, setRecordId] = useState(newId)
   const { kept, flush, drop, stored } = useKeptDraft(
@@ -144,7 +143,7 @@ export function CaseGroupEditor() {
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(group)
-  const problem = caseGroupProblem(fileData.name ?? '', fileData, t)
+  const problem = caseGroupProblem(fileData.name ?? '', fileData, i18n)
   const patch = (p: Partial<Case>) => setData((d) => ({ ...d, ...p }))
   /** A cleared field also drops the reference to a record this browser does not hold. */
   const changeCapacity = (m3: number | undefined) => {

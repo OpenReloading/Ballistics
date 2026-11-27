@@ -32,37 +32,47 @@ import {
   reportTypes,
   reportUrl,
 } from '../lib/report-issue.ts'
+import { databaseTabs, type PageEntry, sections } from '../lib/sections.ts'
 import { presetNames } from '../lib/units.ts'
 import englishMessages from '../locales/en/components/report-issue.json' with { type: 'json' }
+import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
 import { type ReportOption, reportHost } from './report-host.ts'
 import { useUnits } from './units-settings.tsx'
 import { useRoute } from './use-route.ts'
 
-loadEnglish(englishMessages)
+loadEnglish(englishMessages, sectionsEnglish)
 
 const label = /*i18n*/ { id: 'reportIssue.title', message: 'Report an issue' }
 
-/** The areas and types as the dialog shows them; the report itself carries the English value. */
+/** The title of a page of the sidebar or the Database tabs. */
+function pageLabel(href: string): MessageDescriptor {
+  const pages: readonly { href: string; label: MessageDescriptor }[] = [
+    ...databaseTabs,
+    ...sections.flatMap((s): readonly PageEntry[] => s.pages),
+  ]
+  const page = pages.find((p) => p.href === href)
+  if (!page) throw new Error(`No page ${href} in sections.ts`)
+  return page.label
+}
+
+/** The areas and types as the dialog shows them, an area of a page by its title; the report itself carries the English value. */
 const areaLabels: Record<ReportArea, MessageDescriptor> = {
   Workbench: /*i18n*/ { id: 'reportIssue.area.workbench', message: 'Workbench' },
-  'Shot groups': /*i18n*/ { id: 'reportIssue.area.shotGroups', message: 'Shot groups' },
-  'Session summary': /*i18n*/ { id: 'reportIssue.area.sessionSummary', message: 'Session summary' },
-  Cartridges: /*i18n*/ { id: 'reportIssue.area.cartridges', message: 'Cartridges' },
-  Bullets: /*i18n*/ { id: 'reportIssue.area.bullets', message: 'Bullets' },
-  Powders: /*i18n*/ { id: 'reportIssue.area.powders', message: 'Powders' },
-  Brass: /*i18n*/ { id: 'reportIssue.area.brass', message: 'Brass' },
-  Primers: /*i18n*/ { id: 'reportIssue.area.primers', message: 'Primers' },
-  Targets: /*i18n*/ { id: 'reportIssue.area.targets', message: 'Targets' },
-  Disciplines: /*i18n*/ { id: 'reportIssue.area.disciplines', message: 'Disciplines' },
-  Federations: /*i18n*/ { id: 'reportIssue.area.federations', message: 'Federations' },
-  Firearms: /*i18n*/ { id: 'reportIssue.area.firearms', message: 'Firearms' },
-  'Cartridge designer': /*i18n*/ {
-    id: 'reportIssue.area.cartridgeDesigner',
-    message: 'Cartridge designer',
-  },
-  'Bullet designer': /*i18n*/ { id: 'reportIssue.area.bulletDesigner', message: 'Bullet designer' },
-  Settings: /*i18n*/ { id: 'reportIssue.area.settings', message: 'Settings' },
+  'Shot groups': pageLabel('/groups'),
+  'Session summary': pageLabel('/session'),
+  Cartridges: pageLabel('/cartridges'),
+  Bullets: pageLabel('/bullets'),
+  Powders: pageLabel('/powders'),
+  Brass: pageLabel('/cases'),
+  Primers: pageLabel('/primers'),
+  Targets: pageLabel('/targets'),
+  Disciplines: pageLabel('/disciplines'),
+  Federations: pageLabel('/federations'),
+  Firearms: pageLabel('/firearms'),
+  'Cartridge designer': /*i18n*/ { id: 'page.cartridgesDesigner', message: 'Cartridge designer' },
+  'Bullet designer': /*i18n*/ { id: 'page.bulletsDesigner', message: 'Bullet designer' },
+  Settings: /*i18n*/ { id: 'shell.settings', message: 'Settings' },
   Other: /*i18n*/ { id: 'reportIssue.area.other', message: 'Other' },
 }
 const typeLabels: Record<ReportType, MessageDescriptor> = {

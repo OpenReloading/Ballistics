@@ -13,12 +13,14 @@ import {
   storedValue,
 } from '@rangefoundry/svg-drawings/cartridge'
 import { chamberOf } from '@rangefoundry/svg-drawings/seating'
+import { linguiOf } from '../i18n/lingui.ts'
+import { english } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'
+import { fieldError } from './field-error.ts'
 import {
   close,
   type FieldSpec,
   type Fields,
-  fieldError,
   fieldOf,
   siToStored,
   storedToSi,
@@ -321,7 +323,9 @@ export function workbenchDesign(
   // the designer refuses to draw an invalid or too large field
   if (
     fieldSpecs.some(
-      (s) => fieldError(s, fields[s.key], system) !== undefined || tooLarge(s, fields),
+      (s) =>
+        fieldError(s, fields[s.key], system, english.t, linguiOf('en')) !== undefined ||
+        tooLarge(s, fields),
     )
   )
     return

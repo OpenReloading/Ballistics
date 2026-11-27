@@ -1,5 +1,6 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
   Accordion,
@@ -39,10 +40,10 @@ import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { type BulletValues, bulletDrag, typedBullet } from '../lib/bullet.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
+import { fieldError } from '../lib/field-error.ts'
 import {
   type FieldSpec,
   type Fields,
-  fieldError,
   type SpecText,
   siValues,
   specText,
@@ -181,13 +182,13 @@ function noBcText(model: string, t: T) {
 }
 
 /** The errors of the edited fields, the first edited field with one, and the first empty one's error. */
-function checkFields(i: Inputs, t: T) {
+function checkFields(i: Inputs, t: T, i18n: I18n) {
   const specs: readonly FieldSpec[] = i.source === 'manual' ? allFields : shotFields
   const errors: Record<string, string> = {}
   let invalid: SpecText | undefined
   let empty: string | undefined
   for (const s of specs) {
-    const error = fieldError(s, i.fields[s.key], i.system, t)
+    const error = fieldError(s, i.fields[s.key], i.system, t, i18n)
     if (!error) continue
     if (i.touched[s.key]) {
       errors[s.key] = error
@@ -246,8 +247,12 @@ function resultExtras(i: Inputs) {
 }
 
 /** Field errors of the edited fields and the outcome of one computation, texts in the language of `t`. */
-function evaluate(i: Inputs, t: T): { errors: Record<string, string>; attempt: Attempt } {
-  const { errors, invalid, empty } = checkFields(i, t)
+function evaluate(
+  i: Inputs,
+  t: T,
+  i18n: I18n,
+): { errors: Record<string, string>; attempt: Attempt } {
+  const { errors, invalid, empty } = checkFields(i, t, i18n)
   if (invalid) return { errors, attempt: { kind: 'invalid', label: invalid } }
   const prompt = (text: string) => ({ errors, attempt: { kind: 'prompt', text } as const })
   const si = siValues(i.fields)
@@ -1177,7 +1182,7 @@ export function TrajectoryForm({
     ],
   )
   const [debounced] = useDebouncedValue(inputs, 150)
-  const { errors, attempt } = useMemo(() => evaluate(debounced, t), [debounced, t])
+  const { errors, attempt } = useMemo(() => evaluate(debounced, t, i18n), [debounced, t, i18n])
   const { result, stale } = useLastResult(attempt)
 
   const staleText = staleTextOf(attempt, t)
@@ -1207,7 +1212,7 @@ export function TrajectoryForm({
       }}
       error={
         errors[spec.key]
-          ? (s) => fieldError(spec, fields[spec.key], s, t) ?? errors[spec.key]
+          ? (s) => fieldError(spec, fields[spec.key], s, t, i18n) ?? errors[spec.key]
           : undefined
       }
     />

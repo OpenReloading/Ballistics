@@ -1,50 +1,5 @@
-import { type Case, cartridgeCase, parseRef, type UserRecord } from '@rangefoundry/schema'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import type { FieldSpec } from './field-spec.ts'
+import { type Case, parseRef, type UserRecord } from '@rangefoundry/schema'
 import { measuredCapacityRef } from './load-record.ts'
-
-/** The measured fields of a group of cases, in the form's units and in the order of the editor. */
-export const caseGroupFields = [
-  { key: 'mass', label: msg('Case mass'), quantity: 'mass', min: 0, positive: true },
-  { key: 'trimLength', label: msg('Trim length'), quantity: 'length', min: 0, positive: true },
-  { key: 'neckWall', label: msg('Neck wall'), quantity: 'length', min: 0, positive: true },
-  {
-    key: 'numberOfFirings',
-    label: msg('Times fired'),
-    help: msg('Firings of these cases so far.'),
-    quantity: 'ratio',
-    min: 0,
-    integer: true,
-  },
-  {
-    key: 'casesMeasured',
-    label: msg('Cases measured'),
-    help: msg('Cases the capacity and the other measured values come from.'),
-    quantity: 'ratio',
-    min: 1,
-    positive: true,
-    integer: true,
-  },
-  {
-    key: 'spread',
-    label: msg('Capacity spread'),
-    help: msg('Standard deviation of the water capacity over the cases measured.'),
-    quantity: 'mass',
-    min: 0,
-  },
-] as const satisfies readonly FieldSpec[]
-
-/** The water capacity to the mouth, the one measured value that is a record of its own. */
-export const caseGroupCapacitySpec = {
-  key: 'capacity',
-  label: msg('Water capacity to the mouth'),
-  help: msg(
-    'Mean of the cases measured in this group, for example fired and sized. The workbench uses it as the measured case capacity.',
-  ),
-  quantity: 'capacity',
-  min: 0,
-  positive: true,
-} as const satisfies FieldSpec
 
 /** A new group of cases: no cartridge yet, brass. */
 export const blankCaseGroup = (): Case => ({
@@ -53,25 +8,6 @@ export const blankCaseGroup = (): Case => ({
   cartridge: '',
   material: 'brass',
 })
-
-const labels: Record<string, Message> = Object.fromEntries(
-  [...caseGroupFields, caseGroupCapacitySpec].map((s) => [s.key, s.label]),
-)
-
-/** With the field label; undefined when valid; an empty `name` is refused. */
-export function caseGroupProblem(name: string, c: Case, t: Translator['t']): string | undefined {
-  if (!name) return t('Enter a name.')
-  if (!c.cartridge) return t('Choose the cartridge.')
-  const [issue] = cartridgeCase.safeParse(c).error?.issues ?? []
-  if (!issue) return
-  // a stored quantity is `{ value }`: the field is the key above it
-  const field = String(issue.path.findLast((p) => typeof p === 'string' && p !== 'value'))
-  const label = labels[field]
-  const what = label ? t(label) : field
-  return issue.code === 'invalid_type'
-    ? t('{what}: enter a number.', { what })
-    : t('{what}: not valid.', { what })
-}
 
 /** The measured capacity (g) a group of cases names: its `capacity` record among `records`, else undefined. */
 export function groupCapacity(c: Case, records: readonly UserRecord[]): number | undefined {

@@ -8,7 +8,7 @@ import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { colourWord } from '../lib/face-words.ts'
-import { fieldError } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
 import { historyOf } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
 import {

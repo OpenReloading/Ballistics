@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { fieldError } from '../src/lib/field-spec.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
+import { english } from '../src/i18n/translate.ts'
+import { fieldError } from '../src/lib/field-error.ts'
 import { livePick, pickedSystem, pickedText, pickedTyped, pickUnit } from '../src/lib/field-unit.ts'
 import { metersPerInch, presetUnits, resolveUnits } from '../src/lib/units.ts'
+
+const en = [english.t, linguiOf('en')] as const
 
 const metric = presetUnits('metric-grams')
 
@@ -77,17 +81,17 @@ describe('a validation message of a field with its own unit', () => {
 
   it('names the unit the field shows, not the page unit', () => {
     const toG = pickedSystem('mass', us, pickUnit('mass', us, 'g'))
-    expect(fieldError(mass, pickedTyped('mass', us, toG, '0').value, toG)).toBe(
+    expect(fieldError(mass, pickedTyped('mass', us, toG, '0').value, toG, ...en)).toBe(
       'Mass must be greater than 0 g.',
     )
-    expect(fieldError(mass, pickedTyped('mass', us, toG, '0').value, us)).toBe(
+    expect(fieldError(mass, pickedTyped('mass', us, toG, '0').value, us, ...en)).toBe(
       'Mass must be greater than 0 gr.',
     )
     const toGr = pickedSystem('mass', metric, pickUnit('mass', metric, 'gr'))
-    expect(fieldError(mass, pickedTyped('mass', metric, toGr, '0').value, toGr)).toBe(
+    expect(fieldError(mass, pickedTyped('mass', metric, toGr, '0').value, toGr, ...en)).toBe(
       'Mass must be greater than 0 gr.',
     )
-    expect(fieldError(mass, pickedTyped('mass', grains, toGr, '-1').value, grains)).toBe(
+    expect(fieldError(mass, pickedTyped('mass', grains, toGr, '-1').value, grains, ...en)).toBe(
       'Mass must be at least 0 gr.',
     )
   })
@@ -95,7 +99,7 @@ describe('a validation message of a field with its own unit', () => {
   it('names the picked length unit of a bound', () => {
     const length = { key: 'l', label: 'Length', quantity: 'length', min: 0 } as const
     const toIn = pickedSystem('length', metric, pickUnit('length', metric, 'in'))
-    expect(fieldError(length, pickedTyped('length', metric, toIn, '-1').value, toIn)).toBe(
+    expect(fieldError(length, pickedTyped('length', metric, toIn, '-1').value, toIn, ...en)).toBe(
       'Length must be at least 0 in.',
     )
   })
