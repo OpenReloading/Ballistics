@@ -91,7 +91,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import type { Message, Translator } from '../i18n/translate.ts'
 import { photoGuide } from '../lib/docs-url.ts'
 import { storageName } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -692,10 +692,12 @@ function MarkerField({ ed }: { ed: Ed }) {
       <SiField
         spec={{
           key: 'markerDiameter',
-          label: msg('Marker'),
-          help: msg(
-            'Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen.',
-          ),
+          label: /*i18n*/ { id: 'targetEditor.marker', message: 'Marker' },
+          help: /*i18n*/ {
+            id: 'targetEditor.markerHelp',
+            message:
+              'Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen.',
+          },
           quantity: 'length',
           min: 0,
           positive: true,
@@ -816,12 +818,24 @@ function ScalePanel({ ed }: { ed: Ed }) {
       {refKind === 'rectangle' ? (
         <>
           <SiField
-            spec={{ key: 'w', label: msg('Width'), quantity: 'length', min: 0, positive: true }}
+            spec={{
+              key: 'w',
+              label: /*i18n*/ { id: 'targetEditor.width', message: 'Width' },
+              quantity: 'length',
+              min: 0,
+              positive: true,
+            }}
             si={known.width}
             onCommit={(si) => setKnown({ ...known, width: si })}
           />
           <SiField
-            spec={{ key: 'h', label: msg('Height'), quantity: 'length', min: 0, positive: true }}
+            spec={{
+              key: 'h',
+              label: /*i18n*/ { id: 'targetEditor.height', message: 'Height' },
+              quantity: 'length',
+              min: 0,
+              positive: true,
+            }}
             si={known.height}
             onCommit={(si) => setKnown({ ...known, height: si })}
           />
@@ -830,7 +844,10 @@ function ScalePanel({ ed }: { ed: Ed }) {
         <SiField
           spec={{
             key: 'len',
-            label: refKind === 'line' ? msg('Known length') : msg('Ring diameter'),
+            label:
+              refKind === 'line'
+                ? /*i18n*/ { id: 'targetEditor.knownLength', message: 'Known length' }
+                : /*i18n*/ { id: 'targetEditor.ringDiameter', message: 'Ring diameter' },
             quantity: 'length',
             min: 0,
             positive: true,
@@ -869,10 +886,12 @@ function ScalePanel({ ed }: { ed: Ed }) {
       <SiField
         spec={{
           key: 'targetRotation',
-          label: msg('Target axis angle'),
-          help: msg(
-            "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes.",
-          ),
+          label: /*i18n*/ { id: 'targetEditor.targetAxisAngle', message: 'Target axis angle' },
+          help: /*i18n*/ {
+            id: 'targetEditor.targetAxisAngleHelp',
+            message:
+              "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes.",
+          },
           quantity: 'angle',
         }}
         si={sheet.targetRotation}
@@ -1059,8 +1078,11 @@ function GroupPanel({ ed }: { ed: Ed }) {
           <SiField
             spec={{
               key: 'distance',
-              label: msg('Distance'),
-              help: msg('Muzzle to target; the angles use it.'),
+              label: /*i18n*/ { id: 'targetEditor.distance', message: 'Distance' },
+              help: /*i18n*/ {
+                id: 'targetEditor.distanceHelp',
+                message: 'Muzzle to target; the angles use it.',
+              },
               quantity: 'range',
               min: 0,
               positive: true,

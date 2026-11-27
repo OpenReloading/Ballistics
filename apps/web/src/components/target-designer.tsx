@@ -1,13 +1,13 @@
 'use client'
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { ActionIcon, Button, Checkbox, NativeSelect, Text, TextInput } from '@mantine/core'
 import { Plus, Target, X } from 'lucide-react'
 import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { loadEnglish } from '../i18n/lingui.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
+import type { Message } from '../i18n/translate.ts'
 import { colourWord } from '../lib/face-words.ts'
 import { fieldError } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
@@ -51,26 +51,43 @@ const fallbackName = 'Target design'
 /** The key of the empty draft: nothing to keep before the first edit. */
 const blankKey = namedKey(fileData(newDesign()), '')
 
-const ruleOptions: { value: InnerRule; label: Message }[] = [
-  { value: '', label: msg('Not stated') },
-  { value: 'touch', label: msg('Touch counts') },
-  { value: 'cover', label: msg('Cover counts') },
+const ruleOptions: { value: InnerRule; label: MessageDescriptor }[] = [
+  { value: '', label: /*i18n*/ { id: 'targetDesigner.notStated', message: 'Not stated' } },
+  { value: 'touch', label: /*i18n*/ { id: 'targetDesigner.touchCounts', message: 'Touch counts' } },
+  { value: 'cover', label: /*i18n*/ { id: 'targetDesigner.coverCounts', message: 'Cover counts' } },
 ]
 
-const colourOptions = (part: 'fill' | 'line', t: Translator['t'], i18n: I18n) => [
-  { value: '', label: part === 'fill' ? t('Fill: not set') : t('Line: not set') },
+const colourOptions = (part: 'fill' | 'line', i18n: I18n) => [
+  {
+    value: '',
+    label:
+      part === 'fill'
+        ? i18n._({ id: 'targetDesigner.fillNotSet', message: 'Fill: not set' })
+        : i18n._({ id: 'targetDesigner.lineNotSet', message: 'Line: not set' }),
+  },
   ...colours.map((c) => {
     const colour = colourWord(i18n, c)
     return {
       value: c,
-      label: part === 'fill' ? t('Fill: {colour}', { colour }) : t('Line: {colour}', { colour }),
+      label:
+        part === 'fill'
+          ? i18n._({
+              id: 'targetDesigner.fillColour',
+              message: 'Fill: {colour}',
+              values: { colour },
+            })
+          : i18n._({
+              id: 'targetDesigner.lineColour',
+              message: 'Line: {colour}',
+              values: { colour },
+            }),
     }
   }),
 ]
 
 /** The face is drawn by `@rangefoundry/svg-drawings` while its fields change; the draft is kept in this browser on every change (a record of kind `targetFaceDesign`), and once it passes the schema the shot groups and hit probability tools offer it; `?record=` opens a browser record, a Mine row's link. */
 export function TargetDesigner() {
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
   const { i18n } = useLingui()
   const { system } = useUnits()
   const [history, dispatch] = useReducer(reduce, undefined, () => historyOf(newDesign()))
@@ -101,7 +118,7 @@ export function TargetDesigner() {
     key,
   )
 
-  const built = useMemo(() => faceOf(design, userFaceId(recordId), t), [design, recordId, t])
+  const built = useMemo(() => faceOf(design, userFaceId(recordId), i18n), [design, recordId, i18n])
   const problems = 'problems' in built ? built.problems : []
   const keyed = new Map(problems.flatMap((p) => (p.key ? [[p.key, p.message] as const] : [])))
   const general = problems.filter((p) => !p.key).map((p) => p.message)
@@ -123,8 +140,8 @@ export function TargetDesigner() {
   /** `none` in the ring and event tables, whose column headers name the unit. */
   const field = (
     fieldKey: string,
-    label: string,
-    help: string,
+    label: MessageDescriptor,
+    help: MessageDescriptor,
     unit: 'switch' | 'none' = 'none',
   ) => {
     const spec = { ...specOf(fieldKey), label }
@@ -135,9 +152,11 @@ export function TargetDesigner() {
         spec={spec}
         system={system}
         value={value}
-        help={help}
+        help={i18n._(help)}
         changed={false}
-        error={fieldError(spec, value, system, t) ?? (edited ? keyed.get(fieldKey) : undefined)}
+        error={
+          fieldError(spec, value, system, t, i18n) ?? (edited ? keyed.get(fieldKey) : undefined)
+        }
         unit={unit}
         dispatch={dispatch}
       />
@@ -154,20 +173,45 @@ export function TargetDesigner() {
       <div className="face-row">
         {field(
           `ring.${r.id}.value`,
-          t('Ring {n} value', { n: i + 1 }),
-          t('The score of a hole in this ring.'),
+          /*i18n*/ {
+            id: 'targetDesigner.ringNValue',
+            message: 'Ring {n} value',
+            values: { n: i + 1 },
+          },
+          /*i18n*/ {
+            id: 'targetDesigner.ringValueHelp',
+            message: 'The score of a hole in this ring.',
+          },
         )}
         {field(
           `ring.${r.id}.diameter`,
-          t('Ring {n} diameter', { n: i + 1 }),
-          t('Width of the ring to the outside edge of its line.'),
+          /*i18n*/ {
+            id: 'targetDesigner.ringNDiameter',
+            message: 'Ring {n} diameter',
+            values: { n: i + 1 },
+          },
+          /*i18n*/ {
+            id: 'targetDesigner.ringDiameterHelp',
+            message: 'Width of the ring to the outside edge of its line.',
+          },
         )}
         {field(
           `ring.${r.id}.height`,
-          t('Ring {n} height', { n: i + 1 }),
-          t('For an oval; empty for a circle.'),
+          /*i18n*/ {
+            id: 'targetDesigner.ringNHeight',
+            message: 'Ring {n} height',
+            values: { n: i + 1 },
+          },
+          /*i18n*/ { id: 'targetDesigner.ovalHelp', message: 'For an oval; empty for a circle.' },
         )}
-        {remove(t('Remove ring {n}', { n: i + 1 }), { type: 'removeRing', id: r.id })}
+        {remove(
+          i18n._({
+            id: 'targetDesigner.removeRingN',
+            message: 'Remove ring {n}',
+            values: { n: i + 1 },
+          }),
+          { type: 'removeRing', id: r.id },
+        )}
       </div>
       <div className="face-colours">
         {(['fill', 'line'] as const).map((part) => (
@@ -175,14 +219,27 @@ export function TargetDesigner() {
             key={part}
             size={controlSize.row.input}
             aria-label={
-              part === 'fill' ? t('Ring {n} fill', { n: i + 1 }) : t('Ring {n} line', { n: i + 1 })
+              part === 'fill'
+                ? i18n._({
+                    id: 'targetDesigner.ringNFill',
+                    message: 'Ring {n} fill',
+                    values: { n: i + 1 },
+                  })
+                : i18n._({
+                    id: 'targetDesigner.ringNLine',
+                    message: 'Ring {n} line',
+                    values: { n: i + 1 },
+                  })
             }
             title={
               part === 'fill'
-                ? t('Color of the zone this ring line bounds on the outside.')
+                ? i18n._({
+                    id: 'targetDesigner.fillHelp',
+                    message: 'Color of the zone this ring line bounds on the outside.',
+                  })
                 : undefined
             }
-            data={colourOptions(part, t, i18n)}
+            data={colourOptions(part, i18n)}
             value={r[part]}
             onChange={(e) =>
               dispatch({ type: 'colour', id: r.id, part, value: e.currentTarget.value })
@@ -197,8 +254,12 @@ export function TargetDesigner() {
     <div key={e.id} className="face-row face-event">
       <TextInput
         size={controlSize.row.input}
-        aria-label={t('Event {n} name', { n: i + 1 })}
-        placeholder={t('Event name')}
+        aria-label={i18n._({
+          id: 'targetDesigner.eventNName',
+          message: 'Event {n} name',
+          values: { n: i + 1 },
+        })}
+        placeholder={i18n._({ id: 'targetDesigner.eventName', message: 'Event name' })}
         maxLength={200}
         value={e.name}
         error={edited && keyed.has(`event.${e.id}.name`)}
@@ -207,15 +268,30 @@ export function TargetDesigner() {
       />
       {field(
         `event.${e.id}.distance`,
-        t('Event {n} distance', { n: i + 1 }),
-        t('Shooting distance.'),
+        /*i18n*/ {
+          id: 'targetDesigner.eventNDistance',
+          message: 'Event {n} distance',
+          values: { n: i + 1 },
+        },
+        /*i18n*/ { id: 'targetDesigner.distanceHelp', message: 'Shooting distance.' },
       )}
       {field(
         `event.${e.id}.gauge`,
-        t('Event {n} gauge', { n: i + 1 }),
-        t('Diameter of the scored hole.'),
+        /*i18n*/ {
+          id: 'targetDesigner.eventNGauge',
+          message: 'Event {n} gauge',
+          values: { n: i + 1 },
+        },
+        /*i18n*/ { id: 'targetDesigner.gaugeHelp', message: 'Diameter of the scored hole.' },
       )}
-      {remove(t('Remove event {n}', { n: i + 1 }), { type: 'removeEvent', id: e.id })}
+      {remove(
+        i18n._({
+          id: 'targetDesigner.removeEventN',
+          message: 'Remove event {n}',
+          values: { n: i + 1 },
+        }),
+        { type: 'removeEvent', id: e.id },
+      )}
     </div>
   ))
 
@@ -232,29 +308,32 @@ export function TargetDesigner() {
   const sections = [
     {
       key: 'face',
-      title: t('Target'),
+      title: i18n._({ id: 'targetDesigner.target', message: 'Target' }),
       content: (
         <div className="prop-grid designer-grid">
           <TextInput
-            label={t('Name')}
+            label={i18n._({ id: 'targetDesigner.name', message: 'Name' })}
             value={design.name}
             maxLength={200}
             onChange={(ev) => dispatch({ type: 'name', value: ev.currentTarget.value })}
           />
           {field(
             'black.diameter',
-            t('Black area diameter'),
-            t('Outside of the outermost black zone.'),
+            /*i18n*/ { id: 'targetDesigner.blackAreaDiameter', message: 'Black area diameter' },
+            /*i18n*/ {
+              id: 'targetDesigner.blackDiameterHelp',
+              message: 'Outside of the outermost black zone.',
+            },
             'switch',
           )}
           {field(
             'black.height',
-            t('Black area height'),
-            t('For an oval; empty for a circle.'),
+            /*i18n*/ { id: 'targetDesigner.blackAreaHeight', message: 'Black area height' },
+            /*i18n*/ { id: 'targetDesigner.ovalHelp', message: 'For an oval; empty for a circle.' },
             'switch',
           )}
           <Checkbox
-            label={t('Decimal scoring')}
+            label={i18n._({ id: 'targetDesigner.decimalScoring', message: 'Decimal scoring' })}
             checked={design.decimal}
             onChange={(ev) => dispatch({ type: 'decimal', value: ev.currentTarget.checked })}
           />
@@ -263,13 +342,21 @@ export function TargetDesigner() {
     },
     {
       key: 'rings',
-      title: t('Rings, outer to inner'),
+      title: i18n._({ id: 'targetDesigner.ringsOuterToInner', message: 'Rings, outer to inner' }),
       content: (
         <div className="side-grid">
           {head([
-            t('Value'),
-            t('Diameter, {unit}', { unit: mm }),
-            t('Height, {unit}', { unit: mm }),
+            i18n._({ id: 'targetDesigner.value', message: 'Value' }),
+            i18n._({
+              id: 'targetDesigner.diameterUnit',
+              message: 'Diameter, {unit}',
+              values: { unit: mm },
+            }),
+            i18n._({
+              id: 'targetDesigner.heightUnit',
+              message: 'Height, {unit}',
+              values: { unit: mm },
+            }),
             '',
           ])}
           {ringRows}
@@ -279,32 +366,35 @@ export function TargetDesigner() {
             leftSection={<Plus aria-hidden="true" />}
             onClick={() => dispatch({ type: 'addRing', id: rowId() })}
           >
-            {t('Add ring')}
+            {i18n._({ id: 'targetDesigner.addRing', message: 'Add ring' })}
           </Button>
         </div>
       ),
     },
     {
       key: 'inner',
-      title: t('Inner ten'),
+      title: i18n._({ id: 'targetDesigner.innerTen', message: 'Inner ten' }),
       content: (
         <div className="prop-grid designer-grid">
           {field(
             'inner.diameter',
-            t('Inner ten diameter'),
-            t('Width of the inner ten circle.'),
+            /*i18n*/ { id: 'targetDesigner.innerTenDiameter', message: 'Inner ten diameter' },
+            /*i18n*/ {
+              id: 'targetDesigner.innerTenDiameterHelp',
+              message: 'Width of the inner ten circle.',
+            },
             'switch',
           )}
           {field(
             'inner.height',
-            t('Inner ten height'),
-            t('For an oval; empty for a circle.'),
+            /*i18n*/ { id: 'targetDesigner.innerTenHeight', message: 'Inner ten height' },
+            /*i18n*/ { id: 'targetDesigner.ovalHelp', message: 'For an oval; empty for a circle.' },
             'switch',
           )}
           <NativeSelect
-            label={t('Inner ten rule')}
+            label={i18n._({ id: 'targetDesigner.innerTenRule', message: 'Inner ten rule' })}
             size={controlSize.row.input}
-            data={ruleOptions.map((o) => ({ value: o.value, label: t(o.label) }))}
+            data={ruleOptions.map((o) => ({ value: o.value, label: i18n._(o.label) }))}
             value={design.rule}
             onChange={(e) => dispatch({ type: 'rule', value: e.currentTarget.value as InnerRule })}
           />
@@ -313,14 +403,22 @@ export function TargetDesigner() {
     },
     {
       key: 'events',
-      title: t('Events of the target'),
+      title: i18n._({ id: 'targetDesigner.events', message: 'Events of the target' }),
       content: (
         <div className="side-grid">
           {head(
             [
-              t('Name'),
-              t('Distance, {unit}', { unit: system.range.symbol }),
-              t('Gauge, {unit}', { unit: mm }),
+              i18n._({ id: 'targetDesigner.name', message: 'Name' }),
+              i18n._({
+                id: 'targetDesigner.distanceUnit',
+                message: 'Distance, {unit}',
+                values: { unit: system.range.symbol },
+              }),
+              i18n._({
+                id: 'targetDesigner.gaugeUnit',
+                message: 'Gauge, {unit}',
+                values: { unit: mm },
+              }),
               '',
             ],
             'face-row face-event',
@@ -332,7 +430,7 @@ export function TargetDesigner() {
             leftSection={<Plus aria-hidden="true" />}
             onClick={() => dispatch({ type: 'addEvent', id: rowId() })}
           >
-            {t('Add event')}
+            {i18n._({ id: 'targetDesigner.addEvent', message: 'Add event' })}
           </Button>
         </div>
       ),
@@ -341,19 +439,28 @@ export function TargetDesigner() {
 
   const status =
     'face' in built
-      ? t('Usable in the shot groups and hit probability tools as {owner} {name}.', {
-          owner: userOrganization,
-          name,
+      ? i18n._({
+          id: 'targetDesigner.usableAs',
+          message: 'Usable in the shot groups and hit probability tools as {owner} {name}.',
+          values: { owner: userOrganization, name },
         })
       : edited
-        ? general.join(' ') || tn(keyed.size, '{count} field to fix.', '{count} fields to fix.')
+        ? general.join(' ') ||
+          i18n._(
+            'targetDesigner.fieldsToFix',
+            { count: keyed.size },
+            {
+              message: '{count, plural, one {# field to fix.} other {# fields to fix.}}',
+              formats: ungrouped,
+            },
+          )
         : ''
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
       {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
       <PropertyGrid
-        title={t('Parameters')}
+        title={i18n._({ id: 'targetDesigner.parameters', message: 'Parameters' })}
         sections={sections}
         message={edited ? general[0] : undefined}
       />
@@ -362,7 +469,9 @@ export function TargetDesigner() {
   const results = (
     <>
       <div className="page-panel-head designer-panel-head">
-        <h2 className="page-panel-title record-heading">{t('Drawing')}</h2>
+        <h2 className="page-panel-title record-heading">
+          {i18n._({ id: 'targetDesigner.drawing', message: 'Drawing' })}
+        </h2>
       </div>
       <Text component="p" inherit fz="sm" m={0} className="derived-line" title={status}>
         {status}
@@ -371,13 +480,13 @@ export function TargetDesigner() {
         <div className="designer-drawing" data-stale={!shape || undefined}>
           <TargetFaceFigure
             shape={shown}
-            label={tn(
-              shown.rings.length,
-              '{name}: {count} ring, {size} mm across',
-              '{name}: {count} rings, {size} mm across',
+            label={i18n._(
+              'targetDesigner.drawingLabel',
+              { count: shown.rings.length, name, size: shown.rings[0]?.diameter.value ?? 0 },
               {
-                name,
-                size: shown.rings[0]?.diameter.value ?? 0,
+                message:
+                  '{count, plural, one {{name}: # ring, {size, decimal} mm across} other {{name}: # rings, {size, decimal} mm across}}',
+                formats: ungrouped,
               },
             )}
           />
@@ -385,8 +494,11 @@ export function TargetDesigner() {
       ) : (
         <EmptyNote
           icon={<Target size={24} aria-hidden="true" />}
-          title={t('No drawing yet')}
-          description={t('Enter a ring diameter.')}
+          title={i18n._({ id: 'targetDesigner.noDrawingYet', message: 'No drawing yet' })}
+          description={i18n._({
+            id: 'targetDesigner.enterRingDiameter',
+            message: 'Enter a ring diameter.',
+          })}
         />
       )}
     </>
@@ -401,7 +513,7 @@ export function TargetDesigner() {
           <DesignerToolbar
             undo={history.past.length > 0}
             redo={history.future.length > 0}
-            newLabel={t('New target')}
+            newLabel={i18n._({ id: 'targetDesigner.newTarget', message: 'New target' })}
             system={system}
             dispatch={toolbar}
           />
