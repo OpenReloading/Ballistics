@@ -17,12 +17,24 @@ async function openLotRows(page: import('@playwright/test').Page) {
 const burnRates = (page: import('@playwright/test').Page) =>
   page.locator('.ladder-table td[data-label="Burn rate"]').allTextContents()
 
-test('the Ladder table adds a slower and a faster lot row to every charge and follows the percentage', async ({
+// one run of the fixture load for every state of the lot rows: the run is the slow part
+test('the Ladder table adds a slower and a faster lot row to every charge, axe clean, printed and as cards on a phone', async ({
   page,
 }) => {
-  test.setTimeout(60_000)
+  test.setTimeout(90_000)
   await page.setViewportSize({ width: 1280, height: 650 })
   await openLotRows(page)
+
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme })
+    const { violations } = await new AxeBuilder({ page })
+      .include('.lot-rows')
+      .include('.ladder-table')
+      .analyze()
+    expect(violations.map((v) => v.id)).toEqual([])
+  }
+  await page.emulateMedia({ colorScheme: 'light' })
+
   const first = await burnRates(page)
   expect(first.length).toBeGreaterThan(3)
   expect(first.length % 3).toBe(0)
@@ -33,45 +45,20 @@ test('the Ladder table adds a slower and a faster lot row to every charge and fo
   await page.getByLabel('Target barrel time').fill('1.2')
   await expect(page.locator('.lot-rows .lot-chart')).toContainText('Target 1.200 ms')
   await expect(page.locator('.lot-rows .lot-note')).toBeVisible()
-})
 
-test('the lot rows are axe clean in light and dark', async ({ page }) => {
-  test.setTimeout(60_000)
-  await page.setViewportSize({ width: 1280, height: 650 })
-  await openLotRows(page)
-  for (const colorScheme of ['light', 'dark'] as const) {
-    await page.emulateMedia({ colorScheme })
-    const { violations } = await new AxeBuilder({ page })
-      .include('.lot-rows')
-      .include('.ladder-table')
-      .analyze()
-    expect(violations.map((v) => v.id)).toEqual([])
-  }
-})
+  await page.emulateMedia({ media: 'print' })
+  const printed = page.locator('.print-report .lot-chart')
+  await expect(printed.locator('svg path').first()).toBeAttached()
+  expect((await printed.boundingBox())?.width).toBeGreaterThan(100)
+  expect(
+    await page.locator('.print-report .ladder-table td[data-label="Burn rate"]').count(),
+  ).toBeGreaterThan(3)
+  await page.emulateMedia({ media: 'screen' })
 
-test('at phone width the chart fits the window and the table is cards', async ({ page }) => {
-  test.setTimeout(60_000)
-  await page.setViewportSize({ width: 1280, height: 650 })
-  await openLotRows(page)
   await page.setViewportSize({ width: 390, height: 800 })
   await page.getByRole('tab', { name: 'Results', exact: true }).click()
   const chart = page.locator('.lot-rows .lot-chart')
   await expect(chart.locator('svg path').first()).toBeAttached()
-  const box = await chart.boundingBox()
-  expect(box?.width).toBeLessThanOrEqual(390)
+  expect((await chart.boundingBox())?.width).toBeLessThanOrEqual(390)
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
-})
-
-test('the printed report holds the lot chart and the lot rows', async ({ page }) => {
-  test.setTimeout(60_000)
-  await page.setViewportSize({ width: 1280, height: 650 })
-  await openLotRows(page)
-  await page.emulateMedia({ media: 'print' })
-  const chart = page.locator('.print-report .lot-chart')
-  await expect(chart.locator('svg path').first()).toBeAttached()
-  const box = await chart.boundingBox()
-  expect(box?.width).toBeGreaterThan(100)
-  expect(
-    await page.locator('.print-report .ladder-table td[data-label="Burn rate"]').count(),
-  ).toBeGreaterThan(3)
 })
