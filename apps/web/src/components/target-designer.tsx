@@ -7,7 +7,6 @@ import { Plus, Target, X } from 'lucide-react'
 import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
-import type { Message } from '../i18n/translate.ts'
 import { colourWord } from '../lib/face-words.ts'
 import { fieldError } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
@@ -100,7 +99,7 @@ export function TargetDesigner() {
 
   const [recordId, setRecordId] = useState(newId)
   const menu = useRef<FileMenuHandle>(null)
-  const [linkFailure, setLinkFailure] = useState<Message>()
+  const [linkFailure, setLinkFailure] = useState<MessageDescriptor>()
   useRecordLink('targetFaceDesign', menu, (m) =>
     setLinkFailure(m === recordLoadingText ? undefined : m),
   )
@@ -458,7 +457,7 @@ export function TargetDesigner() {
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
-      {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
+      {linkFailure && <ErrorNote>{i18n._(linkFailure)}</ErrorNote>}
       <PropertyGrid
         title={i18n._({ id: 'targetDesigner.parameters', message: 'Parameters' })}
         sections={sections}

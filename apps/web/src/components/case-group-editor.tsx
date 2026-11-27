@@ -1,11 +1,13 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import type { Case, UserCaseRecord, UserRecord } from '@rangefoundry/schema'
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react'
 import { putRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import { blankCaseGroup, caseGroupProblem, groupCapacity, withCapacity } from '../lib/case-group.ts'
@@ -15,6 +17,7 @@ import { capacityRecord } from '../lib/load-record.ts'
 import { newId } from '../lib/new-id.ts'
 import { waterVolume } from '../lib/units.ts'
 import { namedKey } from '../lib/user-data.ts'
+import englishMessages from '../locales/en/components/case-group-editor.json' with { type: 'json' }
 import { CaseEditor } from './case-editor.tsx'
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { PageBar } from './page-bar.tsx'
@@ -22,6 +25,8 @@ import { ErrorNote } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useKeptDraft } from './use-kept-draft.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
+
+loadEnglish(englishMessages)
 
 /** Cartridge names by record id, each asked of the API once; the stored reference shows until it answers. */
 function useCartridgeNames(refs: readonly (string | undefined)[]) {
@@ -57,7 +62,7 @@ const capacityIn = (c: Case, records: readonly UserRecord[] | undefined) => {
 const fallbackName = 'Brass group'
 const blankData = blankCaseGroup()
 const blankKey = namedKey(blankData, '')
-const notKept = msg('Not saved in this browser')
+const notKept = /*i18n*/ { id: 'caseGroupEditor.notSaved', message: 'Not saved in this browser' }
 
 /** A group kept in the browser, with its measured capacity `m3`. */
 interface Draft {
@@ -69,11 +74,12 @@ interface Draft {
 /** A new group, or the stored one that `?record=` names; every valid change is kept in the browser, and the File menu opens the browser's groups. */
 export function CaseGroupEditor() {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const [data, setData] = useState<Case>(blankCaseGroup)
   /** The measured water capacity, m3: a record of its own that the group names. */
   const [capacity, setCapacity] = useState<number>()
-  const [failure, setFailure] = useState<Message>()
+  const [failure, setFailure] = useState<MessageDescriptor>()
   const [nameLeft, setNameLeft] = useState(false)
   /** A new or opened group remounts the editor, so no field starts as left. */
   const [generation, setGeneration] = useState(0)
@@ -196,7 +202,7 @@ export function CaseGroupEditor() {
         }
       />
       <div className="library">
-        {failure && <ErrorNote>{t(failure)}</ErrorNote>}
+        {failure && <ErrorNote>{i18n._(failure)}</ErrorNote>}
         <CaseEditor
           key={generation}
           data={data}

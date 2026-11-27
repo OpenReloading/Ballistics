@@ -1,5 +1,6 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Button, Menu } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
@@ -243,10 +244,11 @@ function ladderPrintText(load: Load, t: Translate) {
 function powderPrintRows(
   load: Load,
   runTemperature: string | undefined,
-  { t, tn }: Pick<Translator, 't' | 'tn'>,
+  t: Translate,
+  i18n: I18n,
 ): PrintRows {
   const { powderDesign, origin, fields, system } = load
-  const mark = loadFitMark(powderDesign, origin, siValues(fields), system, (day) => day, { t, tn })
+  const mark = loadFitMark(powderDesign, origin, siValues(fields), system, (day) => day, i18n)
   const name = load.powderLabel ?? ''
   return [
     [
@@ -291,12 +293,13 @@ function printGroupsOf(
   ok: OkOutcome | undefined,
   seatingRows: PrintRows,
   runTemperature: string | undefined,
-  { t, tn }: Pick<Translator, 't' | 'tn'>,
+  t: Translate,
+  i18n: I18n,
 ): [string, PrintRows][] {
   return [
     [t('Cartridge'), cartridgePrintRows(load, ok, seatingRows, t)],
     [t('Bullet'), bulletPrintRows(load, t)],
-    [t('Powder and charge'), powderPrintRows(load, runTemperature, { t, tn })],
+    [t('Powder and charge'), powderPrintRows(load, runTemperature, t, i18n)],
     [t('Gun and barrel'), gunPrintRows(load, ok, t)],
   ]
 }
@@ -917,7 +920,7 @@ function PrintViews({
   barrel,
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
   const { i18n } = useLingui()
   const sections = usePrintChoice()
   const steps = useMemo(() => shownSteps(ok, t), [ok, t])
@@ -942,7 +945,7 @@ function PrintViews({
     ]
       .filter(Boolean)
       .join(' ') || undefined
-  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature, { t, tn })
+  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature, t, i18n)
   const ladderTable = (
     <LadderTable
       ok={ok}

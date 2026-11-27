@@ -11,9 +11,10 @@ import {
   type UserPowderFit,
   type UserRecord,
 } from '@rangefoundry/schema'
-import { linguiOf } from '../i18n/lingui.ts'
+import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
 import { untranslated } from '../i18n/number.ts'
-import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { english, type Translator } from '../i18n/translate.ts'
+import englishMessages from '../locales/en/lib/powder-designer.json' with { type: 'json' }
 import {
   type FieldSpec,
   type Fields,
@@ -33,6 +34,8 @@ import {
 } from './history.ts'
 import type { Quantity, UnitSystem } from './units.ts'
 import { roundedFieldText } from './units.ts'
+
+loadEnglish(englishMessages)
 
 type FittedKey = NonNullable<Powder['interior']>['fitted'][number]
 
@@ -600,22 +603,68 @@ export function powderOf(
 /** The message of a missing value in the powder schema. */
 const required = /received undefined/
 
+/** The sentences the problems share. */
+const texts = {
+  enter: /*i18n*/ { id: 'powderDesigner.enterLabel', message: 'Enter {label}.' },
+  enterNumber: /*i18n*/ {
+    id: 'powderDesigner.enterNumberFor',
+    message: 'Enter a number for {label}.',
+  },
+  addIngredient: /*i18n*/ {
+    id: 'powderDesigner.addOneIngredient',
+    message: 'Add at least one ingredient.',
+  },
+  setFitted: /*i18n*/ {
+    id: 'powderDesigner.setFittedData',
+    message: 'Set Values came about by to Fitted to data.',
+  },
+  tickFitted: /*i18n*/ {
+    id: 'powderDesigner.tickFittedParameter',
+    message: 'Tick at least one fitted parameter.',
+  },
+  aboveZero: /*i18n*/ {
+    id: 'powderDesigner.greaterThanZero',
+    message: '{label} must be greater than 0{unit}.',
+  },
+  minPercent: /*i18n*/ {
+    id: 'powderDesigner.ingredientMinPercent',
+    message: 'Ingredient {n, decimal} min percent',
+  },
+  maxPercent: /*i18n*/ {
+    id: 'powderDesigner.ingredientMaxPercent',
+    message: 'Ingredient {n, decimal} max percent',
+  },
+} satisfies Record<string, MessageDescriptor>
+
 /** The texts of the schema's own rules (`packages/schema/src/powder.ts`), in plain words. */
-const ruleTexts: Record<string, Message> = {
-  'needs min <= value <= max': msg('{label} must lie between Min and Max.'),
-  'needs min <= max': msg('{label}: Min must not be above Max.'),
-  'needs 1 + a z1 > 0, and q < 1 when z1 < 1': msg(
-    'Burn form: 1 + a × z1 must be above 0, and Form q below 1 where Form z1 is below 1.',
-  ),
-  'the ranges admit no composition summing to 100 %': msg(
-    'Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more.',
-  ),
-  'needs a composition': msg('Add at least one ingredient.'),
-  'needs a fitted source': msg('Set Values came about by to Fitted to data.'),
-  'needs a source with fields country': msg('Add a source that gives the country.'),
-  'needs a source with fields listedCartridges': msg(
-    'Add a source that gives the cartridges the powder is listed for.',
-  ),
+const ruleTexts: Record<string, MessageDescriptor> = {
+  'needs min <= value <= max': /*i18n*/ {
+    id: 'powderDesigner.betweenMinMax',
+    message: '{label} must lie between Min and Max.',
+  },
+  'needs min <= max': /*i18n*/ {
+    id: 'powderDesigner.minNotAboveMax',
+    message: '{label}: Min must not be above Max.',
+  },
+  'needs 1 + a z1 > 0, and q < 1 when z1 < 1': /*i18n*/ {
+    id: 'powderDesigner.burnFormRule',
+    message: 'Burn form: 1 + a × z1 must be above 0, and Form q below 1 where Form z1 is below 1.',
+  },
+  'the ranges admit no composition summing to 100 %': /*i18n*/ {
+    id: 'powderDesigner.compositionSumRule',
+    message:
+      'Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more.',
+  },
+  'needs a composition': texts.addIngredient,
+  'needs a fitted source': texts.setFitted,
+  'needs a source with fields country': /*i18n*/ {
+    id: 'powderDesigner.sourceCountry',
+    message: 'Add a source that gives the country.',
+  },
+  'needs a source with fields listedCartridges': /*i18n*/ {
+    id: 'powderDesigner.sourceCartridges',
+    message: 'Add a source that gives the cartridges the powder is listed for.',
+  },
 }
 
 /** The name of the place of an issue at `path`, in the words of the form. */
@@ -624,90 +673,135 @@ function labelOf(d: Design, path: PropertyKey[], t: Translator['t'], i18n: I18n)
   const row = typeof index === 'number' ? liveRows(d)[index] : undefined
   if (head === 'composition' && row) {
     // numbered as the form numbers its rows, blank ones included
-    const n = d.rows.indexOf(row) + 1
-    if (part === 'name') return t('Ingredient {n} name', { n })
-    if (part === 'cas') return t('Ingredient {n} CAS number', { n })
-    if (part === 'min') return t('Ingredient {n} min percent', { n })
-    if (part === 'max') return t('Ingredient {n} max percent', { n })
-    return t('Ingredient {n}', { n })
+    const values = { n: d.rows.indexOf(row) + 1 }
+    if (part === 'name')
+      return i18n._({
+        id: 'powderDesigner.ingredientName',
+        message: 'Ingredient {n, decimal} name',
+        values,
+      })
+    if (part === 'cas')
+      return i18n._({
+        id: 'powderDesigner.ingredientCasNumber',
+        message: 'Ingredient {n, decimal} CAS number',
+        values,
+      })
+    if (part === 'min') return i18n._({ ...texts.minPercent, values })
+    if (part === 'max') return i18n._({ ...texts.maxPercent, values })
+    return i18n._({
+      id: 'powderDesigner.ingredientNumber',
+      message: 'Ingredient {n, decimal}',
+      values,
+    })
   }
   const key = path.join('.')
   const spec = specByKey.get(key) ?? specByKey.get(`${key}.value`)
   if (spec) return specText(t, spec.label, i18n)
   const section = typeof head === 'string' ? sectionLabels[head] : undefined
-  return section ? t(section) : key
+  return section ? i18n._(section) : key
 }
 
 /** An issue without its own sentence names its field only: zod's English stays out of the interface. */
-export function issueText(issue: Issue, label: string, t: Translator['t']): string {
+export function issueText(issue: Issue, label: string, i18n: I18n = linguiOf('en')): string {
+  const values = { label }
   const rule = ruleTexts[issue.message]
-  if (rule) return t(rule, { label })
+  if (rule) return i18n._({ ...rule, values })
   if (required.test(issue.message))
-    return issue.expected === 'string'
-      ? t('Enter {label}.', { label })
-      : t('Enter a number for {label}.', { label })
-  if (issue.code === 'too_small' && issue.origin === 'string') return t('Enter {label}.', { label })
+    return i18n._({ ...(issue.expected === 'string' ? texts.enter : texts.enterNumber), values })
+  if (issue.code === 'too_small' && issue.origin === 'string')
+    return i18n._({ ...texts.enter, values })
   if (issue.origin === 'number') {
-    const bounded = boundText(issue, label, t)
+    const bounded = boundText(issue, label, i18n)
     if (bounded) return bounded
   }
   if (issue.code === 'invalid_format')
-    return t('{label}: write the CAS number as digits and hyphens, as 9004-70-0.', { label })
+    return i18n._({
+      id: 'powderDesigner.casDigits',
+      message: '{label}: write the CAS number as digits and hyphens, as 9004-70-0.',
+      values,
+    })
   if (issue.code === 'too_small' && issue.origin === 'array')
     return issue.path[0] === 'composition'
-      ? t('Add at least one ingredient.')
-      : t('{label}: add at least one entry.', { label })
+      ? i18n._(texts.addIngredient)
+      : i18n._({
+          id: 'powderDesigner.addOneEntry',
+          message: '{label}: add at least one entry.',
+          values,
+        })
   console.debug('powder designer: unmapped schema issue', issue)
-  return t('{label}: not accepted by the powder record.', { label })
+  return i18n._({
+    id: 'powderDesigner.notAccepted',
+    message: '{label}: not accepted by the powder record.',
+    values,
+  })
 }
 
 /** A number below or above a bound of the schema, with the bound; undefined for another issue. */
-function boundText(issue: Issue, label: string, t: Translator['t']): string | undefined {
+function boundText(issue: Issue, label: string, i18n: I18n): string | undefined {
   if (issue.code === 'too_small') {
     const min = Number(issue.minimum)
-    if (issue.inclusive) return t('{label} must be at least {min}{unit}.', { label, min, unit: '' })
+    if (issue.inclusive)
+      return i18n._({
+        id: 'powderDesigner.atLeast',
+        message: '{label} must be at least {min, decimal}{unit}.',
+        values: { label, min, unit: '' },
+      })
     return min === 0
-      ? t('{label} must be greater than 0{unit}.', { label, unit: '' })
-      : t('{label} must be above {min}.', { label, min })
+      ? i18n._({ ...texts.aboveZero, values: { label, unit: '' } })
+      : i18n._({
+          id: 'powderDesigner.above',
+          message: '{label} must be above {min, decimal}.',
+          values: { label, min },
+        })
   }
   if (issue.code === 'too_big') {
     const max = Number(issue.maximum)
     return issue.inclusive
-      ? t('{label} must be at most {max}{unit}.', { label, max, unit: '' })
-      : t('{label} must be below {max}.', { label, max })
+      ? i18n._({
+          id: 'powderDesigner.atMost',
+          message: '{label} must be at most {max, decimal}{unit}.',
+          values: { label, max, unit: '' },
+        })
+      : i18n._({
+          id: 'powderDesigner.below',
+          message: '{label} must be below {max, decimal}.',
+          values: { label, max },
+        })
   }
 }
 
-const sectionLabels: Record<string, Message> = {
-  composition: msg('Composition'),
-  thermochemistry: msg('Thermochemistry'),
-  interior: msg('Burn law'),
-  aliases: msg('Aliases'),
-  bulkDensity: msg('Bulk density'),
-  country: msg('Country'),
-  listedCartridges: msg('Cartridges'),
+const sectionLabels: Record<string, MessageDescriptor> = {
+  composition: /*i18n*/ { id: 'powderDesigner.composition', message: 'Composition' },
+  thermochemistry: /*i18n*/ { id: 'powderDesigner.thermochemistry', message: 'Thermochemistry' },
+  interior: /*i18n*/ { id: 'powderDesigner.burnLaw', message: 'Burn law' },
+  aliases: /*i18n*/ { id: 'powderDesigner.aliases', message: 'Aliases' },
+  bulkDensity: /*i18n*/ { id: 'powderDesigner.bulkDensity', message: 'Bulk density' },
+  country: /*i18n*/ { id: 'powderDesigner.country', message: 'Country' },
+  listedCartridges: /*i18n*/ { id: 'powderDesigner.cartridges', message: 'Cartridges' },
 }
 
 /** All at once, because the schema checks cross-part rules only once every part passes; the rules stay the schema's. */
-function draftProblems(d: Design, data: UserPowder, t: Translator['t']): Problem[] {
+function draftProblems(d: Design, data: UserPowder, i18n: I18n): Problem[] {
   const draft = data.draft
   const problems: Problem[] = []
   if (draft?.interior) {
-    if (d.fitted.length === 0)
-      problems.push({ key: 'fitted', message: t('Tick at least one fitted parameter.') })
+    if (d.fitted.length === 0) problems.push({ key: 'fitted', message: i18n._(texts.tickFitted) })
     if (d.provenanceKind !== 'fitted')
-      problems.push({
-        key: 'provenanceKind',
-        message: t('Set Values came about by to Fitted to data.'),
-      })
+      problems.push({ key: 'provenanceKind', message: i18n._(texts.setFitted) })
   }
   if (draft?.thermochemistry && !draft.composition)
-    problems.push({ message: t('Add at least one ingredient.') })
+    problems.push({ message: i18n._(texts.addIngredient) })
   const vivacity = fieldAt(d, 'interior.vivacity.value').si
   if (vivacity !== undefined && vivacity <= 0)
     problems.push({
       key: 'interior.vivacity.value',
-      message: t('{label} must be greater than 0{unit}.', { label: t('Vivacity'), unit: '' }),
+      message: i18n._({
+        ...texts.aboveZero,
+        values: {
+          label: i18n._({ id: 'powderDesigner.vivacity', message: 'Vivacity' }),
+          unit: '',
+        },
+      }),
     })
   return problems
 }
@@ -723,14 +817,16 @@ function problemsOf(d: Design, issues: Issue[], t: Translator['t'], i18n: I18n):
           key,
           message:
             issue.path[0] === 'interior'
-              ? t('Set Values came about by to Fitted to data.')
-              : t('Choose an entry for Values came about by.'),
+              ? i18n._(texts.setFitted)
+              : i18n._({
+                  id: 'powderDesigner.chooseValuesCameAbout',
+                  message: 'Choose an entry for Values came about by.',
+                }),
         },
       ]
-    if (key === 'fitted') return [{ key, message: t('Tick at least one fitted parameter.') }]
-    if (key) return [{ key, message: issueText(issue, labelOf(d, issue.path, t, i18n), t) }]
-    if (issue.message === 'needs a composition')
-      return [{ message: t('Add at least one ingredient.') }]
+    if (key === 'fitted') return [{ key, message: i18n._(texts.tickFitted) }]
+    if (key) return [{ key, message: issueText(issue, labelOf(d, issue.path, t, i18n), i18n) }]
+    if (issue.message === 'needs a composition') return [{ message: i18n._(texts.addIngredient) }]
     const prefix = `${issue.path.join('.')}.`
     // an empty Min or Max of a thermochemistry range is built as its value: only the value is asked for
     const empty = powderSpecs.filter(
@@ -742,9 +838,9 @@ function problemsOf(d: Design, issues: Issue[], t: Translator['t'], i18n: I18n):
     if (required.test(issue.message) && empty.length > 0)
       return empty.map((s) => ({
         key: s.key,
-        message: t('Enter a number for {label}.', { label: specText(t, s.label, i18n) }),
+        message: i18n._({ ...texts.enterNumber, values: { label: specText(t, s.label, i18n) } }),
       }))
-    return [{ message: issueText(issue, labelOf(d, issue.path, t, i18n), t) }]
+    return [{ message: issueText(issue, labelOf(d, issue.path, t, i18n), i18n) }]
   })
 }
 
@@ -819,15 +915,16 @@ export function checkDesign(
   const labelled = (key: string) => {
     const [, row, part] = key.split('.')
     if (!key.startsWith('comp.')) return specText(t, specOf(key).label, i18n)
-    const n = d.rows.findIndex((r) => r.id === row) + 1
-    return part === 'max'
-      ? t('Ingredient {n} max percent', { n })
-      : t('Ingredient {n} min percent', { n })
+    const values = { n: d.rows.findIndex((r) => r.id === row) + 1 }
+    return i18n._({ ...(part === 'max' ? texts.maxPercent : texts.minPercent), values })
   }
   const unread = Object.entries(d.fields)
     .filter(([, v]) => v.text.trim() !== '' && v.si === undefined)
-    .map(([key]) => ({ key, message: t('Enter a number for {label}.', { label: labelled(key) }) }))
-  const own = [...unread, ...draftProblems(d, data, t)]
+    .map(([key]) => ({
+      key,
+      message: i18n._({ ...texts.enterNumber, values: { label: labelled(key) } }),
+    }))
+  const own = [...unread, ...draftProblems(d, data, i18n)]
   if ('powder' in built) return own.length > 0 ? { problems: own } : built
   // a rule the draft's own check reports already is not said twice
   const said = new Set(own.map((p) => `${p.key ?? ''} ${p.message}`))

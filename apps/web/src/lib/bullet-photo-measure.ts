@@ -1,10 +1,10 @@
 /** Dimensions with standard uncertainties from a photographed outline (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
+import type { MessageDescriptor } from '@lingui/core'
 import { fromSi, type UserBullet } from '@rangefoundry/schema'
 import { median1 } from '@rangefoundry/target-recognition'
 import { type Scale, solve } from './bullet-photo.ts'
 import { edgeUncertainty, type Outline, sideTapers } from './bullet-photo-outline.ts'
 import type { ScaleBasis } from './bullet-photo-scale.ts'
-import type { Wording } from './wording.ts'
 
 // Unchecked reads inside loops whose bounds keep the index in range; module-local so the calls inline.
 const at = (a: ArrayLike<number>, i: number) => a[i] as number
@@ -25,7 +25,7 @@ export interface BulletMeasurement {
   ogiveForm?: 'tangent' | 'secant'
   baseType: 'flat' | 'boat-tail'
   /** Sentences about what is missing or doubtful. */
-  notes: Wording[]
+  notes: MessageDescriptor[]
   /** What gave the scale, when the worker resolved one (`resolveScale`). */
   scaleBasis?: ScaleBasis
 }

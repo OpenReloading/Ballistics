@@ -36,7 +36,6 @@ import Link from '@/platform/link.tsx'
 import { deleteRecord, putRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
-import type { Message } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import {
   type ClassMembers,
@@ -514,7 +513,7 @@ export function FirearmLibrary() {
   const [gaps, setGaps] = useState(() => loadGaps([]))
   const [failure, setFailure] = useState('')
   /** Why the firearm that `?record=` names could not be opened. */
-  const [linkFailure, setLinkFailure] = useState<Message>()
+  const [linkFailure, setLinkFailure] = useState<MessageDescriptor>()
   /** Why the browser store could not be read. */
   const [readError, setReadError] = useState('')
   /** The name field was left once; its error shows from then on, not on a fresh page. */
@@ -796,7 +795,7 @@ export function FirearmLibrary() {
             }
           />
           {failure && <ErrorNote>{failure}</ErrorNote>}
-          {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
+          {linkFailure && <ErrorNote>{i18n._(linkFailure)}</ErrorNote>}
           <LibraryBody
             readError={readError}
             onRetry={refresh}

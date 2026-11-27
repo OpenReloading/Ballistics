@@ -16,7 +16,6 @@ import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
-import type { Message as Marked } from '../i18n/translate.ts'
 import { fieldError, specText } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
@@ -47,7 +46,6 @@ import { namedKey } from '../lib/user-data.ts'
 import { userRef } from '../lib/variants.ts'
 import { sayLingui, verbatim } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/powder-designer.json' with { type: 'json' }
-import englishSpecs from '../locales/en/lib/powder-designer.json' with { type: 'json' }
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
@@ -61,7 +59,7 @@ import { useKeptDraft } from './use-kept-draft.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 import { Workspace } from './workspace.tsx'
 
-loadEnglish(englishMessages, englishSpecs)
+loadEnglish(englishMessages)
 
 /** The key of the empty draft: nothing to keep before the first edit. */
 const blankKey = namedKey(fileData(newDesign()), '')
@@ -242,7 +240,7 @@ export function PowderDesigner() {
 
   const [recordId, setRecordId] = useState(newId)
   const menu = useRef<FileMenuHandle>(null)
-  const [linkFailure, setLinkFailure] = useState<Marked>()
+  const [linkFailure, setLinkFailure] = useState<MessageDescriptor>()
   useRecordLink('powder', menu, (m) => setLinkFailure(m === recordLoadingText ? undefined : m))
   const data = useMemo(() => fileData(design), [design])
   const key = namedKey(data, design.name)
@@ -574,7 +572,7 @@ export function PowderDesigner() {
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
-      {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
+      {linkFailure && <ErrorNote>{i18n._(linkFailure)}</ErrorNote>}
       <PropertyGrid
         title={i18n._({ id: 'powderDesigner.parameters', message: 'Parameters' })}
         sections={sections}

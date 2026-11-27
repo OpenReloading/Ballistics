@@ -4,7 +4,6 @@ import type { MessageDescriptor } from '@lingui/core'
 import type { UserBullet } from '@rangefoundry/schema'
 import type { Scale } from './bullet-photo.ts'
 import type { BulletMeasurement } from './bullet-photo-measure.ts'
-import type { Wording } from './wording.ts'
 
 /** Sizes of the bullet read off a caliper, mm. */
 export interface Known {
@@ -124,7 +123,7 @@ export function resolveScale(
   px: BulletMeasurement,
   ruler: Scale | undefined,
   known: Known,
-): { scale: Scale | undefined; notes: Wording[]; basis?: ScaleBasis } {
+): { scale: Scale | undefined; notes: MessageDescriptor[]; basis?: ScaleBasis } {
   const es = estimatesOf(px, known)
   if (ruler) {
     const against = { ppm: ruler.pxPerMm, rel: ruler.relUncertainty }

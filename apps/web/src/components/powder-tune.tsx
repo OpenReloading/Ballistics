@@ -24,7 +24,6 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { putRecords, storedRecord, storedRecords } from '@/platform/user-store.ts'
-import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -211,13 +210,12 @@ const step = 0.05
 
 /** The mark of the values shown: fitted to the strings today, or hand-tuned with its line. */
 function HandMark({ strings, tuned }: { strings: readonly TuneString[]; tuned: boolean }) {
-  const { t, tn } = useTranslation()
   const { i18n } = useLingui()
   const count = fitStrings(strings).length
   return (
     <>
       <p className="note fit-mark">
-        {fitMark(count, new Date().toISOString(), tuned, dayText, { t, tn })}
+        {fitMark(count, new Date().toISOString(), tuned, dayText, i18n)}
       </p>
       {tuned && (
         <p className="note">

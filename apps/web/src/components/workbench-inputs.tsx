@@ -735,7 +735,7 @@ type LoadFieldMarkArgs = {
   origin: LoadValues['origin']
   /** The record's value where the user changed it. */
   changed: number | undefined
-  tn: Translator['tn']
+  i18n: I18n
 }
 
 /** The mark of a field in the units it shows: where its value comes from. */
@@ -753,7 +753,7 @@ function loadFieldMark(
     powderDesign,
     origin,
     changed,
-    tn,
+    i18n,
   }: LoadFieldMarkArgs,
   t: Translator['t'],
 ) {
@@ -784,8 +784,8 @@ function loadFieldMark(
         fields[key]?.si,
         (si) => valueWithUnit(spec.quantity, s, si),
         powderDesign ? 'user design' : 'record',
-        t,
-        loadFitMark(powderDesign, origin, siValues(fields), s, dayText, { t, tn }),
+        i18n,
+        loadFitMark(powderDesign, origin, siValues(fields), s, dayText, i18n),
       )) ||
     (changed === undefined
       ? undefined
@@ -924,7 +924,7 @@ function LoadField({ name: key }: { name: string }) {
     firearm,
     outcome,
   } = useLoad()
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
   const { i18n } = useLingui()
   const spec = interiorFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
@@ -984,7 +984,7 @@ function LoadField({ name: key }: { name: string }) {
             powderDesign,
             origin,
             changed: changes[key],
-            tn,
+            i18n,
           },
           t,
         )

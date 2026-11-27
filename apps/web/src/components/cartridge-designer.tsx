@@ -21,7 +21,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, localizeNumber } from '../i18n/number.ts'
-import { msg, type Translator } from '../i18n/translate.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail, CartridgeSummary } from '../lib/api-types.ts'
 import {
@@ -438,7 +438,12 @@ async function loadCartridge(id: string, system: UnitSystem) {
   const record = await fetchRecord<CartridgeDetail>('cartridges', id)
   if (!record) throw new Error('No such cartridge')
   if (!draws(record))
-    return msg('This cartridge has no CIP record that draws. The designer still works.')
+    return {
+      loadNote: /*i18n*/ {
+        id: 'cartridgeDesigner.noDrawingRecord',
+        message: 'This cartridge has no CIP record that draws. The designer still works.',
+      },
+    }
   return fromRecord(record, system)
 }
 
@@ -583,8 +588,11 @@ export function CartridgeDesigner() {
     fallbackName: 'Cartridge design',
     nameKey: (d) => d.name?.trim() ?? '',
     load: loadCartridge,
-    loadingText: msg('Loading the cartridge…'),
-    failText: msg('The cartridge could not be loaded. The designer still works.'),
+    loadingText: /*i18n*/ { id: 'cartridgeDesigner.loading', message: 'Loading the cartridge…' },
+    failText: /*i18n*/ {
+      id: 'cartridgeDesigner.loadFailed',
+      message: 'The cartridge could not be loaded. The designer still works.',
+    },
   })
 
   const e = useMemo(

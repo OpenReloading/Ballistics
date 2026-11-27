@@ -13,7 +13,6 @@ import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useSta
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { localizeDecimals } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import {
@@ -418,8 +417,11 @@ export function BulletDesigner() {
       const names = await fetchManufacturerNames().catch(() => noManufacturerNames)
       return fromRecord(record, system, names)
     },
-    loadingText: msg('Loading the bullet…'),
-    failText: msg('The bullet could not be loaded. The designer still works.'),
+    loadingText: /*i18n*/ { id: 'bulletDesigner.loading', message: 'Loading the bullet…' },
+    failText: /*i18n*/ {
+      id: 'bulletDesigner.loadFailed',
+      message: 'The bullet could not be loaded. The designer still works.',
+    },
   })
 
   const [photoOpen, setPhotoOpen] = useState(false)
@@ -499,7 +501,7 @@ export function BulletDesigner() {
     },
   })
   const { assumed, notes: drawn } = drawingNotes(drawing, i18n)
-  const notes = design.photo ? [...drawn, ...photoText(design.photo, system, t, i18n)] : drawn
+  const notes = design.photo ? [...drawn, ...photoText(design.photo, system, i18n)] : drawn
 
   const root = useRef<HTMLDivElement>(null)
   const mark = (t: Element | null) => markDimension(root.current, t)
