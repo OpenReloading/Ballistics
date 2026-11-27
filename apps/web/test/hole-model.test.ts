@@ -107,9 +107,13 @@ describe('servedDetector', () => {
     expect(fetched).toEqual([])
   })
 
-  it('answers an example pick with the classical detector without loading the model', async () => {
+  it.each([
+    ['an example pick', { at: { x: 16, y: 16 } }],
+    ["the example's polarity", { polarity: 'light' as const }],
+    ["the example's backing color", { backing: { r: 40, g: 30, b: 20 } }],
+  ])('answers %s with the classical detector without loading the model', async (_, request) => {
     const { loader, fetched } = load(files(root, 'abc'))
-    expect(await servedDetector(root, loader, { at: { x: 16, y: 16 } })).toEqual({
+    expect(await servedDetector(root, loader, request)).toEqual({
       detector: holeDetector,
       fellBack: false,
     })

@@ -26,13 +26,14 @@ export type ModelLoad = {
 /** The detector and whether a set model failed to load, so the page can say the classical detector answered. */
 export type RunDetector = { detector: InferencePort; fellBack: boolean }
 
-/** `root` (the edition's base path as an absolute URL ending in `/`, `editionRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. An example pick (`at`) gets the classical detector without a load: the learned one ignores the pick and measures no hole size, which the example sets. */
+/** `root` (the edition's base path as an absolute URL ending in `/`, `editionRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. An example pick (`at`) and a run with the example's `polarity` or `backing` get the classical detector without a load: the learned one reads none of them and measures no hole size, which the example sets. */
 export async function servedDetector(
   root: string | undefined,
   load: ModelLoad,
-  request: Pick<ProposalRequest, 'at'> = {},
+  request: Pick<ProposalRequest, 'at' | 'polarity' | 'backing'> = {},
 ): Promise<RunDetector> {
-  if (!root || request.at) return { detector: holeDetector, fellBack: false }
+  if (!root || request.at || request.polarity || request.backing)
+    return { detector: holeDetector, fellBack: false }
   try {
     return { detector: await untilAborted(learned(root, load), load.signal), fellBack: false }
   } catch (error) {
