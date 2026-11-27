@@ -35,9 +35,11 @@ const brokenHeads = (page: Page) =>
 /** The printable width of the landscape sheet, px at 96 dpi: the paper less the default 10 mm margins. */
 const landscape = { A4: (297 - 20) * (96 / 25.4), Letter: (279.4 - 20) * (96 / 25.4) }
 
-test('the load sheet heads the steps by their value and breaks no header word on A4 and Letter', async ({
+// one run of the saved load for both checks: the run is the slow part
+test('the load sheet breaks no header word on A4 and Letter, and the report and the load sheets print in German inside the page', async ({
   page,
 }) => {
+  test.setTimeout(60_000)
   await runSavedLoad(page)
   await page.emulateMedia({ media: 'print' })
   await page.evaluate(() => {
@@ -54,14 +56,11 @@ test('the load sheet heads the steps by their value and breaks no header word on
       expect(await overflow(page, '.load-sheet:not(.step), .load-sheet:not(.step) table')).toBe(0)
     }
   }
-})
 
-test('the report and the load sheets print in German and stay inside the page', async ({
-  page,
-}) => {
-  test.setTimeout(60_000)
-  await runSavedLoad(page)
-  await showGerman(page)
+  await page.emulateMedia({ media: 'screen' })
+  await page.evaluate(() => {
+    delete document.documentElement.dataset.print
+  })
   await expect(page.getByRole('tab', { name: 'Ladeleiter-Tabelle', exact: true })).toBeVisible()
   await page.emulateMedia({ media: 'print' })
 
