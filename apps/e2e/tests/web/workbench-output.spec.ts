@@ -89,8 +89,13 @@ test('the report keeps its chart after the same load runs again', async ({ page 
   await expect(copy).toBeVisible()
 })
 
-test('the chart data dialog downloads the curves and the results as CSV', async ({ page }) => {
+test('the chart data dialog downloads the curves and the results as CSV, and the free recoil shows the momentum of bullet and gas', async ({
+  page,
+}) => {
   await runSavedLoad(page)
+  await expect(page.locator('.results-head .readout-list')).toContainText(
+    /Momentum \d+\.\d\d lbf·s \(bullet \d+\.\d\d, gas \d+\.\d\d\)/,
+  )
   await page.getByRole('button', { name: 'Chart data' }).click()
   const dialog = page.getByRole('dialog', { name: 'Chart data' })
   const [curves] = await Promise.all([
@@ -117,13 +122,6 @@ test('the chart data dialog downloads the curves and the results as CSV', async 
   expect(text).toMatch(/^Quantity,Value,Unit\n/)
   expect(text).toContain(`Muzzle velocity,${muzzle},ft/s`)
   expect(text).not.toMatch(/Simulation|safe/i)
-})
-
-test('the free recoil shows the momentum of bullet and gas', async ({ page }) => {
-  await runSavedLoad(page)
-  await expect(page.locator('.results-head .readout-list')).toContainText(
-    /Momentum \d+\.\d\d lbf·s \(bullet \d+\.\d\d, gas \d+\.\d\d\)/,
-  )
 })
 
 test('every interior field says what it is', async ({ page }) => {

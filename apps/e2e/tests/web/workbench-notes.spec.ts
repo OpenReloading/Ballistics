@@ -17,12 +17,39 @@ const below = (page: Page) =>
     ),
   )
 
-test('switching steps, changing an input and the units move nothing below the notes', async ({
+// one run of the saved load: the phone layout's More dialog first, then the notes at 1280 px; the run is the slow part
+test('More shows the count, its dialog lists every note, traps the focus and returns it; switching steps, changing an input and the units move nothing below the notes', async ({
   page,
 }) => {
   test.setTimeout(90_000)
-  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.setViewportSize({ width: 390, height: 844 })
   await runSavedLoad(page)
+  await page.getByRole('tab', { name: 'Results', exact: true }).click()
+  const items = notes(page).locator('li[data-kind]')
+  await expect(band(page)).toHaveCount(1, { timeout: 10_000 })
+  const lines = (await items.allTextContents()).map((l) => l.replace(/^\w+: /, ''))
+  expect(lines.length).toBeGreaterThan(0)
+  // the count and the most important entry for screen readers
+  await expect(notes(page).locator('p.visually-hidden')).toContainText(
+    `${lines.length} result note`,
+  )
+  const more = notes(page).getByRole('button', { name: `More (${lines.length})` })
+  await more.focus()
+  await page.keyboard.press('Enter')
+  const dialog = page.getByRole('dialog', { name: 'Result notes' })
+  await expect(dialog).toBeVisible()
+  for (const line of lines) await expect(dialog).toContainText(line)
+  await expect(dialog.locator('li')).toHaveCount(lines.length)
+  // the focus stays in the dialog
+  for (let k = 0; k < 4; k++) {
+    await page.keyboard.press('Tab')
+    expect(await dialog.evaluate((d) => d.contains(document.activeElement))).toBe(true)
+  }
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+  await expect(more).toBeFocused()
+
+  await page.setViewportSize({ width: 1280, height: 800 })
   const form = loadForm(page)
   await form.getByLabel(/^Ladder steps/).fill('5')
   await form.getByLabel(/^Step size/).fill('0.15')
@@ -53,36 +80,4 @@ test('switching steps, changing an input and the units move nothing below the no
   await choosePreset(page, 'US customary')
   await expect(band(page)).toContainText(/ft\/s|Sampled/)
   expect(await below(page)).toEqual(before)
-})
-
-test('More shows the count, its dialog lists every note, traps the focus and returns it', async ({
-  page,
-}) => {
-  test.setTimeout(60_000)
-  await page.setViewportSize({ width: 390, height: 844 })
-  await runSavedLoad(page)
-  await page.getByRole('tab', { name: 'Results', exact: true }).click()
-  const items = notes(page).locator('li[data-kind]')
-  await expect(band(page)).toHaveCount(1, { timeout: 10_000 })
-  const lines = (await items.allTextContents()).map((l) => l.replace(/^\w+: /, ''))
-  expect(lines.length).toBeGreaterThan(0)
-  // the count and the most important entry for screen readers
-  await expect(notes(page).locator('p.visually-hidden')).toContainText(
-    `${lines.length} result note`,
-  )
-  const more = notes(page).getByRole('button', { name: `More (${lines.length})` })
-  await more.focus()
-  await page.keyboard.press('Enter')
-  const dialog = page.getByRole('dialog', { name: 'Result notes' })
-  await expect(dialog).toBeVisible()
-  for (const line of lines) await expect(dialog).toContainText(line)
-  await expect(dialog.locator('li')).toHaveCount(lines.length)
-  // the focus stays in the dialog
-  for (let k = 0; k < 4; k++) {
-    await page.keyboard.press('Tab')
-    expect(await dialog.evaluate((d) => d.contains(document.activeElement))).toBe(true)
-  }
-  await page.keyboard.press('Escape')
-  await expect(dialog).toBeHidden()
-  await expect(more).toBeFocused()
 })

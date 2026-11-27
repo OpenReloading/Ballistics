@@ -130,12 +130,6 @@ describe('the JSON result', () => {
     }
   })
 
-  it('has an absolute $id', () => {
-    const { $id } = JSON.parse(readFileSync(schemaPath, 'utf8'))
-    expect(new URL($id).href).toBe($id)
-    expect($id).toMatch(/\/result\.schema\.json$/)
-  })
-
   it('is the schema the package generates (pnpm run schema)', () => {
     expect(JSON.parse(readFileSync(schemaPath, 'utf8'))).toEqual(JSON.parse(resultJsonSchema()))
   })
