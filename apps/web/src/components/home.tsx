@@ -24,6 +24,28 @@ const openLabels: Record<string, MessageDescriptor> = {
   '/groups': /*i18n*/ { id: 'home.open.groups', message: 'Open shot groups' },
 }
 
+/** The text of a card: only the home page shows it, so the pages' entries in `sections.ts`, which every route loads, leave it out. */
+const abouts: Record<(typeof sections)[number]['pages'][number]['href'], MessageDescriptor> = {
+  '/workbench': /*i18n*/ {
+    id: 'home.about.workbench',
+    message:
+      'Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser.',
+  },
+  '/session': /*i18n*/ {
+    id: 'home.about.session',
+    message: 'Shots and statistics per string from a chronograph export, read in your browser.',
+  },
+  '/groups': /*i18n*/ {
+    id: 'home.about.groups',
+    message:
+      'Group size and dispersion from a target photo or a drawn target; the photo stays in your browser.',
+  },
+  '/cartridges': /*i18n*/ {
+    id: 'home.about.database',
+    message: 'The published records, each with its source, and your own beside them.',
+  },
+}
+
 /** A list's record count, in the language shown. */
 export function RecordCount({ count }: { count: number }) {
   const { i18n } = useLingui()
@@ -65,7 +87,7 @@ export function Home({ counts }: { counts: Record<string, ReactNode> }) {
           {tools.pages.map((p) => (
             <li key={p.href}>
               <CardTitle href={p.href} label={i18n._(p.label)} icon={p.icon} />
-              <p>{i18n._(p.description)}</p>
+              <p>{i18n._(abouts[p.href])}</p>
               <LinkButton
                 href={p.href}
                 size={controlSize.row.button}
@@ -83,7 +105,7 @@ export function Home({ counts }: { counts: Record<string, ReactNode> }) {
           {library.pages.map((p) => (
             <li key={p.href}>
               <CardTitle href={p.href} label={i18n._(p.label)} icon={p.icon} />
-              <p>{i18n._(p.description)}</p>
+              <p>{i18n._(abouts[p.href])}</p>
               <ul className="home-tabs">
                 {p.tabs.map((tab) => (
                   <li key={tab.href}>

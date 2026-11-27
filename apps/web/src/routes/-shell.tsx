@@ -29,7 +29,6 @@ import { openShortcuts, ShortcutsHelp, useShortcuts } from '../components/shortc
 import { Brand } from '../components/site-header.tsx'
 import { ThemeSwitch } from '../components/theme-switch.tsx'
 import { useRoute } from '../components/use-route.ts'
-import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
@@ -37,10 +36,11 @@ import { isToolRoute, pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
 import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
+import englishMessages from '../locales/en/routes/-shell.json' with { type: 'json' }
 import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '../platform/edition.ts'
 import Link from '../platform/link.tsx'
 
-loadEnglish(sectionsEnglish)
+loadEnglish(englishMessages, sectionsEnglish)
 
 // the search loads on its first use, so pages ship without it
 const SiteSearch = lazy(() =>
@@ -92,7 +92,6 @@ function Navigation({
   afterDrawer: (open: () => void) => void
   onReport: () => void
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const openSettings = useContext(SettingsDialog)
   const id = useId()
@@ -100,7 +99,7 @@ function Navigation({
     <>
       <DialogRow
         icon="search"
-        label={t('Search')}
+        label={i18n._({ id: 'shell.search', message: 'Search' })}
         ariaKeys={shortcutAriaKeys('search')}
         open={openSiteSearch}
         afterDrawer={afterDrawer}
@@ -139,7 +138,7 @@ function Navigation({
       </Box>
       <DialogRow
         icon="settings"
-        label={t('Settings')}
+        label={i18n._({ id: 'shell.settings', message: 'Settings' })}
         open={() => openSettings()}
         afterDrawer={afterDrawer}
       />
@@ -149,7 +148,7 @@ function Navigation({
       {docs && (
         <a href={docs} className="ui-nav-item">
           <Library size={20} aria-hidden="true" focusable="false" />
-          <span>{t('Documentation')}</span>
+          <span>{i18n._({ id: 'shell.documentation', message: 'Documentation' })}</span>
         </a>
       )}
       <Box hiddenFrom="lg">

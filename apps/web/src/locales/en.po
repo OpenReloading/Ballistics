@@ -25,6 +25,9 @@ msgstr "{added, decimal} entries added, {equal, decimal} already in this browser
 msgid "events.imported"
 msgstr "{added} events added, {equal} already in this browser, {replaced} replaced."
 
+msgid "offline.notStored"
+msgstr "{address} was never opened on this device, so it is not stored. The tools, your own records and pages you opened before work offline."
+
 msgid "holeDetection.proposedMaybe"
 msgstr "{count, decimal} proposed, {maybe, decimal} maybe"
 
@@ -723,6 +726,9 @@ msgstr "All years"
 
 msgid "disciplines.allowed"
 msgstr "Allowed"
+
+msgid "shell.alphaNote"
+msgstr "Alpha version: breaking changes are to be expected."
 
 msgid "cartridgeRecord.alsoPrintedAs"
 msgstr "Also printed as: {aliases}"
@@ -1588,6 +1594,9 @@ msgstr "Close"
 msgid "photoQuality.rule.closeEnough"
 msgstr "Close enough"
 
+msgid "shell.closeNavigation"
+msgstr "Close navigation"
+
 msgid "bulletPhoto.close"
 msgstr "Close the photograph tool"
 
@@ -2109,6 +2118,9 @@ msgstr "Distance, {unit}"
 
 msgid "events.division"
 msgstr "Division"
+
+msgid "shell.documentation"
+msgstr "Documentation"
 
 msgid "values.double"
 msgstr "double"
@@ -2837,7 +2849,7 @@ msgstr "Group name"
 msgid "targetEditor.groupPanels"
 msgstr "Group panels"
 
-msgid "sections.groups.about"
+msgid "home.about.groups"
 msgstr "Group size and dispersion from a target photo or a drawn target; the photo stays in your browser."
 
 msgid "targetEditor.groups"
@@ -2956,6 +2968,9 @@ msgstr "Hollow-point mouth diameter"
 
 msgid "recordFields.hollowPointMouthDiameter"
 msgstr "Hollow-point mouth diameter"
+
+msgid "shellActions.home"
+msgstr "Home"
 
 msgid "disciplines.column.website"
 msgstr "Homepage"
@@ -3139,6 +3154,9 @@ msgstr "Key statistics"
 
 msgid "bulletCompare.keyValues"
 msgstr "Key values"
+
+msgid "shellActions.keyboardShortcuts"
+msgstr "Keyboard shortcuts"
 
 msgid "faceRecord.column.kind"
 msgstr "Kind"
@@ -3463,6 +3481,9 @@ msgstr "Magnum"
 
 msgid "recordFields.magnum"
 msgstr "Magnum"
+
+msgid "shell.main"
+msgstr "Main"
 
 msgid "events.major"
 msgstr "Major"
@@ -3851,6 +3872,9 @@ msgstr "Named in the rule book"
 msgid "powderTune.narrowLadder"
 msgstr "Narrow ladder"
 
+msgid "shell.navigation"
+msgstr "Navigation"
+
 msgid "targetEditor.compassNE"
 msgstr "NE"
 
@@ -4178,6 +4202,9 @@ msgstr "Not a metallic-cartridge powder"
 msgid "disciplines.notAllowed"
 msgstr "Not allowed"
 
+msgid "offline.notStoredTitle"
+msgstr "Not available offline"
+
 msgid "powderCompare.notComputedReason"
 msgstr "Not computed: {reason}"
 
@@ -4288,6 +4315,9 @@ msgstr "Notes"
 
 msgid "targetEditor.notes"
 msgstr "Notes"
+
+msgid "notFound.title"
+msgstr "Nothing at this address"
 
 msgid "holeDetection.nowCorners"
 msgstr "Now {count, decimal} corners."
@@ -4498,6 +4528,12 @@ msgstr "Page actions"
 
 msgid "page.notFound"
 msgstr "Page not found"
+
+msgid "notFound.links"
+msgstr "Pages"
+
+msgid "offline.links"
+msgstr "Pages kept on this device"
 
 msgid "values.paint"
 msgstr "paint"
@@ -4913,6 +4949,9 @@ msgstr "Range, distance"
 msgid "sources.rangefoundry"
 msgstr "RangeFoundry"
 
+msgid "appError.notShown"
+msgstr "RangeFoundry Workbench could not be shown."
+
 msgid "recordFields.gamma"
 msgstr "Ratio of specific heats"
 
@@ -5318,6 +5357,9 @@ msgstr "Rules"
 msgid "targetEditor.compassS"
 msgstr "S"
 
+msgid "shellActions.safetyNotice"
+msgstr "Safety notice"
+
 msgid "powderTune.saveAsPowder"
 msgstr "Save as a powder"
 
@@ -5408,6 +5450,9 @@ msgstr "SE"
 msgid "directoryTable.search"
 msgstr "Search"
 
+msgid "shell.search"
+msgstr "Search"
+
 msgid "fieldTable.search"
 msgstr "Search {title}"
 
@@ -5495,6 +5540,9 @@ msgstr "Set the scale first (step 2)."
 msgid "powderDesigner.setFittedData"
 msgstr "Set Values came about by to Fitted to data."
 
+msgid "shell.settings"
+msgstr "Settings"
+
 msgid "bulletDesigner.shank"
 msgstr "Shank"
 
@@ -5579,7 +5627,7 @@ msgstr "Shots"
 msgid "targetEditor.shotsCount"
 msgstr "Shots ({count, decimal})"
 
-msgid "sections.session.about"
+msgid "home.about.session"
 msgstr "Shots and statistics per string from a chronograph export, read in your browser."
 
 msgid "targetEditor.shotsStatisticsExcludedShots"
@@ -5639,7 +5687,7 @@ msgstr "Simplified drawing from the record; only values with a source are dimens
 msgid "powderTune.simulated"
 msgstr "Simulated ({unit})"
 
-msgid "sections.workbench.about"
+msgid "home.about.workbench"
 msgstr "Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser."
 
 msgid "powderRecord.handTuned"
@@ -6241,7 +6289,7 @@ msgstr "The powder record was not found."
 msgid "powderTune.powderNotSaved"
 msgstr "The powder was not saved."
 
-msgid "sections.database.about"
+msgid "home.about.database"
 msgstr "The published records, each with its source, and your own beside them."
 
 msgid "events.readFailed"
@@ -6328,8 +6376,20 @@ msgstr "The targets of this discipline state no shot count."
 msgid "powderTune.temperatureFactorNeedsTwo"
 msgstr "The temperature factor needs strings at two or more powder temperatures."
 
+msgid "offline.about"
+msgstr "The tools, your own records and pages you opened before work offline."
+
 msgid "chargeTarget.notMonotone"
 msgstr "The value crosses the target at more than one charge."
+
+msgid "shellActions.theme.dark"
+msgstr "Theme: dark"
+
+msgid "shellActions.theme.light"
+msgstr "Theme: light"
+
+msgid "shellActions.theme.system"
+msgstr "Theme: system"
 
 msgid "powderDesigner.thermochemistry"
 msgstr "Thermochemistry"
@@ -6360,6 +6420,9 @@ msgstr "This file is not an image this browser can read."
 
 msgid "bulletCompare.invalid"
 msgstr "This link is not valid."
+
+msgid "notFound.about"
+msgstr "This page could not be found. Search the records, or open one of these pages."
 
 msgid "pageError.title"
 msgstr "This page could not be shown."
@@ -6466,6 +6529,9 @@ msgstr "Try a sample"
 msgid "holeDetection.trySmallerPhotoAnother"
 msgstr "Try a smaller photo or another browser."
 
+msgid "appError.tryAgain"
+msgstr "Try again"
+
 msgid "powderTune.tryOtherValuesAnyway"
 msgstr "Try the other values anyway"
 
@@ -6549,6 +6615,9 @@ msgstr "Unit if the file has none"
 
 msgid "sessionSummary.unit"
 msgstr "Unit: {units}"
+
+msgid "shellActions.unitsSettings"
+msgstr "Units settings"
 
 msgid "units.name"
 msgstr "Units: {preset}"
@@ -6742,8 +6811,14 @@ msgstr "Wind speed"
 msgid "burnRateCompare.noCurve"
 msgstr "Without a curve"
 
+msgid "shellActions.workbenchSettings"
+msgstr "Workbench settings"
+
 msgid "powderTune.workingOutPressureRange"
 msgstr "Working out the pressure range"
+
+msgid "offline.title"
+msgstr "Works offline"
 
 msgid "chargeTarget.applyHelp"
 msgstr "Writes the charge into the charge field"

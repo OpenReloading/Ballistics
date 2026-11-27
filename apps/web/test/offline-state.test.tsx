@@ -3,15 +3,23 @@ import { MantineProvider } from '@mantine/core'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
-import { NotFoundState, OfflineState } from '../src/components/offline-state.tsx'
+import { NotFoundState } from '../src/components/not-found-state.tsx'
+import { OfflineState } from '../src/components/offline-state.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
 
-const html = (node: ReactNode) =>
-  renderToStaticMarkup(
+/** `node`'s markup in English; a message without its English fails the test. */
+function html(node: ReactNode) {
+  const missing: string[] = []
+  const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+  const markup = renderToStaticMarkup(
     <I18nProvider i18n={linguiOf('en')}>
       <MantineProvider>{node}</MantineProvider>
     </I18nProvider>,
   )
+  stop()
+  expect(missing).toEqual([])
+  return markup
+}
 
 // Retry reloading the page is not checked here (no DOM)
 it('the offline state has its page h1 and a title below it, Retry and links to the pages kept on the device', () => {
