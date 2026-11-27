@@ -6,9 +6,9 @@ path = "**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
 SPDX-License-Identifier = "AGPL-3.0-only"
 
-# Documentation: the docs site pages and the Markdown files.
+# Documentation: the docs site pages, their examples and the Markdown files.
 [[annotations]]
-path = ["apps/docs/docs/**", "**/*.md", "**/*.mdx"]
+path = ["apps/docs/docs/**", "apps/docs/examples/**", "**/*.md", "**/*.mdx"]
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
 SPDX-License-Identifier = "MIT"
 
@@ -29,7 +29,7 @@ SPDX-License-Identifier = "MIT"
 path = "apps/docs/src/components/RepoWidget.tsx"
 precedence = "aggregate"
 SPDX-FileCopyrightText = ["2026 the RangeFoundry contributors", "2026 GitHub Inc."]
-SPDX-License-Identifier = "ISC AND MIT"
+SPDX-License-Identifier = "AGPL-3.0-only AND MIT"
 
 # Catalog records (NOTICE, packages/catalog/LICENSE).
 [[annotations]]

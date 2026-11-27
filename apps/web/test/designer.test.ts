@@ -11,6 +11,7 @@ import { face } from '@rangefoundry/svg-drawings'
 import { bulletFigureModel, bulletOutline } from '@rangefoundry/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
+import { english } from '../src/i18n/translate.ts'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
   type Action,
@@ -30,12 +31,15 @@ import {
   newDesign,
   reduce,
 } from '../src/lib/bullet-designer.ts'
-import { fieldError, fieldValueFromText } from '../src/lib/field-spec.ts'
+import { fieldError } from '../src/lib/field-error.ts'
+import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedBullet } from '../src/lib/variants.ts'
 import { defined } from './defined.ts'
 import { matchBullet, targetBullet } from './fixtures/bullets.ts'
 import { catalogBundle } from './records.ts'
+
+const en = [english.t, linguiOf('en')] as const
 
 describe('choice lists', () => {
   it('are subsets of the record schema enums', () => {
@@ -229,7 +233,10 @@ describe('refusals', () => {
     }
     const mass = defined(designerSpecs.find((s) => s.key === 'mass'))
     for (const text of ['0', '-5'])
-      expect(fieldError(mass, fieldValueFromText('mass', metric, text), metric), text).toBeDefined()
+      expect(
+        fieldError(mass, fieldValueFromText('mass', metric, text), metric, ...en),
+        text,
+      ).toBeDefined()
   })
 
   it('asks for the other cannelure value', () => {

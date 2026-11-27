@@ -1,11 +1,13 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
 import { useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
-import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import { type FieldSpec, type Fields, initialFields } from '../lib/field-spec.ts'
 import { movingTargetRows } from '../lib/moving-target.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
@@ -40,10 +42,11 @@ export function MovingTarget({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [fields, setFields] = useState<Fields>(() => initialFields(specs, system))
   useFieldUnits(specs, system, (update) => setFields((f) => update(f)))
   const errors = Object.fromEntries(
-    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t)]),
+    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t, i18n)]),
   )
   const { speed, heading, length } = {
     ...Object.fromEntries(specs.map((s) => [s.key, fields[s.key]?.si])),

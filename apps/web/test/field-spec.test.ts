@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
+import { english } from '../src/i18n/translate.ts'
+import { fieldError } from '../src/lib/field-error.ts'
 import {
   close,
   type FieldSpec,
-  fieldError,
   fieldOf,
   fieldValueFromText,
   initialFields,
@@ -14,6 +16,8 @@ import {
   typedFieldValue,
 } from '../src/lib/field-spec.ts'
 import { kilogramsPerGrain, presetUnits } from '../src/lib/units.ts'
+
+const en = [english.t, linguiOf('en')] as const
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
@@ -106,51 +110,55 @@ describe('fieldError', () => {
   const open: FieldSpec = { key: 'l', label: 'Length', quantity: 'length' }
 
   it('asks for a number in a required field only', () => {
-    expect(fieldError(length, at(''), metric)).toBeUndefined()
-    expect(fieldError(length, undefined, metric)).toBeUndefined()
-    expect(fieldError(length, at('  '), metric)).toBeUndefined()
-    expect(fieldError({ ...length, required: true }, at(' '), metric)).toBe(
+    expect(fieldError(length, at(''), metric, ...en)).toBeUndefined()
+    expect(fieldError(length, undefined, metric, ...en)).toBeUndefined()
+    expect(fieldError(length, at('  '), metric, ...en)).toBeUndefined()
+    expect(fieldError({ ...length, required: true }, at(' '), metric, ...en)).toBe(
       'Enter a number for Length.',
     )
-    expect(fieldError({ ...length, required: true }, undefined, metric)).toBe(
+    expect(fieldError({ ...length, required: true }, undefined, metric, ...en)).toBe(
       'Enter a number for Length.',
     )
   })
 
   it('names text that is no number, and both readings of an ambiguous one', () => {
-    expect(fieldError(length, { text: 'abc', si: undefined }, metric)).toBe(
+    expect(fieldError(length, { text: 'abc', si: undefined }, metric, ...en)).toBe(
       'Enter a number for Length.',
     )
-    expect(fieldError(open, { text: '1,234', si: undefined }, metric)).toBe(
+    expect(fieldError(open, { text: '1,234', si: undefined }, metric, ...en)).toBe(
       'Ambiguous: write 1.234 for a decimal or 1234 for a whole number.',
     )
   })
 
   it('holds the bounds inclusive and names them in the shown unit', () => {
-    expect(fieldError(length, at('1'), metric)).toBeUndefined()
-    expect(fieldError(length, at('100'), metric)).toBeUndefined()
-    expect(fieldError(length, at('0.5'), metric)).toBe('Length must be at least 1 mm.')
-    expect(fieldError(length, at('100.5'), metric)).toBe('Length must be at most 100 mm.')
-    expect(fieldError(length, at('1e3'), metric)).toBe('Length must be at most 100 mm.')
-    expect(fieldError({ ...open, max: 100 }, at('-5', open), metric)).toBeUndefined()
-    expect(fieldError(open, at('1e6', open), metric)).toBeUndefined()
+    expect(fieldError(length, at('1'), metric, ...en)).toBeUndefined()
+    expect(fieldError(length, at('100'), metric, ...en)).toBeUndefined()
+    expect(fieldError(length, at('0.5'), metric, ...en)).toBe('Length must be at least 1 mm.')
+    expect(fieldError(length, at('100.5'), metric, ...en)).toBe('Length must be at most 100 mm.')
+    expect(fieldError(length, at('1e3'), metric, ...en)).toBe('Length must be at most 100 mm.')
+    expect(fieldError({ ...open, max: 100 }, at('-5', open), metric, ...en)).toBeUndefined()
+    expect(fieldError(open, at('1e6', open), metric, ...en)).toBeUndefined()
   })
 
   it('refuses 0 where the value must be greater than 0, and a fraction where it must be whole', () => {
     const positive: FieldSpec = { key: 'l', label: 'Length', quantity: 'length', positive: true }
-    expect(fieldError(positive, at('0', positive), metric)).toBe(
+    expect(fieldError(positive, at('0', positive), metric, ...en)).toBe(
       'Length must be greater than 0 mm.',
     )
-    expect(fieldError(positive, at('0.001', positive), metric)).toBeUndefined()
-    expect(fieldError({ ...positive, positive: false }, at('0', positive), metric)).toBeUndefined()
+    expect(fieldError(positive, at('0.001', positive), metric, ...en)).toBeUndefined()
+    expect(
+      fieldError({ ...positive, positive: false }, at('0', positive), metric, ...en),
+    ).toBeUndefined()
     const count: FieldSpec = { key: 'n', label: 'Shots', quantity: 'ratio', integer: true }
-    expect(fieldError(count, at('2.5', count), metric)).toBe('Shots must be a whole number.')
-    expect(fieldError(count, at('3', count), metric)).toBeUndefined()
-    expect(fieldError({ ...count, integer: false }, at('2.5', count), metric)).toBeUndefined()
+    expect(fieldError(count, at('2.5', count), metric, ...en)).toBe('Shots must be a whole number.')
+    expect(fieldError(count, at('3', count), metric, ...en)).toBeUndefined()
+    expect(
+      fieldError({ ...count, integer: false }, at('2.5', count), metric, ...en),
+    ).toBeUndefined()
   })
 
   it('leaves the unit out of the message of a quantity without a symbol', () => {
     const ratio: FieldSpec = { key: 'r', label: 'Ratio', quantity: 'ratio', min: 0 }
-    expect(fieldError(ratio, at('-1', ratio), metric)).toBe('Ratio must be at least 0.')
+    expect(fieldError(ratio, at('-1', ratio), metric, ...en)).toBe('Ratio must be at least 0.')
   })
 })

@@ -38,7 +38,7 @@ $$
 \text{coverage} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}\big(|e_i| \le k\,u_i\big), \qquad k_{90} = Q_{0.9}\!\left(\frac{|e_i|}{u_i}\right)
 $$
 
-$k_{90}$ is the factor that would cover 90 % of the replicates; a calibrated interval has $k_{90} \approx 1.645$. The relative distance of a value $x$ outside the fitted range $[x_\min, x_\max]$ is $x / x_\max - 1$ above and $x / x_\min - 1$ below. With 200 replicates the standard error of a coverage near 90 % is about 2 points. The grid points of one replicate share its noise, so neighboring cells are not independent.
+$k_{90}$ is the factor that would cover 90 % of the replicates; a calibrated interval has $k_{90} \approx 1.645$. The relative distance of a value $x$ outside the fitted range $[x_{\min}, x_{\max}]$ is $x / x_{\max} - 1$ above and $x / x_{\min} - 1$ below. With 200 replicates the standard error of a coverage near 90 % is about 2 points. The grid points of one replicate share its noise, so neighboring cells are not independent.
 
 ## Numbers
 
