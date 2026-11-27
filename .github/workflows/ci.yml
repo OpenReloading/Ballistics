@@ -218,7 +218,20 @@ jobs:
   # also checks the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run: the
   # plan skips `static` for prose that no other check reads, which is where a word breaks.
   check:
-    needs: [changes, static, test, docs, e2e-checks, e2e-shard, e2e, e2e-next, hole-model, workflows, dependency-review]
+    needs:
+      [
+        changes,
+        static,
+        test,
+        docs,
+        e2e-checks,
+        e2e-shard,
+        e2e,
+        e2e-next,
+        hole-model,
+        workflows,
+        dependency-review,
+      ]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
