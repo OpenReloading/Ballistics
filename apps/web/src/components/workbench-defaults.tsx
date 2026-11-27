@@ -1,14 +1,15 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Stack, Switch } from '@mantine/core'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
+import { fieldError } from '../lib/field-error.ts'
 import {
   type FieldSpec,
   type Fields,
   type FieldValue,
-  fieldError,
   initialFields,
   specText,
 } from '../lib/field-spec.ts'
@@ -52,6 +53,7 @@ const keys = [...defaultKeys, 'barrelLength'] as const
 export function WorkbenchDefaultsForm() {
   const { system, ready } = useUnits()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [stored, setStored] = useState<WorkbenchDefaults>()
   const [fields, setFields] = useState<Fields>({})
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
@@ -89,9 +91,10 @@ export function WorkbenchDefaultsForm() {
     if (key === 'barrelLength')
       return value.text.trim() === ''
         ? undefined
-        : (fieldError(spec, value, shown, t) ?? ((value.si ?? 0) > 0 ? undefined : aboveZero(spec)))
+        : (fieldError(spec, value, shown, t, i18n) ??
+            ((value.si ?? 0) > 0 ? undefined : aboveZero(spec)))
     return (
-      fieldError(spec, value, shown, t) ??
+      fieldError(spec, value, shown, t, i18n) ??
       (validDefault(key, value.si) ? undefined : aboveZero(spec))
     )
   }

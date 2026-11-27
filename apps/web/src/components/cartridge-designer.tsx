@@ -35,6 +35,7 @@ import {
   fieldLabel,
   fileData,
   fromRecord,
+  labeled,
   missingHint,
   newDesign,
   reduce,
@@ -50,7 +51,8 @@ import {
 } from '../lib/cartridge-draft.ts'
 import { groupLabel, meaningText, symbolText } from '../lib/cartridge-record.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
-import { type FieldValue, fieldError } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import type { FieldValue } from '../lib/field-spec.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
 import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { resolveCartridge } from '../lib/variants.ts'
@@ -459,7 +461,7 @@ function fieldErrorText(
   i18n: I18n,
 ) {
   return (
-    fieldError({ ...s, label: fieldLabel(s, i18n) }, design.fields[s.key], system, t, i18n) ??
+    fieldError(labeled(s), design.fields[s.key], system, t, i18n) ??
     (refusal?.field === s.key ? refusal.reason : undefined) ??
     e.checks[s.key]?.join(' ')
   )
@@ -649,7 +651,7 @@ export function CartridgeDesigner() {
     return (
       <DesignerField
         key={s.key}
-        spec={s}
+        spec={labeled(s)}
         system={system}
         value={value}
         help={helpText(s, state, system, e.notes[s.key] ?? [], i18n)}

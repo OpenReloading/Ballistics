@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { radPerMoa } from '@rangefoundry/ballistics'
 import { useState } from 'react'
@@ -8,7 +9,8 @@ import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import { localDay } from '../lib/dates.ts'
-import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import { type FieldSpec, type Fields, initialFields } from '../lib/field-spec.ts'
 import { cssMm, ladderMarks, markDiameterMm, maxMarkMm, rulerMm } from '../lib/ladder-target.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
@@ -46,11 +48,12 @@ export function LadderTarget({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const body = usePortalBody()
   const [fields, setFields] = useState<Fields>(() => initialFields(specs, system))
   useFieldUnits(specs, system, (update) => setFields((f) => update(f)))
   const errors = Object.fromEntries(
-    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t)]),
+    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t, i18n)]),
   )
   const distance = fields.distance?.si
   const size = fields.size?.si

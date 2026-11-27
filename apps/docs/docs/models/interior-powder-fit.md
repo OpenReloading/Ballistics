@@ -171,7 +171,7 @@ Code: `packages/ballistics/src/interior/fit.ts`, `predictPowder` (`quantile`), `
 A fit keeps the data it was made from as its `domain`: one closed range per axis, each widened by a relative margin $\delta$ (default `powderDomainMargin`, 0, set per fit with `domainMargin`: on synthetic ladders with model error the interval loses coverage from the first per cent outside the range, so no margin keeps it and the flag sits at the range edge, [research log](../research/interior-powder-fit-extrapolation-margin.md)). The upper end of bore diameter and barrel length is widened by $\delta_+ = \max(\delta, 0.025)$, a tolerance for values rounded in the input; on the other axes $\delta_+ = \delta$:
 
 $$
-[\,x_\min (1 - \delta),\; x_\max (1 + \delta_+)\,]
+[\,x_{\min} (1 - \delta),\; x_{\max} (1 + \delta_+)\,]
 $$
 
 Code: `packages/ballistics/src/interior/fit.ts`, `fitDomain`, `outsideDomain`.
@@ -394,7 +394,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $\chi^2$                                    | Sum of squared weighted residuals                                                                                  | 1                      | 1                      |
 | $n$, $n_p$, $\nu$                           | Rows, parameters, degrees of freedom                                                                               | 1                      | 1                      |
 | $C_\theta$                                  | Covariance of the log parameters                                                                                   | 1                      | 1                      |
-| $x_\min$, $x_\max$, $\delta$, $\delta_+$    | Smallest and largest value of an axis in the data, relative margin of the domain, relative margin of its upper end | as the axis, 1         | as the axis, 1         |
+| $x_{\min}, x_{\max}$, $\delta$, $\delta_+$  | Smallest and largest value of an axis in the data, relative margin of the domain, relative margin of its upper end | as the axis, 1         | as the axis, 1         |
 | $m$, $\hat y$                               | Charge of a prediction, predicted muzzle velocity or peak breech pressure                                          | g, m/s or bar          | kg, m/s or Pa          |
 | $u(\hat y)$, $g_j$                          | Standard uncertainty of a prediction, its gradient in the log parameters                                           | as $\hat y$            | as $\hat y$            |
 | $k$, $z$, $t$, $\alpha$                     | Coverage factor, normal and Student quantile, one minus the coverage                                               | 1                      | 1                      |

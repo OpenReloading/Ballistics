@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
-import { fieldError, fieldValueFromText, switchFields } from '../src/lib/field-spec.ts'
+import { english } from '../src/i18n/translate.ts'
+import { fieldError } from '../src/lib/field-error.ts'
+import { fieldValueFromText, switchFields } from '../src/lib/field-spec.ts'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import { shotFields } from '../src/lib/trajectory-input.ts'
 import {
@@ -24,6 +27,8 @@ import {
   waterGrams,
   waterVolume,
 } from '../src/lib/units.ts'
+
+const en = [english.t, linguiOf('en')] as const
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
@@ -146,23 +151,23 @@ describe('a field over a unit switch', () => {
     )[s.key]
 
   it('names the bound in the shown unit', () => {
-    expect(fieldError(step, fieldValueFromText('range', metric, '0.5'), metric)).toBe(
+    expect(fieldError(step, fieldValueFromText('range', metric, '0.5'), metric, ...en)).toBe(
       'Range step must be at least 1 m.',
     )
-    expect(fieldError(step, fieldValueFromText('range', us, '0.5'), us)).toBe(
+    expect(fieldError(step, fieldValueFromText('range', us, '0.5'), us, ...en)).toBe(
       'Range step must be at least 1 yd.',
     )
   })
 
   it('keeps the sign of a value below its bound and its error', () => {
     const grams = fieldValueFromText('mass', metric, '-1')
-    expect(fieldError(mass, grams, metric)).toBe('Bullet mass must be at least 0 g.')
+    expect(fieldError(mass, grams, metric, ...en)).toBe('Bullet mass must be at least 0 g.')
     const grains = switched(mass, metric, us, '-1')
     expect(grains?.text).toBe('-15.4')
-    expect(fieldError(mass, grains, us)).toBe('Bullet mass must be at least 0 gr.')
+    expect(fieldError(mass, grains, us, ...en)).toBe('Bullet mass must be at least 0 gr.')
     const fps = switched(velocity, metric, us, '-1')
     expect(fps?.text).toBe('-3.28')
-    expect(fieldError(velocity, fps, us)).toBe('Muzzle velocity must be at least 0 ft/s.')
+    expect(fieldError(velocity, fps, us, ...en)).toBe('Muzzle velocity must be at least 0 ft/s.')
   })
 
   it('converts the values the e2e flows type', () => {
@@ -262,19 +267,23 @@ describe('a twist as 1:N', () => {
   })
 
   it('names the field error for text that is no twist, and the bound for a negative one', () => {
-    expect(fieldError(twist, fieldValueFromText('twist', inches, '1:x'), inches)).toBe(
+    expect(fieldError(twist, fieldValueFromText('twist', inches, '1:x'), inches, ...en)).toBe(
       'Enter a twist as 1:8 or 8.',
     )
-    expect(fieldError(twist, fieldValueFromText('twist', inches, '1:'), inches)).toBe(
+    expect(fieldError(twist, fieldValueFromText('twist', inches, '1:'), inches, ...en)).toBe(
       'Enter a twist as 1:8 or 8.',
     )
-    expect(fieldError(twist, fieldValueFromText('twist', inches, ''), inches)).toBe(
+    expect(fieldError(twist, fieldValueFromText('twist', inches, ''), inches, ...en)).toBe(
       'Enter a number for Twist.',
     )
-    expect(fieldError(twist, fieldValueFromText('twist', inches, '1:-8'), inches)).toBe(
+    expect(fieldError(twist, fieldValueFromText('twist', inches, '1:-8'), inches, ...en)).toBe(
       'Twist must be at least 0 in.',
     )
-    expect(fieldError(twist, fieldValueFromText('twist', inches, '1:8'), inches)).toBeUndefined()
-    expect(fieldError(twist, fieldValueFromText('twist', inches, '0'), inches)).toBeUndefined()
+    expect(
+      fieldError(twist, fieldValueFromText('twist', inches, '1:8'), inches, ...en),
+    ).toBeUndefined()
+    expect(
+      fieldError(twist, fieldValueFromText('twist', inches, '0'), inches, ...en),
+    ).toBeUndefined()
   })
 })

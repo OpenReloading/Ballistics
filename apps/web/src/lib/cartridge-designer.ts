@@ -34,7 +34,8 @@ import {
   tooLarge,
 } from './cartridge-draft.ts'
 import { drawable } from './cartridge-sheet.ts'
-import { close, type FieldValue, fieldError, fieldOf } from './field-spec.ts'
+import { fieldError } from './field-error.ts'
+import { close, type FieldSpec, type FieldValue, fieldOf } from './field-spec.ts'
 import { designReduce, type History as H, historyOf, mapHistory, pushHistory } from './history.ts'
 import { nth } from './nth.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
@@ -196,6 +197,17 @@ const sideSymbol = {
 export const fieldLabel = (s: CartridgeFieldSpec, i18n: I18n) =>
   i18n._({ ...sideSymbol[s.side], values: { symbol: s.symbol } })
 
+const labeledSpecs = new WeakMap<CartridgeFieldSpec, FieldSpec>()
+
+/** The field with that label as a message, so the field and its messages show it in the language shown; one object per field, for the memoized field. */
+export function labeled(s: CartridgeFieldSpec): FieldSpec {
+  const known = labeledSpecs.get(s)
+  if (known) return known
+  const spec = { ...s, label: { ...sideSymbol[s.side], values: { symbol: s.symbol } } }
+  labeledSpecs.set(s, spec)
+  return spec
+}
+
 /** Where each field's value comes from, against the record the design started from. */
 function fieldStates({ fields, origin }: Design): Evaluation['states'] {
   const states: Evaluation['states'] = {}
@@ -241,11 +253,7 @@ function refuseInvalid(
   const invalid = fieldSpecs
     .map(
       (s) =>
-        [
-          s.key,
-          fieldError({ ...s, label: fieldLabel(s, i18n) }, fields[s.key], system, t) ??
-            tooLargeText(s),
-        ] as const,
+        [s.key, fieldError(labeled(s), fields[s.key], system, t, i18n) ?? tooLargeText(s)] as const,
     )
     .filter(([, e]) => e !== undefined)
   const bad = invalid.find(([k]) => k === last) ?? invalid[0]

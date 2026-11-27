@@ -268,11 +268,20 @@ msgstr "{label} from {velocity}"
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
 
+msgid "fieldError.wholeNumber"
+msgstr "{label} must be a whole number."
+
 msgid "powderDesigner.above"
 msgstr "{label} must be above {min, decimal}."
 
+msgid "fieldError.atLeast"
+msgstr "{label} must be at least {min, decimal}{unit}."
+
 msgid "powderDesigner.atLeast"
 msgstr "{label} must be at least {min, decimal}{unit}."
+
+msgid "fieldError.atMost"
+msgstr "{label} must be at most {max, decimal}{unit}."
 
 msgid "powderDesigner.atMost"
 msgstr "{label} must be at most {max, decimal}{unit}."
@@ -282,6 +291,9 @@ msgstr "{label} must be at most {max} {unit} in the designer."
 
 msgid "powderDesigner.below"
 msgstr "{label} must be below {max, decimal}."
+
+msgid "fieldError.greaterThanZero"
+msgstr "{label} must be greater than 0{unit}."
 
 msgid "powderDesigner.greaterThanZero"
 msgstr "{label} must be greater than 0{unit}."
@@ -456,6 +468,12 @@ msgstr "{value} {unit}"
 
 msgid "chargeTarget.valueAt"
 msgstr "{value} at {charge}"
+
+msgid "caseGroup.enterNumber"
+msgstr "{what}: enter a number."
+
+msgid "caseGroup.notValid"
+msgstr "{what}: not valid."
 
 msgid "logSummary.yearTotals"
 msgstr "{year}: {entries}, {rounds}"
@@ -994,9 +1012,6 @@ msgstr "boron nitride"
 msgid "page.cases"
 msgstr "Brass"
 
-msgid "reportIssue.area.brass"
-msgstr "Brass"
-
 msgid "values.brass"
 msgstr "Brass"
 
@@ -1060,9 +1075,6 @@ msgstr "Bullet data table"
 msgid "page.bulletsDesigner"
 msgstr "Bullet designer"
 
-msgid "reportIssue.area.bulletDesigner"
-msgstr "Bullet designer"
-
 msgid "cartridgeRecord.meaning.bulletDiameter"
 msgstr "bullet diameter"
 
@@ -1088,9 +1100,6 @@ msgid "disciplines.row.bulletTypes"
 msgstr "Bullets"
 
 msgid "page.bullets"
-msgstr "Bullets"
-
-msgid "reportIssue.area.bullets"
 msgstr "Bullets"
 
 msgid "siteSearch.bullets"
@@ -1231,6 +1240,9 @@ msgstr "Cannelure width"
 msgid "powderTune.cannotRun"
 msgstr "Cannot run"
 
+msgid "caseGroup.capacitySpread"
+msgstr "Capacity spread"
+
 msgid "values.carbine"
 msgstr "Carbine"
 
@@ -1268,9 +1280,6 @@ msgid "cartridgeDesigner.cartridgeDesign"
 msgstr "Cartridge design"
 
 msgid "page.cartridgesDesigner"
-msgstr "Cartridge designer"
-
-msgid "reportIssue.area.cartridgeDesigner"
 msgstr "Cartridge designer"
 
 msgid "cartridgeRecord.dimensions.cartridge"
@@ -1324,9 +1333,6 @@ msgstr "Cartridges"
 msgid "powderRecord.cartridges"
 msgstr "Cartridges"
 
-msgid "reportIssue.area.cartridges"
-msgstr "Cartridges"
-
 msgid "cartridges.filtered"
 msgstr "Cartridges, {filters}"
 
@@ -1348,6 +1354,9 @@ msgstr "case length"
 msgid "cartridges.column.caseLength"
 msgstr "Case length L3"
 
+msgid "caseGroup.caseMass"
+msgstr "Case mass"
+
 msgid "cartridges.column.type"
 msgstr "Case type"
 
@@ -1359,6 +1368,12 @@ msgstr "case-contact"
 
 msgid "cartridgeRecord.meaning.case"
 msgstr "Case: the case type, derived from the record"
+
+msgid "caseGroup.casesMeasured"
+msgstr "Cases measured"
+
+msgid "caseGroup.casesMeasuredHelp"
+msgstr "Cases the capacity and the other measured values come from."
 
 msgid "values.cast"
 msgstr "cast"
@@ -1518,6 +1533,9 @@ msgstr "Choose or drop a chronograph file, or load the example: three strings of
 
 msgid "bulletPhoto.choosePhotograph"
 msgstr "Choose photograph"
+
+msgid "caseGroup.chooseCartridge"
+msgstr "Choose the cartridge."
 
 msgid "targetEditor.chooseDropPastePhoto"
 msgstr "Choose, drop or paste a photo; it stays in this browser and is never uploaded."
@@ -2110,9 +2128,6 @@ msgstr "Disciplines"
 msgid "page.disciplines"
 msgstr "Disciplines"
 
-msgid "reportIssue.area.disciplines"
-msgstr "Disciplines"
-
 msgid "targets.column.disciplines"
 msgstr "Disciplines"
 
@@ -2329,8 +2344,14 @@ msgstr "Enter a name and the values you have."
 msgid "caseEditor.enterName"
 msgstr "Enter a name."
 
+msgid "caseGroup.enterName"
+msgstr "Enter a name."
+
 msgid "targetEditor.enterName"
 msgstr "Enter a name."
+
+msgid "fieldError.enterNumber"
+msgstr "Enter a number for {label}."
 
 msgid "powderDesigner.enterNumberFor"
 msgstr "Enter a number for {label}."
@@ -2343,6 +2364,9 @@ msgstr "Enter a target above 0{unit}."
 
 msgid "chargeTarget.enterTargetAtMost"
 msgstr "Enter a target of at most {max}{unit}."
+
+msgid "fieldError.twist"
+msgstr "Enter a twist as 1:8 or 8."
 
 msgid "cartridgeDesigner.enterLeastToDraw"
 msgstr "Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw."
@@ -2558,9 +2582,6 @@ msgstr "Federation data is unavailable right now."
 msgid "page.federations"
 msgstr "Federations"
 
-msgid "reportIssue.area.federations"
-msgstr "Federations"
-
 msgid "disciplines.federationsFiltered"
 msgstr "Federations, {filters}"
 
@@ -2636,11 +2657,11 @@ msgstr "Firearms"
 msgid "page.firearms"
 msgstr "Firearms"
 
-msgid "reportIssue.area.firearms"
-msgstr "Firearms"
-
 msgid "firearms.titleFiltered"
 msgstr "Firearms, {filters}"
+
+msgid "caseGroup.timesFiredHelp"
+msgstr "Firings of these cases so far."
 
 msgid "powderDesigner.fitPowderChronographStrings"
 msgstr "Fit a powder from chronograph strings"
@@ -3713,6 +3734,9 @@ msgstr "Mean extreme spread per ladder step as an angle, so groups at different 
 msgid "powderDesigner.meanMolarMassCombustion"
 msgstr "Mean molar mass of the combustion gas."
 
+msgid "caseGroup.waterCapacityHelp"
+msgstr "Mean of the cases measured in this group, for example fired and sized. The workbench uses it as the measured case capacity."
+
 msgid "targetEditor.meanRadius"
 msgstr "Mean radius"
 
@@ -3970,6 +3994,9 @@ msgstr "neck diameter at L2"
 
 msgid "cartridgeRecord.meaning.neckAtMouth"
 msgstr "neck diameter at the mouth"
+
+msgid "caseGroup.neckWall"
+msgstr "Neck wall"
 
 msgid "caseEditor.new"
 msgstr "New brass group"
@@ -4802,9 +4829,6 @@ msgstr "Powder values from the user design {name}, not a catalogue record."
 msgid "page.powders"
 msgstr "Powders"
 
-msgid "reportIssue.area.powders"
-msgstr "Powders"
-
 msgid "burnRateCompare.byRate"
 msgstr "Powders by burn rate"
 
@@ -4875,9 +4899,6 @@ msgid "recordFields.primerPocket"
 msgstr "Primer pocket"
 
 msgid "page.primers"
-msgstr "Primers"
-
-msgid "reportIssue.area.primers"
 msgstr "Primers"
 
 msgid "primers.filtered"
@@ -5642,9 +5663,6 @@ msgstr "Session"
 msgid "page.session"
 msgstr "Session summary"
 
-msgid "reportIssue.area.sessionSummary"
-msgstr "Session summary"
-
 msgid "targetEditor.set"
 msgstr "Set"
 
@@ -5659,9 +5677,6 @@ msgstr "Set the scale first (step 2)."
 
 msgid "powderDesigner.setFittedData"
 msgstr "Set Values came about by to Fitted to data."
-
-msgid "reportIssue.area.settings"
-msgstr "Settings"
 
 msgid "shell.settings"
 msgstr "Settings"
@@ -5712,9 +5727,6 @@ msgid "disciplineRecord.column.groups"
 msgstr "Shot groups"
 
 msgid "page.groups"
-msgstr "Shot groups"
-
-msgid "reportIssue.area.shotGroups"
 msgstr "Shot groups"
 
 msgid "targetEditor.markerHelp"
@@ -5945,6 +5957,9 @@ msgstr "Stage points"
 msgid "events.stages"
 msgstr "Stages"
 
+msgid "caseGroup.capacitySpreadHelp"
+msgstr "Standard deviation of the water capacity over the cases measured."
+
 msgid "powderTune.standardUncertainty"
 msgstr "Standard uncertainty"
 
@@ -6161,9 +6176,6 @@ msgid "federationRecord.column.targets"
 msgstr "Targets"
 
 msgid "page.targets"
-msgstr "Targets"
-
-msgid "reportIssue.area.targets"
 msgstr "Targets"
 
 msgid "disciplineRecord.targets"
@@ -6598,6 +6610,9 @@ msgstr "Time (s)"
 msgid "disciplines.row.timeLimit"
 msgstr "Time limit"
 
+msgid "caseGroup.timesFired"
+msgstr "Times fired"
+
 msgid "values.tin"
 msgstr "tin"
 
@@ -6663,6 +6678,9 @@ msgstr "transducer"
 
 msgid "disciplines.row.minTriggerWeight"
 msgstr "Trigger weight from"
+
+msgid "caseGroup.trimLength"
+msgstr "Trim length"
 
 msgid "values.triple"
 msgstr "triple"
@@ -6921,6 +6939,9 @@ msgstr "Water capacity"
 
 msgid "recordFields.waterCapacity"
 msgstr "Water capacity"
+
+msgid "caseGroup.waterCapacity"
+msgstr "Water capacity to the mouth"
 
 msgid "cases.column.capacityHelp"
 msgstr "Water to the case mouth, as the manufacturer states."
