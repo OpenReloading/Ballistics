@@ -239,8 +239,29 @@ describe('learnedDetector region and contract', () => {
     )
   })
 
-  it('rejects holes so small that the working image passes 2 million px', async () => {
-    await expect(propose([], { expectedHoleDiameter: 0.0005 })).rejects.toThrow(RangeError)
+  it('coarsens a whole 4032 x 3024 photo of 30 px holes to the 2 million px cap', async () => {
+    const dims: number[][] = []
+    const run: RunModel = async (input) => {
+      dims.push([...input.dims])
+      return bigStub([])(input)
+    }
+    const found = await learnedDetector(manifest, run).propose({
+      image: bigImage(4032, 3024),
+      pxPerM: 1000,
+      expectedHoleDiameter: 0.03,
+    })
+    expect(found.proposals).toEqual([])
+    expect(dims).toEqual([[1, 3, 1216, 1632]])
+  })
+
+  it('rejects holes that the 2 million px cap leaves under 4 working px', async () => {
+    await expect(
+      learnedDetector(manifest, bigStub([])).propose({
+        image: bigImage(4000, 3000),
+        pxPerM: 1000,
+        expectedHoleDiameter: 0.008,
+      }),
+    ).rejects.toThrow(RangeError)
   })
 })
 

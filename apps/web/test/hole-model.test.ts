@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { holeDetector, modelManifest, type RunModel } from '@rangefoundry/target-recognition'
 import { describe, expect, it } from 'vitest'
-import { editionRoot } from '../src/lib/dev-model.ts'
 import { type ModelLoad, servedDetector } from '../src/lib/hole-model.ts'
+import { editionRoot } from '../src/lib/model-root.ts'
 import { wasmSettings } from '../src/lib/onnx-model.ts'
 
 const site = new URL('../public/', import.meta.url)
@@ -101,6 +101,15 @@ describe('servedDetector', () => {
   it('answers with the classical detector when no model is set', async () => {
     const { loader, fetched } = load(files(root, 'abc'))
     expect(await servedDetector(undefined, loader)).toEqual({
+      detector: holeDetector,
+      fellBack: false,
+    })
+    expect(fetched).toEqual([])
+  })
+
+  it('answers an example pick with the classical detector without loading the model', async () => {
+    const { loader, fetched } = load(files(root, 'abc'))
+    expect(await servedDetector(root, loader, { at: { x: 16, y: 16 } })).toEqual({
       detector: holeDetector,
       fellBack: false,
     })

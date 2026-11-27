@@ -2,11 +2,18 @@
 import type { Point } from '@rangefoundry/shot-groups'
 import { nth } from '@rangefoundry/statistics'
 import { MAYBE_BELOW } from './confidence-tier.ts'
-import { checkScales, cropBox, type HoleProposal, MAX_WORK_PIXELS } from './hole-detection.ts'
+import {
+  checkScales,
+  cropBox,
+  type HoleProposal,
+  MAX_WORK_PIXELS,
+  MIN_WORK_DIAMETER,
+} from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
 import type { InferencePort, ProposalRequest, Proposals } from './inference-port.ts'
 import type { ModelManifest } from './model-manifest.ts'
 import { clamp, insidePolygon, rectangle } from './raster-ops.ts'
+import { paperOutline } from './target-paper.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
@@ -41,7 +48,7 @@ export function learnedDetector(manifest: ModelManifest, run: RunModel): Inferen
 type Box = { x0: number; y0: number; x1: number; y1: number }
 type Size = { w: number; h: number; pw: number; ph: number }
 
-/** A plain run on the region (else the face outline, else the whole image); `at` and `auto` change nothing, as the scale comes from the expected hole diameter. */
+/** A plain run on the region (else the face outline, else the paper's outline); `at` and `auto` change nothing, as the scale comes from the expected hole diameter. */
 async function propose(
   r: ProposalRequest,
   { input, output }: ModelManifest,
@@ -50,7 +57,7 @@ async function propose(
   const { holePx, poly, box } = areaOf(r)
   const [cw, ch] = [box.x1 - box.x0, box.y1 - box.y0]
   if (cw < 1 || ch < 1) return { proposals: [], flagged: [] }
-  const size = sizeOf(cw, ch, input.holePx / holePx, input.sizeMultiple)
+  const size = sizeOf(cw, ch, holePx, input)
   const data = tensor(resample(r.image, box, size), size, input)
   const heat = await run({ data, dims: [1, 3, size.ph, size.pw] })
   const [gw, gh] = [size.pw / output.stride, size.ph / output.stride]
@@ -68,18 +75,16 @@ async function propose(
       y: box.y0 + ((p.y + 0.5) * t * ch) / size.h - 0.5,
       confidence: confidence(p.value, output.sure),
     }))
-    .filter((p) => !poly || insidePolygon(p, poly))
+    .filter((p) => insidePolygon(p, poly))
   return { proposals: clustered(found, holePx), flagged: [] }
 }
 
-/** The expected hole diameter in photo px, the region's polygon and the box the run works on, with the classical detector's margin. */
-function areaOf(r: ProposalRequest): { holePx: number; poly: Point[] | undefined; box: Box } {
+/** The expected hole diameter in photo px, the region's polygon (as the classical detector: else the face outline, else the paper's) and the box the run works on, with the classical detector's margin. */
+function areaOf(r: ProposalRequest): { holePx: number; poly: Point[]; box: Box } {
   checkScales(r)
   const holePx = r.expectedHoleDiameter * r.pxPerM * (r.holeScale ?? 1)
   if (!(holePx > 0)) throw new RangeError('The expected hole diameter must be positive')
-  const area = r.region ?? r.face?.outline
-  if (!area)
-    return { holePx, poly: undefined, box: { x0: 0, y0: 0, x1: r.image.width, y1: r.image.height } }
+  const area = r.region ?? r.face?.outline ?? paperOutline(r.image)
   const poly = 'width' in area ? rectangle(area) : [...area]
   if (poly.length < 3) throw new Error('A region needs at least 3 points')
   if (!poly.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y)))
@@ -87,13 +92,22 @@ function areaOf(r: ProposalRequest): { holePx: number; poly: Point[] | undefined
   return { holePx, poly, box: cropBox(poly, MARGIN * holePx, r.image) }
 }
 
-/** The working size at `scale` and its padding to `multiple`; a RangeError past the working px cap. */
-function sizeOf(cw: number, ch: number, scale: number, multiple: number): Size {
-  const [w, h] = [Math.max(1, Math.round(cw * scale)), Math.max(1, Math.round(ch * scale))]
-  const [pw, ph] = [Math.ceil(w / multiple) * multiple, Math.ceil(h / multiple) * multiple]
-  if (pw * ph > MAX_WORK_PIXELS)
+/** The working size of a `cw` x `ch` box with `holePx` holes, padded to the size multiple; as the classical detector, a working image past the px cap is coarsened, with a RangeError when that leaves a hole under `MIN_WORK_DIAMETER` working px. */
+function sizeOf(cw: number, ch: number, holePx: number, input: ModelManifest['input']): Size {
+  let scale = input.holePx / holePx
+  let size = padded(cw, ch, scale, input.sizeMultiple)
+  while (size.pw * size.ph > MAX_WORK_PIXELS) {
+    scale *= Math.sqrt(MAX_WORK_PIXELS / (size.pw * size.ph))
+    size = padded(cw, ch, scale, input.sizeMultiple)
+  }
+  if (holePx * scale < MIN_WORK_DIAMETER)
     throw new RangeError('The region is too large for holes this small; mark a smaller region')
-  return { w, h, pw, ph }
+  return size
+}
+
+function padded(cw: number, ch: number, scale: number, multiple: number): Size {
+  const [w, h] = [Math.max(1, Math.round(cw * scale)), Math.max(1, Math.round(ch * scale))]
+  return { w, h, pw: Math.ceil(w / multiple) * multiple, ph: Math.ceil(h / multiple) * multiple }
 }
 
 /** Per working px of one axis, the first source px it covers and the shares of it each covered px gives. */

@@ -1,15 +1,16 @@
-/** The detector of a detection run: the learned one when the served model is switched on and loads in time, else the classical one. */
+/** The detector of a detection run: the learned one when the served model loads in time, else the classical one. */
 import {
   holeDetector,
   type InferencePort,
   learnedDetector,
   type ModelManifest,
   modelManifest,
+  type ProposalRequest,
   type RunModel,
 } from '@rangefoundry/target-recognition'
 
 /** The served model's manifest (`apps/web/public/models/`), relative to the edition's base path like the `file.url` and `runtime.wasmPaths` it names. */
-const MODEL_MANIFEST = 'models/hole-model-0.1.0.json'
+export const MODEL_MANIFEST = 'models/hole-model-0.1.0.json'
 
 /** The limit on loading the manifest, the model and the runtime: both files (4.6 MB compressed) take about 23 s over a 1.6 Mbit/s mobile link. */
 export const MODEL_LOAD_MS = 60_000
@@ -25,12 +26,13 @@ export type ModelLoad = {
 /** The detector and whether a set model failed to load, so the page can say the classical detector answered. */
 export type RunDetector = { detector: InferencePort; fellBack: boolean }
 
-/** `root` (the edition's base path as an absolute URL ending in `/`, `editionRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. */
+/** `root` (the edition's base path as an absolute URL ending in `/`, `editionRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. An example pick (`at`) gets the classical detector without a load: the learned one ignores the pick and measures no hole size, which the example sets. */
 export async function servedDetector(
   root: string | undefined,
   load: ModelLoad,
+  request: Pick<ProposalRequest, 'at'> = {},
 ): Promise<RunDetector> {
-  if (!root) return { detector: holeDetector, fellBack: false }
+  if (!root || request.at) return { detector: holeDetector, fellBack: false }
   try {
     return { detector: await untilAborted(learned(root, load), load.signal), fellBack: false }
   } catch (error) {
