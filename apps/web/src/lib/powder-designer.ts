@@ -1,4 +1,6 @@
 /** The powder designer: the draft, its file data, the powder it builds and the problems it reports. */
+
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import {
   fromSi,
   type Powder,
@@ -9,6 +11,7 @@ import {
   type UserPowderFit,
   type UserRecord,
 } from '@rangefoundry/schema'
+import { linguiOf } from '../i18n/lingui.ts'
 import { untranslated } from '../i18n/number.ts'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
@@ -75,18 +78,18 @@ export interface PowderSpec extends FieldSpec {
 
 const spec = (
   key: string,
-  label: string,
+  label: MessageDescriptor,
   quantity: Quantity,
   kind: QuantityKind,
   group: PowderSpec['group'],
-  help: string,
+  help?: MessageDescriptor,
 ): PowderSpec => ({ key, label, quantity, kind, group, help })
 
 /** A field of the burn law; without a quantity it is a plain number. */
 const burn = (
   key: string,
-  label: string,
-  help: string,
+  label: MessageDescriptor,
+  help: MessageDescriptor,
   quantity: Quantity = 'ratio',
   kind: QuantityKind = 'dimensionless',
 ): PowderSpec => spec(key, label, quantity, kind, 'burn', help)
@@ -94,15 +97,15 @@ const burn = (
 /** The three numbers of a computed range of the thermochemistry, labeled value, min and max. */
 const range = (
   name: string,
-  labels: readonly [Message, Message, Message],
+  labels: readonly [MessageDescriptor, MessageDescriptor, MessageDescriptor],
   quantity: Quantity,
   kind: QuantityKind,
-  help: string,
+  help: MessageDescriptor,
 ): PowderSpec[] =>
   (['value', 'min', 'max'] as const).map((part, i) =>
     spec(
       `thermochemistry.${name}.${part}`,
-      labels[i] ?? part,
+      labels[i] ?? { id: part },
       quantity,
       kind,
       'thermochemistry',
@@ -114,60 +117,104 @@ const range = (
 export const powderSpecs: readonly PowderSpec[] = [
   spec(
     'bulkDensity.value',
-    msg('Bulk density'),
+    /*i18n*/ { id: 'powderDesigner.bulkDensity', message: 'Bulk density' },
     'density',
     'density',
     'properties',
-    msg('Mass per volume of loose powder, voids included.'),
+    /*i18n*/ {
+      id: 'powderDesigner.massPerVolumeLoose',
+      message: 'Mass per volume of loose powder, voids included.',
+    },
   ),
   spec(
     'thermochemistry.loadingDensity.value',
-    msg('Loading density'),
+    /*i18n*/ { id: 'powderDesigner.loadingDensity', message: 'Loading density' },
     'density',
     'density',
     'thermochemistry',
-    msg('Loading density of the constant-volume burn the values below apply to.'),
+    /*i18n*/ {
+      id: 'powderDesigner.loadingDensityConstantVolume',
+      message: 'Loading density of the constant-volume burn the values below apply to.',
+    },
   ),
   ...range(
     'flameTemperature',
-    [msg('Flame temperature value'), msg('Flame temperature min'), msg('Flame temperature max')],
+    [
+      /*i18n*/ { id: 'powderDesigner.flameTemperatureValue', message: 'Flame temperature value' },
+      /*i18n*/ { id: 'powderDesigner.flameTemperatureMin', message: 'Flame temperature min' },
+      /*i18n*/ { id: 'powderDesigner.flameTemperatureMax', message: 'Flame temperature max' },
+    ],
     'temperature',
     'absoluteTemperature',
-    msg('At constant volume; min and max over the composition ranges.'),
+    /*i18n*/ {
+      id: 'powderDesigner.constantVolumeMinMax',
+      message: 'At constant volume; min and max over the composition ranges.',
+    },
   ),
   ...range(
     'impetus',
-    [msg('Impetus value'), msg('Impetus min'), msg('Impetus max')],
+    [
+      /*i18n*/ { id: 'powderDesigner.impetusValue', message: 'Impetus value' },
+      /*i18n*/ { id: 'powderDesigner.impetusMin', message: 'Impetus min' },
+      /*i18n*/ { id: 'powderDesigner.impetusMax', message: 'Impetus max' },
+    ],
     'specificEnergy',
     'specificEnergy',
-    msg('Impetus of the burning, with its extremes.'),
+    /*i18n*/ {
+      id: 'powderDesigner.impetusBurningExtremes',
+      message: 'Impetus of the burning, with its extremes.',
+    },
   ),
   ...range(
     'gamma',
-    [msg('Gamma value'), msg('Gamma min'), msg('Gamma max')],
+    [
+      /*i18n*/ { id: 'powderDesigner.gammaValue', message: 'Gamma value' },
+      /*i18n*/ { id: 'powderDesigner.gammaMin', message: 'Gamma min' },
+      /*i18n*/ { id: 'powderDesigner.gammaMax', message: 'Gamma max' },
+    ],
     'ratio',
     'dimensionless',
-    msg('Frozen ratio of specific heats at the flame temperature.'),
+    /*i18n*/ {
+      id: 'powderDesigner.frozenRatioSpecificHeats',
+      message: 'Frozen ratio of specific heats at the flame temperature.',
+    },
   ),
   ...range(
     'molarMass',
-    [msg('Molar mass value'), msg('Molar mass min'), msg('Molar mass max')],
+    [
+      /*i18n*/ { id: 'powderDesigner.molarMassValue', message: 'Molar mass value' },
+      /*i18n*/ { id: 'powderDesigner.molarMassMin', message: 'Molar mass min' },
+      /*i18n*/ { id: 'powderDesigner.molarMassMax', message: 'Molar mass max' },
+    ],
     'molarMass',
     'molarMass',
-    msg('Mean molar mass of the combustion gas.'),
+    /*i18n*/ {
+      id: 'powderDesigner.meanMolarMassCombustion',
+      message: 'Mean molar mass of the combustion gas.',
+    },
   ),
   ...range(
     'covolume',
-    [msg('Covolume value'), msg('Covolume min'), msg('Covolume max')],
+    [
+      /*i18n*/ { id: 'powderDesigner.covolumeValue', message: 'Covolume value' },
+      /*i18n*/ { id: 'powderDesigner.covolumeMin', message: 'Covolume min' },
+      /*i18n*/ { id: 'powderDesigner.covolumeMax', message: 'Covolume max' },
+    ],
     'covolume',
     'specificVolume',
-    msg('Covolume of the combustion gas, with its extremes.'),
+    /*i18n*/ {
+      id: 'powderDesigner.covolumeCombustionGasExtremes',
+      message: 'Covolume of the combustion gas, with its extremes.',
+    },
   ),
   {
     ...burn(
       'interior.vivacity.value',
-      msg('Vivacity'),
-      msg('Burn rate scale of the vivacity law at the reference pressure.'),
+      /*i18n*/ { id: 'powderDesigner.vivacity', message: 'Vivacity' },
+      /*i18n*/ {
+        id: 'powderDesigner.burnRateScaleVivacity',
+        message: 'Burn rate scale of the vivacity law at the reference pressure.',
+      },
       'vivacity',
       'burnRate',
     ),
@@ -175,74 +222,112 @@ export const powderSpecs: readonly PowderSpec[] = [
   },
   burn(
     'interior.energy.value',
-    msg('Specific energy'),
-    msg('At constant volume.'),
+    /*i18n*/ { id: 'powderDesigner.specificEnergy', message: 'Specific energy' },
+    /*i18n*/ { id: 'powderDesigner.constantVolume', message: 'At constant volume.' },
     'specificEnergy',
     'specificEnergy',
   ),
-  burn('interior.gamma', msg('Gamma'), msg('Ratio of specific heats of the gas; above 1.')),
+  burn(
+    'interior.gamma',
+    /*i18n*/ { id: 'powderDesigner.gamma', message: 'Gamma' },
+    /*i18n*/ {
+      id: 'powderDesigner.ratioSpecificHeatsGas',
+      message: 'Ratio of specific heats of the gas; above 1.',
+    },
+  ),
   burn(
     'interior.covolume.value',
-    msg('Covolume'),
-    msg('Covolume of the gas.'),
+    /*i18n*/ { id: 'powderDesigner.covolume', message: 'Covolume' },
+    /*i18n*/ { id: 'powderDesigner.covolumeGas', message: 'Covolume of the gas.' },
     'covolume',
     'specificVolume',
   ),
   burn(
     'interior.density.value',
-    msg('Grain density'),
-    msg('Solid density of the grains.'),
+    /*i18n*/ { id: 'powderDesigner.grainDensity', message: 'Grain density' },
+    /*i18n*/ { id: 'powderDesigner.solidDensityGrains', message: 'Solid density of the grains.' },
     'density',
     'density',
   ),
   burn(
     'interior.pressureExponent',
-    msg('Pressure exponent'),
-    msg('Exponent of the pressure in the burn law.'),
+    /*i18n*/ { id: 'powderDesigner.pressureExponent', message: 'Pressure exponent' },
+    /*i18n*/ {
+      id: 'powderDesigner.exponentPressureBurnLaw',
+      message: 'Exponent of the pressure in the burn law.',
+    },
   ),
   burn(
     'interior.referencePressure.value',
-    msg('Reference pressure'),
-    msg('Pressure at which the vivacity holds.'),
+    /*i18n*/ { id: 'powderDesigner.referencePressure', message: 'Reference pressure' },
+    /*i18n*/ {
+      id: 'powderDesigner.pressureWhichVivacityHolds',
+      message: 'Pressure at which the vivacity holds.',
+    },
     'pressure',
     'pressure',
   ),
   burn(
     'interior.ignitionPressure.value',
-    msg('Ignition pressure'),
-    msg('Pressure at which the grains start to burn.'),
+    /*i18n*/ { id: 'powderDesigner.ignitionPressure', message: 'Ignition pressure' },
+    /*i18n*/ {
+      id: 'powderDesigner.pressureWhichGrainsStart',
+      message: 'Pressure at which the grains start to burn.',
+    },
     'pressure',
     'pressure',
   ),
   burn(
     'interior.startPressure.value',
-    msg('Start pressure'),
-    msg('Pressure at which the bullet starts to move. Empty: solver default.'),
+    /*i18n*/ { id: 'powderDesigner.startPressure', message: 'Start pressure' },
+    /*i18n*/ {
+      id: 'powderDesigner.pressureWhichBulletStarts',
+      message: 'Pressure at which the bullet starts to move. Empty: solver default.',
+    },
     'pressure',
     'pressure',
   ),
   burn(
     'interior.propellantTemperature.value',
-    msg('Propellant temperature'),
-    msg('Temperature the parameters were fitted at.'),
+    /*i18n*/ { id: 'powderDesigner.propellantTemperature', message: 'Propellant temperature' },
+    /*i18n*/ {
+      id: 'powderDesigner.temperatureParametersWereFitted',
+      message: 'Temperature the parameters were fitted at.',
+    },
     'temperature',
     'temperature',
   ),
   burn(
     'interior.burnForm.a.value',
-    msg('Form a'),
-    msg('Form parameter a of the two-stage burn form.'),
+    /*i18n*/ { id: 'powderDesigner.formA', message: 'Form a' },
+    /*i18n*/ {
+      id: 'powderDesigner.formParameterATwo',
+      message: 'Form parameter a of the two-stage burn form.',
+    },
   ),
-  burn('interior.burnForm.m', msg('Form m'), msg('Form parameter m of the two-stage burn form.')),
+  burn(
+    'interior.burnForm.m',
+    /*i18n*/ { id: 'powderDesigner.formM', message: 'Form m' },
+    /*i18n*/ {
+      id: 'powderDesigner.formParameterMTwo',
+      message: 'Form parameter m of the two-stage burn form.',
+    },
+  ),
   burn(
     'interior.burnForm.q',
-    msg('Form q'),
-    msg('Form parameter q of the two-stage burn form; not negative.'),
+    /*i18n*/ { id: 'powderDesigner.formQ', message: 'Form q' },
+    /*i18n*/ {
+      id: 'powderDesigner.formParameterQTwo',
+      message: 'Form parameter q of the two-stage burn form; not negative.',
+    },
   ),
   burn(
     'interior.burnForm.z1',
-    msg('Form z1'),
-    msg('Burnt fraction at which the first stage ends; above 0, at most 1.'),
+    /*i18n*/ { id: 'powderDesigner.formZ1', message: 'Form z1' },
+    /*i18n*/ {
+      id: 'powderDesigner.burntFractionWhichFirst',
+      message: 'Burnt fraction at which the first stage ends; above 0, at most 1.',
+    },
   ),
 ]
 
@@ -252,8 +337,10 @@ const specByKey = new Map(powderSpecs.map((s) => [s.key, s]))
 export function specOf(key: string): PowderSpec {
   const own = specByKey.get(key)
   if (own) return own
-  const label = key.endsWith('.max') ? msg('Mass percent max') : msg('Mass percent min')
-  return spec(key, label, 'percent', 'massFraction', 'properties', '')
+  const label = key.endsWith('.max')
+    ? /*i18n*/ { id: 'powderDesigner.massPercentMax', message: 'Mass percent max' }
+    : /*i18n*/ { id: 'powderDesigner.massPercentMin', message: 'Mass percent min' }
+  return spec(key, label, 'percent', 'massFraction', 'properties')
 }
 
 /** An ingredient row; its numbers are `comp.<id>.min` and `comp.<id>.max`. */
@@ -532,7 +619,7 @@ const ruleTexts: Record<string, Message> = {
 }
 
 /** The name of the place of an issue at `path`, in the words of the form. */
-function labelOf(d: Design, path: PropertyKey[], t: Translator['t']): string {
+function labelOf(d: Design, path: PropertyKey[], t: Translator['t'], i18n: I18n): string {
   const [head, index, part] = path
   const row = typeof index === 'number' ? liveRows(d)[index] : undefined
   if (head === 'composition' && row) {
@@ -546,7 +633,7 @@ function labelOf(d: Design, path: PropertyKey[], t: Translator['t']): string {
   }
   const key = path.join('.')
   const spec = specByKey.get(key) ?? specByKey.get(`${key}.value`)
-  if (spec) return specText(t, spec.label)
+  if (spec) return specText(t, spec.label, i18n)
   const section = typeof head === 'string' ? sectionLabels[head] : undefined
   return section ? t(section) : key
 }
@@ -626,7 +713,7 @@ function draftProblems(d: Design, data: UserPowder, t: Translator['t']): Problem
 }
 
 /** A value the record needs is reported at each empty field below its place. */
-function problemsOf(d: Design, issues: Issue[], t: Translator['t']): Problem[] {
+function problemsOf(d: Design, issues: Issue[], t: Translator['t'], i18n: I18n): Problem[] {
   const live = liveRows(d)
   return issues.flatMap((issue): Problem[] => {
     const key = keyOf(live, issue.path)
@@ -641,7 +728,7 @@ function problemsOf(d: Design, issues: Issue[], t: Translator['t']): Problem[] {
         },
       ]
     if (key === 'fitted') return [{ key, message: t('Tick at least one fitted parameter.') }]
-    if (key) return [{ key, message: issueText(issue, labelOf(d, issue.path, t), t) }]
+    if (key) return [{ key, message: issueText(issue, labelOf(d, issue.path, t, i18n), t) }]
     if (issue.message === 'needs a composition')
       return [{ message: t('Add at least one ingredient.') }]
     const prefix = `${issue.path.join('.')}.`
@@ -655,9 +742,9 @@ function problemsOf(d: Design, issues: Issue[], t: Translator['t']): Problem[] {
     if (required.test(issue.message) && empty.length > 0)
       return empty.map((s) => ({
         key: s.key,
-        message: t('Enter a number for {label}.', { label: specText(t, s.label) }),
+        message: t('Enter a number for {label}.', { label: specText(t, s.label, i18n) }),
       }))
-    return [{ message: issueText(issue, labelOf(d, issue.path, t), t) }]
+    return [{ message: issueText(issue, labelOf(d, issue.path, t, i18n), t) }]
   })
 }
 
@@ -724,13 +811,14 @@ export function checkDesign(
   d: Design,
   id: string,
   t: Translator['t'] = untranslated(),
+  i18n: I18n = linguiOf('en'),
 ): { powder: Powder } | { problems: Problem[] } {
   const data = fileData(d)
   const built = powderOf(data, d.name, id)
   // a typed text that reads as no number is left out of the record, so the record is not done
   const labelled = (key: string) => {
     const [, row, part] = key.split('.')
-    if (!key.startsWith('comp.')) return specText(t, specOf(key).label)
+    if (!key.startsWith('comp.')) return specText(t, specOf(key).label, i18n)
     const n = d.rows.findIndex((r) => r.id === row) + 1
     return part === 'max'
       ? t('Ingredient {n} max percent', { n })
@@ -743,7 +831,7 @@ export function checkDesign(
   if ('powder' in built) return own.length > 0 ? { problems: own } : built
   // a rule the draft's own check reports already is not said twice
   const said = new Set(own.map((p) => `${p.key ?? ''} ${p.message}`))
-  const schema = problemsOf(d, built.issues, t).filter(
+  const schema = problemsOf(d, built.issues, t, i18n).filter(
     (p) => !said.has(`${p.key ?? ''} ${p.message}`),
   )
   return { problems: [...own, ...schema] }

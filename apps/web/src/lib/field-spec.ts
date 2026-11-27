@@ -1,5 +1,7 @@
 /** Form fields: specs, typed text and SI values, validation messages. */
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { fromSi, type QuantityKind, toSi } from '@rangefoundry/schema'
+import { linguiOf } from '../i18n/lingui.ts'
 import { ambiguousMessage, type NumberRange, parseNumber, untranslated } from '../i18n/number.ts'
 import type { Message, Translator } from '../i18n/translate.ts'
 import {
@@ -14,11 +16,14 @@ import {
 /** A form field: the text as typed or converted, and its SI value (undefined while empty or invalid). */
 export type FieldValue = { text: string; si: number | undefined }
 
+/** A spec's text: a Lingui message, or an English text of the catalogue that `t` reads. */
+export type SpecText = string | MessageDescriptor
+
 export interface FieldSpec {
   key: string
-  label: string
+  label: SpecText
   /** Field help, shown as the field description. */
-  help?: string | undefined
+  help?: SpecText | undefined
   quantity: Quantity
   required?: boolean
   /** Bounds in display units, only where they hold in every unit of the quantity. */
@@ -124,8 +129,9 @@ export function siValues(fields: Fields): Record<string, number | undefined> {
   return Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si]))
 }
 
-/** A spec marks its texts as messages where it is defined, so the catalogue has them. */
-export const specText = (t: Translator['t'], text: string) => t(text as Message)
+/** A spec marks its texts as messages where it is defined, so the catalogue has them; `i18n` is in the language of `t`. */
+export const specText = (t: Translator['t'], text: SpecText, i18n: I18n = linguiOf('en')) =>
+  typeof text === 'string' ? t(text as Message) : i18n._(text)
 
 /** Undefined when valid; bounds inclusive in display units, as the HTML attributes; the message names the field's own unit, not the Settings. */
 export function fieldError(
@@ -133,9 +139,10 @@ export function fieldError(
   value: FieldValue | undefined,
   shown: UnitSystem,
   t: Translator['t'] = untranslated(),
+  i18n?: I18n,
 ): string | undefined {
   const text = value?.text.trim() ?? ''
-  const label = specText(t, spec.label)
+  const label = specText(t, spec.label, i18n)
   if (text === '') return spec.required ? t('Enter a number for {label}.', { label }) : undefined
   if (value?.si === undefined) {
     if (spec.quantity === 'twist') return t('Enter a twist as 1:8 or 8.')

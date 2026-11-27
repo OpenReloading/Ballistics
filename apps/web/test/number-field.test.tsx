@@ -1,7 +1,9 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it } from 'vitest'
 import { NumberField } from '../src/components/number-field.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import type { FieldSpec } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -10,15 +12,17 @@ const system = presetUnits('metric-grams')
 
 const field = (spec: Omit<FieldSpec, 'key' | 'label'>, text: string) =>
   renderToStaticMarkup(
-    <MantineProvider>
-      <NumberField
-        spec={{ key: 'x', label: 'Value', ...spec }}
-        system={system}
-        value={{ text, si: Number(text) }}
-        onChange={() => {}}
-        unit="none"
-      />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <NumberField
+          spec={{ key: 'x', label: 'Value', ...spec }}
+          system={system}
+          value={{ text, si: Number(text) }}
+          onChange={() => {}}
+          unit="none"
+        />
+      </MantineProvider>
+    </I18nProvider>,
   )
 
 const inputOf = (html: string) => /<input[^>]*>/.exec(html)?.[0] ?? ''
@@ -65,16 +69,18 @@ describe('a number field under German', () => {
 describe('the description of a flagged field', () => {
   const described = (flag: { kind: 'exceeded' | 'record'; text: string }) => {
     const html = renderToStaticMarkup(
-      <MantineProvider>
-        <NumberField
-          spec={{ key: 'x', label: 'Value', quantity: 'mass', min: 0, help: 'A long help.' }}
-          system={system}
-          value={{ text: '2', si: 2 }}
-          onChange={() => {}}
-          unit="none"
-          flag={flag}
-        />
-      </MantineProvider>,
+      <I18nProvider i18n={linguiOf('en')}>
+        <MantineProvider>
+          <NumberField
+            spec={{ key: 'x', label: 'Value', quantity: 'mass', min: 0, help: 'A long help.' }}
+            system={system}
+            value={{ text: '2', si: 2 }}
+            onChange={() => {}}
+            unit="none"
+            flag={flag}
+          />
+        </MantineProvider>
+      </I18nProvider>,
     )
     return /<p[^>]*>([^<]*)<\/p>/.exec(html)?.[1]
   }
