@@ -39,7 +39,6 @@ import {
   caliberClassesOf,
   ownCartridges,
 } from '../lib/caliber-candidates.ts'
-import { devModelRoot } from '../lib/dev-model.ts'
 import { photoGuide } from '../lib/docs-url.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -57,6 +56,7 @@ import {
   proposalsClearOfShots,
   rectangleFromDiagonal,
 } from '../lib/hole-proposals.ts'
+import { modelRoot } from '../lib/model-root.ts'
 import { belowMinimum, guideRule, layoutOf, type QualityIssue } from '../lib/photo-quality.ts'
 import type { Frame } from '../lib/target-editor.ts'
 import { type Point, turnedBox } from '../lib/target-geometry.ts'
@@ -236,6 +236,7 @@ export function useHoleDetection({
     setHeld(false)
     setResult(false)
     setSizeOpen(false)
+    setFellBack(false)
     awaiting.current = false
     return stop
   }, [sheet.photo, sheetId, group?.id])
@@ -296,7 +297,7 @@ export function useHoleDetection({
       failed(e.message)
     }
     if (request.kind !== 'face') setFellBack(false)
-    w.postMessage(request.kind === 'face' ? request : { ...request, model: devModelRoot() })
+    w.postMessage(request.kind === 'face' ? request : { ...request, model: modelRoot() })
   }
 
   const failed = (error?: unknown) => {
@@ -728,6 +729,14 @@ export function useHoleDetection({
   )
 
   const running = progress !== undefined
+  const fellBackNote = fellBack && (
+    <Message severity="info" compact>
+      {i18n._({
+        id: 'holeDetection.modelFellBack',
+        message: 'The hole model did not load; the classical detector ran instead.',
+      })}
+    </Message>
+  )
   const runButton = (label: MessageDescriptor, auto: boolean) => (
     <>
       <RunButton
@@ -740,14 +749,7 @@ export function useHoleDetection({
         onStart={start}
         onRun={() => run(false)}
       />
-      {fellBack && (
-        <Message severity="info" compact>
-          {i18n._({
-            id: 'holeDetection.modelFellBack',
-            message: 'The hole model did not load; the classical detector ran instead.',
-          })}
-        </Message>
-      )}
+      {fellBackNote}
     </>
   )
 
@@ -863,14 +865,19 @@ export function useHoleDetection({
       step={step}
       setStep={goStep}
       start={
-        result
-          ? resultLine
-          : runButton(
-              held
-                ? /*i18n*/ { id: 'holeDetection.detectAnyway', message: 'Detect anyway' }
-                : /*i18n*/ { id: 'holeDetection.detectHoles', message: 'Detect holes' },
-              true,
-            )
+        result ? (
+          <>
+            {resultLine}
+            {fellBackNote}
+          </>
+        ) : (
+          runButton(
+            held
+              ? /*i18n*/ { id: 'holeDetection.detectAnyway', message: 'Detect anyway' }
+              : /*i18n*/ { id: 'holeDetection.detectHoles', message: 'Detect holes' },
+            true,
+          )
+        )
       }
       notes={quality && <QualityNotes issues={quality} held={held} />}
       body={step === undefined ? undefined : stepBody[step]}

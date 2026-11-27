@@ -362,6 +362,12 @@ export type RunModel = (input: ModelTensor) => Promise<ModelTensor>;
 export function shareInside(e: Ellipse, w: number, h: number): number;
 
 // @public
+export class UntrainedScaleError extends RangeError {
+    // (undocumented)
+    name: string;
+}
+
+// @public
 export const WORK_DIAMETER = 16;
 
 // (No @packageDocumentation comment for this package)

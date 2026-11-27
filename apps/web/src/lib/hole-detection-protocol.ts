@@ -30,7 +30,7 @@ type Search = {
   /** Expected hole diameter, m. */
   holeDiameter: number
   minContrast: number
-  /** The edition root the served model loads under (`devModelRoot`); absent: the classical detector. */
+  /** The edition root the served model loads under (`modelRoot`); absent: the classical detector. */
   model?: string | undefined
 }
 

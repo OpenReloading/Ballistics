@@ -30,6 +30,7 @@ export {
   ModelContractError,
   type ModelTensor,
   type RunModel,
+  UntrainedScaleError,
 } from './learned-detector.ts'
 export { type ModelManifest, type ModelScores, modelManifest } from './model-manifest.ts'
 export { clamp, components, median1 } from './raster-ops.ts'
