@@ -143,6 +143,37 @@ describe('servedDetector', () => {
     },
   )
 
+  it('answers a whole 4032 x 3024 photo of 16 px holes, which the model would see under its trained 8 px, with the classical detector', async () => {
+    const [width, height] = [4032, 3024]
+    const data = new Uint8ClampedArray(width * height * 4).fill(255)
+    const holes = [
+      { x: 1000, y: 1000 },
+      { x: 2000, y: 1500 },
+      { x: 3000, y: 2000 },
+    ]
+    for (const { x, y } of holes)
+      for (let v = y - 8; v <= y + 8; v++)
+        for (let u = x - 8; u <= x + 8; u++)
+          if ((u - x) ** 2 + (v - y) ** 2 <= 64)
+            data.fill(0, (v * width + u) * 4, (v * width + u) * 4 + 3)
+    const nothing: RunModel = async ({ dims: [, , ph = 0, pw = 0] }) => ({
+      data: new Float32Array((ph / 2) * (pw / 2)),
+      dims: [1, 1, ph / 2, pw / 2],
+    })
+    const { loader } = load(files(root, 'abc'), async () => nothing)
+    const { detector, fellBack } = await servedDetector(root, loader)
+    expect(fellBack).toBe(false)
+    const { proposals } = await detector.propose({
+      image: { width, height, data },
+      pxPerM: 1000,
+      expectedHoleDiameter: 0.016,
+    })
+    expect(proposals.map(({ x, y }) => ({ x: Math.round(x), y: Math.round(y) }))).toEqual(
+      expect.arrayContaining(holes),
+    )
+    expect(proposals).toHaveLength(3)
+  })
+
   it.each([
     ['size', 'abcd', 'hole-model-0.1.0.onnx: 4 bytes, the manifest names 3'],
     [

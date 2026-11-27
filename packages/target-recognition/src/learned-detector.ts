@@ -2,13 +2,7 @@
 import type { Point } from '@rangefoundry/shot-groups'
 import { nth } from '@rangefoundry/statistics'
 import { MAYBE_BELOW } from './confidence-tier.ts'
-import {
-  checkScales,
-  cropBox,
-  type HoleProposal,
-  MAX_WORK_PIXELS,
-  MIN_WORK_DIAMETER,
-} from './hole-detection.ts'
+import { checkScales, cropBox, type HoleProposal, MAX_WORK_PIXELS } from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
 import type { InferencePort, ProposalRequest, Proposals } from './inference-port.ts'
 import type { ModelManifest } from './model-manifest.ts'
@@ -30,6 +24,11 @@ export type RunModel = (input: ModelTensor) => Promise<ModelTensor>
 /** A manifest whose output contract the decoder does not read, or a model output that breaks its manifest. */
 export class ModelContractError extends Error {
   override name = 'ModelContractError'
+}
+
+/** A run whose holes the working px cap shrinks below half the manifest's `holePx`, the smallest hole the model is trained on; the classical detector works at smaller holes. */
+export class UntrainedScaleError extends RangeError {
+  override name = 'UntrainedScaleError'
 }
 
 // the classical detector's margin around the region, in expected hole diameters
@@ -92,7 +91,7 @@ function areaOf(r: ProposalRequest): { holePx: number; poly: Point[]; box: Box }
   return { holePx, poly, box: cropBox(poly, MARGIN * holePx, r.image) }
 }
 
-/** The working size of a `cw` x `ch` box with `holePx` holes, padded to the size multiple; as the classical detector, a working image past the px cap is coarsened, with a RangeError when that leaves a hole under `MIN_WORK_DIAMETER` working px. */
+/** The working size of a `cw` x `ch` box with `holePx` holes, padded to the size multiple; as the classical detector, a working image past the px cap is coarsened, with an `UntrainedScaleError` when that leaves a hole under half the manifest's `holePx`. */
 function sizeOf(cw: number, ch: number, holePx: number, input: ModelManifest['input']): Size {
   let scale = input.holePx / holePx
   let size = padded(cw, ch, scale, input.sizeMultiple)
@@ -100,8 +99,10 @@ function sizeOf(cw: number, ch: number, holePx: number, input: ModelManifest['in
     scale *= Math.sqrt(MAX_WORK_PIXELS / (size.pw * size.ph))
     size = padded(cw, ch, scale, input.sizeMultiple)
   }
-  if (holePx * scale < MIN_WORK_DIAMETER)
-    throw new RangeError('The region is too large for holes this small; mark a smaller region')
+  if (holePx * scale < input.holePx / 2)
+    throw new UntrainedScaleError(
+      `The holes come out at ${(holePx * scale).toFixed(1)} working px, under the model's smallest trained hole of ${input.holePx / 2} px`,
+    )
   return size
 }
 

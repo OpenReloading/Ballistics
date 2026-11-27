@@ -110,7 +110,7 @@ export const WORK_DIAMETER = 16
 /** Most working px of a region: larger blocks keep memory and time bounded on a large photo. */
 export const MAX_WORK_PIXELS = 2_000_000
 /** Least hole diameter in working px once the cap forces larger blocks. */
-export const MIN_WORK_DIAMETER = 4
+const MIN_WORK_DIAMETER = 4
 
 /** A RangeError when the cap leaves a hole fewer than 4 working px. */
 export function workBlockSize(
