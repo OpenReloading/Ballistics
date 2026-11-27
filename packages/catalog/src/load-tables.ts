@@ -29,7 +29,7 @@ function checkInteriorSource(
   return errors
 }
 
-/** The findings of the fitted source `s` in a records root without load tables (the public catalog): it names its document, the retrieval date and the model version, and no fit report. */
+/** The findings of the fitted source `s` when no records root has load tables (the public catalog): it names its document, the retrieval date and the model version, and no fit report. */
 function publicFitFindings(s: Source, at: string): string[] {
   const errors: string[] = []
   if (s.title === undefined) errors.push(`${at} names no title`)
@@ -42,7 +42,7 @@ function publicFitFindings(s: Source, at: string): string[] {
 /**
  * Provenance gate of the powder model. A source that is `fitted`, or supports `interior` of a
  * powder that has one, must be a `fitted` source whose `fields` list only `interior`, on a powder
- * with `interior`. With `loadTables` (the records root has a `load-tables.json`) it must name a
+ * with `interior`. With `loadTables` (a records root read has a `load-tables.json`) it must name a
  * listed load table (title, URL, retrieval date) and the fit run (model version, report); without
  * them (the public catalog) a title, a retrieval date and the model version of the fit run, and no
  * report. A source under an open license (`origin: public` with a `license`) is exempt. A powder
