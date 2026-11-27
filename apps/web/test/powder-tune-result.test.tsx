@@ -88,12 +88,11 @@ describe('the result view of the tuning route', () => {
       running: false,
     }
     const shown = text(state)
-    for (const r of all) expect(shown).toContain(`<li>${reasonTexts[r]}</li>`)
+    for (const r of all) expect(shown).toContain(`<li>${reasonTexts[r].message}</li>`)
     // under a visible heading, and the label in no color of a verdict
     expect(shown).toContain('<h2 id="fit-because">Because</h2>')
     expect(shown).toMatch(/<p class="fit-label">Pressure range: \w+, plus and minus/)
     expect(shown).not.toMatch(/\bsafe\b/i)
-    expect(reasonTexts['residual-trend']).toBe('Residuals may show a trend')
   })
 
   it('lists the drawn velocity and band per charge step in the Chart data table', () => {
@@ -183,7 +182,7 @@ describe('refusals and rules on the screen', () => {
     'says what to change for %s',
     (reason) => {
       const html = text({ failure: { kind: 'refused', id: 1, reason }, running: false })
-      expect(html).toContain(refusalTexts[reason])
+      expect(html).toContain(refusalTexts[reason].message)
     },
   )
 

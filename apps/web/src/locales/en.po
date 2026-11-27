@@ -79,6 +79,9 @@ msgstr "{count, plural, one {# cartridge} other {# cartridges}}"
 msgid "powders.trainingCartridges"
 msgstr "{count, plural, one {# cartridge} other {# cartridges}}"
 
+msgid "powderTune.charges"
+msgstr "{count, plural, one {# charge} other {# charges}}"
+
 msgid "events.count"
 msgstr "{count, plural, one {# competition event in this browser} other {# competition events in this browser}}"
 
@@ -277,6 +280,9 @@ msgstr "{label}. Double-click or Enter accepts it, drag or arrow keys move it, D
 msgid "targetEditor.intervalDegreesFreedom"
 msgstr "{level, decimal} % interval {lower} to {upper} {unit} ({df, decimal} degrees of freedom)"
 
+msgid "powderTune.levelInterval"
+msgstr "{level} % interval"
+
 msgid "chargeTarget.pressureRangeValue"
 msgstr "{low} to {high}"
 
@@ -291,6 +297,9 @@ msgstr "{low} to {high}"
 
 msgid "sessionSummary.rangeWithUnit"
 msgstr "{low} to {high} {unit}"
+
+msgid "powderTune.lowerToUpper"
+msgstr "{lower} to {upper}"
 
 msgid "values.materialCore"
 msgstr "{material} core"
@@ -316,6 +325,9 @@ msgstr "{n, decimal} {unit} per stage"
 msgid "construction.drivingBands"
 msgstr "{n} driving bands"
 
+msgid "powderSave.nameFit"
+msgstr "{name} (fit {n})"
+
 msgid "powderDesigner.userDesignNotCatalogue"
 msgstr "{name} (user design, not a catalogue record)"
 
@@ -333,6 +345,15 @@ msgstr "{name} was not deleted: the browser refused."
 
 msgid "cartridgeDesigner.nameCipTable"
 msgstr "{name}, CIP table {table}"
+
+msgid "powderTune.nameFitted"
+msgstr "{name}, fitted"
+
+msgid "powderTune.nameValue"
+msgstr "{name}: {value}"
+
+msgid "powderTune.offsetFromFit"
+msgstr "{offset} standard uncertainties from the fit"
 
 msgid "recordFields.burnRateOrder"
 msgstr "{order} of {total}"
@@ -457,6 +478,15 @@ msgstr "A known distance on the target or the size of a target ring, marked on t
 msgid "powderRecord.neighborNote"
 msgstr "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
 
+msgid "powderTune.numberAbove0"
+msgstr "A number above 0"
+
+msgid "powderTune.numberOrEmpty"
+msgstr "A number, or empty"
+
+msgid "powderTune.saveFailedPoints"
+msgstr "A powder record holds at most 40 points, one per charge and powder temperature."
+
 msgid "holeDetection.regionNeedsLeast3"
 msgstr "A region needs at least 3 points"
 
@@ -508,6 +538,12 @@ msgstr "Add"
 msgid "log.add"
 msgstr "Add"
 
+msgid "powderTune.addString"
+msgstr "Add a string"
+
+msgid "powderTune.emptyPrompt"
+msgstr "Add a string, or open this page from the Measurements tab of a load with chronograph strings mapped to charges."
+
 msgid "bulletCompare.add"
 msgstr "Add bullet"
 
@@ -537,6 +573,9 @@ msgstr "Add to the round count?"
 
 msgid "log.addRoundCount"
 msgstr "Add to the round count?"
+
+msgid "powderTune.addedHere"
+msgstr "Added here"
 
 msgid "targetEditor.aimUnit"
 msgstr "Aim ({unit})"
@@ -595,6 +634,9 @@ msgstr "All statistics"
 msgid "targets.all"
 msgstr "All targets"
 
+msgid "powderTune.allSimulations"
+msgstr "All values on this screen are simulations, not load data."
+
 msgid "log.allYears"
 msgstr "All years"
 
@@ -609,6 +651,9 @@ msgstr "Altitude"
 
 msgid "values.aluminum"
 msgstr "Aluminum"
+
+msgid "powderTune.inputLeftOutPressureRange"
+msgstr "An input left out of the pressure range"
 
 msgid "recordFields.annealed"
 msgstr "Annealed"
@@ -658,6 +703,9 @@ msgstr "At least one source stays on"
 msgid "directoryTable.full"
 msgstr "At most {max} at once"
 
+msgid "powderTune.atFit"
+msgstr "at the fit"
+
 msgid "bulletPhoto.diameterOffRuler"
 msgstr "At the ruler's scale, the diameter in the photograph is {percent, decimal} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera."
 
@@ -670,6 +718,9 @@ msgstr "Axis direction, degrees from the photograph's x axis"
 msgid "holeDetection.back"
 msgstr "Back"
 
+msgid "powderTune.backToFit"
+msgstr "Back to the fit"
+
 msgid "values.ball"
 msgstr "ball"
 
@@ -678,6 +729,9 @@ msgstr "Ballistic coefficients"
 
 msgid "bulletRecord.coefficients"
 msgstr "Ballistic coefficients"
+
+msgid "powderTune.bandNote"
+msgstr "Band: uncertainty of the fitted parameters only, not model error. Simulation, not load data."
 
 msgid "firearms.column.barrel"
 msgstr "Barrel"
@@ -753,6 +807,9 @@ msgstr "Bearing length"
 
 msgid "recordFields.bearingLength"
 msgstr "Bearing length"
+
+msgid "powderTune.because"
+msgstr "Because"
 
 msgid "cartridgeRecord.meaning.beltDiameter"
 msgstr "belt diameter (table III)"
@@ -1036,6 +1093,9 @@ msgstr "Cannelure start"
 msgid "bulletDesigner.cannelureWidth"
 msgstr "Cannelure width"
 
+msgid "powderTune.cannotRun"
+msgstr "Cannot run"
+
 msgid "values.carbine"
 msgstr "Carbine"
 
@@ -1129,6 +1189,9 @@ msgstr "Case"
 msgid "units.quantity.capacity"
 msgstr "Case capacity"
 
+msgid "powderTune.caseCapacityEstimated"
+msgstr "Case capacity estimated"
+
 msgid "powderCompare.caseFill"
 msgstr "Case fill"
 
@@ -1216,6 +1279,9 @@ msgstr "Chamber neck length"
 msgid "cartridgeDesigner.chamberShoulderAngle"
 msgstr "Chamber shoulder angle"
 
+msgid "powderTune.chamberVolumeFactor"
+msgstr "Chamber volume factor"
+
 msgid "cartridgeDesigner.chamberUnit"
 msgstr "Chamber, {unit}"
 
@@ -1255,6 +1321,9 @@ msgstr "Changed; record value not printed"
 msgid "powderCompare.charge"
 msgstr "Charge"
 
+msgid "powderTune.charge"
+msgstr "Charge ({unit})"
+
 msgid "targetEditor.chargeUnit"
 msgstr "Charge ({unit})"
 
@@ -1273,8 +1342,14 @@ msgstr "Check the event: a value is out of its range."
 msgid "holeDetection.choose"
 msgstr "Choose"
 
+msgid "powderTune.chooseLoad"
+msgstr "Choose a load; it opens in the workbench, where its Measurements link fits the powder."
+
 msgid "bulletPhoto.chooseHelp"
 msgstr "Choose a photograph of the bullet beside a ruler, or try the sample. It is never uploaded."
+
+msgid "powderTune.choosePowder"
+msgstr "Choose a powder"
 
 msgid "bulletCompare.choose"
 msgstr "Choose bullets"
@@ -1978,6 +2053,9 @@ msgstr "Empty: same as Value."
 msgid "events.nameHint"
 msgstr "Empty: the event type and the day."
 
+msgid "powderTune.emptyLoads"
+msgstr "Empty: the load's"
+
 msgid "events.roundsFiredHint"
 msgstr "Empty: the shots of the series, where each lists them."
 
@@ -2204,6 +2282,12 @@ msgstr "Federations"
 msgid "disciplines.federationsFiltered"
 msgstr "Federations, {filters}"
 
+msgid "powderTune.refusedUnderdetermined"
+msgstr "Fewer charges than values to fit. Add a string at another charge, or fit the burn coefficient alone."
+
+msgid "powderTune.thinLadder"
+msgstr "Fewer than 3 charges, or charges less than 10 % apart: only the burn coefficient is fitted, the other values stay at those of the similar powder."
+
 msgid "sessionSummary.tooFewShots"
 msgstr "Fewer than two shots to draw."
 
@@ -2282,6 +2366,9 @@ msgstr "Fits {name}"
 msgid "recordSources.kind.fitted"
 msgstr "fitted"
 
+msgid "powderTune.fitted"
+msgstr "Fitted"
+
 msgid "recordFields.fittedFilter"
 msgstr "Fitted"
 
@@ -2297,11 +2384,20 @@ msgstr "Fitted energy over thermochemistry energy (impetus over gamma minus 1). 
 msgid "powderRecord.fittedCurve"
 msgstr "Fitted M3 curve"
 
+msgid "powderTune.fittedPowder"
+msgstr "Fitted powder"
+
 msgid "powderDesigner.fittedData"
 msgstr "Fitted to data"
 
+msgid "powderTune.fittedValues"
+msgstr "Fitted values"
+
 msgid "recordFields.fittedNote"
 msgstr "Fitted: plus and minus {k, decimal} standard uncertainties, a lower bound (the rows of one load table are correlated)."
+
+msgid "powderTune.fitting"
+msgstr "Fitting"
 
 msgid "bullets.fitting"
 msgstr "fitting {name}"
@@ -2408,6 +2504,9 @@ msgstr "From the official result, where published."
 msgid "cartridgeDesigner.fromRecord"
 msgstr "From the record"
 
+msgid "powderTune.fromSavedLoads"
+msgstr "From your saved loads with chronograph strings"
+
 msgid "powderDesigner.frozenRatioSpecificHeats"
 msgstr "Frozen ratio of specific heats at the flame temperature."
 
@@ -2504,6 +2603,12 @@ msgstr "Groups at two or more ladder steps give a chart of size against charge."
 msgid "targetEditor.groupsPerLadderStep"
 msgstr "Groups per ladder step"
 
+msgid "powderTune.handTuning"
+msgstr "Hand tuning"
+
+msgid "powderTune.handTuned"
+msgstr "Hand-tuned"
+
 msgid "disciplines.row.handloads"
 msgstr "Handloads"
 
@@ -2594,8 +2699,14 @@ msgstr "Homepage"
 msgid "federationRecord.homepage"
 msgstr "Homepage"
 
+msgid "powderTune.ladderGuide"
+msgstr "How to fire a ladder for the fit"
+
 msgid "bulletDesigner.howMeasureBulletDimensions"
 msgstr "How to measure bullet dimensions"
+
+msgid "powderTune.temperatureGuide"
+msgstr "How to measure powder temperature"
 
 msgid "targetEditor.howTakePhotoApp"
 msgstr "How to take a photo the app can score"
@@ -2605,6 +2716,9 @@ msgstr "hybrid"
 
 msgid "bulletDesigner.identity"
 msgstr "Identity"
+
+msgid "powderTune.revolverNoLeakArea"
+msgstr "If these strings were shot from a revolver: no leak area is set, so the fitted values take up the gas lost at the cylinder gap, and the simulated pressure can come out too low."
 
 msgid "powderDesigner.ignitionPressure"
 msgstr "Ignition pressure"
@@ -2822,6 +2936,9 @@ msgstr "learned"
 msgid "targetEditor.left"
 msgstr "left"
 
+msgid "powderTune.leftOutOtherLoad"
+msgstr "Left out, the strings of another load at {charges} {unit}"
+
 msgid "bulletDesigner.length"
 msgstr "Length"
 
@@ -3020,6 +3137,9 @@ msgstr "Loads"
 msgid "disciplines.firearm.longGun"
 msgstr "Long gun"
 
+msgid "powderTune.loose"
+msgstr "loose"
+
 msgid "targetEditor.low"
 msgstr "low"
 
@@ -3164,6 +3284,9 @@ msgstr "maybe {pct, decimal} %"
 msgid "sessionSummary.mean"
 msgstr "Mean"
 
+msgid "powderTune.mean"
+msgstr "Mean ({unit})"
+
 msgid "powderRecord.meanMethod"
 msgstr "Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval."
 
@@ -3256,6 +3379,9 @@ msgstr "Model output from fitted M3 parameters, not manufacturer data."
 
 msgid "powderRecord.modelParameters"
 msgstr "Model parameters"
+
+msgid "powderTune.moderate"
+msgstr "moderate"
 
 msgid "powderDesigner.molarMass"
 msgstr "Molar mass"
@@ -3385,6 +3511,9 @@ msgstr "Name, number, federation or caliber, 2.53…"
 
 msgid "disciplines.classBasis.stated"
 msgstr "Named in the rule book"
+
+msgid "powderTune.narrowLadder"
+msgstr "Narrow ladder"
 
 msgid "targetEditor.compassNE"
 msgstr "NE"
@@ -3563,6 +3692,9 @@ msgstr "No firearm saved in this browser yet"
 msgid "states.noMatch.firearms"
 msgstr "No firearms match these filters."
 
+msgid "powderTune.noFit"
+msgstr "No fit: open this page from a saved load's Measurements tab."
+
 msgid "powderCompare.noModel"
 msgstr "No fitted model parameters"
 
@@ -3583,6 +3715,9 @@ msgstr "No holes proposed in the region."
 
 msgid "powderCompare.noLimit"
 msgstr "no limit"
+
+msgid "powderTune.noMeasuredPressure"
+msgstr "No measured pressure"
 
 msgid "recordSources.noPage"
 msgstr "No page stated"
@@ -3613,6 +3748,12 @@ msgstr "No row of {table} matches {query}."
 
 msgid "events.nothingToExport"
 msgstr "No saved event to export."
+
+msgid "powderTune.noLoadWithStrings"
+msgstr "No saved load has chronograph strings mapped to charges."
+
+msgid "powderTune.noLoadUsesPowder"
+msgstr "No saved load uses this powder."
 
 msgid "bulletPhoto.noScale"
 msgstr "No scale yet."
@@ -3673,6 +3814,9 @@ msgstr "Nose length"
 
 msgid "recordFields.noseLength"
 msgstr "Nose length"
+
+msgid "powderTune.notFitSimulation"
+msgstr "Not a fit. Simulation, not load data."
 
 msgid "burnRate.notMetallic"
 msgstr "Not a metallic-cartridge powder"
@@ -3842,6 +3986,9 @@ msgstr "OK"
 msgid "targetEditor.onPointOfAim"
 msgstr "on the point of aim"
 
+msgid "powderTune.numbersAbove0"
+msgstr "One or more numbers above 0, separated by spaces"
+
 msgid "sessionSummary.oneShot"
 msgstr "one shot"
 
@@ -3877,6 +4024,12 @@ msgstr "Open in designer"
 
 msgid "recordActions.openInShotGroups"
 msgstr "Open in shot groups"
+
+msgid "powderTune.openWorkbench"
+msgstr "Open the workbench"
+
+msgid "powderTune.openLoadInWorkbench"
+msgstr "Open this load in the workbench and follow its Measurements link to fit a powder."
 
 msgid "values.openMeplat"
 msgstr "open-meplat"
@@ -3940,6 +4093,9 @@ msgstr "Outline, {name}"
 
 msgid "cartridgeDesigner.outline"
 msgstr "Outline, {name}"
+
+msgid "powderTune.outsideLadder"
+msgstr "Outside the ladder"
 
 msgid "recordFields.computedRange"
 msgstr "Over the composition ranges: {min, decimal} to {max, decimal}."
@@ -4106,6 +4262,9 @@ msgstr "Powder"
 msgid "powderDesigner.powder"
 msgstr "Powder"
 
+msgid "powderTune.powder"
+msgstr "Powder"
+
 msgid "page.powdersBurnRates"
 msgstr "Powder burn rates"
 
@@ -4117,6 +4276,9 @@ msgstr "Powder data is unavailable right now."
 
 msgid "page.powdersDesigner"
 msgstr "Powder designer"
+
+msgid "powderTune.powderName"
+msgstr "Powder name"
 
 msgid "page.powders"
 msgstr "Powders"
@@ -4177,6 +4339,9 @@ msgstr "Pressure range"
 
 msgid "powderCompare.pressureRangeUnit"
 msgstr "Pressure range, {unit}"
+
+msgid "powderTune.pressureRange"
+msgstr "Pressure range: {label}, plus and minus {percent} %"
 
 msgid "workbench.replacedPrimer"
 msgstr "primer {id}"
@@ -4436,6 +4601,9 @@ msgstr "Region off"
 msgid "holeDetection.regionOffTargetFound"
 msgstr "Region off: the target found in the photo"
 
+msgid "powderTune.remove"
+msgstr "Remove"
+
 msgid "targetEditor.remove"
 msgstr "Remove"
 
@@ -4463,8 +4631,14 @@ msgstr "Remove series {n}"
 msgid "targetEditor.removePhotoQuestion"
 msgstr "Remove the photo?"
 
+msgid "powderTune.removeStringAt"
+msgstr "Remove the string at {charge} {unit}"
+
 msgid "firearms.removedOptic"
 msgstr "Removed optic"
+
+msgid "powderTune.removedStringAt"
+msgstr "Removed the string at {charge} {unit}."
 
 msgid "targetEditor.renameSheet"
 msgstr "Rename sheet"
@@ -4507,6 +4681,12 @@ msgstr "Reset to record"
 
 msgid "cartridgeDesigner.resetRecord"
 msgstr "Reset to record"
+
+msgid "powderTune.residual"
+msgstr "Residual ({unit})"
+
+msgid "powderTune.residualsMayShowTrend"
+msgstr "Residuals may show a trend"
 
 msgid "disciplines.rule.rest"
 msgstr "rest"
@@ -4715,17 +4895,32 @@ msgstr "Rules"
 msgid "targetEditor.compassS"
 msgstr "S"
 
+msgid "powderTune.saveAsPowder"
+msgstr "Save as a powder"
+
 msgid "log.saveEntry"
 msgstr "Save entry"
 
 msgid "events.saveEvent"
 msgstr "Save event"
 
+msgid "powderTune.saveLoadToFit"
+msgstr "Save the load to fit a powder from its strings."
+
+msgid "powderTune.savedAs"
+msgstr "Saved as {name}. The workbench Powder search lists it."
+
 msgid "targetEditor.savedBrowser"
 msgstr "Saved in this browser."
 
 msgid "firearms.column.notesHelp"
 msgstr "Saved loads of another cartridge, or no saved load."
+
+msgid "powderTune.savedLoadsWithPowder"
+msgstr "Saved loads with this powder"
+
+msgid "powderTune.savesFittedNotHandTuned"
+msgstr "Saves the fitted values, not the hand-tuned ones. Type those on the workbench."
 
 msgid "holeDetection.scale"
 msgstr "Scale"
@@ -4768,6 +4963,9 @@ msgstr "SD"
 
 msgid "sessionSummary.column.sd"
 msgstr "SD"
+
+msgid "powderTune.sd"
+msgstr "SD ({unit})"
 
 msgid "sessionSummary.column.sdInterval"
 msgstr "SD {level}"
@@ -4831,6 +5029,9 @@ msgstr "semi automatic"
 
 msgid "values.semiRimmed"
 msgstr "semi-rimmed"
+
+msgid "powderTune.separatedBySpaces"
+msgstr "Separated by spaces"
 
 msgid "events.seriesHeading"
 msgstr "Series"
@@ -4910,6 +5111,9 @@ msgstr "Shot groups"
 msgid "page.groups"
 msgstr "Shot groups"
 
+msgid "powderTune.shotVelocities"
+msgstr "Shot velocities ({unit})"
+
 msgid "targetEditor.shotAddShotsActive"
 msgstr "Shot: add shots to the active group by click or tap"
 
@@ -4926,6 +5130,9 @@ msgid "events.shots"
 msgstr "Shots"
 
 msgid "faceRecord.column.shots"
+msgstr "Shots"
+
+msgid "powderTune.shots"
 msgstr "Shots"
 
 msgid "sessionSummary.shots"
@@ -4990,6 +5197,9 @@ msgstr "Signature"
 
 msgid "bulletDrawing.simplified"
 msgstr "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
+
+msgid "powderTune.simulated"
+msgstr "Simulated ({unit})"
 
 msgid "values.single"
 msgstr "single"
@@ -5075,6 +5285,9 @@ msgstr "Sources table"
 msgid "powderDesigner.specificEnergy"
 msgstr "Specific energy"
 
+msgid "powderTune.specificEnergy"
+msgstr "Specific energy"
+
 msgid "powderDesigner.specificEnergyMovedFit"
 msgstr "Specific energy (moved by the fit)"
 
@@ -5099,8 +5312,14 @@ msgstr "Stage points"
 msgid "events.stages"
 msgstr "Stages"
 
+msgid "powderTune.standardUncertainty"
+msgstr "Standard uncertainty"
+
 msgid "disciplines.rule.standing"
 msgstr "standing"
+
+msgid "powderTune.start"
+msgstr "Start"
 
 msgid "bulletDesigner.startFromRecord"
 msgstr "Start from a record"
@@ -5111,8 +5330,14 @@ msgstr "Start from a record"
 msgid "powderDesigner.startPressure"
 msgstr "Start pressure"
 
+msgid "powderTune.startPressure"
+msgstr "Start pressure"
+
 msgid "recordFields.startPressure"
 msgstr "Start pressure"
+
+msgid "powderTune.startPressureTiedVivacity"
+msgstr "Start pressure tied to the vivacity"
 
 msgid "bulletDesigner.startedFrom"
 msgstr "Started from {name}."
@@ -5170,6 +5395,9 @@ msgstr "String"
 
 msgid "sessionSummary.statsLabel"
 msgstr "String statistics"
+
+msgid "powderTune.strings"
+msgstr "Strings"
 
 msgid "recordFields.structure"
 msgstr "Structure"
@@ -5311,6 +5539,15 @@ msgstr "Technical drawing of the bullet, full section about the axis, base at th
 msgid "units.quantity.temperature"
 msgstr "Temperature"
 
+msgid "powderTune.temperature"
+msgstr "Temperature ({unit})"
+
+msgid "powderTune.temperatureFactor"
+msgstr "Temperature factor"
+
+msgid "powderTune.temperatureSensitivity"
+msgstr "Temperature sensitivity (1/K)"
+
 msgid "powderDesigner.temperatureParametersWereFitted"
 msgstr "Temperature the parameters were fitted at."
 
@@ -5340,6 +5577,9 @@ msgstr "The black zones of the target look grey."
 
 msgid "bulletPhoto.rebatedBoatTail"
 msgstr "The boat tail is not a straight cone in the photograph (a rebated boat tail?)."
+
+msgid "powderTune.saveFailedStore"
+msgstr "The browser could not store the powder. {reason} Free browser storage or allow site storage, then save again."
 
 msgid "bulletPhoto.tooAlike"
 msgstr "The bullet and the background are too alike in brightness to tell apart."
@@ -5382,6 +5622,9 @@ msgstr "The catalogue has no powders. Make one with New powder, or import a tabl
 
 msgid "chargeTarget.notFound"
 msgstr "The charge could not be found."
+
+msgid "powderTune.refusedIllConditioned"
+msgstr "The charges are too close to separate the chosen values. Add a string at a charge well apart, or a measured pressure."
 
 msgid "cartridges.column.calHelp"
 msgstr "The common caliber of the bullet diameter G1."
@@ -5428,6 +5671,12 @@ msgstr "The firearms of this browser could not be read."
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
 
+msgid "powderTune.refusedNotConverged"
+msgstr "The fit did not settle. Start from the burn coefficient of a similar powder, or fit fewer values."
+
+msgid "powderTune.saveFailedRecord"
+msgstr "The fit does not make a valid powder record. {reason}"
+
 msgid "holeDetection.modelFellBack"
 msgstr "The hole model did not load; the classical detector ran instead."
 
@@ -5451,6 +5700,9 @@ msgstr "The manufacturer's first published BC of this drag model."
 
 msgid "bullets.column.g7Help"
 msgstr "The manufacturer's first published BC of this drag model."
+
+msgid "powderTune.refusedInvalid"
+msgstr "The model cannot run one of the charges. Check the charge of the highlighted string against the case and the bullet."
 
 msgid "bulletPhoto.noseByTaper"
 msgstr "The nose end was chosen by its longer taper, which is close here: flip the nose if it is wrong."
@@ -5509,6 +5761,9 @@ msgstr "The photograph has one grey only."
 msgid "powderCompare.noRecord"
 msgstr "The powder record was not found."
 
+msgid "powderTune.powderNotSaved"
+msgstr "The powder was not saved."
+
 msgid "events.readFailed"
 msgstr "The records of this browser could not be read."
 
@@ -5542,6 +5797,9 @@ msgstr "The rule-book target, found from the black area and the ring lines. It s
 msgid "chargeTarget.toleranceNotReached"
 msgstr "The search did not reach its tolerance."
 
+msgid "powderTune.sessionsNotRead"
+msgstr "The sessions of the link could not be read."
+
 msgid "targetEditor.shotsStayDrawnTarget"
 msgstr "The shots stay on a drawn target."
 
@@ -5560,6 +5818,12 @@ msgstr "The simulation gives no valid run for this load. Reason: {reason}."
 msgid "chargeTarget.reachesAt"
 msgstr "The simulation reaches the target at about"
 
+msgid "powderTune.noTemperatureSensitivity"
+msgstr "The strings are at two or more powder temperatures, but the powder has no temperature sensitivity. Give it one to fit the temperature factor."
+
+msgid "powderTune.heldBurnCoefficient"
+msgstr "The strings cannot separate start pressure and chamber volume from the burn coefficient, so only the burn coefficient is fitted and the others keep their start values. Add a measured pressure to fit more."
+
 msgid "photoQuality.tilt"
 msgstr "The target is photographed at a slant of about {n} degrees."
 
@@ -5575,6 +5839,9 @@ msgstr "The targets need the network: set the scale by hand (step 2)."
 msgid "matchRounds.shotsUnstated"
 msgstr "The targets of this discipline state no shot count."
 
+msgid "powderTune.temperatureFactorNeedsTwo"
+msgstr "The temperature factor needs strings at two or more powder temperatures."
+
 msgid "chargeTarget.notMonotone"
 msgstr "The value crosses the target at more than one charge."
 
@@ -5589,6 +5856,12 @@ msgstr "These dimensions do not form an outline."
 
 msgid "targetEditor.pointsGiveNoScale"
 msgstr "These points give no scale: three lie on one line."
+
+msgid "powderTune.refusedUnresolved"
+msgstr "These strings cannot tell one of the values apart from the burn coefficient. Widen the charge spread, add a measured pressure, or fit the burn coefficient alone."
+
+msgid "powderTune.heldTemperature"
+msgstr "These strings cannot tell the temperature factor from the burn coefficient. It stays at 1 and only the burn coefficient is fitted. Add strings at temperatures further apart."
 
 msgid "bulletPhoto.unreadable"
 msgstr "This browser cannot read the photograph."
@@ -5613,6 +5886,9 @@ msgstr "throat diameter"
 
 msgid "bulletCompare.noneText"
 msgstr "Tick 2 to 4 bullets in the list, then Compare."
+
+msgid "powderTune.tight"
+msgstr "tight"
 
 msgid "events.time"
 msgstr "Time (s)"
@@ -5689,6 +5965,9 @@ msgstr "Try a sample"
 msgid "holeDetection.trySmallerPhotoAnother"
 msgstr "Try a smaller photo or another browser."
 
+msgid "powderTune.tryOtherValuesAnyway"
+msgstr "Try the other values anyway"
+
 msgid "page.powdersTune"
 msgstr "Tune a powder"
 
@@ -5746,10 +6025,22 @@ msgstr "Undo of {name} failed: {reason}"
 msgid "log.undoFailed"
 msgstr "Undo of {name} failed: {reason}"
 
+msgid "powderTune.unfiredAboveLadder"
+msgstr "Unfired {charge} (above the ladder): {velocity}, {level} % interval {lower} to {upper}"
+
+msgid "powderTune.unfiredBelowLadder"
+msgstr "Unfired {charge} (below the ladder): {velocity}, {level} % interval {lower} to {upper}"
+
+msgid "powderTune.unfiredInsideLadder"
+msgstr "Unfired {charge} (inside the ladder): {velocity}, {level} % interval {lower} to {upper}"
+
 msgid "bulletCompare.unit"
 msgstr "Unit"
 
 msgid "fieldTable.column.unit"
+msgstr "Unit"
+
+msgid "powderTune.unit"
 msgstr "Unit"
 
 msgid "sessionSummary.fallbackUnit"
@@ -5803,6 +6094,9 @@ msgstr "Use in workbench: {name}"
 msgid "powderCompare.usePowderWorkbench"
 msgstr "Use this powder in the workbench"
 
+msgid "powderTune.temperatureSensitivityHelp"
+msgstr "Used above and below the load temperature. Any value above 0 starts the fit, which scales it from the strings."
+
 msgid "powderDesigner.userDesignWorkbenchMarks"
 msgstr "User design: the workbench marks every result computed with it."
 
@@ -5819,6 +6113,9 @@ msgid "fieldTable.column.value"
 msgstr "Value"
 
 msgid "powderDesigner.value"
+msgstr "Value"
+
+msgid "powderTune.value"
 msgstr "Value"
 
 msgid "targetEditor.value"
@@ -5872,6 +6169,9 @@ msgstr "Velocity per shot, {name}"
 msgid "powderDesigner.vivacity"
 msgstr "Vivacity"
 
+msgid "powderTune.vivacity"
+msgstr "Vivacity"
+
 msgid "recordFields.vivacity"
 msgstr "Vivacity"
 
@@ -5880,6 +6180,9 @@ msgstr "Vivacity (moved by the fit)"
 
 msgid "burnRate.unresolvedDetail"
 msgstr "vivacity {value, decimal} 1/s, plus and minus {factor} times {sigma, decimal}"
+
+msgid "powderTune.vivacityFarSimilarPowders"
+msgstr "Vivacity far from the similar powders"
 
 msgid "targetEditor.compassW"
 msgstr "W"
@@ -5902,6 +6205,9 @@ msgstr "Water to the case mouth, as the manufacturer states."
 msgid "values.waxLube"
 msgstr "wax lube"
 
+msgid "powderTune.weakPrior"
+msgstr "Weak prior"
+
 msgid "holeDetection.whereLookRectangleTwo"
 msgstr "Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group."
 
@@ -5916,6 +6222,9 @@ msgstr "Wind speed"
 
 msgid "burnRateCompare.noCurve"
 msgstr "Without a curve"
+
+msgid "powderTune.workingOutPressureRange"
+msgstr "Working out the pressure range"
 
 msgid "chargeTarget.applyHelp"
 msgstr "Writes the charge into the charge field"
