@@ -15,9 +15,11 @@ const rows = (parts: object, citations: [string, (string | undefined)[]][] = [])
 
 const interior = { vivacity: { value: 1 } }
 const ogive = { form: 'tangent' }
-const fittedPowder = (id: string) => ({
-  ...cited(id, 'fitted', { ...page, fields: ['interior'] }),
-  interior,
+const thermochemistry = { flameTemperature: { value: 2800 } }
+// thermochemistry is a field no maker source may supply
+const makerSolved = (id: string) => ({
+  ...cited(id, 'computed', { ...page, fields: ['thermochemistry'] }),
+  thermochemistry,
 })
 
 const solved = (id: string, source: object) => ({
@@ -35,13 +37,13 @@ const refused = (id: string, field: string) =>
 
 describe('makerRows of bullets and powders by source id', () => {
   it("counts a source as a maker's unless its id is listed, also an embedded one", () => {
-    const powders = [fittedPowder('listed'), fittedPowder('other'), fittedPowder('embedded')]
+    const powders = [makerSolved('listed'), makerSolved('other'), makerSolved('embedded')]
     const found = rows({ powders }, [
       ['powders/listed.json', ['synthetic-test-data']],
       ['powders/other.json', ['maker-table']],
     ])
     const covers = [
-      'source "Maker page" (not a listed non-maker source): covers interior, which no maker source may supply',
+      'source "Maker page" (not a listed non-maker source): covers thermochemistry, which no maker source may supply',
     ]
     expect(found).toEqual({
       powders: [
@@ -53,15 +55,15 @@ describe('makerRows of bullets and powders by source id', () => {
 
   it('does not take a public origin as clearing a source', () => {
     const powder = {
-      ...cited('p', 'fitted', { ...page, origin: 'public', fields: ['interior'] }),
-      interior,
+      ...cited('p', 'computed', { ...page, origin: 'public', fields: ['thermochemistry'] }),
+      thermochemistry,
     }
     expect(rows({ powders: [powder] }, [['powders/p.json', ['open-data']]])).toEqual({
       powders: [
         {
           id: 'p',
           findings: [
-            'source "Maker page" (not a listed non-maker source): covers interior, which no maker source may supply',
+            'source "Maker page" (not a listed non-maker source): covers thermochemistry, which no maker source may supply',
           ],
         },
       ],
@@ -189,9 +191,14 @@ describe('makerRows of the wording map and a detailed path below a basic field',
 
 describe('makerRows of an id outside the list', () => {
   it('counts an id that is only a property of every object as a maker source', () => {
-    const found = rows({ powders: [fittedPowder('p')] }, [['powders/p.json', ['constructor']]])
-    expect(found).toEqual({ powders: [{ id: 'p', findings: [coversFinding('interior')] }] })
+    const found = rows({ powders: [makerSolved('p')] }, [['powders/p.json', ['constructor']]])
+    expect(found).toEqual({ powders: [{ id: 'p', findings: [coversFinding('thermochemistry')] }] })
   })
+})
+
+const fitted = (id: string, fields: string[]) => ({
+  ...cited(id, 'fitted', { ...page, fields }),
+  interior,
 })
 
 describe('makerRows of the maker sources of bullets and powders', () => {
@@ -227,6 +234,28 @@ describe('makerRows of the maker sources of bullets and powders', () => {
   })
 })
 
+describe('makerRows of a maker source for the country, aliases and bulk density', () => {
+  it('takes it for the country, and for the aliases and bulk density of a powder', () => {
+    const bullet = { ...cited('b', 'published', { ...page, fields: ['country'] }), country: 'US' }
+    const powder = {
+      ...cited('p', 'published', { ...page, fields: ['country', 'aliases', 'bulkDensity'] }),
+      country: 'FI',
+      aliases: ['P 1'],
+      bulkDensity: { value: 950 },
+    }
+    expect(rows({ bullets: [bullet], powders: [powder] })).toEqual({})
+  })
+})
+
+describe('makerRows of a fitted maker source', () => {
+  it('takes it for interior only when it names nothing else', () => {
+    const found = rows({
+      powders: [fitted('interior', ['interior']), fitted('scope', ['interior', 'scope'])],
+    })
+    expect(found).toEqual({ powders: [{ id: 'scope', findings: [coversFinding('interior')] }] })
+  })
+})
+
 describe('makerRows of a maker source that names a field below a detailed path', () => {
   it('refuses it when the path is outside the list', () => {
     const powder = powderSchema.parse({
@@ -253,7 +282,7 @@ describe('makerRows of a maker source that names a field below a detailed path',
       },
     })
     const vivacity = {
-      ...cited('v', 'fitted', { ...page, fields: ['interior.vivacity'] }),
+      ...cited('v', 'published', { ...page, fields: ['interior.vivacity'] }),
       interior,
     }
     expect(rows({ powders: [powder, vivacity] })).toEqual({
@@ -308,6 +337,24 @@ describe('makerRows of the fields and terms of a maker source', () => {
         {
           id: 'ogive',
           findings: ['source "Lengths" (not a listed non-maker source): needs a terms URL'],
+        },
+      ],
+    })
+  })
+})
+
+describe('makerRows of a maker document cited by title', () => {
+  it('takes a document without a URL that names its title and publisher', () => {
+    const book = { title: 'Reloading guide', publisher: 'Maker', terms, fields: ['ogive'] }
+    const bullets = [
+      { ...cited('book', 'published', book), ogive },
+      { ...cited('no-fields', 'published', { ...book, fields: undefined }), ogive },
+    ]
+    expect(rows({ bullets })).toEqual({
+      bullets: [
+        {
+          id: 'no-fields',
+          findings: ['source "Reloading guide" (not a listed non-maker source): names no fields'],
         },
       ],
     })

@@ -101,7 +101,11 @@ const sourceParser = z.object({
         .string()
         .regex(/^[0-9a-f]{16}$/)
         .describe('Model version id the report names.'),
-      report: z.string().min(1).describe('Report of the evaluation of the fit.'),
+      report: z
+        .string()
+        .min(1)
+        .describe('Report of the evaluation of the fit; absent in the public catalog.')
+        .optional(),
     })
     .describe('The fit run behind a `fitted` source.')
     .optional(),
@@ -148,8 +152,8 @@ export const source: z.ZodObject<{
   terms: z.ZodOptional<z.ZodString>
   /** Who stands behind the source; `title` names the actual source (for example the site and the table). */
   origin: z.ZodOptional<typeof sourceOrigin>
-  /** The fit run behind a `fitted` source: model version id the report names, report of its evaluation. */
-  run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodString }>>
+  /** The fit run behind a `fitted` source: model version id the report names, report of its evaluation (absent in the public catalog). */
+  run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodOptional<z.ZodString> }>>
   note: z.ZodOptional<z.ZodString>
 }> = sourceParser
   .refine((s) => s.title !== undefined || s.entry !== undefined, {

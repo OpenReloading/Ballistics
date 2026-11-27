@@ -180,7 +180,7 @@ function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): Lo
 function checkReferences(
   bundle: Bundle,
   ids: ReturnType<typeof recordIds>,
-  loadTables: LoadTables,
+  loadTables: LoadTables | undefined,
   errors: string[],
 ) {
   checkCartridgeReferences(bundle, ids, errors)
@@ -198,7 +198,8 @@ function checkReferences(
 export type RecordsRead = {
   bundle: Bundle
   published: LocatedPublishedLoads[]
-  loadTables: LoadTables
+  /** Absent when no records root has a `load-tables.json`, as in the public catalog. */
+  loadTables: LoadTables | undefined
   /** Whether the records come from one root, so a cartridge with a capacity that is no estimate has to name its default. */
   singleRoot: boolean
 }

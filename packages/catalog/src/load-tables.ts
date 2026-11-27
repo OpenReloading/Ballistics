@@ -15,7 +15,7 @@ function checkInteriorSource(
   s: Source,
   at: string,
   kind: string,
-  { powder, loadTables }: { powder: Powder; loadTables: LoadTables },
+  { powder, loadTables }: { powder: Powder; loadTables: LoadTables | undefined },
 ): string[] {
   const errors: string[] = []
   if (kind !== 'fitted') errors.push(`${at} supports interior but is not fitted`)
@@ -23,20 +23,32 @@ function checkInteriorSource(
     errors.push(`${at}: a fitted source supports only interior`)
   else if (!powder.interior) errors.push(`${at}: fitted source without interior`)
   if (kind !== 'fitted') return errors
+  if (!loadTables) return [...errors, ...publicFitFindings(s, at)]
   if (!isListedLoadTable(s, loadTables)) errors.push(`${at} is not a listed load table`)
-  if (!s.run) errors.push(`${at} names no fit run (version, report)`)
+  if (!s.run?.report) errors.push(`${at} names no fit run (version, report)`)
+  return errors
+}
+
+/** The findings of the fitted source `s` in a records root without load tables (the public catalog): it names its document, the retrieval date and the model version, and no fit report. */
+function publicFitFindings(s: Source, at: string): string[] {
+  const errors: string[] = []
+  if (s.title === undefined) errors.push(`${at} names no title`)
+  if (s.retrieved === undefined) errors.push(`${at} names no retrieval date`)
+  if (!s.run) errors.push(`${at} names no fit run (version)`)
+  if (s.run?.report !== undefined) errors.push(`${at} names a fit report, which stays private`)
   return errors
 }
 
 /**
  * Provenance gate of the powder model. A source that is `fitted`, or supports `interior` of a
  * powder that has one, must be a `fitted` source whose `fields` list only `interior`, on a powder
- * with `interior`, and must name a listed load table (title, URL, retrieval date) and the fit run
- * (model version, report). A source under an open license (`origin: public` with a `license`) is
- * exempt. A powder with `interior` needs at least one fitted source. Returns one message per broken
- * rule.
+ * with `interior`. With `loadTables` (the records root has a `load-tables.json`) it must name a
+ * listed load table (title, URL, retrieval date) and the fit run (model version, report); without
+ * them (the public catalog) a title, a retrieval date and the model version of the fit run, and no
+ * report. A source under an open license (`origin: public` with a `license`) is exempt. A powder
+ * with `interior` needs at least one fitted source. Returns one message per broken rule.
  */
-export function checkFittedSources(powder: Powder, loadTables: LoadTables): string[] {
+export function checkFittedSources(powder: Powder, loadTables: LoadTables | undefined): string[] {
   const { provenance } = powder
   if (!provenance) return powder.interior ? ['interior without a fitted source'] : []
   const errors: string[] = []

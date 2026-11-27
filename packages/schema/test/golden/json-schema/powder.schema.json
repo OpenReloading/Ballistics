@@ -918,12 +918,11 @@
                   "report": {
                     "type": "string",
                     "minLength": 1,
-                    "description": "Report of the evaluation of the fit."
+                    "description": "Report of the evaluation of the fit; absent in the public catalog."
                   }
                 },
                 "required": [
-                  "version",
-                  "report"
+                  "version"
                 ],
                 "description": "The fit run behind a `fitted` source."
               },
