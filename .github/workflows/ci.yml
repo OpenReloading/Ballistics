@@ -429,17 +429,25 @@ jobs:
 
   # The web specs of the routes the Start app has ported, on its next edition (project `next-chromium`), apart from
   # `e2e` so that job keeps its timeout headroom. Playwright's `webServer` builds and serves the Start site; no API.
+  # Three shards by Playwright's `--shard`: the specs took 22 minutes on one runner, each shard builds its own site.
   e2e-next:
+    name: e2e-next (shard ${{ matrix.shard }}/3)
     needs: changes
     # the plan of `e2e`: a failed `changes` job still runs it
     if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # at least 10 minutes above the slowest shard
+    timeout-minutes: 20
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     env:
       # as in `e2e`: the Start build reads it, and the specs see the shell's repository links
       NEXT_PUBLIC_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+      SHARD: ${{ matrix.shard }}/3
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -455,10 +463,10 @@ jobs:
           docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
             --env CI --env GITHUB_ACTIONS --env NEXT_PUBLIC_REPOSITORY_URL \
             --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
-            "$PLAYWRIGHT_IMAGE" npx playwright test --project next-chromium
+            "$PLAYWRIGHT_IMAGE" npx playwright test --project next-chromium --shard="$SHARD"
       - name: Keep the e2e results of a failed run
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: e2e-next-test-results
+          name: e2e-next-test-results-${{ matrix.shard }}
           path: apps/e2e/test-results
