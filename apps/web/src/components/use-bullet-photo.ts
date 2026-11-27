@@ -4,7 +4,6 @@ import type { MessageDescriptor } from '@lingui/core'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { loadEnglish } from '../i18n/lingui.ts'
-import type { Message } from '../i18n/translate.ts'
 import { type Design, evaluate } from '../lib/bullet-designer.ts'
 import { paintDisc, type Scale, type ScaleSpan, scaleOf } from '../lib/bullet-photo.ts'
 import { tintBox, tintOf } from '../lib/bullet-photo-canvas.ts'
@@ -23,7 +22,7 @@ import { errorText } from '../lib/error-text.ts'
 import { type FieldSpec, type FieldValue, fieldOf } from '../lib/field-spec.ts'
 import type { Point } from '../lib/target-geometry.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import type { Wording } from '../lib/wording.ts'
+import { type LinguiWording, verbatim } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/use-bullet-photo.json' with { type: 'json' }
 import englishBulletPhoto from '../locales/en/lib/bullet-photo.json' with { type: 'json' }
 import englishBulletPhotoWorker from '../locales/en/lib/bullet-photo.worker.json' with {
@@ -92,7 +91,7 @@ const texts = {
 type Without<T> = T extends unknown ? Omit<T, 'id'> : never
 
 /** Started on the first request, answers matched by request id; a worker that failed to load or died ends what waits with an error reply, the next request starts a new one. */
-export function useWorker(onError: (message: Wording) => void) {
+export function useWorker(onError: (message: LinguiWording) => void) {
   const worker = useRef<Worker | undefined>(undefined)
   const waiting = useRef(new Map<number, (r: WorkerReply) => void>())
   const sequence = useRef(0)
@@ -140,8 +139,8 @@ interface Found {
   outline?: Outline
   measurement?: BulletMeasurement
   /** Sentences about the photograph's quality, and why it cannot be measured when it cannot. */
-  hints: Wording[]
-  unusable?: Wording
+  hints: LinguiWording[]
+  unusable?: LinguiWording
   /** The scale the worker measured at: the ruler's, else the caliper sizes'; absent when there was none. */
   scale?: Scale
   /** What the worker measured: the design waits for a measurement of the inputs as they are now. */
@@ -162,12 +161,12 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const [known, setKnown] = useState<[FieldValue, FieldValue]>([empty, empty])
   const [axis, setAxis] = useState<number>()
   const [found, setFound] = useState<Found>()
-  const [warnings, setWarnings] = useState<Wording[]>([])
+  const [warnings, setWarnings] = useState<LinguiWording[]>([])
   /** The width the cut-out's edge is spread over, px; 0 once the cut-out is corrected by hand. */
   const [spread, setSpread] = useState(0)
   const [busy, setBusy] = useState<MessageDescriptor>()
   /** English, a message where the tool wrote it, translated where it is shown. */
-  const [failure, setFailure] = useState<Wording>()
+  const [failure, setFailure] = useState<LinguiWording>()
   const ask = useWorker(setFailure)
 
   const rulerScale = useMemo(() => {
@@ -278,7 +277,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     try {
       await work()
     } catch (err) {
-      setFailure(errorText(err) as Message)
+      setFailure(verbatim(errorText(err)))
     }
     setBusy(undefined)
   }

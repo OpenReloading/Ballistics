@@ -1600,6 +1600,10 @@ msgid "cartridgeRecord.side.cartridge"
 msgstr "Patrone"
 
 # en: "Cartridge"
+msgid "caseEditor.cartridge"
+msgstr "Patrone"
+
+# en: "Cartridge"
 msgid "caseRecord.cartridge"
 msgstr "Patrone"
 
@@ -1931,6 +1935,10 @@ msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
 msgid "holeDetection.choose"
 msgstr "Wählen"
 
+# en: "Choose a cartridge first"
+msgid "caseEditor.cartridgeFirst"
+msgstr "Zuerst eine Patrone wählen"
+
 # en: "Choose a load; it opens in the workbench, where its Measurements link fits the powder."
 msgid "powderTune.chooseLoad"
 msgstr "Wählen Sie eine Laborierung; sie öffnet sich in der Werkbank, wo ihr Link in den Messungen das Treibladungspulver anpasst."
@@ -2014,6 +2022,10 @@ msgstr "Suche leeren"
 # en: "Clear selection"
 msgid "comparePicks.clearSelection"
 msgstr "Auswahl aufheben"
+
+# en: "Clear the cartridge"
+msgid "caseEditor.clearCartridge"
+msgstr "Patrone entfernen"
 
 # en: "Clear the scale"
 msgid "bulletPhoto.clearScale"
@@ -2984,6 +2996,10 @@ msgid "powderDesigner.enterNameValuesYou"
 msgstr "Geben Sie einen Namen und die Werte ein, die Sie haben."
 
 # en: "Enter a name."
+msgid "caseEditor.enterName"
+msgstr "Geben Sie einen Namen ein."
+
+# en: "Enter a name."
 msgid "targetEditor.enterName"
 msgstr "Geben Sie einen Namen ein."
 
@@ -3520,6 +3536,10 @@ msgstr "Kopf umdrehen"
 msgid "targetDesigner.ovalHelp"
 msgstr "Für ein Oval; leer für einen Kreis."
 
+# en: "For example headstamp and batch."
+msgid "caseEditor.nameHelp"
+msgstr "Zum Beispiel Bodenstempel und Charge."
+
 # en: "For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length."
 msgid "bulletPhoto.needScale"
 msgstr "Für Werte setzen Sie zwei Punkte auf das Lineal und geben ihren Abstand ein, oder geben Sie Durchmesser oder Gesamtlänge vom Messschieber ein."
@@ -3801,6 +3821,10 @@ msgid "cartridgeRecord.group.head"
 msgstr "Boden, Rand und Rille"
 
 # en: "Headstamp"
+msgid "caseEditor.headstamp"
+msgstr "Bodenstempel"
+
+# en: "Headstamp"
 msgid "recordFields.headstamp"
 msgstr "Bodenstempel"
 
@@ -3908,6 +3932,10 @@ msgstr "Webseite"
 msgid "federationRecord.homepage"
 msgstr "Webseite"
 
+# en: "How the cases were measured: fired or sized, primed or not."
+msgid "caseEditor.notesHelp"
+msgstr "Wie die Hülsen gemessen wurden: abgeschossen oder kalibriert, mit oder ohne Zündhütchen."
+
 # en: "How to fire a ladder for the fit"
 msgid "powderTune.ladderGuide"
 msgstr "So schießen Sie einen Ladeleiter für die Anpassung"
@@ -3915,6 +3943,10 @@ msgstr "So schießen Sie einen Ladeleiter für die Anpassung"
 # en: "How to measure bullet dimensions"
 msgid "bulletDesigner.howMeasureBulletDimensions"
 msgstr "So messen Sie die Geschossmaße"
+
+# en: "How to measure case capacity"
+msgid "caseEditor.capacityGuide"
+msgstr "So messen Sie das Hülsenvolumen"
 
 # en: "How to measure powder temperature"
 msgid "powderTune.temperatureGuide"
@@ -4693,6 +4725,10 @@ msgid "lists.matching"
 msgstr "Suche nach „{query}“"
 
 # en: "Material"
+msgid "caseEditor.material"
+msgstr "Material"
+
+# en: "Material"
 msgid "cases.column.material"
 msgstr "Material"
 
@@ -4997,6 +5033,10 @@ msgid "cartridges.column.name"
 msgstr "Name"
 
 # en: "Name"
+msgid "caseEditor.name"
+msgstr "Name"
+
+# en: "Name"
 msgid "cases.column.name"
 msgstr "Name"
 
@@ -5087,6 +5127,14 @@ msgstr "Halsdurchmesser bei L2"
 # en: "neck diameter at the mouth"
 msgid "cartridgeRecord.meaning.neckAtMouth"
 msgstr "Halsdurchmesser an der Mündung"
+
+# en: "New brass group"
+msgid "caseEditor.new"
+msgstr "Neue Hülsengruppe"
+
+# en: "New brass group"
+msgid "caseGroupEditor.new"
+msgstr "Neue Hülsengruppe"
 
 # en: "New brass group"
 msgid "cases.new"
@@ -5210,6 +5258,10 @@ msgstr "Es gibt keine Zeichenfläche, um das Foto zu lesen."
 
 # en: "No cartridge found"
 msgid "cartridgeDesigner.noCartridgeFound"
+msgstr "Keine Patrone gefunden"
+
+# en: "No cartridge found"
+msgid "caseEditor.noCartridge"
 msgstr "Keine Patrone gefunden"
 
 # en: "No cartridge matches {query}."
@@ -5445,6 +5497,10 @@ msgid "powderCompare.none"
 msgstr "keine"
 
 # en: "None"
+msgid "caseEditor.none"
+msgstr "Keine"
+
+# en: "None"
 msgid "events.none"
 msgstr "Keine"
 
@@ -5619,6 +5675,10 @@ msgstr "Hinweis"
 # en: "Note: {note}"
 msgid "sessionSummary.note"
 msgstr "Hinweis: {note}"
+
+# en: "Notes"
+msgid "caseEditor.notes"
+msgstr "Notizen"
 
 # en: "Notes"
 msgid "events.notes"
@@ -7116,6 +7176,10 @@ msgstr "Suchen"
 msgid "fieldTable.search"
 msgstr "{title} durchsuchen"
 
+# en: "Search cartridges"
+msgid "caseEditor.searchCartridges"
+msgstr "Patronen suchen"
+
 # en: "Seat a bullet"
 msgid "cartridgeDesigner.seatBullet"
 msgstr "Geschoss setzen"
@@ -7580,6 +7644,10 @@ msgstr "stehend"
 msgid "powderTune.start"
 msgstr "Start"
 
+# en: "Start from a case product"
+msgid "caseEditor.product"
+msgstr "Von einem Hülsenprodukt ausgehen"
+
 # en: "Start from a record"
 msgid "bulletDesigner.startFromRecord"
 msgstr "Von einem Datensatz ausgehen"
@@ -7759,6 +7827,10 @@ msgstr "Tabelle III zeichnet einen Gürtel; die anderen Tabellen zeichnen densel
 # en: "Table: the CIP table of the record, I to XI, by cartridge class"
 msgid "cartridgeRecord.meaning.table"
 msgstr "Tabelle: die CIP-Tabelle des Datensatzes, I bis XI, nach Patronenklasse"
+
+# en: "Takes its material and mass; the values you measured replace them."
+msgid "caseEditor.productHelp"
+msgstr "Übernimmt Material und Masse; Ihre gemessenen Werte ersetzen sie."
 
 # en: "tangent"
 msgid "values.tangent"
@@ -8037,6 +8109,10 @@ msgstr "Die Freistellung berührt den Rand des Fotos: Vielleicht ist nicht das g
 # en: "The data file could not be loaded. Check the connection and retry."
 msgid "states.dataError"
 msgstr "Die Datendatei konnte nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut."
+
+# en: "The database is unreachable; the cartridge can be chosen later."
+msgid "caseEditor.unreachable"
+msgstr "Die Datenbank ist nicht erreichbar; die Patrone kann später gewählt werden."
 
 # en: "The database is unreachable. The designer still works."
 msgid "bulletDesigner.databaseUnreachableDesignerStill"

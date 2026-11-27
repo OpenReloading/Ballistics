@@ -1,5 +1,8 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { useWorker } from '../src/components/use-bullet-photo.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
+import { segment } from '../src/lib/bullet-photo.ts'
+import { sayLingui } from '../src/lib/wording.ts'
 import { renderHook } from './fake-hooks.ts'
 
 vi.mock('react', async (original) => ({
@@ -51,4 +54,15 @@ it('ends a waiting request when the worker fails and starts a new worker on the 
   void ask({ kind: 'segment', exclude: [] })
   expect(StubWorker.made).toHaveLength(2)
   expect(StubWorker.made[1]?.posted).toHaveLength(1)
+})
+
+it("has the English of the worker's messages without another page", () => {
+  const missing: string[] = []
+  const en = linguiOf('en')
+  const stop = en.on('missing', ({ id }) => missing.push(id))
+  const [warning] = segment({ width: 4, height: 4, data: new Float32Array(16) }).warnings
+  const text = warning && sayLingui(en, warning)
+  stop()
+  expect(missing).toEqual([])
+  expect(text).toBe('The photograph has one grey only.')
 })

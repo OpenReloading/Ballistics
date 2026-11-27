@@ -18,13 +18,12 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { fixedNumber } from '../i18n/number.ts'
-import type { Translator } from '../i18n/translate.ts'
 import type { Design } from '../lib/bullet-designer.ts'
 import { paintPhoto } from '../lib/bullet-photo-canvas.ts'
 import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design.ts'
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { say } from '../lib/wording.ts'
+import { sayLingui } from '../lib/wording.ts'
 import englishMessages from '../locales/en/components/bullet-photo.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
@@ -46,17 +45,19 @@ const tools: { value: Tool; label: MessageDescriptor }[] = [
 type PhotoState = ReturnType<typeof useBulletPhoto>
 
 /** The messages about the photograph and the cut-out. */
-function stateMessages(p: PhotoState, t: Translator['t'], i18n: I18n): MessageEntry[] {
+function stateMessages(p: PhotoState, i18n: I18n): MessageEntry[] {
   const outlined = p.found?.outline
   const empty = p.cut && !outlined && !p.busy
   return [
     // a failure is a message of the tool, else the browser's own text, which shows as written
-    ...(p.failure ? [{ severity: 'error', text: say(i18n, t, p.failure) } as const] : []),
-    ...p.warnings.map((w) => ({ severity: 'warning', text: say(i18n, t, w) }) as const),
+    ...(p.failure ? [{ severity: 'error', text: sayLingui(i18n, p.failure) } as const] : []),
+    ...p.warnings.map((w) => ({ severity: 'warning', text: sayLingui(i18n, w) }) as const),
     ...(p.found?.unusable
-      ? [{ severity: 'error', text: say(i18n, t, p.found.unusable) } as const]
+      ? [{ severity: 'error', text: sayLingui(i18n, p.found.unusable) } as const]
       : []),
-    ...(p.found?.hints ?? []).map((w) => ({ severity: 'warning', text: say(i18n, t, w) }) as const),
+    ...(p.found?.hints ?? []).map(
+      (w) => ({ severity: 'warning', text: sayLingui(i18n, w) }) as const,
+    ),
     ...(empty
       ? [
           {
@@ -292,7 +293,6 @@ function PhotoTool({
   onPhoto: (loaded: boolean) => void
 }) {
   const p = useBulletPhoto(system, record)
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const id = useId()
   const { size, points, found, scale, drawing } = p
@@ -331,7 +331,7 @@ function PhotoTool({
 
   const outline = found?.outline
   const turned = outline && fromSi('angle', outline.angle)
-  const messages = [...stateMessages(p, t, i18n), ...valueMessages(p, record, i18n)]
+  const messages = [...stateMessages(p, i18n), ...valueMessages(p, record, i18n)]
   return (
     <Flex gap="md" wrap="wrap" align="flex-start" className="bullet-photo">
       <div style={{ flex: '2 1 28rem', minWidth: 0 }}>

@@ -3,7 +3,7 @@ import { clamp, components, otsu } from '@rangefoundry/target-recognition'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
 import type { Point } from './target-geometry.ts'
-import type { Wording } from './wording.ts'
+import type { LinguiWording } from './wording.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
 const at = (a: ArrayLike<number>, i: number) => a[i] as number
@@ -32,7 +32,7 @@ export interface Segmentation {
   height: number
   alpha: Uint8Array
   /** Sentences for the user, empty when the cut looks sound. */
-  warnings: Wording[]
+  warnings: LinguiWording[]
   /** Gap between the mean grey of the bullet and of the background, grey levels; 0 without a cut-out. */
   contrast: number
   /** The width the grey takes to go from the background to the bullet at the cut-out's edge, px (1 for a sharp edge); 0 for a cut-out not found or corrected by hand. */
@@ -333,7 +333,7 @@ function edgeSpreadOf(
 }
 
 /** The sentence about edges spread over more than 4 px and more than 4 % of the bullet's thickness. */
-function softEdgeWarning(spread: number, thickness: number): Wording[] {
+function softEdgeWarning(spread: number, thickness: number): LinguiWording[] {
   return spread > Math.max(4, 0.04 * thickness)
     ? [
         /*i18n*/ {
@@ -431,7 +431,7 @@ function coverOf(
 /** Otsu on the plane-leveled greys, the largest part off the edge and away from `exclude` (the ruler); a 2 px band keeps sub-pixel edges. */
 export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   const { width: w, height: h } = g
-  const none = (warning: Wording): Segmentation => ({
+  const none = (warning: LinguiWording): Segmentation => ({
     width: w,
     height: h,
     alpha: new Uint8Array(w * h),
@@ -478,7 +478,7 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   for (let i = 0; i < alpha.length; i++)
     alpha[i] = at(eroded, i) ? 255 : at(dilated, i) ? Math.round(255 * soft(i)) : 0
   const edgeSpread = edgeSpreadOf(flat, mask, w, box, contrast)
-  const warnings: Wording[] = [
+  const warnings: LinguiWording[] = [
     ...(best.edge
       ? [
           /*i18n*/ {

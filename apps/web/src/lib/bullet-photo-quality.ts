@@ -1,13 +1,13 @@
 /** Whether a photograph can be measured (`apps/docs/docs/models/bullet-photo.md`): one too poor gets no values rather than wrong ones. */
 import { shankOf } from './bullet-photo-measure.ts'
 import { edgeUncertainty, type Outline } from './bullet-photo-outline.ts'
-import type { Wording } from './wording.ts'
+import type { LinguiWording } from './wording.ts'
 
 /** What the outline allows: sentences about its quality, and the reason no value is given. */
 export interface OutlineHints {
-  hints: Wording[]
+  hints: LinguiWording[]
   /** Set when the photograph cannot be measured: no values are given then. */
-  unusable?: Wording
+  unusable?: LinguiWording
 }
 
 /** The bullet is narrower than this, px, and it is not measured: the nose circle and the boat tail cone have too few samples. */
@@ -54,7 +54,7 @@ export function outlineHints(o: Outline): OutlineHints {
         values: { ratio: tenths(ratio) },
       },
     }
-  const hints: Wording[] = []
+  const hints: LinguiWording[] = []
   if (width < goodWidthPx)
     hints.push(
       /*i18n*/ {
