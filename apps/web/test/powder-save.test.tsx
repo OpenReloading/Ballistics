@@ -9,7 +9,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import { saveFailures, TuneNotes } from '../src/components/powder-tune.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { english } from '../src/i18n/translate.ts'
 import { dayText, localDay } from '../src/lib/dates.ts'
 import { nth } from '../src/lib/nth.ts'
 import { fileData, fromFile, newerFit, powderDesigns } from '../src/lib/powder-designer.ts'
@@ -221,12 +220,10 @@ describe("the newer fit of a load's powder", () => {
 
 describe('the fit mark', () => {
   it('names the strings and the day of the fit, or hand-tuned', () => {
-    expect(fitMark(5, date.toISOString(), false, (d) => d, english)).toBe(
+    expect(fitMark(5, date.toISOString(), false, (d) => d)).toBe(
       `simulation parameters fitted to 5 strings, ${localDay(date)}`,
     )
-    expect(fitMark(5, date.toISOString(), true, (d) => d, english)).toBe(
-      'simulation parameters, hand-tuned',
-    )
+    expect(fitMark(5, date.toISOString(), true, (d) => d)).toBe('simulation parameters, hand-tuned')
   })
 
   it('reads hand-tuned on the workbench once a typed value moves a fitted parameter', () => {
@@ -236,7 +233,7 @@ describe('the fit mark', () => {
     if (!design || !origin) throw new Error('no design')
     const system = presetUnits('metric-grains')
     const mark = (values: Record<string, number>) =>
-      loadFitMark(design, origin, values, system, (d) => d, english)
+      loadFitMark(design, origin, values, system, (d) => d)
     expect(mark(origin)).toBe(`simulation parameters fitted to 5 strings, ${localDay(date)}`)
     // a value typed as the field shows it is no move
     const typed = Number(origin.vivacity?.toPrecision(3))
@@ -246,9 +243,7 @@ describe('the fit mark', () => {
     )
     // an input of the fit is no fitted parameter
     expect(mark({ ...origin, gamma: 1.3 })).toContain('fitted to 5 strings')
-    expect(loadFitMark({ powder: design.powder }, origin, origin, system, dayText, english)).toBe(
-      undefined,
-    )
+    expect(loadFitMark({ powder: design.powder }, origin, origin, system, dayText)).toBe(undefined)
   })
 })
 

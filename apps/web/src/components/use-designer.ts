@@ -1,9 +1,9 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { type UserRecord, userRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { useTranslation } from '../i18n/language.ts'
-import type { Message } from '../i18n/translate.ts'
 import { type History, historyOf } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
 import type { UnitSystem } from '../lib/units.ts'
@@ -34,6 +34,11 @@ interface Draft<K extends UserRecord['kind']> {
 /** A shared action as the designer's own action type: every designer's reducer takes them. */
 const asAction = <D, A>(a: DesignerAction<D>) => a as unknown as A
 
+/** The line `load` shows in place of a design. */
+interface LoadNote {
+  loadNote: MessageDescriptor
+}
+
 /** What a designer gives `useDesigner`. */
 interface DesignerSetup<D, A, K extends UserRecord['kind']> {
   reduce: (h: History<D>, a: A) => History<D>
@@ -47,9 +52,9 @@ interface DesignerSetup<D, A, K extends UserRecord['kind']> {
   /** The name typed, when the record keeps it outside its data: a change to keep. */
   nameKey?: (design: D) => string
   /** The design of a catalogue record, or the line shown when it does not start one; throws when it cannot be read. */
-  load: (id: string, system: UnitSystem) => Promise<D | Message>
-  loadingText: Message
-  failText: Message
+  load: (id: string, system: UnitSystem) => Promise<D | LoadNote>
+  loadingText: MessageDescriptor
+  failText: MessageDescriptor
 }
 
 /** `start` is a catalogue record, also the `?from=` link of a record page; every change is kept in the browser as the record `recordId`. */
@@ -64,9 +69,9 @@ export function useDesigner<D, A extends { type: string }, K extends UserRecord[
     undo: () => dispatch(asAction<D, A>({ type: 'undo' })),
     redo: () => dispatch(asAction<D, A>({ type: 'redo' })),
   })
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // held as the message, so a language change rewrites the line shown
-  const [loading, setLoading] = useState<Message>()
+  const [loading, setLoading] = useState<MessageDescriptor>()
   const fileMenu = useRef<FileMenuHandle>(null)
   const current = useRef(history)
   current.current = history
@@ -136,9 +141,8 @@ export function useDesigner<D, A extends { type: string }, K extends UserRecord[
       setLoading(loadingText)
       try {
         const design = await load(id, system)
-        if (typeof design === 'string') {
-          // a design is an object, so a string is the message of `load`
-          setLoading(design as Message)
+        if (typeof design === 'object' && design !== null && 'loadNote' in design) {
+          setLoading(design.loadNote)
           return
         }
         // a catalogue design is kept from its first edit: a reload of its link adds no record
@@ -189,7 +193,7 @@ export function useDesigner<D, A extends { type: string }, K extends UserRecord[
     history,
     design,
     dispatch,
-    loading: loading && t(loading),
+    loading: loading && i18n._(loading),
     fileMenu,
     start,
     begin,

@@ -251,6 +251,10 @@ msgstr "{count, plural, one {Kein Geschoss mit der ID {ids}.} other {Keine Gesch
 msgid "bulletCompare.invalidIds"
 msgstr "{count, plural, one {Keine Geschoss-ID: {ids}.} other {Keine Geschoss-IDs: {ids}.}}"
 
+# en: "{count, plural, one {simulation parameters fitted to # string, {date}} other {simulation parameters fitted to # strings, {date}}}"
+msgid "powderRecord.fittedStrings"
+msgstr "{count, plural, one {Simulationsparameter angepasst an # Schussreihe, {date}} other {Simulationsparameter angepasst an # Schussreihen, {date}}}"
+
 # en: "{count} ({excluded} excluded)"
 msgid "targetEditor.excluded"
 msgstr "{count} ({excluded} ausgeschlossen)"
@@ -343,9 +347,33 @@ msgstr "{label} ab {velocity}"
 msgid "fieldStrip.bandFrom"
 msgstr "{label} ab {velocity}"
 
+# en: "{label} must be above {min, decimal}."
+msgid "powderDesigner.above"
+msgstr "{label} muss größer als {min, decimal} sein."
+
+# en: "{label} must be at least {min, decimal}{unit}."
+msgid "powderDesigner.atLeast"
+msgstr "{label} muss mindestens {min, decimal}{unit} betragen."
+
+# en: "{label} must be at most {max, decimal}{unit}."
+msgid "powderDesigner.atMost"
+msgstr "{label} darf höchstens {max, decimal}{unit} betragen."
+
 # en: "{label} must be at most {max} {unit} in the designer."
 msgid "cartridgeDesigner.atMostInDesigner"
 msgstr "{label} darf im Editor höchstens {max} {unit} betragen."
+
+# en: "{label} must be below {max, decimal}."
+msgid "powderDesigner.below"
+msgstr "{label} muss kleiner als {max, decimal} sein."
+
+# en: "{label} must be greater than 0{unit}."
+msgid "powderDesigner.greaterThanZero"
+msgstr "{label} muss größer als 0{unit} sein."
+
+# en: "{label} must lie between Min and Max."
+msgid "powderDesigner.betweenMinMax"
+msgstr "{label} muss zwischen Min und Max liegen."
 
 # en: "{label} table"
 msgid "fieldTable.region"
@@ -370,6 +398,22 @@ msgstr "{label}, aufsteigend"
 # en: "{label}, Z to A"
 msgid "directoryTable.zToA"
 msgstr "{label}, Z bis A"
+
+# en: "{label}: add at least one entry."
+msgid "powderDesigner.addOneEntry"
+msgstr "{label}: Fügen Sie mindestens einen Eintrag hinzu."
+
+# en: "{label}: Min must not be above Max."
+msgid "powderDesigner.minNotAboveMax"
+msgstr "{label}: Min darf nicht größer als Max sein."
+
+# en: "{label}: not accepted by the powder record."
+msgid "powderDesigner.notAccepted"
+msgstr "{label}: vom Datensatz des Treibladungspulvers nicht angenommen."
+
+# en: "{label}: write the CAS number as digits and hyphens, as 9004-70-0."
+msgid "powderDesigner.casDigits"
+msgstr "{label}: Schreiben Sie die CAS-Nummer aus Ziffern und Bindestrichen, etwa 9004-70-0."
 
 # en: "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it."
 msgid "holeDetection.doubleClickEnterAccepts"
@@ -747,6 +791,14 @@ msgstr "Hinzufügen"
 msgid "log.add"
 msgstr "Hinzufügen"
 
+# en: "Add a source that gives the cartridges the powder is listed for."
+msgid "powderDesigner.sourceCartridges"
+msgstr "Fügen Sie eine Quelle hinzu, die die Patronen angibt, für die das Treibladungspulver gelistet ist."
+
+# en: "Add a source that gives the country."
+msgid "powderDesigner.sourceCountry"
+msgstr "Fügen Sie eine Quelle hinzu, die das Land angibt."
+
 # en: "Add a string"
 msgid "powderTune.addString"
 msgstr "Schussreihe hinzufügen"
@@ -754,6 +806,10 @@ msgstr "Schussreihe hinzufügen"
 # en: "Add a string, or open this page from the Measurements tab of a load with chronograph strings mapped to charges."
 msgid "powderTune.emptyPrompt"
 msgstr "Fügen Sie eine Schussreihe hinzu oder öffnen Sie diese Seite über den Tab Messungen einer Laborierung mit Chronographen-Schussreihen, die Treibladungen zugeordnet sind."
+
+# en: "Add at least one ingredient."
+msgid "powderDesigner.addOneIngredient"
+msgstr "Fügen Sie mindestens einen Bestandteil hinzu."
 
 # en: "Add bullet"
 msgid "bulletCompare.add"
@@ -822,6 +878,10 @@ msgstr "Luftdruck"
 # en: "Air rifle"
 msgid "values.airRifle"
 msgstr "Luftgewehr"
+
+# en: "Aliases"
+msgid "powderDesigner.aliases"
+msgstr "Alternative Namen"
 
 # en: "Aliases"
 msgid "recordFields.aliases"
@@ -1383,6 +1443,14 @@ msgstr "Abbrandform z1"
 msgid "recordFields.burnFormGroup"
 msgstr "Abbrandform, zweistufig"
 
+# en: "Burn form: 1 + a × z1 must be above 0, and Form q below 1 where Form z1 is below 1."
+msgid "powderDesigner.burnFormRule"
+msgstr "Abbrandform: 1 + a × z1 muss größer als 0 sein und Form q kleiner als 1, wenn Form z1 kleiner als 1 ist."
+
+# en: "Burn law"
+msgid "powderDesigner.burnLaw"
+msgstr "Abbrandgesetz"
+
 # en: "Burn law (interior model)"
 msgid "powderDesigner.burnLawInteriorModel"
 msgstr "Abbrandgesetz (Innenballistikmodell)"
@@ -1632,6 +1700,10 @@ msgid "page.cartridges"
 msgstr "Patronen"
 
 # en: "Cartridges"
+msgid "powderDesigner.cartridges"
+msgstr "Patronen"
+
+# en: "Cartridges"
 msgid "powderRecord.cartridges"
 msgstr "Patronen"
 
@@ -1799,6 +1871,14 @@ msgstr "Maßstab ändern"
 msgid "holeDetection.changeTarget"
 msgstr "Zielscheibe ändern"
 
+# en: "Changed from the record value {value}."
+msgid "powderRecord.changedFromRecord"
+msgstr "Gegenüber dem Wert des Datensatzes geändert: {value}."
+
+# en: "Changed from the user design value {value}."
+msgid "powderRecord.changedFromDesign"
+msgstr "Gegenüber dem Wert des eigenen Entwurfs geändert: {value}."
+
 # en: "Changed values are drawn as entered, without the record's tolerances."
 msgid "cartridgeDesigner.changedValuesDrawnEntered"
 msgstr "Geänderte Werte sind wie eingegeben gezeichnet, ohne die Toleranzen des Datensatzes."
@@ -1862,6 +1942,10 @@ msgstr "Wählen Sie ein Foto des Geschosses neben einem Lineal oder probieren Si
 # en: "Choose a powder"
 msgid "powderTune.choosePowder"
 msgstr "Treibladungspulver wählen"
+
+# en: "Choose an entry for Values came about by."
+msgid "powderDesigner.chooseValuesCameAbout"
+msgstr "Wählen Sie einen Eintrag für Herkunft der Werte."
 
 # en: "Choose bullets"
 msgid "bulletCompare.choose"
@@ -2080,12 +2164,20 @@ msgid "logSummary.competitions"
 msgstr "Wettkämpfe"
 
 # en: "Composition"
+msgid "powderDesigner.composition"
+msgstr "Zusammensetzung"
+
+# en: "Composition"
 msgid "recordFields.composition"
 msgstr "Zusammensetzung"
 
 # en: "Composition, mass percent"
 msgid "powderDesigner.compositionMassPercent"
 msgstr "Zusammensetzung, Massenprozent"
+
+# en: "Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more."
+msgid "powderDesigner.compositionSumRule"
+msgstr "Zusammensetzung: Die Min-Anteile müssen zusammen höchstens 100 ergeben und die Max-Anteile mindestens 100."
 
 # en: "Compound"
 msgid "primers.column.compound"
@@ -2241,6 +2333,10 @@ msgstr "Land"
 
 # en: "Country"
 msgid "fieldStrip.country"
+msgstr "Land"
+
+# en: "Country"
+msgid "powderDesigner.country"
 msgstr "Land"
 
 # en: "Country of the manufacturer"
@@ -2879,6 +2975,10 @@ msgstr "Energieverhältnis"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "Energie, wie unter Pressures (Energies) gedruckt"
 
+# en: "Enter {label}."
+msgid "powderDesigner.enterLabel"
+msgstr "Geben Sie {label} ein."
+
 # en: "Enter a name and the values you have."
 msgid "powderDesigner.enterNameValuesYou"
 msgstr "Geben Sie einen Namen und die Werte ein, die Sie haben."
@@ -2886,6 +2986,10 @@ msgstr "Geben Sie einen Namen und die Werte ein, die Sie haben."
 # en: "Enter a name."
 msgid "targetEditor.enterName"
 msgstr "Geben Sie einen Namen ein."
+
+# en: "Enter a number for {label}."
+msgid "powderDesigner.enterNumberFor"
+msgstr "Geben Sie eine Zahl für {label} ein."
 
 # en: "Enter a ring diameter."
 msgid "targetDesigner.enterRingDiameter"
@@ -3496,6 +3600,26 @@ msgstr "Aus dem offiziellen Ergebnis, wo veröffentlicht."
 msgid "cartridgeDesigner.fromRecord"
 msgstr "Aus dem Datensatz"
 
+# en: "From the record (fitted)."
+msgid "powderRecord.fromRecordFitted"
+msgstr "Aus dem Datensatz (angepasst)."
+
+# en: "From the record (input of the fit)."
+msgid "powderRecord.fromRecordInput"
+msgstr "Aus dem Datensatz (Eingabe der Anpassung)."
+
+# en: "From the user design (fitted)."
+msgid "powderRecord.fromDesignFitted"
+msgstr "Aus dem eigenen Entwurf (angepasst)."
+
+# en: "From the user design (input of the fit)."
+msgid "powderRecord.fromDesignInput"
+msgstr "Aus dem eigenen Entwurf (Eingabe der Anpassung)."
+
+# en: "From the user design: {mark}."
+msgid "powderRecord.fromDesignMark"
+msgstr "Aus dem eigenen Entwurf: {mark}."
+
 # en: "From your saved loads with chronograph strings"
 msgid "powderTune.fromSavedLoads"
 msgstr "Aus Ihren gespeicherten Laborierungen mit Chronographen-Schussreihen"
@@ -3903,6 +4027,10 @@ msgstr "eingeschlossen, 2 atan((P2 - H1) / 2 / (L2 - L1))"
 # en: "Ingredient"
 msgid "powderDesigner.ingredient"
 msgstr "Bestandteil"
+
+# en: "Ingredient {n, decimal}"
+msgid "powderDesigner.ingredientNumber"
+msgstr "Bestandteil {n, decimal}"
 
 # en: "Ingredient {n, decimal} CAS number"
 msgid "powderDesigner.ingredientCasNumber"
@@ -4340,9 +4468,17 @@ msgstr "Der Hülsendatensatz wird geladen"
 msgid "states.loading.theBulletRecord"
 msgstr "Der Geschossdatensatz wird geladen"
 
+# en: "Loading the bullet…"
+msgid "bulletDesigner.loading"
+msgstr "Das Geschoss wird geladen…"
+
 # en: "Loading the cartridge record"
 msgid "states.loading.theCartridgeRecord"
 msgstr "Der Patronendatensatz wird geladen"
+
+# en: "Loading the cartridge…"
+msgid "cartridgeDesigner.loading"
+msgstr "Die Patrone wird geladen…"
 
 # en: "Loading the designer"
 msgid "states.loading.theDesigner"
@@ -4359,6 +4495,10 @@ msgstr "Der Vergleich der Treibladungspulver wird geladen"
 # en: "Loading the preview"
 msgid "states.loading.thePreview"
 msgstr "Die Vorschau wird geladen"
+
+# en: "Loading the record…"
+msgid "recordLink.loading"
+msgstr "Der Datensatz wird geladen…"
 
 # en: "Loading the settings"
 msgid "states.loading.theSettings"
@@ -5419,6 +5559,10 @@ msgstr "Im Datensatz nicht abgedruckt"
 # en: "Not restored: the browser store refused."
 msgid "targetEditor.notRestoredStoreRefused"
 msgstr "Nicht wiederhergestellt: Der Browserspeicher hat es abgelehnt."
+
+# en: "Not saved in this browser"
+msgid "caseGroupEditor.notSaved"
+msgstr "In diesem Browser nicht gespeichert"
 
 # en: "Not saved: {reason}"
 msgid "events.notSaved"
@@ -7072,6 +7216,10 @@ msgstr "Je Zeile der Ladetabelle durch die Lauflänge und den Geschossaufbau fes
 msgid "holeDetection.setScaleFirstStep"
 msgstr "Stellen Sie zuerst den Maßstab ein (Schritt 2)."
 
+# en: "Set Values came about by to Fitted to data."
+msgid "powderDesigner.setFittedData"
+msgstr "Setzen Sie Herkunft der Werte auf An Daten angepasst."
+
 # en: "Shank"
 msgid "bulletDesigner.shank"
 msgstr "Schaft"
@@ -7259,6 +7407,10 @@ msgstr "Vereinfachte Zeichnung aus dem Datensatz; nur Werte mit Quelle sind bema
 # en: "Simulated ({unit})"
 msgid "powderTune.simulated"
 msgstr "Simuliert ({unit})"
+
+# en: "simulation parameters, hand-tuned"
+msgid "powderRecord.handTuned"
+msgstr "Simulationsparameter, von Hand abgestimmt"
 
 # en: "single"
 msgid "values.single"
@@ -7754,6 +7906,14 @@ msgstr "Nutzungsbedingungen"
 msgid "recordSources.termsText"
 msgstr "Nutzungsbedingungen: {terms}"
 
+# en: "That record is not a design of this kind."
+msgid "recordLink.otherKind"
+msgstr "Dieser Datensatz ist kein Entwurf dieser Art."
+
+# en: "That record is not in this browser."
+msgid "recordLink.notInBrowser"
+msgstr "Dieser Datensatz ist nicht in diesem Browser."
+
 # en: "The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base."
 msgid "bulletDesigner.baseRecordChangedSince"
 msgstr "Der Basisdatensatz {name} hat sich geändert, seit dieser Entwurf gespeichert wurde. Felder, die Sie nicht geändert haben, folgen ihm; Speichern behält den Entwurf gegenüber der neuen Basis."
@@ -7786,6 +7946,10 @@ msgstr "Der Browser konnte das Treibladungspulver nicht speichern. {reason} Gebe
 msgid "bulletPhoto.tooAlike"
 msgstr "Geschoss und Hintergrund sind sich in der Helligkeit zu ähnlich, um sie zu unterscheiden."
 
+# en: "The bullet could not be loaded. The designer still works."
+msgid "bulletDesigner.loadFailed"
+msgstr "Das Geschoss konnte nicht geladen werden. Der Editor funktioniert weiterhin."
+
 # en: "The bullet differs from the background by {gap} grey levels only: the outline may be rough. Use a plainer background, or one much lighter or darker than the bullet."
 msgid "bulletPhoto.lowContrast"
 msgstr "Das Geschoss unterscheidet sich vom Hintergrund nur um {gap} Graustufen: Der Umriss kann grob sein. Verwenden Sie einen schlichteren Hintergrund oder einen, der viel heller oder dunkler als das Geschoss ist."
@@ -7813,6 +7977,10 @@ msgstr "Die Seiten des Geschosses verlaufen nicht parallel zur eingegebenen Achs
 # en: "The bullet's sides are ragged (about {sigma, decimal} px): a reflection, shadow or noise. Retake the photograph in even, soft light, or brush the cut-out where it is wrong."
 msgid "bulletPhoto.raggedSides"
 msgstr "Die Seiten des Geschosses sind ausgefranst (etwa {sigma, decimal} px): eine Spiegelung, ein Schatten oder Rauschen. Fotografieren Sie erneut in gleichmäßigem, weichem Licht oder korrigieren Sie die Freistellung mit dem Pinsel, wo sie falsch ist."
+
+# en: "The cartridge could not be loaded. The designer still works."
+msgid "cartridgeDesigner.loadFailed"
+msgstr "Die Patrone konnte nicht geladen werden. Der Editor funktioniert weiterhin."
 
 # en: "The cartridge has a CIP limit per variant, so a percentage has no single limit. Enter the pressure instead."
 msgid "chargeTarget.severalLimits"
@@ -8034,6 +8202,10 @@ msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
 msgid "log.readFailed"
 msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
 
+# en: "The records of this browser could not be read."
+msgid "recordLink.unreadable"
+msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
+
 # en: "The region is too large for holes this small; mark a smaller region"
 msgid "holeDetection.regionTooLargeHoles"
 msgstr "Der Bereich ist für so kleine Schusslöcher zu groß; markieren Sie einen kleineren Bereich"
@@ -8166,6 +8338,10 @@ msgstr "Diese Schussreihen können den Temperaturfaktor nicht vom Abbrandkoeffiz
 msgid "bulletPhoto.unreadable"
 msgstr "Dieser Browser kann das Foto nicht lesen."
 
+# en: "This cartridge has no CIP record that draws. The designer still works."
+msgid "cartridgeDesigner.noDrawingRecord"
+msgstr "Zu dieser Patrone gibt es keinen CIP-Datensatz, der sich zeichnen lässt. Der Editor funktioniert weiterhin."
+
 # en: "This file is not an image this browser can read."
 msgid "bulletPhoto.notAnImage"
 msgstr "Diese Datei ist kein Bild, das dieser Browser lesen kann."
@@ -8193,6 +8369,10 @@ msgstr "Durchmesser des Übergangskegels"
 # en: "Tick 2 to 4 bullets in the list, then Compare."
 msgid "bulletCompare.noneText"
 msgstr "Haken Sie in der Liste 2 bis 4 Geschosse an und wählen Sie dann „Vergleichen“."
+
+# en: "Tick at least one fitted parameter."
+msgid "powderDesigner.tickFittedParameter"
+msgstr "Kreuzen Sie mindestens einen angepassten Parameter an."
 
 # en: "tight"
 msgid "powderTune.tight"

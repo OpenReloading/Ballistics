@@ -190,6 +190,9 @@ msgstr "{count, plural, one {No bullet with the id {ids}.} other {No bullets wit
 msgid "bulletCompare.invalidIds"
 msgstr "{count, plural, one {Not a bullet id: {ids}.} other {Not bullet ids: {ids}.}}"
 
+msgid "powderRecord.fittedStrings"
+msgstr "{count, plural, one {simulation parameters fitted to # string, {date}} other {simulation parameters fitted to # strings, {date}}}"
+
 msgid "targetEditor.excluded"
 msgstr "{count} ({excluded} excluded)"
 
@@ -259,8 +262,26 @@ msgstr "{label} from {velocity}"
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
 
+msgid "powderDesigner.above"
+msgstr "{label} must be above {min, decimal}."
+
+msgid "powderDesigner.atLeast"
+msgstr "{label} must be at least {min, decimal}{unit}."
+
+msgid "powderDesigner.atMost"
+msgstr "{label} must be at most {max, decimal}{unit}."
+
 msgid "cartridgeDesigner.atMostInDesigner"
 msgstr "{label} must be at most {max} {unit} in the designer."
+
+msgid "powderDesigner.below"
+msgstr "{label} must be below {max, decimal}."
+
+msgid "powderDesigner.greaterThanZero"
+msgstr "{label} must be greater than 0{unit}."
+
+msgid "powderDesigner.betweenMinMax"
+msgstr "{label} must lie between Min and Max."
 
 msgid "fieldTable.region"
 msgstr "{label} table"
@@ -279,6 +300,18 @@ msgstr "{label}, low to high"
 
 msgid "directoryTable.zToA"
 msgstr "{label}, Z to A"
+
+msgid "powderDesigner.addOneEntry"
+msgstr "{label}: add at least one entry."
+
+msgid "powderDesigner.minNotAboveMax"
+msgstr "{label}: Min must not be above Max."
+
+msgid "powderDesigner.notAccepted"
+msgstr "{label}: not accepted by the powder record."
+
+msgid "powderDesigner.casDigits"
+msgstr "{label}: write the CAS number as digits and hyphens, as 9004-70-0."
 
 msgid "holeDetection.doubleClickEnterAccepts"
 msgstr "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it."
@@ -562,11 +595,20 @@ msgstr "Add"
 msgid "log.add"
 msgstr "Add"
 
+msgid "powderDesigner.sourceCartridges"
+msgstr "Add a source that gives the cartridges the powder is listed for."
+
+msgid "powderDesigner.sourceCountry"
+msgstr "Add a source that gives the country."
+
 msgid "powderTune.addString"
 msgstr "Add a string"
 
 msgid "powderTune.emptyPrompt"
 msgstr "Add a string, or open this page from the Measurements tab of a load with chronograph strings mapped to charges."
+
+msgid "powderDesigner.addOneIngredient"
+msgstr "Add at least one ingredient."
 
 msgid "bulletCompare.add"
 msgstr "Add bullet"
@@ -618,6 +660,9 @@ msgstr "Air pressure"
 
 msgid "values.airRifle"
 msgstr "Air rifle"
+
+msgid "powderDesigner.aliases"
+msgstr "Aliases"
 
 msgid "recordFields.aliases"
 msgstr "Aliases"
@@ -1039,6 +1084,12 @@ msgstr "Burn form z1"
 msgid "recordFields.burnFormGroup"
 msgstr "Burn form, two-stage"
 
+msgid "powderDesigner.burnFormRule"
+msgstr "Burn form: 1 + a × z1 must be above 0, and Form q below 1 where Form z1 is below 1."
+
+msgid "powderDesigner.burnLaw"
+msgstr "Burn law"
+
 msgid "powderDesigner.burnLawInteriorModel"
 msgstr "Burn law (interior model)"
 
@@ -1225,6 +1276,9 @@ msgstr "Cartridges"
 msgid "page.cartridges"
 msgstr "Cartridges"
 
+msgid "powderDesigner.cartridges"
+msgstr "Cartridges"
+
 msgid "powderRecord.cartridges"
 msgstr "Cartridges"
 
@@ -1351,6 +1405,12 @@ msgstr "Change the scale"
 msgid "holeDetection.changeTarget"
 msgstr "Change the target"
 
+msgid "powderRecord.changedFromRecord"
+msgstr "Changed from the record value {value}."
+
+msgid "powderRecord.changedFromDesign"
+msgstr "Changed from the user design value {value}."
+
 msgid "cartridgeDesigner.changedValuesDrawnEntered"
 msgstr "Changed values are drawn as entered, without the record's tolerances."
 
@@ -1398,6 +1458,9 @@ msgstr "Choose a photograph of the bullet beside a ruler, or try the sample. It 
 
 msgid "powderTune.choosePowder"
 msgstr "Choose a powder"
+
+msgid "powderDesigner.chooseValuesCameAbout"
+msgstr "Choose an entry for Values came about by."
 
 msgid "bulletCompare.choose"
 msgstr "Choose bullets"
@@ -1561,11 +1624,17 @@ msgstr "Competition events"
 msgid "logSummary.competitions"
 msgstr "Competitions"
 
+msgid "powderDesigner.composition"
+msgstr "Composition"
+
 msgid "recordFields.composition"
 msgstr "Composition"
 
 msgid "powderDesigner.compositionMassPercent"
 msgstr "Composition, mass percent"
+
+msgid "powderDesigner.compositionSumRule"
+msgstr "Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more."
 
 msgid "primers.column.compound"
 msgstr "Compound"
@@ -1682,6 +1751,9 @@ msgid "federations.facet.country"
 msgstr "Country"
 
 msgid "fieldStrip.country"
+msgstr "Country"
+
+msgid "powderDesigner.country"
 msgstr "Country"
 
 msgid "fieldStrip.countryNote"
@@ -2161,11 +2233,17 @@ msgstr "Energy ratio"
 msgid "cartridgeRecord.meaning.energy"
 msgstr "energy, as printed under Pressures (Energies)"
 
+msgid "powderDesigner.enterLabel"
+msgstr "Enter {label}."
+
 msgid "powderDesigner.enterNameValuesYou"
 msgstr "Enter a name and the values you have."
 
 msgid "targetEditor.enterName"
 msgstr "Enter a name."
+
+msgid "powderDesigner.enterNumberFor"
+msgstr "Enter a number for {label}."
 
 msgid "targetDesigner.enterRingDiameter"
 msgstr "Enter a ring diameter."
@@ -2624,6 +2702,21 @@ msgstr "From the official result, where published."
 msgid "cartridgeDesigner.fromRecord"
 msgstr "From the record"
 
+msgid "powderRecord.fromRecordFitted"
+msgstr "From the record (fitted)."
+
+msgid "powderRecord.fromRecordInput"
+msgstr "From the record (input of the fit)."
+
+msgid "powderRecord.fromDesignFitted"
+msgstr "From the user design (fitted)."
+
+msgid "powderRecord.fromDesignInput"
+msgstr "From the user design (input of the fit)."
+
+msgid "powderRecord.fromDesignMark"
+msgstr "From the user design: {mark}."
+
 msgid "powderTune.fromSavedLoads"
 msgstr "From your saved loads with chronograph strings"
 
@@ -2929,6 +3022,9 @@ msgstr "included, 2 atan((P2 - H1) / 2 / (L2 - L1))"
 
 msgid "powderDesigner.ingredient"
 msgstr "Ingredient"
+
+msgid "powderDesigner.ingredientNumber"
+msgstr "Ingredient {n, decimal}"
 
 msgid "powderDesigner.ingredientCasNumber"
 msgstr "Ingredient {n, decimal} CAS number"
@@ -3257,8 +3353,14 @@ msgstr "Loading the brass record"
 msgid "states.loading.theBulletRecord"
 msgstr "Loading the bullet record"
 
+msgid "bulletDesigner.loading"
+msgstr "Loading the bullet…"
+
 msgid "states.loading.theCartridgeRecord"
 msgstr "Loading the cartridge record"
+
+msgid "cartridgeDesigner.loading"
+msgstr "Loading the cartridge…"
 
 msgid "states.loading.theDesigner"
 msgstr "Loading the designer"
@@ -3271,6 +3373,9 @@ msgstr "Loading the powder comparison"
 
 msgid "states.loading.thePreview"
 msgstr "Loading the preview"
+
+msgid "recordLink.loading"
+msgstr "Loading the record…"
 
 msgid "states.loading.theSettings"
 msgstr "Loading the settings"
@@ -4066,6 +4171,9 @@ msgstr "Not printed in the record"
 
 msgid "targetEditor.notRestoredStoreRefused"
 msgstr "Not restored: the browser store refused."
+
+msgid "caseGroupEditor.notSaved"
+msgstr "Not saved in this browser"
 
 msgid "events.notSaved"
 msgstr "Not saved: {reason}"
@@ -5306,6 +5414,9 @@ msgstr "Set per load row by the barrel length and the bullet construction."
 msgid "holeDetection.setScaleFirstStep"
 msgstr "Set the scale first (step 2)."
 
+msgid "powderDesigner.setFittedData"
+msgstr "Set Values came about by to Fitted to data."
+
 msgid "bulletDesigner.shank"
 msgstr "Shank"
 
@@ -5446,6 +5557,9 @@ msgstr "Simplified drawing from the record; only values with a source are dimens
 
 msgid "powderTune.simulated"
 msgstr "Simulated ({unit})"
+
+msgid "powderRecord.handTuned"
+msgstr "simulation parameters, hand-tuned"
 
 msgid "values.single"
 msgstr "single"
@@ -5818,6 +5932,12 @@ msgstr "Terms"
 msgid "recordSources.termsText"
 msgstr "Terms: {terms}"
 
+msgid "recordLink.otherKind"
+msgstr "That record is not a design of this kind."
+
+msgid "recordLink.notInBrowser"
+msgstr "That record is not in this browser."
+
 msgid "bulletDesigner.baseRecordChangedSince"
 msgstr "The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base."
 
@@ -5842,6 +5962,9 @@ msgstr "The browser could not store the powder. {reason} Free browser storage or
 msgid "bulletPhoto.tooAlike"
 msgstr "The bullet and the background are too alike in brightness to tell apart."
 
+msgid "bulletDesigner.loadFailed"
+msgstr "The bullet could not be loaded. The designer still works."
+
 msgid "bulletPhoto.lowContrast"
 msgstr "The bullet differs from the background by {gap} grey levels only: the outline may be rough. Use a plainer background, or one much lighter or darker than the bullet."
 
@@ -5862,6 +5985,9 @@ msgstr "The bullet's sides are not parallel to the typed axis direction: it is a
 
 msgid "bulletPhoto.raggedSides"
 msgstr "The bullet's sides are ragged (about {sigma, decimal} px): a reflection, shadow or noise. Retake the photograph in even, soft light, or brush the cut-out where it is wrong."
+
+msgid "cartridgeDesigner.loadFailed"
+msgstr "The cartridge could not be loaded. The designer still works."
 
 msgid "chargeTarget.severalLimits"
 msgstr "The cartridge has a CIP limit per variant, so a percentage has no single limit. Enter the pressure instead."
@@ -6028,6 +6154,9 @@ msgstr "The records of this browser could not be read."
 msgid "log.readFailed"
 msgstr "The records of this browser could not be read."
 
+msgid "recordLink.unreadable"
+msgstr "The records of this browser could not be read."
+
 msgid "holeDetection.regionTooLargeHoles"
 msgstr "The region is too large for holes this small; mark a smaller region"
 
@@ -6127,6 +6256,9 @@ msgstr "These strings cannot tell the temperature factor from the burn coefficie
 msgid "bulletPhoto.unreadable"
 msgstr "This browser cannot read the photograph."
 
+msgid "cartridgeDesigner.noDrawingRecord"
+msgstr "This cartridge has no CIP record that draws. The designer still works."
+
 msgid "bulletPhoto.notAnImage"
 msgstr "This file is not an image this browser can read."
 
@@ -6147,6 +6279,9 @@ msgstr "throat diameter"
 
 msgid "bulletCompare.noneText"
 msgstr "Tick 2 to 4 bullets in the list, then Compare."
+
+msgid "powderDesigner.tickFittedParameter"
+msgstr "Tick at least one fitted parameter."
 
 msgid "powderTune.tight"
 msgstr "tight"

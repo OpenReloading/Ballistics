@@ -1,6 +1,6 @@
 import { powder as powderSchema, type UserPowder, type UserRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { historyOf } from '../src/lib/history.ts'
 import {
@@ -376,8 +376,17 @@ describe('the user design mark', () => {
   })
 })
 
+it('has every English text of the problems without the designer page', () => {
+  const missing: string[] = []
+  const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+  checkDesign(newDesign(), id)
+  checkDesign(typed(draft(), 'interior.vivacity.value', '-3'), id)
+  stop()
+  expect(missing).toEqual([])
+})
+
 describe('issueText', () => {
-  const t = english.t
+  const i18n = linguiOf('en')
   /** Issues as the powder schema raises them on a broken draft. */
   const parsed = powderSchema.safeParse({
     id,
@@ -410,7 +419,7 @@ describe('issueText', () => {
 
   it("keeps zod's message out of every sentence and names the field", () => {
     for (const issue of issues) {
-      const text = issueText(issue as Parameters<typeof issueText>[0], 'Field', t)
+      const text = issueText(issue as Parameters<typeof issueText>[0], 'Field', i18n)
       expect(text).not.toContain(issue.message)
       expect(text).not.toMatch(/Invalid|Unrecognized|Too small|expected/)
     }
@@ -418,8 +427,8 @@ describe('issueText', () => {
 
   it('says to add an ingredient for an empty composition, and an entry for another empty list', () => {
     const empty = { code: 'too_small', origin: 'array', path: ['composition'], message: 'x' }
-    expect(issueText(empty, 'Composition', t)).toBe('Add at least one ingredient.')
-    expect(issueText({ ...empty, path: ['aliases'] }, 'Aliases', t)).toBe(
+    expect(issueText(empty, 'Composition', i18n)).toBe('Add at least one ingredient.')
+    expect(issueText({ ...empty, path: ['aliases'] }, 'Aliases', i18n)).toBe(
       'Aliases: add at least one entry.',
     )
   })
@@ -430,7 +439,7 @@ describe('issueText', () => {
       issueText(
         { code: 'custom', path: [key], message: `needs a source with fields ${key}` },
         key,
-        t,
+        i18n,
       )
     expect(text('country')).toBe('Add a source that gives the country.')
     expect(text('listedCartridges')).toBe(
@@ -445,7 +454,7 @@ describe('issueText', () => {
       path: ['composition'],
       message: 'Invalid input',
     }
-    expect(issueText(issue, 'Composition', t)).toBe(
+    expect(issueText(issue, 'Composition', i18n)).toBe(
       'Composition: not accepted by the powder record.',
     )
   })

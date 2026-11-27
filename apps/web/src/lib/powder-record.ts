@@ -1,8 +1,12 @@
+import type { I18n } from '@lingui/core'
 import type { Powder, UserPowderFit } from '@rangefoundry/schema'
-import type { Translator } from '../i18n/translate.ts'
+import { linguiOf, loadEnglish, ungrouped } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/lib/powder-record.json' with { type: 'json' }
 import { localDay } from './dates.ts'
 import { interiorFields } from './interior-input.ts'
 import { fixedFieldText, type UnitSystem } from './units.ts'
+
+loadEnglish(englishMessages)
 
 /** Fill, field marks, fit summary and the fit's bore resistance. */
 
@@ -51,15 +55,18 @@ export const fitMark = (
   date: string,
   tuned: boolean,
   day: (iso: string) => string,
-  { tn, t }: Pick<Translator, 't' | 'tn'>,
+  i18n: I18n = linguiOf('en'),
 ) =>
   tuned
-    ? t('simulation parameters, hand-tuned')
-    : tn(
-        strings,
-        'simulation parameters fitted to {count} string, {date}',
-        'simulation parameters fitted to {count} strings, {date}',
-        { date: day(localDay(new Date(date))) },
+    ? i18n._({ id: 'powderRecord.handTuned', message: 'simulation parameters, hand-tuned' })
+    : i18n._(
+        'powderRecord.fittedStrings',
+        { count: strings, date: day(localDay(new Date(date))) },
+        {
+          message:
+            '{count, plural, one {simulation parameters fitted to # string, {date}} other {simulation parameters fitted to # strings, {date}}}',
+          formats: ungrouped,
+        },
       )
 
 /** `origin`: the record values the fit filled, `values`: the SI field values, compared as the fields write them in `s`; undefined for a powder not saved from a fit. */
@@ -69,7 +76,7 @@ export function loadFitMark(
   values: Record<string, number | undefined>,
   s: UnitSystem,
   day: (iso: string) => string,
-  tr: Pick<Translator, 't' | 'tn'>,
+  i18n: I18n = linguiOf('en'),
 ) {
   if (!design?.fit || !origin) return
   const shown = (key: string, si: number) => {
@@ -77,7 +84,7 @@ export function loadFitMark(
     return spec ? fixedFieldText(spec.quantity, s, si) : `${si}`
   }
   const tuned = handTuned(design.powder, origin, values, shown)
-  return fitMark(design.fit.input.length, design.fit.date, tuned, day, tr)
+  return fitMark(design.fit.input.length, design.fit.date, tuned, day, i18n)
 }
 
 /** Undefined for a field the record does not fill. */
@@ -89,25 +96,46 @@ export function recordMark(
   shown: (si: number) => string,
   /** Where the values come from. */
   source: 'record' | 'user design',
-  t: Translator['t'],
+  i18n: I18n = linguiOf('en'),
   /** The mark of a powder saved from a fit (`fitMark`), which its fitted fields carry. */
   fit?: string | undefined,
 ) {
   const from = origin[key]
   if (from === undefined) return
   const fitted = p.interior?.fitted.some((k) => k === fittedKey[key])
-  if (fitted && fit) return t('From the user design: {mark}.', { mark: fit })
+  if (fitted && fit)
+    return i18n._({
+      id: 'powderRecord.fromDesignMark',
+      message: 'From the user design: {mark}.',
+      values: { mark: fit },
+    })
   if (matchesRecordValue(from, si)) {
     if (source === 'record')
-      return fitted ? t('From the record (fitted).') : t('From the record (input of the fit).')
+      return fitted
+        ? i18n._({ id: 'powderRecord.fromRecordFitted', message: 'From the record (fitted).' })
+        : i18n._({
+            id: 'powderRecord.fromRecordInput',
+            message: 'From the record (input of the fit).',
+          })
     return fitted
-      ? t('From the user design (fitted).')
-      : t('From the user design (input of the fit).')
+      ? i18n._({ id: 'powderRecord.fromDesignFitted', message: 'From the user design (fitted).' })
+      : i18n._({
+          id: 'powderRecord.fromDesignInput',
+          message: 'From the user design (input of the fit).',
+        })
   }
   const value = shown(from)
   return source === 'record'
-    ? t('Changed from the record value {value}.', { value })
-    : t('Changed from the user design value {value}.', { value })
+    ? i18n._({
+        id: 'powderRecord.changedFromRecord',
+        message: 'Changed from the record value {value}.',
+        values: { value },
+      })
+    : i18n._({
+        id: 'powderRecord.changedFromDesign',
+        message: 'Changed from the user design value {value}.',
+        values: { value },
+      })
 }
 
 /** Fitted energy over impetus / (gamma - 1) at the mean composition, a plausibility check; undefined without thermochemistry or a fit. */

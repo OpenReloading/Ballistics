@@ -1,5 +1,6 @@
 /** Cuts by color distance where luma barely separates bullet and background (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 
+import type { MessageDescriptor } from '@lingui/core'
 import {
   type Gray,
   grayOf,
@@ -10,7 +11,6 @@ import {
 } from './bullet-photo.ts'
 import type { RgbaImage } from './image.ts'
 import type { Point } from './target-geometry.ts'
-import type { Wording } from './wording.ts'
 
 type Rgb = [number, number, number]
 
@@ -272,7 +272,7 @@ interface Pick {
   /** The cut-out `cut` reads the background around, when it is not the photograph's own. */
   known?: Uint8Array
   /** Sentences for the user about the choice itself, which the cut-out made on the photograph needs too. */
-  notes?: Wording[]
+  notes?: MessageDescriptor[]
 }
 
 /** Luma, then color, then luma distance for a part-bright part-dark bullet; a ragged edge falls back to the largest smooth cut-out. */

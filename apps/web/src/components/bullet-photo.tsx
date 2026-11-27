@@ -97,17 +97,12 @@ function stateMessages(p: PhotoState, t: Translator['t'], i18n: I18n): MessageEn
 }
 
 /** The messages about the values: what could not be told, and where the photograph and the chosen record disagree. */
-function valueMessages(
-  p: PhotoState,
-  record: Design['origin'],
-  t: Translator['t'],
-  i18n: I18n,
-): MessageEntry[] {
+function valueMessages(p: PhotoState, record: Design['origin'], i18n: I18n): MessageEntry[] {
   const differing = p.rows.filter((r) => r.differs).map((r) => i18n._(r.spec.label).toLowerCase())
   const values = differing.join(', ')
   return [
     ...(p.found?.measurement?.notes ?? []).map(
-      (w) => ({ severity: 'info', text: say(i18n, t, w) }) as const,
+      (w) => ({ severity: 'info', text: i18n._(w) }) as const,
     ),
     ...(differing.length > 0
       ? [
@@ -336,7 +331,7 @@ function PhotoTool({
 
   const outline = found?.outline
   const turned = outline && fromSi('angle', outline.angle)
-  const messages = [...stateMessages(p, t, i18n), ...valueMessages(p, record, t, i18n)]
+  const messages = [...stateMessages(p, t, i18n), ...valueMessages(p, record, i18n)]
   return (
     <Flex gap="md" wrap="wrap" align="flex-start" className="bullet-photo">
       <div style={{ flex: '2 1 28rem', minWidth: 0 }}>

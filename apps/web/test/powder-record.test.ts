@@ -1,8 +1,9 @@
 import { powderModelValues, recordResistance } from '@rangefoundry/ballistics'
 import type { Powder } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import {
+  fitMark,
   fitTables,
   fittedEnergyRatio,
   recordMark,
@@ -72,26 +73,45 @@ it('gives the model fields in SI, the start pressure by the rule of the fit', ()
 it('marks a field from the record, fitted or a fixed input, and an edit after the fill', () => {
   const origin = powderModelValues(powder) ?? {}
   const shown = (si: number) => `${si} u`
-  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'record', english.t)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'record')).toBe(
     'From the record (fitted).',
   )
-  expect(recordMark(powder, origin, 'gamma', 1.24, shown, 'record', english.t)).toBe(
+  expect(recordMark(powder, origin, 'gamma', 1.24, shown, 'record')).toBe(
     'From the record (input of the fit).',
   )
-  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'record', english.t)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'record')).toBe(
     'Changed from the record value 0.5 u.',
   )
-  expect(recordMark(powder, origin, 'vivacity', undefined, shown, 'record', english.t)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', undefined, shown, 'record')).toBe(
     'Changed from the record value 0.5 u.',
   )
-  expect(recordMark(powder, origin, 'charge', 0.002, shown, 'record', english.t)).toBeUndefined()
+  expect(recordMark(powder, origin, 'charge', 0.002, shown, 'record')).toBeUndefined()
   // the values of a user design say so
-  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'user design', english.t)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'user design')).toBe(
     'From the user design (fitted).',
   )
-  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'user design', english.t)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'user design')).toBe(
     'Changed from the user design value 0.5 u.',
   )
+})
+
+it('has every English text of the field marks without the designer page', () => {
+  const origin = powderModelValues(powder) ?? {}
+  const shown = (si: number) => `${si} u`
+  const missing: string[] = []
+  const stop = linguiOf('en').on('missing', ({ id }) => missing.push(id))
+  for (const source of ['record', 'user design'] as const)
+    for (const [key, si] of [
+      ['vivacity', 0.5],
+      ['gamma', 1.24],
+      ['vivacity', 0.6],
+    ] as const)
+      recordMark(powder, origin, key, si, shown, source)
+  recordMark(powder, origin, 'vivacity', 0.5, shown, 'user design', undefined, 'fit')
+  fitMark(1, '2025-01-01T00:00:00Z', false, (d) => d)
+  fitMark(1, '2025-01-01T00:00:00Z', true, (d) => d)
+  stop()
+  expect(missing).toEqual([])
 })
 
 it('applies the bore resistance of the record from the cartridge, bullet length and run', () => {

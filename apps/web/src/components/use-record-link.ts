@@ -1,17 +1,24 @@
+import type { MessageDescriptor } from '@lingui/core'
 import { type UserRecordKind, userRecord } from '@rangefoundry/schema'
 import { type RefObject, useEffect } from 'react'
 import { storedRecord } from '@/platform/user-store.ts'
-import { type Message, msg } from '../i18n/translate.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
+import englishMessages from '../locales/en/components/use-record-link.json' with { type: 'json' }
 import type { FileMenuHandle } from './file-menu.tsx'
 
+loadEnglish(englishMessages)
+
 /** The status while a linked record is read. */
-export const recordLoadingText = msg('Loading the record…')
+export const recordLoadingText = /*i18n*/ {
+  id: 'recordLink.loading',
+  message: 'Loading the record…',
+}
 
 /** Checked against the schema and the designer's kind and opened as Open's saved records, so Save writes that record; read once on mount, `say` gets the status message, undefined to clear it. */
 export function useRecordLink(
   kind: UserRecordKind,
   menu: RefObject<FileMenuHandle | null>,
-  say: (message: Message | undefined) => void,
+  say: (message: MessageDescriptor | undefined) => void,
 ) {
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('record')
@@ -19,14 +26,31 @@ export function useRecordLink(
     say(recordLoadingText)
     storedRecord(id).then(
       async (raw) => {
-        if (raw === undefined) return say(msg('That record is not in this browser.'))
+        if (raw === undefined)
+          return say(
+            /*i18n*/ {
+              id: 'recordLink.notInBrowser',
+              message: 'That record is not in this browser.',
+            },
+          )
         const r = userRecord.safeParse(raw)
         if (!r.success || r.data.kind !== kind)
-          return say(msg('That record is not a design of this kind.'))
+          return say(
+            /*i18n*/ {
+              id: 'recordLink.otherKind',
+              message: 'That record is not a design of this kind.',
+            },
+          )
         say(undefined)
         await menu.current?.open(r.data)
       },
-      () => say(msg('The records of this browser could not be read.')),
+      () =>
+        say(
+          /*i18n*/ {
+            id: 'recordLink.unreadable',
+            message: 'The records of this browser could not be read.',
+          },
+        ),
     )
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- once on mount
   }, [])

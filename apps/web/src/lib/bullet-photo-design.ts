@@ -3,7 +3,6 @@
 import type { I18n } from '@lingui/core'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { fixedNumber } from '../i18n/number.ts'
-import type { Translator } from '../i18n/translate.ts'
 import englishMessages from '../locales/en/lib/bullet-photo-design.json' with { type: 'json' }
 import { type Design, type DesignerSpec, designerSpecs } from './bullet-designer.ts'
 import type { Scale } from './bullet-photo.ts'
@@ -104,7 +103,6 @@ export interface PhotoFacts {
 export function photoText(
   photo: NonNullable<Design['photo']>,
   system: UnitSystem,
-  t: Translator['t'],
   i18n: I18n,
 ): string[] {
   const basis = basisNote(photo.scaleBasis)
