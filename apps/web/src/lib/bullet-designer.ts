@@ -1,3 +1,4 @@
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import {
   type Bullet,
   baseTypes,
@@ -14,8 +15,9 @@ import {
   bulletProfile,
   bulletScreenEm,
 } from '@rangefoundry/svg-drawings/bullet'
+import { linguiOf } from '../i18n/lingui.ts'
 import { untranslated } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'
 import {
   close,
@@ -36,25 +38,25 @@ import { dropPath, type ResolvedBullet, revisionOf, setPath } from './variants.t
 
 /** The field groups of the designer, in order. */
 export const groups = {
-  identity: msg('Identity'),
-  size: msg('Mass, diameter and length'),
-  nose: msg('Nose'),
-  shank: msg('Shank'),
-  base: msg('Base'),
-  tip: msg('Tip'),
+  identity: /*i18n*/ { id: 'bulletDesigner.identity', message: 'Identity' },
+  size: /*i18n*/ { id: 'bulletDesigner.massDiameterLength', message: 'Mass, diameter and length' },
+  nose: /*i18n*/ { id: 'bulletDesigner.nose', message: 'Nose' },
+  shank: /*i18n*/ { id: 'bulletDesigner.shank', message: 'Shank' },
+  base: /*i18n*/ { id: 'bulletDesigner.base', message: 'Base' },
+  tip: /*i18n*/ { id: 'bulletDesigner.tip', message: 'Tip' },
 }
 
 export type Group = keyof typeof groups
 
 /** A number field of the designer; `key` is the record path. */
 export interface DesignerSpec extends FieldSpec {
-  label: Message
+  label: MessageDescriptor
   group: Group
   /** SI range; outside it the field asks to check the unit, a soft flag that blocks nothing (the ranges of issue #788). */
   plausible?: [number, number]
 }
 
-const len = (key: string, label: Message, group: Group): DesignerSpec => ({
+const len = (key: string, label: MessageDescriptor, group: Group): DesignerSpec => ({
   key,
   label,
   quantity: 'length',
@@ -70,50 +72,105 @@ const range = (low: number, high: number, perUnit: number): [number, number] => 
 
 export const designerSpecs: DesignerSpec[] = [
   {
-    ...len('diameter', msg('Diameter'), 'size'),
+    ...len('diameter', /*i18n*/ { id: 'bulletDesigner.diameter', message: 'Diameter' }, 'size'),
     required: true,
     plausible: range(0.05, 1.5, metersPerInch),
   },
   {
     key: 'mass',
-    label: msg('Mass'),
+    label: /*i18n*/ { id: 'bulletDesigner.mass', message: 'Mass' },
     quantity: 'mass',
     group: 'size',
     min: 0,
     positive: true,
     plausible: range(5, 1500, kilogramsPerGrain),
   },
-  len('length', msg('Length'), 'size'),
-  len('noseLength', msg('Nose length'), 'nose'),
-  len('ogive.radius', msg('Ogive radius'), 'nose'),
+  len('length', /*i18n*/ { id: 'bulletDesigner.length', message: 'Length' }, 'size'),
+  len('noseLength', /*i18n*/ { id: 'bulletDesigner.noseLength', message: 'Nose length' }, 'nose'),
+  len(
+    'ogive.radius',
+    /*i18n*/ { id: 'bulletDesigner.ogiveRadius', message: 'Ogive radius' },
+    'nose',
+  ),
   {
     key: 'ogive.radiusRatio',
-    label: msg('Ogive Rt/R'),
+    label: /*i18n*/ { id: 'bulletDesigner.ogiveRtR', message: 'Ogive Rt/R' },
     quantity: 'ratio',
     group: 'nose',
     min: 0,
     max: 1,
   },
-  len('meplatDiameter', msg('Meplat diameter'), 'nose'),
-  len('bearingLength', msg('Bearing length'), 'shank'),
-  len('baseToOgive', msg('Base to ogive'), 'shank'),
-  len('cannelure.start', msg('Cannelure start'), 'shank'),
-  len('cannelure.width', msg('Cannelure width'), 'shank'),
-  len('cannelure.depth', msg('Cannelure depth'), 'shank'),
-  len('base.length', msg('Boat-tail length'), 'base'),
-  len('base.diameter', msg('Base diameter'), 'base'),
-  len('base.cavityDiameter', msg('Cavity diameter'), 'base'),
-  len('base.cavityDepth', msg('Cavity depth'), 'base'),
+  len(
+    'meplatDiameter',
+    /*i18n*/ { id: 'bulletDesigner.meplatDiameter', message: 'Meplat diameter' },
+    'nose',
+  ),
+  len(
+    'bearingLength',
+    /*i18n*/ { id: 'bulletDesigner.bearingLength', message: 'Bearing length' },
+    'shank',
+  ),
+  len(
+    'baseToOgive',
+    /*i18n*/ { id: 'bulletDesigner.baseOgive', message: 'Base to ogive' },
+    'shank',
+  ),
+  len(
+    'cannelure.start',
+    /*i18n*/ { id: 'bulletDesigner.cannelureStart', message: 'Cannelure start' },
+    'shank',
+  ),
+  len(
+    'cannelure.width',
+    /*i18n*/ { id: 'bulletDesigner.cannelureWidth', message: 'Cannelure width' },
+    'shank',
+  ),
+  len(
+    'cannelure.depth',
+    /*i18n*/ { id: 'bulletDesigner.cannelureDepth', message: 'Cannelure depth' },
+    'shank',
+  ),
+  len(
+    'base.length',
+    /*i18n*/ { id: 'bulletDesigner.boatTailLength', message: 'Boat-tail length' },
+    'base',
+  ),
+  len(
+    'base.diameter',
+    /*i18n*/ { id: 'bulletDesigner.baseDiameter', message: 'Base diameter' },
+    'base',
+  ),
+  len(
+    'base.cavityDiameter',
+    /*i18n*/ { id: 'bulletDesigner.cavityDiameter', message: 'Cavity diameter' },
+    'base',
+  ),
+  len(
+    'base.cavityDepth',
+    /*i18n*/ { id: 'bulletDesigner.cavityDepth', message: 'Cavity depth' },
+    'base',
+  ),
   {
     key: 'base.angle',
-    label: msg('Boat-tail angle'),
+    label: /*i18n*/ { id: 'bulletDesigner.boatTailAngle', message: 'Boat-tail angle' },
     quantity: 'angle',
     group: 'base',
     min: 0,
     max: 90,
   },
-  len('tip.length', msg('Polymer tip length'), 'tip'),
-  len('tip.mouthDiameter', msg('Hollow-point mouth diameter'), 'tip'),
+  len(
+    'tip.length',
+    /*i18n*/ { id: 'bulletDesigner.polymerTipLength', message: 'Polymer tip length' },
+    'tip',
+  ),
+  len(
+    'tip.mouthDiameter',
+    /*i18n*/ {
+      id: 'bulletDesigner.hollowPointMouthDiameter',
+      message: 'Hollow-point mouth diameter',
+    },
+    'tip',
+  ),
 ]
 
 /** Whether the SI value `si` of the field `s` is outside its plausible range: a unit to check. */
@@ -457,10 +514,11 @@ function validateInputs(
   system: UnitSystem,
   last: string | undefined,
   t: Translator['t'],
+  i18n: I18n,
 ): Evaluation['refusal'] {
   // the mass is not drawn: its error shows at the field only
   const invalid = designerSpecs
-    .map((s) => [s.key, fieldError(s, design.fields[s.key], system, t)] as const)
+    .map((s) => [s.key, fieldError(s, design.fields[s.key], system, t, i18n)] as const)
     .filter(([k, e]) => e !== undefined && k !== 'mass')
   const bad = invalid.find(([k]) => k === last) ?? invalid[0]
   if (bad) return { reason: bad[1] as string, field: bad[0] }
@@ -468,7 +526,10 @@ function validateInputs(
   const widthOnly = v['cannelure.width'] !== undefined && v['cannelure.start'] === undefined
   if (startOnly || widthOnly)
     return {
-      reason: t('A cannelure needs a start and a width.'),
+      reason: i18n._({
+        id: 'bulletDesigner.cannelureNeedsStartWidth',
+        message: 'A cannelure needs a start and a width.',
+      }),
       field: startOnly ? 'cannelure.width' : 'cannelure.start',
     }
 }
@@ -648,6 +709,7 @@ export function evaluate(
   system: UnitSystem,
   last?: string,
   t: Translator['t'] = untranslated(),
+  i18n: I18n = linguiOf('en'),
 ): Evaluation {
   const { choices } = design
   const { v, states } = fieldStates(design)
@@ -662,7 +724,7 @@ export function evaluate(
     : []
   const done = (refusal: Evaluation['refusal']): Evaluation => ({ refusal, states, computed })
 
-  const refusal = validateInputs(design, v, system, last, t)
+  const refusal = validateInputs(design, v, system, last, t, i18n)
   if (refusal) return done(refusal)
 
   const completed = completeShape(v, choices)

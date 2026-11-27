@@ -112,7 +112,7 @@ export function photoText(
     const v = photo.values[s.key as PhotoField]
     return v
       ? [
-          `${t(s.label)} ${valueText(s, system, { value: v.value, uncertainty: v.standardUncertainty })}`,
+          `${i18n._(s.label)} ${valueText(s, system, { value: v.value, uncertainty: v.standardUncertainty })}`,
         ]
       : []
   })
