@@ -14,7 +14,7 @@ import {
 import { type Case, caseMaterials } from '@rangefoundry/schema'
 import { X } from 'lucide-react'
 import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from 'react'
-import { useTranslation } from '../i18n/language.ts'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeSummary, CaseSummary } from '../lib/api-types.ts'
 import { caseGroupCapacitySpec, caseGroupFields } from '../lib/case-group.ts'
@@ -24,9 +24,12 @@ import { kebabValue } from '../lib/list-values.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
+import englishMessages from '../locales/en/components/case-editor.json' with { type: 'json' }
 import { SiField } from './firearm-editor.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
+
+loadEnglish(englishMessages)
 
 /** The case products of a catalogue cartridge, for the "Start from a product" choice. */
 function useProducts(cartridge: string | undefined) {
@@ -77,7 +80,6 @@ export function CaseEditor({
   patch: (p: Partial<Case>) => void
   setCapacity: (m3: number | undefined) => void
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const names = useManufacturerNames()
   const products = useProducts(data.cartridge)
@@ -90,7 +92,7 @@ export function CaseEditor({
     <section aria-labelledby="library-editor" className="library-editor">
       <Group gap="md" wrap="nowrap" className="page-panel-head library-head">
         <h2 id="library-editor" className="page-panel-title record-heading">
-          {data.name || t('New brass group')}
+          {data.name || i18n._({ id: 'caseEditor.new', message: 'New brass group' })}
         </h2>
         {data.cartridge && (
           <Group gap={0} wrap="nowrap">
@@ -100,7 +102,10 @@ export function CaseEditor({
             <ActionIcon
               variant="subtle"
               size={controlSize.row.icon}
-              aria-label={t('Clear the cartridge')}
+              aria-label={i18n._({
+                id: 'caseEditor.clearCartridge',
+                message: 'Clear the cartridge',
+              })}
               onClick={() => patch({ cartridge: '', basedOn: undefined })}
             >
               <X size={14} aria-hidden="true" />
@@ -111,7 +116,7 @@ export function CaseEditor({
       {capacityGuide && (
         <p className="note">
           <Anchor href={capacityGuide} target="_blank" rel="noopener">
-            {t('How to measure case capacity')}
+            {i18n._({ id: 'caseEditor.capacityGuide', message: 'How to measure case capacity' })}
           </Anchor>
         </p>
       )}
@@ -122,23 +127,33 @@ export function CaseEditor({
         verticalSpacing="sm"
       >
         <TextInput
-          label={t('Name')}
+          label={i18n._({ id: 'caseEditor.name', message: 'Name' })}
           required
           maxLength={200}
-          description={t('For example headstamp and batch.')}
+          description={i18n._({
+            id: 'caseEditor.nameHelp',
+            message: 'For example headstamp and batch.',
+          })}
           value={data.name ?? ''}
           onChange={(e) => patch({ name: e.currentTarget.value })}
           onBlur={() => setNameLeft(true)}
-          error={nameLeft && !data.name ? t('Enter a name.') : undefined}
+          error={
+            nameLeft && !data.name
+              ? i18n._({ id: 'caseEditor.enterName', message: 'Enter a name.' })
+              : undefined
+          }
         />
         <div className="firearm-row">
           <span className="firearm-label" aria-hidden="true">
-            {t('Cartridge')}
+            {i18n._({ id: 'caseEditor.cartridge', message: 'Cartridge' })}
           </span>
           <RecordSearch<CartridgeSummary>
             kind="cartridges"
-            label={t('Cartridge')}
-            chosen={cartridgeName(data.cartridge) ?? t('Search cartridges')}
+            label={i18n._({ id: 'caseEditor.cartridge', message: 'Cartridge' })}
+            chosen={
+              cartridgeName(data.cartridge) ??
+              i18n._({ id: 'caseEditor.searchCartridges', message: 'Search cartridges' })
+            }
             picked={cartridgeName(data.cartridge) !== undefined}
             describe={(c) => c.name}
             onSelect={(c) => {
@@ -149,14 +164,20 @@ export function CaseEditor({
               chosen.current = cartridge
               patch({ cartridge, basedOn: undefined })
             }}
-            noneText={t('No cartridge found')}
-            unreachableText={t('The database is unreachable; the cartridge can be chosen later.')}
+            noneText={i18n._({ id: 'caseEditor.noCartridge', message: 'No cartridge found' })}
+            unreachableText={i18n._({
+              id: 'caseEditor.unreachable',
+              message: 'The database is unreachable; the cartridge can be chosen later.',
+            })}
           />
         </div>
         <NativeSelect
-          label={t('Start from a case product')}
+          label={i18n._({ id: 'caseEditor.product', message: 'Start from a case product' })}
           disabled={products.length === 0}
-          description={t('Takes its material and mass; the values you measured replace them.')}
+          description={i18n._({
+            id: 'caseEditor.productHelp',
+            message: 'Takes its material and mass; the values you measured replace them.',
+          })}
           value={data.basedOn?.slice('catalogue:'.length) ?? ''}
           onChange={(e) => {
             const p = product(e.currentTarget.value)
@@ -175,19 +196,24 @@ export function CaseEditor({
             {
               value: '',
               label:
-                data.cartridge || products.length > 0 ? t('None') : t('Choose a cartridge first'),
+                data.cartridge || products.length > 0
+                  ? i18n._({ id: 'caseEditor.none', message: 'None' })
+                  : i18n._({
+                      id: 'caseEditor.cartridgeFirst',
+                      message: 'Choose a cartridge first',
+                    }),
             },
             ...products.map((p) => ({ value: p.id, label: label(p) })),
           ]}
         />
         <NativeSelect
-          label={t('Material')}
+          label={i18n._({ id: 'caseEditor.material', message: 'Material' })}
           value={data.material}
           onChange={(e) => patch({ material: e.currentTarget.value as Case['material'] })}
           data={caseMaterials.options.map((value) => ({ value, label: kebabValue(i18n, value) }))}
         />
         <TextInput
-          label={t('Headstamp')}
+          label={i18n._({ id: 'caseEditor.headstamp', message: 'Headstamp' })}
           maxLength={200}
           value={data.headstamp ?? ''}
           onChange={(e) => patch({ headstamp: e.currentTarget.value || undefined })}
@@ -209,8 +235,11 @@ export function CaseEditor({
         ))}
         <Textarea
           className="wide"
-          label={t('Notes')}
-          description={t('How the cases were measured: fired or sized, primed or not.')}
+          label={i18n._({ id: 'caseEditor.notes', message: 'Notes' })}
+          description={i18n._({
+            id: 'caseEditor.notesHelp',
+            message: 'How the cases were measured: fired or sized, primed or not.',
+          })}
           autosize
           minRows={1}
           maxRows={4}

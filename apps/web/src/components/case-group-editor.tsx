@@ -182,7 +182,7 @@ export function CaseGroupEditor() {
                 show(newId(), blank, undefined, false)
               }}
             >
-              {t('New brass group')}
+              {i18n._({ id: 'caseGroupEditor.new', message: 'New brass group' })}
             </Button>
             <FileMenu
               ref={menu}

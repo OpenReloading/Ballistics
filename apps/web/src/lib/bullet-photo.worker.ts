@@ -1,5 +1,4 @@
 /** Keeps the posted image (nothing leaves the browser) so the page stays responsive on a large photograph (`apps/docs/docs/models/bullet-photo.md`). */
-import type { Message } from '../i18n/translate.ts'
 import { segmentPhoto } from './bullet-photo-colour.ts'
 import { measureOutline } from './bullet-photo-measure.ts'
 import { fitOutline } from './bullet-photo-outline.ts'
@@ -8,6 +7,7 @@ import { outlineHints } from './bullet-photo-quality.ts'
 import { resolveScale, withBasis } from './bullet-photo-scale.ts'
 import { errorText } from './error-text.ts'
 import type { RgbaImage } from './image.ts'
+import { verbatim } from './wording.ts'
 
 let photo: RgbaImage | undefined
 
@@ -64,6 +64,6 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       post(measure(q))
     }
   } catch (err) {
-    post({ kind: 'error', id: q.id, message: errorText(err) as Message })
+    post({ kind: 'error', id: q.id, message: verbatim(errorText(err)) })
   }
 }

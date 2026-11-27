@@ -1201,6 +1201,9 @@ msgstr "Carbine"
 msgid "cartridgeRecord.side.cartridge"
 msgstr "Cartridge"
 
+msgid "caseEditor.cartridge"
+msgstr "Cartridge"
+
 msgid "caseRecord.cartridge"
 msgstr "Cartridge"
 
@@ -1450,6 +1453,9 @@ msgstr "Check the event: a value is out of its range."
 msgid "holeDetection.choose"
 msgstr "Choose"
 
+msgid "caseEditor.cartridgeFirst"
+msgstr "Choose a cartridge first"
+
 msgid "powderTune.chooseLoad"
 msgstr "Choose a load; it opens in the workbench, where its Measurements link fits the powder."
 
@@ -1512,6 +1518,9 @@ msgstr "Clear search"
 
 msgid "comparePicks.clearSelection"
 msgstr "Clear selection"
+
+msgid "caseEditor.clearCartridge"
+msgstr "Clear the cartridge"
 
 msgid "bulletPhoto.clearScale"
 msgstr "Clear the scale"
@@ -2239,6 +2248,9 @@ msgstr "Enter {label}."
 msgid "powderDesigner.enterNameValuesYou"
 msgstr "Enter a name and the values you have."
 
+msgid "caseEditor.enterName"
+msgstr "Enter a name."
+
 msgid "targetEditor.enterName"
 msgstr "Enter a name."
 
@@ -2642,6 +2654,9 @@ msgstr "Flip nose"
 msgid "targetDesigner.ovalHelp"
 msgstr "For an oval; empty for a circle."
 
+msgid "caseEditor.nameHelp"
+msgstr "For example headstamp and batch."
+
 msgid "bulletPhoto.needScale"
 msgstr "For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length."
 
@@ -2852,6 +2867,9 @@ msgstr "head to where the shoulder cone meets the axis"
 msgid "cartridgeRecord.group.head"
 msgstr "Head, rim and groove"
 
+msgid "caseEditor.headstamp"
+msgstr "Headstamp"
+
 msgid "recordFields.headstamp"
 msgstr "Headstamp"
 
@@ -2933,11 +2951,17 @@ msgstr "Homepage"
 msgid "federationRecord.homepage"
 msgstr "Homepage"
 
+msgid "caseEditor.notesHelp"
+msgstr "How the cases were measured: fired or sized, primed or not."
+
 msgid "powderTune.ladderGuide"
 msgstr "How to fire a ladder for the fit"
 
 msgid "bulletDesigner.howMeasureBulletDimensions"
 msgstr "How to measure bullet dimensions"
+
+msgid "caseEditor.capacityGuide"
+msgstr "How to measure case capacity"
 
 msgid "powderTune.temperatureGuide"
 msgstr "How to measure powder temperature"
@@ -3521,6 +3545,9 @@ msgstr "Mass, diameter and length"
 msgid "lists.matching"
 msgstr "matching \"{query}\""
 
+msgid "caseEditor.material"
+msgstr "Material"
+
 msgid "cases.column.material"
 msgstr "Material"
 
@@ -3749,6 +3776,9 @@ msgstr "Name"
 msgid "cartridges.column.name"
 msgstr "Name"
 
+msgid "caseEditor.name"
+msgstr "Name"
+
 msgid "cases.column.name"
 msgstr "Name"
 
@@ -3817,6 +3847,12 @@ msgstr "neck diameter at L2"
 
 msgid "cartridgeRecord.meaning.neckAtMouth"
 msgstr "neck diameter at the mouth"
+
+msgid "caseEditor.new"
+msgstr "New brass group"
+
+msgid "caseGroupEditor.new"
+msgstr "New brass group"
 
 msgid "cases.new"
 msgstr "New brass group"
@@ -3909,6 +3945,9 @@ msgid "holeDetection.noCanvas"
 msgstr "No canvas to read the photo."
 
 msgid "cartridgeDesigner.noCartridgeFound"
+msgstr "No cartridge found"
+
+msgid "caseEditor.noCartridge"
 msgstr "No cartridge found"
 
 msgid "bulletRecord.noCartridge"
@@ -4085,6 +4124,9 @@ msgstr "none"
 msgid "powderCompare.none"
 msgstr "none"
 
+msgid "caseEditor.none"
+msgstr "None"
+
 msgid "events.none"
 msgstr "None"
 
@@ -4216,6 +4258,9 @@ msgstr "Note"
 
 msgid "sessionSummary.note"
 msgstr "Note: {note}"
+
+msgid "caseEditor.notes"
+msgstr "Notes"
 
 msgid "events.notes"
 msgstr "Notes"
@@ -5339,6 +5384,9 @@ msgstr "Search"
 msgid "fieldTable.search"
 msgstr "Search {title}"
 
+msgid "caseEditor.searchCartridges"
+msgstr "Search cartridges"
+
 msgid "cartridgeDesigner.seatBullet"
 msgstr "Seat a bullet"
 
@@ -5687,6 +5735,9 @@ msgstr "standing"
 msgid "powderTune.start"
 msgstr "Start"
 
+msgid "caseEditor.product"
+msgstr "Start from a case product"
+
 msgid "bulletDesigner.startFromRecord"
 msgstr "Start from a record"
 
@@ -5821,6 +5872,9 @@ msgstr "Table III draws a belt; the other tables draw the same outline."
 
 msgid "cartridgeRecord.meaning.table"
 msgstr "Table: the CIP table of the record, I to XI, by cartridge class"
+
+msgid "caseEditor.productHelp"
+msgstr "Takes its material and mass; the values you measured replace them."
 
 msgid "values.tangent"
 msgstr "tangent"
@@ -6030,6 +6084,9 @@ msgstr "The cut-out touches the edge of the photograph: the whole bullet may not
 
 msgid "states.dataError"
 msgstr "The data file could not be loaded. Check the connection and retry."
+
+msgid "caseEditor.unreachable"
+msgstr "The database is unreachable; the cartridge can be chosen later."
 
 msgid "bulletDesigner.databaseUnreachableDesignerStill"
 msgstr "The database is unreachable. The designer still works."
