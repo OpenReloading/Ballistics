@@ -1,5 +1,3 @@
-'use client'
-
 import { ActionIcon, Button, Popover } from '@mantine/core'
 import { Info } from 'lucide-react'
 import { useEffect, useState } from 'react'

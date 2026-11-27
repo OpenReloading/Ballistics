@@ -33,7 +33,7 @@ const nameOf = (id: string) => `Record ${id} & "co"`
 const maker = { id: 'mk', name: 'Maker & Sons' }
 const names = new Map([[maker.id, maker.name]])
 
-/** The head tags of a record page as Next renders them for the fixture record `id` of `kind`. */
+/** The head tags of a record page as the prerender writes them for the fixture record `id` of `kind`. */
 const headOf = (kind: RecordKind, id: string) => {
   const { title, description } = recordHeadText(
     kind,

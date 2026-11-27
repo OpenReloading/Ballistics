@@ -54,7 +54,7 @@ const render = (printed: boolean) =>
 it("links the cartridge record's sources on screen, in one short line", () => {
   const html = render(false)
   expect(html).toContain('Source: C.I.P. TDCC')
-  expect(html).toContain('href="/cartridges/308-win#record-sources"')
+  expect(html).toContain('href="/cartridges/308-win/#record-sources"')
   expect(html).not.toContain('Tables of Dimensions')
   expect(html).not.toContain('<h3')
 })

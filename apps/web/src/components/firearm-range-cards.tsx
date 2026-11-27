@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import type { Bullet } from '@rangefoundry/schema'
 import { Fragment, useEffect } from 'react'

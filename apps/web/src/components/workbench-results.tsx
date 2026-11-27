@@ -1,10 +1,8 @@
-'use client'
-
 import { Button, Menu, Tabs, Textarea } from '@mantine/core'
 import { useClipboard, useMediaQuery } from '@mantine/hooks'
 import { ChevronDown } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -39,26 +37,22 @@ import { BurnRate, ErrorView, LadderStrip, LadderTable, Readouts } from './workb
 export const Measurements = dynamic(
   () => import('./measurements.tsx').then((m) => m.Measurements),
   {
-    ssr: false,
     loading: () => <Loading what="the measurements" inline />,
   },
 )
 
 const PowderCompare = dynamic(() => import('./powder-compare.tsx').then((m) => m.PowderCompare), {
-  ssr: false,
   loading: () => <Loading what="the powder comparison" inline />,
 })
 
 const TrajectoryForm = dynamic(
   () => import('./trajectory-form.tsx').then((m) => m.TrajectoryForm),
   {
-    ssr: false,
     loading: () => <Loading what="the trajectory" inline />,
   },
 )
 
 const GroupsTab = dynamic(() => import('./groups-tab.tsx').then((m) => m.GroupsTab), {
-  ssr: false,
   loading: () => <Loading what="the shot groups" inline />,
 })
 

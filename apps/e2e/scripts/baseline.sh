@@ -19,9 +19,5 @@ in_image() {
   "$engine" run --rm --platform=linux/amd64 --network=host --ipc=host $user \
     -v "$PWD:/work:z" -w /work/apps/e2e -e DRAWING_BASELINE="${DRAWING_BASELINE:-1}" "$@"
 }
-in_image -e START_SITE=off -e WEB_URL="${WEB_URL:-http://localhost:3003}" "$image" \
+in_image -e WEB_URL="${WEB_URL:-http://localhost:3003}" "$image" \
   npx playwright test --project=full tests/web/drawing-baseline "$@"
-# in CI also the Start app's next edition against the same snapshots; its webServer builds the Start site
-if [ -n "${CI:-}" ]; then
-  in_image "$image" npx playwright test --project=next-chromium tests/web/drawing-baseline
-fi

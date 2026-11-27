@@ -1,5 +1,3 @@
-'use client'
-
 import { Autocomplete } from '@mantine/core'
 import { memo, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'

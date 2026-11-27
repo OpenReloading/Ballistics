@@ -14,7 +14,7 @@ The web app supports these browsers and widths. An older browser may open it, bu
 | Firefox                | 121            |
 | Safari (macOS and iOS) | 16.4           |
 - Phone widths: 320 and 390 CSS px.
-- Performance: the JavaScript each route loads stays within the budgets of [`apps/web/weight-budget.json`](https://github.com/OpenReloading/Ballistics/blob/main/apps/web/weight-budget.json). There is no other performance figure.
+- Performance: no budget is checked yet; `pnpm run pages:build` prints the size of the client's scripts and styles.
 
 ## Why these versions
 

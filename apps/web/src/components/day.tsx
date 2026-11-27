@@ -1,5 +1,3 @@
-'use client'
-
 import { useTranslation } from '../i18n/language.ts'
 import { dayText } from '../lib/dates.ts'
 

@@ -15,9 +15,6 @@ const basic: Bullet = {
   mass: { value: 11.34 },
 }
 
-// the page draws the bullet in the self-hosted drawing font
-vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
-
 vi.mock('../src/components/use-record.ts', () => ({
   useRecord: () => ({ state: { status: 'ok', data: basic }, retry: () => {} }),
   useRead: () => ({

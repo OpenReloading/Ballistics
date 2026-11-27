@@ -1,6 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
-import { storageName } from './edition.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { chooseSavedLoad, fixtureLoad, loadForm } from './workbench.ts'
@@ -40,7 +39,7 @@ test('the firearm library searches its table, counts its firearms and offers to 
 }) => {
   await page.addInitScript((store) => {
     localStorage.setItem(store, '4')
-  }, storageName('safety-ack'))
+  }, 'safety-ack')
   await page.goto('./firearms')
   await seed(page, ['Bench rifle', 'Hunting rifle'])
   await page.reload()
@@ -131,7 +130,7 @@ test('a record link does not put its loading status in the alert line', async ({
     new MutationObserver(() => {
       if (document.body?.innerText.includes('Loading the record')) seen.loading = true
     }).observe(document, { subtree: true, childList: true, characterData: true })
-  }, storageName('safety-ack'))
+  }, 'safety-ack')
   await page.goto('./firearms')
   await seed(page, ['Bench rifle'])
   await page.goto(`./firearms?record=${firearmId(0)}`)
@@ -165,7 +164,7 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
   await storeUnits(page)
   await page.addInitScript((store) => {
     localStorage.setItem(store, '4')
-  }, storageName('safety-ack'))
+  }, 'safety-ack')
   await page.goto('./firearms')
   await seed(page, ['Truing rifle'], {
     optics: [{ id: 'o1', kind: 'scope', name: 'Scope' }],

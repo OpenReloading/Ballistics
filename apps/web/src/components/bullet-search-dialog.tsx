@@ -1,5 +1,3 @@
-'use client'
-
 import { NumberInput, Pill } from '@mantine/core'
 import type { CartridgeDiameters } from '@rangefoundry/ballistics'
 import { useEffect, useMemo, useState } from 'react'

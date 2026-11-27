@@ -1,5 +1,4 @@
-import { docsAddress, noDocs } from '@/platform/edition.ts'
-import { basePath } from './edition.ts'
+import { basePath, docsAddress, noDocs } from '@/platform/build-env.ts'
 
 /** `NEXT_PUBLIC_DOCS_URL`, else the site's `docs/` folder; `without` (builds with no docs site) gives no link. */
 export function docsUrl(

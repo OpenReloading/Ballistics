@@ -1,5 +1,3 @@
-'use client'
-
 import Link from '@/platform/link.tsx'
 import { loadEnglish } from '../i18n/lingui.ts'
 import type { NewsItem } from '../lib/news.ts'

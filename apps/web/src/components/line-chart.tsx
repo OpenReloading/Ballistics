@@ -1,5 +1,3 @@
-'use client'
-
 import type { ECharts } from 'echarts/core'
 import { createContext, type ReactNode, useContext, useMemo, useState } from 'react'
 import { formatNumber } from '../i18n/number.ts'

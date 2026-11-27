@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Badge, Box, Button, Text } from '@mantine/core'
 import { FlaskConical, Plus } from 'lucide-react'

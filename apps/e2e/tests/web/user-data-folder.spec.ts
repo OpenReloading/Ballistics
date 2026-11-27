@@ -1,6 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { storeUnits } from './units.ts'
 
 // The workspace folder of the Save options menu; headless Chromium 153 (Playwright's build) crashes the page reading an origin-private directory handle back from IndexedDB, so the folder offered on the next visit is not run here.
@@ -33,7 +32,7 @@ const storedManufacturers = (page: Page) =>
           all.onsuccess = () => ok(all.result.filter((r) => r.kind === 'manufacturer'))
         }
       }),
-    storageName('rangefoundry-user-data'),
+    'rangefoundry-user-data',
   )
 
 /** Types a manufacturer and saves with the button, or with the save shortcut while the field has focus. */
@@ -71,10 +70,7 @@ test('a folder whose reading crashed the last load is forgotten unread', async (
   // the shortcut stored the typed manufacturer before it saved the bullet
   expect(await storedManufacturers(page)).toMatchObject([{ name: 'Folder' }])
   // as left by a load that crashed while reading the stored folder
-  await page.evaluate(
-    (store) => localStorage.setItem(store, '1'),
-    storageName('user-data-folder-restoring'),
-  )
+  await page.evaluate((store) => localStorage.setItem(store, '1'), 'user-data-folder-restoring')
   await page.reload()
   await expect(page.getByRole('status').filter({ hasText: 'could not be restored' })).toHaveText(
     'The workspace folder could not be restored; choose it again.',
@@ -84,9 +80,6 @@ test('a folder whose reading crashed the last load is forgotten unread', async (
   await (await barButton(page, 'Save options')).click()
   await expect(page.getByRole('menuitem', { name: 'Choose workspace folder…' })).toBeVisible()
   expect(
-    await page.evaluate(
-      (store) => localStorage.getItem(store),
-      storageName('user-data-folder-restoring'),
-    ),
+    await page.evaluate((store) => localStorage.getItem(store), 'user-data-folder-restoring'),
   ).toBeNull()
 })

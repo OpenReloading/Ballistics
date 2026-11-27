@@ -1,5 +1,3 @@
-'use client'
-
 import { Menu } from '@mantine/core'
 import { useEffect, useSyncExternalStore } from 'react'
 import { useTranslation } from '../i18n/language.ts'

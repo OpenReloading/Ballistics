@@ -5,7 +5,7 @@ import { groupColours } from '../src/lib/target-editor.ts'
 import { missing } from './defined.ts'
 
 describe('drawing tokens', () => {
-  const css = readFileSync(new URL('../src/app/globals.css', import.meta.url), 'utf8')
+  const css = readFileSync(new URL('../src/globals.css', import.meta.url), 'utf8')
   const block = (prefix: string) => {
     const start = css.indexOf(`${prefix} {\n`)
     const body = css.slice(css.indexOf('{', start + prefix.length) + 1, css.indexOf('}', start))

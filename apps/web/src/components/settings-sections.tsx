@@ -1,5 +1,3 @@
-'use client'
-
 import {
   Box,
   Button,
@@ -14,7 +12,7 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import type { ReactNode } from 'react'
-import { buildLine } from '@/platform/edition.ts'
+import { buildLine } from '@/platform/build-env.ts'
 import { chooseLanguage, type Language, languages, useTranslation } from '../i18n/language.ts'
 import { useInstall } from './install-button.tsx'
 import { ManufacturersForm } from './manufacturers-settings.tsx'

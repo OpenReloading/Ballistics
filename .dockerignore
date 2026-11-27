@@ -3,9 +3,6 @@
 .git
 **/.env*
 **/test
-**/.next
 .claude
 .codex
-**/out
 pages
-pages-start

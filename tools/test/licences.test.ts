@@ -139,7 +139,7 @@ it('fails on a platform package that notShipped does not name', () => {
   ).toThrow('bin-linux@1.0.0 is a platform package in a shipped closure')
 })
 
-it('leaves out sharp, the @img scope and the Next.js compiler by default and starts from the API and the web app', () => {
+it('leaves out sharp and the @img scope by default and starts from the API and the web app', () => {
   const shipped: Lock = {
     importers: {
       'packages/api': {
@@ -147,7 +147,6 @@ it('leaves out sharp, the @img scope and the Next.js compiler by default and sta
           sharp: { version: '0.1.0' },
           '@img/sharp-wasm32': { version: '0.1.0' },
           '@imgx/a': { version: '1.0.0' },
-          '@next/swc-linux-x64-gnu': { version: '1.0.0' },
         },
       },
       'apps/web': { dependencies: { b: { version: '1.0.0' } } },

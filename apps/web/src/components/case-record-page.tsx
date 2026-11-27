@@ -1,5 +1,3 @@
-'use client'
-
 import type { CatalogueCase } from '@rangefoundry/schema'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'

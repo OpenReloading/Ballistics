@@ -9,13 +9,13 @@ loadEnglish(englishMessages)
 // anything may be thrown
 const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
-/** A page's render or load error, as the Next app's `app/error.tsx`: the frame stays, Retry loads and renders it anew. */
+/** A page's render or load error: the frame stays, Retry loads and renders it anew. */
 export function PageError({ error }: ErrorComponentProps) {
   const router = useRouter()
   return <PageErrorState message={messageOf(error)} retry={() => void router.invalidate()} />
 }
 
-/** The frame's own error, as the Next app's `app/global-error.tsx`: no frame, the document's providers stay. */
+/** The frame's own error: no frame, the document's providers stay. */
 export function AppError({ error }: ErrorComponentProps) {
   const { i18n } = useLingui()
   const router = useRouter()

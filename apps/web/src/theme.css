@@ -1,4 +1,4 @@
-/* What src/lib/theme.ts sets in the Next app and ui's theme sets otherwise; `html` outranks the variables MantineProvider writes after the head */
+/* What the app sets beyond the theme of @rangefoundry/ui; `html` outranks the variables MantineProvider writes after the head */
 html:root {
   --mantine-font-family: var(--font-ui), system-ui, sans-serif;
   --mantine-font-family-headings: var(--font-ui), system-ui, sans-serif;
@@ -15,12 +15,12 @@ html:root {
   }
 }
 
-/* the Next shell has no frame padding: the page container pads the page */
+/* the shell has no frame padding: the page container pads the page */
 .page-shell .mantine-AppShell-main {
   --app-shell-padding: 0rem;
 }
 
-/* the page container is the Next layout's main (.page-top > main in globals.css): window-high from 62em on a framed route, unpadded in print */
+/* the page container is the shell's main (.page-top > main in globals.css): window-high from 62em on a framed route, unpadded in print */
 @media screen and (width >= 62em) {
   .page-shell[data-frame] #main {
     display: flex;
@@ -104,7 +104,7 @@ button.ui-nav-item {
   cursor: pointer;
 }
 
-/* from 75em the sidebar keeps the section titles for screen readers only, as the Next rail does; a media query, not a class set after hydration, which moved the links below them */
+/* from 75em the sidebar keeps the section titles for screen readers only; a media query, not a class set after hydration, which moved the links below them */
 @media (width >= 75em) {
   .nav-section-title {
     position: absolute;

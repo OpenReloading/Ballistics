@@ -1,6 +1,5 @@
 import { expect, type Page } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
 import { openSavedLoad } from './workbench.ts'
@@ -36,7 +35,7 @@ const stored = (page: Page, kind: string) =>
       db.close()
       return all.filter((r) => r.kind === kind)
     },
-    [kind, storageName('rangefoundry-user-data')] as const,
+    [kind, 'rangefoundry-user-data'] as const,
   )
 
 /** A tab of the results: on the phone layout behind the Results tab, below 62em maybe in the More menu. */

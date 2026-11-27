@@ -29,11 +29,11 @@ it('the offline state has its page h1 and a title below it, Retry and links to t
   expect(page).toMatch(/<button[^>]*>.*Retry/)
   expect(page).toContain('aria-label="Pages kept on this device"')
   expect(page.match(/href="\/[^"]*"/g)).toEqual([
-    'href="/workbench"',
-    'href="/session"',
-    'href="/groups"',
-    'href="/firearms"',
-    'href="/cases/editor"',
+    'href="/workbench/"',
+    'href="/session/"',
+    'href="/groups/"',
+    'href="/firearms/"',
+    'href="/cases/editor/"',
   ])
 })
 
@@ -43,9 +43,9 @@ it('the not-found state has its page h1, offers Search and links every page of t
   expect(page).toContain('This page could not be found.')
   expect(page).toMatch(/<button[^>]*>.*Search/)
   expect(page.match(/href="\/[^"]*"/g)).toEqual([
-    'href="/workbench"',
-    'href="/session"',
-    'href="/groups"',
-    'href="/cartridges"',
+    'href="/workbench/"',
+    'href="/session/"',
+    'href="/groups/"',
+    'href="/cartridges/"',
   ])
 })

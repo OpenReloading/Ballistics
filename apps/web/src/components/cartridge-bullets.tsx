@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Tooltip } from '@mantine/core'
 import Link from '@/platform/link.tsx'

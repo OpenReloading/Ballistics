@@ -1,6 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
 import { cutText } from './cut.ts'
-import { storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { loadForm, openSavedLoad } from './workbench.ts'
@@ -63,10 +62,7 @@ for (const language of ['en', 'de'] as const)
   }) => {
     test.setTimeout(60_000)
     if (language === 'de')
-      await page.addInitScript(
-        (store) => localStorage.setItem(store, 'de'),
-        storageName('language'),
-      )
+      await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
     await page.setViewportSize({ width: 1280, height: 650 })
     await gotoHydrated(page, '/workbench')
     await openSavedLoad(page, language)
@@ -109,7 +105,7 @@ for (const width of [1280, 390])
 
 // the longer German labels and buttons in the group panel's column
 test('at 1280 px the shot groups in German cut nothing with the spacing', async ({ page }) => {
-  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
   await page.setViewportSize({ width: 1280, height: 800 })
   await gotoHydrated(page, '/groups')
   for (const input of await page.locator('.aim-fields input').all()) await input.fill('-12,5')
@@ -128,7 +124,7 @@ for (const path of ['/bullets/designer', '/powders/designer', '/targets/designer
 
 // a long German compound in the page bar's title at the narrowest width
 test('at 320 px the German designers cut nothing with the spacing', async ({ page }) => {
-  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
   await page.setViewportSize({ width: 320, height: 800 })
   for (const path of ['/bullets/designer', '/powders/designer', '/targets/designer']) {
     await gotoHydrated(page, path)

@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Anchor, Button } from '@mantine/core'
 import { CircleQuestionMark, Info, TriangleExclamationPoint } from 'lucide-react'

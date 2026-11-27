@@ -1,5 +1,3 @@
-'use client'
-
 import { type ComponentProps, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'

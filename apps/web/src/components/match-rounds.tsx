@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { NumberInput, SimpleGrid } from '@mantine/core'
 import { useState } from 'react'

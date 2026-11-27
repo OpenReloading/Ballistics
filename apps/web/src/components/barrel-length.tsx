@@ -1,10 +1,9 @@
-'use client'
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 
 import { Button, SegmentedControl } from '@mantine/core'
-import dynamic from 'next/dynamic'
 import { useState } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -17,7 +16,6 @@ import { PanelTable } from './scroll-region.tsx'
 import type { BarrelStudy, RangeKey } from './use-barrel-study.ts'
 
 const BarrelChart = dynamic(() => import('./barrel-chart.tsx').then((m) => m.BarrelChart), {
-  ssr: false,
   loading: () => <div className="chart barrel-chart" />,
 })
 

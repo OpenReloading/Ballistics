@@ -1,4 +1,3 @@
-'use client'
 import { useLingui } from '@lingui/react'
 
 import { Button, Group, NumberInput, Select, Stack, Text } from '@mantine/core'

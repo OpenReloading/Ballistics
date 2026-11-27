@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { createSpotlight } from '@mantine/spotlight'
 import { useEffect, useMemo } from 'react'

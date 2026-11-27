@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Group, Select, SimpleGrid, Table, Text, Title } from '@mantine/core'
 import { parseRef, type ShootingLogRecord, type UserRecord } from '@rangefoundry/schema'

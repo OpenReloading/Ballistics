@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Indicator } from '@mantine/core'
 import { Signpost } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'

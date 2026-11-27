@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Tabs } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'

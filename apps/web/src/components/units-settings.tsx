@@ -1,5 +1,3 @@
-'use client'
-
 import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Button, NativeSelect, SegmentedControl, SimpleGrid, Stack, Tooltip } from '@mantine/core'
@@ -17,7 +15,6 @@ import {
 } from 'react'
 import { onLanguageChange } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
-import { storageName } from '../lib/edition.ts'
 import { type FieldSpec, type Fields, switchFields } from '../lib/field-spec.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
@@ -39,9 +36,9 @@ import { Loading } from './states.tsx'
 loadEnglish(englishMessages)
 
 /** `localStorage` key of the viewer's unit choice. */
-const unitsKey = storageName('units')
+const unitsKey = 'units'
 /** `localStorage` key of the saved custom variant: kept while a preset is chosen. */
-const customUnitsKey = storageName('units-custom')
+const customUnitsKey = 'units-custom'
 
 type Units = {
   choice: UnitChoice

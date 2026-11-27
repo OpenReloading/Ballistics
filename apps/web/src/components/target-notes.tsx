@@ -1,5 +1,3 @@
-'use client'
-
 import { ActionIcon, Button, NativeSelect, Popover, Textarea } from '@mantine/core'
 import type { SheetNote, ShotGroup } from '@rangefoundry/schema'
 import type { GroupStatistics } from '@rangefoundry/shot-groups'

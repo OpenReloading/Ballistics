@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import type { Provenance } from '@rangefoundry/schema'
 import type { ReactNode } from 'react'

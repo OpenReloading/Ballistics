@@ -1,5 +1,3 @@
-'use client'
-
 import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'

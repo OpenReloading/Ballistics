@@ -31,9 +31,11 @@ it('lists the two groups in order: tools, then the library; four pages in all', 
   expect(hrefs).not.toContain('/settings')
 })
 
-const routes = globSync('**/page.tsx', { cwd: new URL('../src/app', import.meta.url) })
-  .map((f) => `/${f.replace(/\/?page\.tsx$/, '')}`)
-  .filter((r) => r !== '/' && !r.includes('['))
+// the route files without the record (`$id`), splat, root and `-` files
+const routes = globSync('**/*.tsx', { cwd: new URL('../src/routes', import.meta.url) })
+  .filter((f) => !/(^|\/)[-_$]/.test(f))
+  .map((f) => `/${f.replace(/(\/?index)?\.tsx$/, '')}`)
+  .filter((r) => r !== '/')
 
 const listed = new Set([...hrefs, ...databaseTabs.map((t) => t.href)])
 

@@ -1,5 +1,3 @@
-'use client'
-
 import { type Load, parseRef, type SessionRecord, toSi, userRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import {

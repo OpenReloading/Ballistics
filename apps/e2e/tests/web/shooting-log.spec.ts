@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { putRecords } from './user-store.ts'
 
 const rifle = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
@@ -48,7 +47,7 @@ const stored = (page: Page, kind: string) =>
       db.close()
       return all.filter((r) => r.kind === kind).sort((a, b) => a.id.localeCompare(b.id))
     },
-    [kind, storageName('rangefoundry-user-data')] as const,
+    [kind, 'rangefoundry-user-data'] as const,
   )
 
 const roundCount = async (page: Page, id: string) =>
@@ -179,7 +178,7 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
       })
       db.close()
     },
-    [before.map((r) => r.id), storageName('rangefoundry-user-data')] as const,
+    [before.map((r) => r.id), 'rangefoundry-user-data'] as const,
   )
   await page.reload()
   await expect(page.locator('.page-bar-status .bar-count')).toHaveText('0 entries')

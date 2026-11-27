@@ -52,7 +52,7 @@ it("links a record's Sources panel in a new tab", () => {
     </I18nProvider>,
   )
   expect(html).toBe(
-    '<a target="_blank" rel="noopener" href="/bullets/a%20b#record-sources">Sources<span class="visually-hidden"> in a new tab</span></a>',
+    '<a target="_blank" rel="noopener" href="/bullets/a%20b/#record-sources">Sources<span class="visually-hidden"> in a new tab</span></a>',
   )
 })
 

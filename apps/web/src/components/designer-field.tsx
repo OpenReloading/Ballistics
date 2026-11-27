@@ -1,5 +1,3 @@
-'use client'
-
 import { type CSSProperties, memo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { FieldSpec, FieldValue } from '../lib/field-spec.ts'

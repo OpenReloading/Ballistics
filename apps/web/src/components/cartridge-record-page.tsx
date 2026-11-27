@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { recordFigures } from '@rangefoundry/svg-drawings/cartridge'
 import { useEffect, useState } from 'react'

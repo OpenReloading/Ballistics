@@ -35,7 +35,7 @@ const docsOnly = [
 const e2eInputs = [
   /^apps\/e2e\//,
   /^(compose\.yaml|\.dockerignore)$/,
-  /^tools\/src\/(pages|pages-serve|pages-payload|executable|start-site|root-not-found)\.ts$/,
+  /^tools\/src\/(pages|pages-serve|executable)\.ts$/,
 ]
 
 /** Files whose change needs the docs image built, which runs the docs site build: the site, the palette it imports, the API whose document it prints, and the compose service. */
@@ -60,12 +60,12 @@ const recordInputs = [
   /^packages\/schema\//,
   /^packages\/api\//,
   ...rootInputs,
-  /^apps\/web\/(package\.json|next\.config\.ts|tsconfig\.json)$/,
+  /^apps\/web\/(package\.json|vite\.config\.mts|tsconfig\.json)$/,
   /^apps\/web\/scripts\/(ci-plan|check-prerender)\.mts$/,
   /^apps\/web\/src\/lib\/prerender-sample\.ts$/,
 ]
 
-/** The pages that take the ids of `generateStaticParams`. */
+/** The record page routes, which prerender one page per record. */
 const recordRoutes = [
   'cartridges',
   'bullets',
@@ -75,7 +75,7 @@ const recordRoutes = [
   'targets',
   'disciplines',
   'federations',
-].map((r) => `apps/web/src/app/${r}/[id]`)
+].map((r) => `apps/web/src/routes/${r}/$id.tsx`)
 
 /** The workspace scope. */
 const scope = /^@rangefoundry\//
@@ -130,8 +130,7 @@ export function recordClosure(root = repoRoot) {
       queue.push(file)
     }
   }
-  for (const dir of recordRoutes)
-    for (const name of readdirSync(path.join(root, dir))) add(`${dir}/${name}`)
+  for (const file of recordRoutes) add(file)
   for (let file = queue.pop(); file !== undefined; file = queue.pop()) {
     if (!/\.(ts|tsx|mts|js)$/.test(file)) continue
     const source = readFileSync(path.join(root, file), 'utf8')

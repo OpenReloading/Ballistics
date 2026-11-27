@@ -1,5 +1,3 @@
-'use client'
-
 import { compareDisciplines, compareTargetFaces, type TargetFace, toSi } from '@rangefoundry/schema'
 import { emptyDirectory, writeDirectory } from '../lib/directory.ts'
 import {

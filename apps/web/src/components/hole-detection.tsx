@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { ActionIcon, Anchor, Button, NativeSelect } from '@mantine/core'

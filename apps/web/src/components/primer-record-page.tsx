@@ -1,5 +1,3 @@
-'use client'
-
 import type { Primer } from '@rangefoundry/schema'
 import { loadEnglish } from '../i18n/lingui.ts'
 import {

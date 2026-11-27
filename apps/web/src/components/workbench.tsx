@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Button, Menu } from '@mantine/core'
@@ -17,7 +15,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { buildTag } from '@/platform/edition.ts'
+import { buildTag } from '@/platform/build-env.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'

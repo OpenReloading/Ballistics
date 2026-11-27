@@ -1,4 +1,4 @@
-/** The web app manifest of the edition at `basePath`; the logo is full-bleed, so it is maskable too. */
+/** The web app manifest of the site at `basePath`; the logo is full-bleed, so it is maskable too. */
 export function webManifest(basePath: string) {
   const icons = [
     { src: `${basePath}/icon-192.png`, sizes: '192x192', type: 'image/png' },

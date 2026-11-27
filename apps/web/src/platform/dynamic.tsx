@@ -2,7 +2,7 @@ import { type ComponentType, lazy, type ReactNode, Suspense, useSyncExternalStor
 
 const none = () => () => {}
 
-/** `next/dynamic` in the Start build, client-only as every call passes `ssr: false`: `loading` until hydrated and loaded. */
+/** A component loaded on the client only: `loading` until hydrated and loaded. */
 export default function dynamic<P extends object>(
   load: () => Promise<ComponentType<P>>,
   { loading }: { loading?: () => ReactNode } = {},

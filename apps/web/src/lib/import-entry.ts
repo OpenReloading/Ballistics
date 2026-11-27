@@ -24,7 +24,6 @@ import {
 } from '@rangefoundry/importers'
 import { type UserRecord, type UserRecordKind, userRecord } from '@rangefoundry/schema'
 import { recordOf } from './candidates.ts'
-import { storageName } from './edition.ts'
 import { readerErrorText } from './file-diagnostics.ts'
 import type { InvalidRecordDiagnostic } from './import-diagnostics.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
@@ -404,7 +403,7 @@ interface SavedMapping {
 
 export type SavedMappings = Record<string, SavedMapping>
 
-const mappingsKey = storageName('import-mappings')
+const mappingsKey = 'import-mappings'
 
 const isObject = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object'
 const unitSources: unknown[] = [undefined, 'header', 'values', 'default', 'unknown']
