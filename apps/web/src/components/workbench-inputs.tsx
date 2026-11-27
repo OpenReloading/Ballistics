@@ -47,13 +47,8 @@ import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
 import { quickCartridges } from '../lib/examples.ts'
-import {
-  type FieldSpec,
-  type FieldValue,
-  fieldError,
-  siValues,
-  specText,
-} from '../lib/field-spec.ts'
+import { fieldError } from '../lib/field-error.ts'
+import { type FieldSpec, type FieldValue, siValues, specText } from '../lib/field-spec.ts'
 import { type Cylinder, type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { bulletFields, burnFormError, interiorFields, specFields } from '../lib/interior-input.ts'
@@ -993,7 +988,7 @@ function LoadField({ name: key }: { name: string }) {
       error={
         props.error &&
         ((s) =>
-          fieldError(spec, fields[key], s, t) ??
+          fieldError(spec, fields[key], s, t, i18n) ??
           burnFormError(siValues(fields), key, t) ??
           // a message a run set, as the engraving values needing each other
           (typeof props.error === 'string' ? translateMessage(props.error, i18n) : undefined))
@@ -1044,6 +1039,7 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
     resetKeys,
   } = useLoad()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const spec = bulletFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
   const typed = typedBulletFields[key]
@@ -1066,7 +1062,7 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
       }
       placeholder={bands > 1 ? t('{count} bands', { count: bands }) : undefined}
       muted={typed === undefined}
-      error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
+      error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t, i18n) : undefined}
       mark={(s) =>
         changes[key] === undefined
           ? missingValueMark(bulletRecord, value === undefined, t)
@@ -1106,6 +1102,7 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
     caseLengthBrass,
   } = useLoad()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const spec = specFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
   const typed = typedSpecFields[key]
@@ -1125,7 +1122,7 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
           : value
       }
       muted={typed === undefined}
-      error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
+      error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t, i18n) : undefined}
       mark={(s) =>
         changes[key] === undefined
           ? brassMark(key, typed === undefined ? caseLengthBrass : undefined, s, t)
@@ -1264,6 +1261,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
     resetKeys,
   } = useLoad()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   // the gun weight's message waits for the end of the typing, as "0." on the way to "0.5" is no error
   const [gunLeft, setGunLeft] = useState(false)
   const tall = useMediaQuery(tallFrame, false) ?? false
@@ -1340,7 +1338,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
         spec={firearmMassSpec}
         system={system}
         value={gunWeight}
-        error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s, t) : undefined}
+        error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s, t, i18n) : undefined}
         mark={(s) =>
           changes.firearmMass === undefined
             ? undefined

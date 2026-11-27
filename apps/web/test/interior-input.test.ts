@@ -1,9 +1,13 @@
 import { interiorValueKeys } from '@rangefoundry/ballistics'
 import { expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { english } from '../src/i18n/translate.ts'
-import { fieldError, fieldValueFromText } from '../src/lib/field-spec.ts'
+import { fieldError } from '../src/lib/field-error.ts'
+import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { burnFormError, interiorBody, interiorFields } from '../src/lib/interior-input.ts'
 import { presetUnits } from '../src/lib/units.ts'
+
+const en = [english.t, linguiOf('en')] as const
 
 /** A synthetic load typed in metric display units; the numbers are made up. */
 const text: Record<string, string> = {
@@ -99,7 +103,7 @@ it('refuses an engraving length of 0 or below and a negative leak area, bore fri
   const error = (key: string, text: string) => {
     const spec = interiorFields.find((f) => f.key === key)
     if (!spec) throw new Error(key)
-    return fieldError(spec, fieldValueFromText(spec.quantity, system, text), system)
+    return fieldError(spec, fieldValueFromText(spec.quantity, system, text), system, ...en)
   }
   expect(error('engravingLength', '0')).toBe('Engraving length must be greater than 0 mm.')
   expect(error('engravingLength', '-1')).toMatch(/at least 0/)

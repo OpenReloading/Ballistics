@@ -31,7 +31,7 @@ $$
 
 The travel follows from $V$ by the free-volume equation. After burnout the gas energy $N$ falls as $V^{-(k-1)}$, which gives the muzzle velocity. The solution is derived from the energy balance and the reduced variable of the constant-surface case ([Rheinmetall 1977](../bibliography.md#rheinmetall-1977), pp. 88 to 94, for the case with $\eta = 1/\rho_s$).
 
-In that case the velocity depends on the travel only through $A x/V^_$ with $V^_ = V_c - m_c/\rho_s$. To first order an added chamber volume $\Delta V$ then acts like a shorter barrel by $L\,\Delta V/V^*$:
+In that case the velocity depends on the travel only through $A x/V^\ast$ with $V^\ast = V_c - m_c/\rho_s$. To first order an added chamber volume $\Delta V$ then acts like a shorter barrel by $L\,\Delta V/V^\ast$:
 
 $$
 \frac{\partial v}{\partial V_c} = -\frac{L}{V^*}\,\frac{\partial v}{\partial L}

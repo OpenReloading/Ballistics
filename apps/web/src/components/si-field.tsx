@@ -1,7 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { useState } from 'react'
-import { type FieldSpec, type FieldValue, fieldError } from '../lib/field-spec.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { fieldError } from '../lib/field-error.ts'
+import type { FieldSpec, FieldValue } from '../lib/field-spec.ts'
 import { formatQuantity, roundedFieldText } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
 import { useUnits } from './units-settings.tsx'
@@ -25,9 +28,11 @@ export function SiField({
   deferred?: boolean
 }) {
   const { system } = useUnits()
+  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [draft, setDraft] = useState<FieldValue>()
   const commits = (v: FieldValue) =>
-    !fieldError(spec, v, system) && (v.si !== undefined || !spec.required)
+    !fieldError(spec, v, system, t, i18n) && (v.si !== undefined || !spec.required)
   const commit = () => {
     if (draft && commits(draft)) onCommit(draft.si)
     setDraft(undefined)
@@ -46,7 +51,7 @@ export function SiField({
           ? placeholder
           : (s) => `${formatQuantity(spec.quantity, s, shown)} ${placeholder}`
       }
-      error={draft && ((s) => fieldError(spec, draft, s))}
+      error={draft && ((s) => fieldError(spec, draft, s, t, i18n))}
       onChange={(v) => {
         setDraft(v)
         if (!deferred && commits(v)) onCommit(v.si)

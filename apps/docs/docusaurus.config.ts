@@ -5,6 +5,7 @@ import type { UserThemeConfig } from '@docusaurus/theme-common'
 import type { Config } from '@docusaurus/types'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import { failOnMathErrors, katexOptions } from './scripts/math.mts'
 import { repoFacts } from './scripts/repo-facts.mts'
 
 const baseUrl = process.env.DOCS_BASE_URL ?? '/'
@@ -41,11 +42,18 @@ const config = async (): Promise<Config> => ({
         routeBasePath: '/',
         sidebarPath: './sidebars.ts',
         remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex],
+        rehypePlugins: [[rehypeKatex, katexOptions], failOnMathErrors],
         breadcrumbs: true,
       },
     ],
     ['@docusaurus/plugin-sitemap', {} satisfies SitemapOptions],
+    // `?raw` imports a file's text (the doc examples) with webpack's built-in asset type in place of raw-loader; `!` before the path skips the TypeScript loader (`!!` would also drop the asset type)
+    () => ({
+      name: 'raw-source',
+      configureWebpack: () => ({
+        module: { rules: [{ resourceQuery: /raw/, type: 'asset/source' }] },
+      }),
+    }),
     // the search index of the built site, docs and both reference sites (scripts/search.mts), in its own process, as the config loader cannot require the ESM-only pagefind package
     ({ siteDir }) => ({
       name: 'search-index',
