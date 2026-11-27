@@ -5428,6 +5428,9 @@ msgstr "The firearms of this browser could not be read."
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
 
+msgid "holeDetection.modelFellBack"
+msgstr "The hole model did not load; the classical detector ran instead."
+
 msgid "holeDetection.holeMustLeast4"
 msgstr "The hole must be at least 4 px across"
 

@@ -40,6 +40,7 @@ import {
   caliberClassesOf,
   ownCartridges,
 } from '../lib/caliber-candidates.ts'
+import { devModelRoot } from '../lib/dev-model.ts'
 import { photoGuide } from '../lib/docs-url.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -179,6 +180,7 @@ export function useHoleDetection({
   /** Regions too large to count: the user places their shots by hand; no statistic sees them. */
   const [flagged, setFlagged] = useState<FlaggedRegion[]>([])
   const [progress, setProgress] = useState<number>()
+  const [fellBack, setFellBack] = useState(false)
   const [shape, setShape] = useState<'rectangle' | 'polygon'>('rectangle')
   const [pending, setPending] = useState<Point[]>([])
   /** The guided step shown, 0 to 4; undefined: the one-click start. */
@@ -282,6 +284,7 @@ export function useHoleDetection({
       if (worker.current !== w) return
       const m = e.data
       if (m.kind === 'progress') return setProgress(m.done)
+      if (m.kind === 'fallback') return setFellBack(true)
       stop()
       if (m.kind === 'error') {
         const known = workerErrors.find((e) => e.message === m.message)
@@ -293,7 +296,8 @@ export function useHoleDetection({
       if (worker.current !== w) return
       failed(e.message)
     }
-    w.postMessage(request)
+    if (request.kind !== 'face') setFellBack(false)
+    w.postMessage(request.kind === 'face' ? request : { ...request, model: devModelRoot() })
   }
 
   const failed = (error?: unknown) => {
@@ -726,16 +730,26 @@ export function useHoleDetection({
 
   const running = progress !== undefined
   const runButton = (label: MessageDescriptor, auto: boolean) => (
-    <RunButton
-      label={label}
-      auto={auto}
-      progress={progress}
-      photo={photo !== undefined}
-      blocked={blocked}
-      onCancel={cancel}
-      onStart={start}
-      onRun={() => run(false)}
-    />
+    <>
+      <RunButton
+        label={label}
+        auto={auto}
+        progress={progress}
+        photo={photo !== undefined}
+        blocked={blocked}
+        onCancel={cancel}
+        onStart={start}
+        onRun={() => run(false)}
+      />
+      {fellBack && (
+        <Message severity="info" compact>
+          {i18n._({
+            id: 'holeDetection.modelFellBack',
+            message: 'The hole model did not load; the classical detector ran instead.',
+          })}
+        </Message>
+      )}
+    </>
   )
 
   const regionRow = (

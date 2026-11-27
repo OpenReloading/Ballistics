@@ -194,7 +194,7 @@ Code: `packages/target-recognition/src/hole-detection.ts`, `shotsFromParts`, `en
 
 A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step; Accept sure leaves it out, and the counts name the sure and the maybe proposals apart. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
-Code: `packages/target-recognition/src/learned-detector.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
+Code: `packages/target-recognition/src/confidence-tier.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
 
 ### Hole size
 
@@ -363,7 +363,21 @@ Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a c
 - Test, 300 synthetic target photos with 1,476 holes: recall 0.731, precision 0.936, corrections median 1, 90th percentile 4, maximum 9.
 - Largest output difference between PyTorch and ONNX Runtime: $2.7 \times 10^{-7}$.
 
-The accuracy gate on the holdout photos has not run on this model, so its manifest has no holdout scores. The classical detector stays the default, and the app neither downloads nor runs this model.
+The accuracy gate on the holdout photos has not run on this model, so its manifest has no holdout scores. The classical detector stays the default; the app downloads and runs this model only with the development switch below.
+
+### Learned detector in the app
+
+The detection worker of the web app runs the learned detector through ONNX Runtime Web on single-thread WebAssembly (no WebGPU): threads need cross-origin isolation, which a static host does not send. For development, any value in the `localStorage` key `holeModel` switches it on. The worker then loads, under the edition's base path:
+
+- the manifest `models/hole-model-0.1.0.json`;
+- the model file at the manifest's `file.url`, refused when its size or SHA-256 differs from the manifest's `bytes` and `sha256`;
+- the runtime's `ort-wasm-simd-threaded.mjs` and `ort-wasm-simd-threaded.wasm` from `onnxruntime-web/dist` of the version the app pins, in the manifest's `runtime.wasmPaths`. They do not ship yet: for a local run, copy them to `apps/web/public/models/ort/`.
+
+The whole load has a limit of 60 s: the model and the runtime, 4.6 MB with gzip, take about 23 s over a 1.6 Mbit/s mobile link. Without the key the classical detector answers, with the same progress steps. When the manifest, the model or the runtime does not load, does not match or passes the limit, the worker logs the error to the console, the classical detector answers, and the Detect step says so.
+
+The runtime stays out of the offline layer's precache and the script output: the app imports `onnxruntime-web/wasm` through an alias to the package's build that loads its WASM files from `wasmPaths`, and both builds fail when their output holds a `.wasm` or `.onnx` file other than the files copied from `public/models/` (the Start build's client output, the service worker's precache list of the export).
+
+Code: `apps/web/src/lib/hole-model.ts`, `servedDetector`; `apps/web/src/lib/onnx-model.ts`, `openOnnxModel`.
 
 ### Photo quality
 
