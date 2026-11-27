@@ -10,6 +10,8 @@ const root = fileURLToPath(new URL('../../pages/', import.meta.url))
 const types: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript',
+  '.mjs': 'text/javascript',
+  '.wasm': 'application/wasm',
   '.css': 'text/css',
   '.json': 'application/json',
   '.txt': 'text/plain; charset=utf-8',

@@ -149,15 +149,20 @@ async function handleDetect(
     minContrast: r.minContrast,
     onProgress: (done: number) => post({ kind: 'progress', done: 0.2 + 0.8 * done }),
   }
-  const { detector, fellBack } = await servedDetector(r.model, {
-    fetch: (url, signal) => fetch(url, { signal }),
-    open: openOnnxModel,
-    signal: AbortSignal.timeout(MODEL_LOAD_MS),
-    report: (error) =>
-      console.error('The hole model did not load; the classical detector runs.', error),
-  })
+  const request = requestOf(r, input, toWork)
+  const { detector, fellBack } = await servedDetector(
+    r.model,
+    {
+      fetch: (url, signal) => fetch(url, { signal }),
+      open: openOnnxModel,
+      signal: AbortSignal.timeout(MODEL_LOAD_MS),
+      report: (error) =>
+        console.error('The hole model did not load; the classical detector runs.', error),
+    },
+    request,
+  )
   if (fellBack) post({ kind: 'fallback' })
-  const found = await detector.propose(requestOf(r, input, toWork))
+  const found = await detector.propose(request)
   return toPhotoPx(found, k, x0, y0)
 }
 

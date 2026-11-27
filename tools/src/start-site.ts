@@ -29,6 +29,11 @@ function build() {
     { PRERENDER: prerender },
   )
   run(`${web}node_modules/.bin/lingui`, ['compile', '--strict'])
+  // the model runtime's files, which public/ serves beside the model in each edition
+  run(process.execPath, [
+    '--disable-warning=MODULE_TYPELESS_PACKAGE_JSON',
+    'scripts/model-runtime.mts',
+  ])
   run(process.execPath, [
     '--disable-warning=MODULE_TYPELESS_PACKAGE_JSON',
     'scripts/english-catalogs.mts',

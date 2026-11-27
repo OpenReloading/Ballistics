@@ -1,15 +1,17 @@
-/** The detector of a detection run: the learned one when the served model is switched on and loads in time, else the classical one. */
+/** The detector of a detection run: the learned one when the served model loads in time, else the classical one. */
 import {
   holeDetector,
   type InferencePort,
   learnedDetector,
   type ModelManifest,
   modelManifest,
+  type ProposalRequest,
   type RunModel,
+  UntrainedScaleError,
 } from '@rangefoundry/target-recognition'
 
 /** The served model's manifest (`apps/web/public/models/`), relative to the edition's base path like the `file.url` and `runtime.wasmPaths` it names. */
-const MODEL_MANIFEST = 'models/hole-model-0.1.0.json'
+export const MODEL_MANIFEST = 'models/hole-model-0.1.0.json'
 
 /** The limit on loading the manifest, the model and the runtime: both files (4.6 MB compressed) take about 23 s over a 1.6 Mbit/s mobile link. */
 export const MODEL_LOAD_MS = 60_000
@@ -25,12 +27,14 @@ export type ModelLoad = {
 /** The detector and whether a set model failed to load, so the page can say the classical detector answered. */
 export type RunDetector = { detector: InferencePort; fellBack: boolean }
 
-/** `root` (the edition's base path as an absolute URL ending in `/`, `editionRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. */
+/** `root` (the edition's base path as an absolute URL ending in `/`, `editionRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. A run whose holes the working px cap shrinks below the model's trained sizes (`UntrainedScaleError`) gets the classical detector too, without `fellBack`. An example pick (`at`) and a run with the example's `polarity` or `backing` get the classical detector without a load: the learned one reads none of them and measures no hole size, which the example sets. */
 export async function servedDetector(
   root: string | undefined,
   load: ModelLoad,
+  request: Pick<ProposalRequest, 'at' | 'polarity' | 'backing'> = {},
 ): Promise<RunDetector> {
-  if (!root) return { detector: holeDetector, fellBack: false }
+  if (!root || request.at || request.polarity || request.backing)
+    return { detector: holeDetector, fellBack: false }
   try {
     return { detector: await untilAborted(learned(root, load), load.signal), fellBack: false }
   } catch (error) {
@@ -44,8 +48,17 @@ async function learned(root: string, load: ModelLoad) {
   const model = await (await read(load, manifest.file.url, root)).arrayBuffer()
   await checkFile(model, manifest.file)
   const wasmPaths = new URL(manifest.runtime.wasmPaths, root).href
-  return learnedDetector(manifest, await load.open(model, wasmPaths))
+  return classicalBelowTrainedScale(learnedDetector(manifest, await load.open(model, wasmPaths)))
 }
+
+/** The model loaded, so a run it was not trained for gets the classical detector without the fallback note. */
+const classicalBelowTrainedScale = (learned: InferencePort): InferencePort => ({
+  propose: (request) =>
+    learned.propose(request).catch((error: unknown) => {
+      if (error instanceof UntrainedScaleError) return holeDetector.propose(request)
+      throw error
+    }),
+})
 
 async function read(load: ModelLoad, path: string, root: string) {
   const url = new URL(path, root)
