@@ -1,0 +1,385 @@
+exit 0
+--- stdout
+{
+  "schemaVersion": 2,
+  "notice": "simulation, not load data",
+  "format": "rangefoundry-cli-verify",
+  "command": "verify",
+  "split": "validation",
+  "splitSalt": "2026-11-12",
+  "final": false,
+  "inputs": {
+    "rows": "<sha256>",
+    "records": "<sha256>"
+  },
+  "model": "m3",
+  "modelVersion": "<sha256>",
+  "interval": {
+    "basis": "training",
+    "byBarrel": {
+      "rifle": {
+        "halfWidth": 0.0893719806763284,
+        "trainingRows": 10
+      }
+    },
+    "trainingRows": 10
+  },
+  "overall": {
+    "rows": {
+      "inSplit": 12,
+      "used": 5,
+      "notUsed": {
+        "unknownCartridge": 1,
+        "unknownBullet": 1,
+        "unknownPowder": 1,
+        "noPowderModel": 1,
+        "noCaseCapacity": 1,
+        "noBarrelLength": 1,
+        "modelRefused": 1
+      }
+    },
+    "velocity": {
+      "median": 0.030000000000000124,
+      "p90": 0.0760000000000001
+    },
+    "pressure": {
+      "median": 0.14999999999999997,
+      "p90": 0.18999999999999992,
+      "rows": 2
+    },
+    "byBarrel": {
+      "rifle": {
+        "rows": 5,
+        "velocity": {
+          "median": 0.030000000000000124,
+          "p90": 0.0760000000000001
+        },
+        "pressure": {
+          "median": 0.14999999999999997,
+          "p90": 0.18999999999999992,
+          "rows": 2
+        }
+      }
+    },
+    "pressureByBasis": {
+      "unstated": {
+        "median": 0.14999999999999997,
+        "p90": 0.18999999999999992,
+        "rows": 2
+      }
+    },
+    "interval": {
+      "coverage": 0.8
+    }
+  },
+  "byFamily": {
+    "double/extruded": {
+      "rows": {
+        "inSplit": 8,
+        "used": 3,
+        "notUsed": {
+          "unknownCartridge": 1,
+          "unknownBullet": 1,
+          "noCaseCapacity": 1,
+          "noBarrelLength": 1,
+          "modelRefused": 1
+        }
+      },
+      "velocity": {
+        "median": 0.019999999999999966,
+        "p90": 0.08400000000000005
+      },
+      "pressure": {
+        "median": 0.14999999999999997,
+        "p90": 0.18999999999999992,
+        "rows": 2
+      },
+      "byBarrel": {
+        "rifle": {
+          "rows": 3,
+          "velocity": {
+            "median": 0.019999999999999966,
+            "p90": 0.08400000000000005
+          },
+          "pressure": {
+            "median": 0.14999999999999997,
+            "p90": 0.18999999999999992,
+            "rows": 2
+          }
+        }
+      },
+      "pressureByBasis": {
+        "unstated": {
+          "median": 0.14999999999999997,
+          "p90": 0.18999999999999992,
+          "rows": 2
+        }
+      },
+      "interval": {
+        "coverage": 0.6666666666666666
+      }
+    },
+    "single/ball": {
+      "rows": {
+        "inSplit": 2,
+        "used": 2,
+        "notUsed": {}
+      },
+      "velocity": {
+        "median": 0.03500000000000012,
+        "p90": 0.03900000000000012
+      },
+      "pressure": null,
+      "byBarrel": {
+        "rifle": {
+          "rows": 2,
+          "velocity": {
+            "median": 0.03500000000000012,
+            "p90": 0.03900000000000012
+          },
+          "pressure": null
+        }
+      },
+      "pressureByBasis": {},
+      "interval": {
+        "coverage": 1
+      }
+    },
+    "unknown": {
+      "rows": {
+        "inSplit": 1,
+        "used": 0,
+        "notUsed": {
+          "unknownPowder": 1
+        }
+      },
+      "velocity": null,
+      "pressure": null,
+      "byBarrel": {},
+      "pressureByBasis": {},
+      "interval": null
+    },
+    "unspecified/flake": {
+      "rows": {
+        "inSplit": 1,
+        "used": 0,
+        "notUsed": {
+          "noPowderModel": 1
+        }
+      },
+      "velocity": null,
+      "pressure": null,
+      "byBarrel": {},
+      "pressureByBasis": {},
+      "interval": null
+    }
+  },
+  "byPowder": {
+    "demo-powder-dp40": {
+      "rows": {
+        "inSplit": 8,
+        "used": 3,
+        "notUsed": {
+          "unknownCartridge": 1,
+          "unknownBullet": 1,
+          "noCaseCapacity": 1,
+          "noBarrelLength": 1,
+          "modelRefused": 1
+        }
+      },
+      "velocity": {
+        "median": 0.019999999999999966,
+        "p90": 0.08400000000000005
+      },
+      "pressure": {
+        "median": 0.14999999999999997,
+        "p90": 0.18999999999999992,
+        "rows": 2
+      },
+      "byBarrel": {
+        "rifle": {
+          "rows": 3,
+          "velocity": {
+            "median": 0.019999999999999966,
+            "p90": 0.08400000000000005
+          },
+          "pressure": {
+            "median": 0.14999999999999997,
+            "p90": 0.18999999999999992,
+            "rows": 2
+          }
+        }
+      },
+      "pressureByBasis": {
+        "unstated": {
+          "median": 0.14999999999999997,
+          "p90": 0.18999999999999992,
+          "rows": 2
+        }
+      },
+      "interval": {
+        "coverage": 0.6666666666666666
+      }
+    },
+    "demo-powder-plain": {
+      "rows": {
+        "inSplit": 1,
+        "used": 0,
+        "notUsed": {
+          "noPowderModel": 1
+        }
+      },
+      "velocity": null,
+      "pressure": null,
+      "byBarrel": {},
+      "pressureByBasis": {},
+      "interval": null
+    },
+    "demo-powder-sp20": {
+      "rows": {
+        "inSplit": 2,
+        "used": 2,
+        "notUsed": {}
+      },
+      "velocity": {
+        "median": 0.03500000000000012,
+        "p90": 0.03900000000000012
+      },
+      "pressure": null,
+      "byBarrel": {
+        "rifle": {
+          "rows": 2,
+          "velocity": {
+            "median": 0.03500000000000012,
+            "p90": 0.03900000000000012
+          },
+          "pressure": null
+        }
+      },
+      "pressureByBasis": {},
+      "interval": {
+        "coverage": 1
+      }
+    },
+    "no-powder": {
+      "rows": {
+        "inSplit": 1,
+        "used": 0,
+        "notUsed": {
+          "unknownPowder": 1
+        }
+      },
+      "velocity": null,
+      "pressure": null,
+      "byBarrel": {},
+      "pressureByBasis": {},
+      "interval": null
+    }
+  },
+  "grouped": {
+    "by": "cartridge",
+    "groups": {
+      "30-30-win": {
+        "rows": {
+          "inSplit": 2,
+          "used": 2,
+          "notUsed": {}
+        },
+        "velocity": {
+          "median": 0.07000000000000009,
+          "p90": 0.09400000000000007
+        },
+        "pressure": null,
+        "byBarrel": {
+          "rifle": {
+            "rows": 2,
+            "velocity": {
+              "median": 0.07000000000000009,
+              "p90": 0.09400000000000007
+            },
+            "pressure": null
+          }
+        },
+        "pressureByBasis": {},
+        "interval": {
+          "coverage": 0.5
+        }
+      },
+      "308-match": {
+        "rows": {
+          "inSplit": 8,
+          "used": 3,
+          "notUsed": {
+            "unknownBullet": 1,
+            "unknownPowder": 1,
+            "noPowderModel": 1,
+            "noBarrelLength": 1,
+            "modelRefused": 1
+          }
+        },
+        "velocity": {
+          "median": 0.019999999999999966,
+          "p90": 0.028000000000000094
+        },
+        "pressure": {
+          "median": 0.14999999999999997,
+          "p90": 0.18999999999999992,
+          "rows": 2
+        },
+        "byBarrel": {
+          "rifle": {
+            "rows": 3,
+            "velocity": {
+              "median": 0.019999999999999966,
+              "p90": 0.028000000000000094
+            },
+            "pressure": {
+              "median": 0.14999999999999997,
+              "p90": 0.18999999999999992,
+              "rows": 2
+            }
+          }
+        },
+        "pressureByBasis": {
+          "unstated": {
+            "median": 0.14999999999999997,
+            "p90": 0.18999999999999992,
+            "rows": 2
+          }
+        },
+        "interval": {
+          "coverage": 1
+        }
+      },
+      "7-62-x-54-r": {
+        "rows": {
+          "inSplit": 1,
+          "used": 0,
+          "notUsed": {
+            "noCaseCapacity": 1
+          }
+        },
+        "velocity": null,
+        "pressure": null,
+        "byBarrel": {},
+        "pressureByBasis": {},
+        "interval": null
+      },
+      "unknown-4": {
+        "rows": {
+          "inSplit": 1,
+          "used": 0,
+          "notUsed": {
+            "unknownCartridge": 1
+          }
+        },
+        "velocity": null,
+        "pressure": null,
+        "byBarrel": {},
+        "pressureByBasis": {},
+        "interval": null
+      }
+    }
+  }
+}
+--- stderr

@@ -1,0 +1,4 @@
+exit 1
+--- stdout
+--- stderr
+{"error":{"kind":"refused","message":"the test split is sealed: run it once per model version with --final"}}

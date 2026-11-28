@@ -1,0 +1,21 @@
+exit 0
+--- stdout
+model m3  version <sha256>
+split validation  salt 2026-11-12  interval half width rifle 8.9 % (10 rows) of 10 training rows
+group                     used  v med %  v P90 %  p med %  p P90 %  cover %
+all                       5/12      3.0      7.6     15.0     19.0     80.0
+family double/extruded     3/8      2.0      8.4     15.0     19.0     66.7
+family single/ball         2/2      3.5      3.9        -        -    100.0
+family unknown             0/1        -        -        -        -        -
+family unspecified/flake   0/1        -        -        -        -        -
+powder demo-powder-dp40    3/8      2.0      8.4     15.0     19.0     66.7
+powder demo-powder-plain   0/1        -        -        -        -        -
+powder demo-powder-sp20    2/2      3.5      3.9        -        -    100.0
+powder no-powder           0/1        -        -        -        -        -
+cartridge 30-30-win        2/2      7.0      9.4        -        -     50.0
+cartridge 308-match        3/8      2.0      2.8     15.0     19.0    100.0
+cartridge 7-62-x-54-r      0/1        -        -        -        -        -
+cartridge unknown-4        0/1        -        -        -        -        -
+not used: unknownCartridge 1, unknownBullet 1, unknownPowder 1, noPowderModel 1, noCaseCapacity 1, noBarrelLength 1, modelRefused 1
+pressure by basis, median / P90: unstated 15.0 / 19.0 % (2 rows)
+--- stderr

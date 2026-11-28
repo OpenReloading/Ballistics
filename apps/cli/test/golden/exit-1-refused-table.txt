@@ -1,0 +1,4 @@
+exit 1
+--- stdout
+--- stderr
+refused: the test split is sealed: run it once per model version with --final

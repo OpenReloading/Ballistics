@@ -1,0 +1,27 @@
+exit 0
+--- stdout
+usage: ballistics [options] [command]
+
+Measures how far the interior model is from printed load rows it was not fitted
+to, says whether a changed model got better, and runs the compute operations of
+the REST API offline. Results are simulations compared with printed values,
+never load data.
+
+options:
+  --version                      the version
+  -h, --help                     this text
+
+commands:
+  verify [options]               evaluate one model on a split of the rows
+  compare [options]              compare a candidate model with a baseline on
+                                 the same rows and split
+  fit [options]                  fit the burn coefficient of each powder the
+                                 rows name
+  run [options] <operation>      run one compute operation offline
+  estimate-capacities [options]  write an estimated capacity record for each
+                                 cartridge with a case outline only
+  operations [options]           list every operation of run
+
+exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
+unreadable input, 70 internal error
+--- stderr

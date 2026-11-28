@@ -1,0 +1,56 @@
+exit 0
+--- stdout
+{
+  "operations": [
+    {
+      "name": "exterior/trajectory",
+      "summary": "Compute a trajectory",
+      "description": "Integrates the flight of a projectile from the muzzle (point mass, or modified point mass with yaw of repose and spin) and answers its state at each requested slant range: distance, height, windage, time, velocity, energy and holds. The zero gives the bore angles. A `bullet` id supplies mass, diameter, length and ballistic coefficients.",
+      "input": "<JSON Schema>",
+      "output": "<JSON Schema>"
+    },
+    {
+      "name": "exterior/truing",
+      "summary": "True a trajectory to observations",
+      "description": "Fits the muzzle velocity, or drag factors (constant or at Mach knots) with or without the muzzle velocity, to measured heights, elevation holds or velocities at known ranges, by least squares on log parameters. Answers the fitted parameters with standard uncertainties and correlations, the residuals and the trued shot.",
+      "input": "<JSON Schema>",
+      "output": "<JSON Schema>"
+    },
+    {
+      "name": "exterior/range-strings/plan",
+      "summary": "Plan range strings",
+      "description": "Compares candidate range strings before any shot: per candidate the identifiability status, expected standard uncertainty and variance inflation of muzzle velocity, drag factor, click value and zero offset, and the condition number of the design.",
+      "input": "<JSON Schema>",
+      "output": "<JSON Schema>"
+    },
+    {
+      "name": "exterior/range-strings/fit",
+      "summary": "Fit range strings",
+      "description": "Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialed corrections of strings at known ranges and an optional chronograph string. Answers each parameter with identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.",
+      "input": "<JSON Schema>",
+      "output": "<JSON Schema>"
+    },
+    {
+      "name": "interior",
+      "summary": "Simulate a shot in the barrel",
+      "description": "Runs the M3 lumped-parameter model of the shot from ignition to muzzle exit and answers the time curves of pressure, travel, velocity and burnt fraction, the peak pressure, muzzle velocity and energy, the pressure range from the tolerances, and warnings. A `ladder` runs one step per charge. A `cartridge` id adds its CIP Pmax limits. Results are simulations, not load data.",
+      "input": "<JSON Schema>",
+      "output": "<JSON Schema>"
+    },
+    {
+      "name": "interior/load-file",
+      "summary": "Simulate a workbench load file",
+      "description": "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. Values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. Every value neither the file nor a record gives is listed in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a workbench download for the API holds them all. Results are simulations, not load data.",
+      "input": "<JSON Schema>",
+      "output": "<JSON Schema>"
+    },
+    {
+      "name": "interior/charge-target",
+      "summary": "Solve the charge for a target",
+      "description": "Searches the charge at which an M3 run reaches a target peak pressure (Pa or a percentage of the cartridge CIP Pmax), muzzle velocity, load ratio, barrel time or bullet lead time. Answers the charge, the value reached, the run at that charge without curves, its pressure range, limits and warnings. A target outside the reachable values answers 422 with the reachable range. Results are simulations, not load data.",
+      "input": "<JSON Schema>",
+      "output": "<JSON Schema>"
+    }
+  ]
+}
+--- stderr

@@ -1,0 +1,11 @@
+exit 0
+--- stdout
+{
+  "command": "estimate-capacities",
+  "factor": 0.7106881443676618,
+  "cartridges": 29,
+  "looRms": 0.0956437658192653,
+  "written": 507,
+  "folder": "<tmp>/capacities"
+}
+--- stderr

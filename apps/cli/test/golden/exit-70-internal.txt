@@ -1,0 +1,4 @@
+exit 70
+--- stdout
+--- stderr
+{"error":{"kind":"internal","message":"no space left\non the device"}}
