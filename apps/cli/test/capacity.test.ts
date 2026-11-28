@@ -10,7 +10,7 @@ import {
   outlineVolume,
   writeEstimatedCapacities,
 } from '../src/capacity.ts'
-import { UsageError } from '../src/errors.ts'
+import { DataError, Refusal } from '../src/errors.ts'
 import { loadRecords } from '../src/records.ts'
 import { recordRoots, records } from './fixture.ts'
 
@@ -68,7 +68,7 @@ describe('fillFactor', () => {
         { capacity: 1, outline: 1 },
         { capacity: 1, outline: 1 },
       ]),
-    ).toThrow(UsageError)
+    ).toThrow(DataError)
   })
 })
 
@@ -101,6 +101,6 @@ describe('writeEstimatedCapacities', () => {
     expect(isEstimatedCapacity(loaded.capacities.get('7-62-x-54-r') as never)).toBe(true)
     expect(isEstimatedCapacity(loaded.capacities.get('308-match') as never)).toBe(false)
     expect(existsSync(join(out, 'capacities'))).toBe(true)
-    expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(UsageError)
+    expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(Refusal)
   })
 })

@@ -9,7 +9,7 @@ import type {
 } from '@rangefoundry/schema'
 import { compareKeys, defaultCapacity, isEstimatedCapacity, parseRef } from '@rangefoundry/schema'
 import { readRecords } from '@rangefoundry/tools/catalog'
-import { UsageError } from './errors.ts'
+import { NoInputError } from './errors.ts'
 
 /** The records a run reads, by id; a cartridge's capacity is its default (`defaultCapacity`), only without one its case is the first by id with a stated water capacity, and with neither its capacity is an estimate. */
 export interface Records {
@@ -46,12 +46,12 @@ export const withoutEstimates = (records: Records): Records => ({
   capacities: new Map([...records.capacities].filter(([, c]) => !isEstimatedCapacity(c))),
 })
 
-/** Reads the records of `roots` as one set, or the records of the catalog package without roots; a `UsageError` for a root that is not a folder. */
+/** Reads the records of `roots` as one set, or the records of the catalog package without roots; a `NoInputError` for a root that is not a folder. */
 export function readBundle(roots: readonly string[]) {
   for (const [i, root] of roots.entries())
     if (!statSync(root, { throwIfNoEntry: false })?.isDirectory())
       // NOSONAR: the path is the argument the user gave
-      throw new UsageError(
+      throw new NoInputError(
         `the --records path${roots.length > 1 ? ` ${i + 1} of ${roots.length}` : ''} (or BALLISTICS_RECORDS) does not exist or is not a folder`,
       )
   return readRecords(roots.length > 0 ? roots : undefined)

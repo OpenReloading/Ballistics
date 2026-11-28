@@ -3,7 +3,7 @@ import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { interior } from '@rangefoundry/ballistics'
 import { InputError } from '@rangefoundry/statistics'
-import { UsageError } from './errors.ts'
+import { DataError, NoInputError } from './errors.ts'
 import type { InteriorModel } from './evaluate.ts'
 
 /** A model version: the function that runs a load and the built source files it stands on. */
@@ -74,7 +74,7 @@ export function fitFiles() {
   ]
 }
 
-/** `m3` (the installed core model) or the path of a module that exports `interior(load, options?)` with the signature of the core function; throws a `UsageError` for a module that cannot be loaded or has no such export. */
+/** `m3` (the installed core model) or the path of a module that exports `interior(load, options?)` with the signature of the core function; throws a `NoInputError` for a path that is no file and a `DataError` for a module that cannot be loaded or has no such export. */
 export async function loadModel(spec: string): Promise<Model> {
   const { statistics, ballistics, files } = sharedFiles()
   // this file is built as .js and tested as .ts: the estimator has the same extension
@@ -93,16 +93,16 @@ export async function loadModel(spec: string): Promise<Model> {
   if (spec === builtInName) return { name: spec, interior, files: coreModel }
   const path = resolve(spec)
   if (!existsSync(path))
-    throw new UsageError(`the model ${spec} is neither "${builtInName}" nor a file`)
+    throw new NoInputError(`the model ${spec} is neither "${builtInName}" nor a file`)
   let loaded: { interior?: unknown }
   try {
     loaded = (await import(pathToFileURL(path).href)) as { interior?: unknown }
   } catch (error) {
     const cause = String(error instanceof Error ? error.message : error).split('\n')[0]
-    throw new UsageError(`the model module ${spec} cannot be loaded: ${cause}`)
+    throw new DataError(`the model module ${spec} cannot be loaded: ${cause}`)
   }
   if (typeof loaded.interior !== 'function')
-    throw new UsageError(`the model module ${spec} exports no function "interior"`)
+    throw new DataError(`the model module ${spec} exports no function "interior"`)
   const candidate = loaded.interior as InteriorModel
   return {
     name: spec,
@@ -113,7 +113,7 @@ export async function loadModel(spec: string): Promise<Model> {
       } catch (error) {
         if (error instanceof InputError) throw error
         const cause = String(error instanceof Error ? error.message : error).split('\n')[0]
-        throw new UsageError(`the model module ${spec} threw: ${cause}`)
+        throw new DataError(`the model module ${spec} threw: ${cause}`)
       }
     },
     files: [...coreModel, ...closure(path, dirname(path), 'candidate')],

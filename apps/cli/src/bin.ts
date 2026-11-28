@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { internalCode } from './errors.ts'
 import { report, run } from './main.ts'
 
 const argv = process.argv.slice(2)
@@ -13,7 +14,7 @@ process.stdout.on('error', (error: NodeJS.ErrnoException) => {
   if (error.code === 'EPIPE') process.exit(0)
   report(error, argv, {
     ...io,
-    stderr: (text) => process.stderr.write(text, () => process.exit(3)),
+    stderr: (text) => process.stderr.write(text, () => process.exit(internalCode)),
   })
 })
 

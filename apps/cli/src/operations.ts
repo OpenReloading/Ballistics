@@ -10,7 +10,7 @@ import {
 } from '@rangefoundry/use-cases'
 import { buildCatalogue, type Catalogue, openCatalogue } from '@rangefoundry/use-cases/catalog'
 import { z } from 'zod'
-import { Refusal, UsageError } from './errors.ts'
+import { DataError, NoInputError, Refusal, UsageError } from './errors.ts'
 import { readBundle } from './records.ts'
 
 const dialect = 'https://json-schema.org/draft/2020-12/schema'
@@ -43,12 +43,12 @@ function readBody(input: string): unknown {
   try {
     text = readFileSync(input === '-' ? 0 : input, 'utf8') // NOSONAR: the path is the argument the user gave
   } catch (error) {
-    throw new UsageError(`the --input cannot be read: ${(error as NodeJS.ErrnoException).code}`)
+    throw new NoInputError(`the --input cannot be read: ${(error as NodeJS.ErrnoException).code}`)
   }
   try {
     return JSON.parse(text.replace(/^﻿/, ''))
   } catch {
-    throw new UsageError('the --input is not JSON')
+    throw new DataError('the --input is not JSON')
   }
 }
 
@@ -57,7 +57,7 @@ function schemaError(error: z.ZodError) {
   const issues = error.issues.map(({ path, message }) => ({ path, message }))
   const first = issues[0]
   const at = first?.path.length ? `${first.path.map(String).join('.')}: ` : ''
-  return new UsageError(
+  return new DataError(
     `the --input does not match the schema of the operation${first ? `: ${at}${first.message}` : ''}`,
     { issues },
   )
@@ -98,7 +98,7 @@ export async function runOperation(
     if (error instanceof z.ZodError) throw schemaError(error)
     // an unknown record id is bad input, not a refusal of the model
     if (error instanceof RecordNotFound)
-      throw new UsageError(withParams(error.message, error.issue.params), error.issue)
+      throw new DataError(withParams(error.message, error.issue.params), error.issue)
     const known = errorAnswer(error, op.errors)
     if (!known) throw error
     answer = { status: known.status, payload: known.body }
