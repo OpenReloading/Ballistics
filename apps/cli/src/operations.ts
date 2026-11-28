@@ -12,6 +12,7 @@ import { buildCatalogue, type Catalogue, openCatalogue } from '@rangefoundry/use
 import { z } from 'zod'
 import { DataError, NoInputError, Refusal, UsageError } from './errors.ts'
 import { readBundle } from './records.ts'
+import { systemErrorCode } from './system-error.ts'
 
 const dialect = 'https://json-schema.org/draft/2020-12/schema'
 
@@ -43,7 +44,7 @@ function readBody(input: string): unknown {
   try {
     text = readFileSync(input === '-' ? 0 : input, 'utf8') // NOSONAR: the path is the argument the user gave
   } catch (error) {
-    throw new NoInputError(`the --input cannot be read: ${(error as NodeJS.ErrnoException).code}`)
+    throw new NoInputError(`the --input cannot be read: ${systemErrorCode(error)}`)
   }
   try {
     return JSON.parse(text.replace(/^﻿/, ''))
@@ -103,17 +104,21 @@ export async function runOperation(
     if (!known) throw error
     answer = { status: known.status, payload: known.body }
   }
-  if (answer.status !== 200) {
-    const { message, field, params } = answer.payload as {
-      message?: unknown
-      field?: unknown
-      params?: Record<string, unknown>
-    }
-    const text = String(message ?? `answer ${answer.status}`)
-    const named = field === undefined ? text : `${text} (${String(field)})`
-    throw new Refusal(withParams(named, params ?? {}), {
-      answer: answer.payload,
-    })
-  }
+  if (answer.status !== 200) throw refusalOf(answer)
   return answer.payload
+}
+
+/** The fields of an answer other than 200 that a refusal names. */
+const refusalBody = z.object({
+  message: z.string().optional(),
+  field: z.string().optional(),
+  params: z.record(z.string(), z.unknown()).optional(),
+})
+
+/** The refusal of an answer other than 200: its message (else its status), its field and its parameters. */
+function refusalOf({ status, payload }: { status: number; payload: unknown }) {
+  const { message, field, params } = refusalBody.parse(payload)
+  const text = message ?? `answer ${status}`
+  const named = field === undefined ? text : `${text} (${field})`
+  return new Refusal(withParams(named, params ?? {}), { answer: payload })
 }

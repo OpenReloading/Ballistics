@@ -514,48 +514,6 @@
       }
     },
     {
-      "files": ["apps/cli/src/**"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [],
-            "patterns": [
-              {
-                "group": [
-                  "@rangefoundry/*",
-                  "@rangefoundry/*/**",
-                  "!@rangefoundry/units",
-                  "!@rangefoundry/units/**",
-                  "!@rangefoundry/statistics",
-                  "!@rangefoundry/statistics/**",
-                  "!@rangefoundry/ballistics",
-                  "!@rangefoundry/ballistics/**",
-                  "!@rangefoundry/shot-groups",
-                  "!@rangefoundry/shot-groups/**",
-                  "!@rangefoundry/catalog",
-                  "!@rangefoundry/catalog/**",
-                  "!@rangefoundry/svg-drawings",
-                  "!@rangefoundry/svg-drawings/**",
-                  "!@rangefoundry/schema",
-                  "!@rangefoundry/schema/**",
-                  "!@rangefoundry/use-cases",
-                  "!@rangefoundry/use-cases/**",
-                  "!@rangefoundry/api/catalogue",
-                  "!@rangefoundry/catalog-files"
-                ],
-                "message": "cli-imports-logic-catalog-drawing-schema-only: apps/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog and its file reader catalog-files, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs."
-              },
-              {
-                "regex": "^(\\.\\./)+(web|docs|e2e|packages|apps)/",
-                "message": "cli-imports-logic-catalog-drawing-schema-only: apps/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog and its file reader catalog-files, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs."
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
       "files": ["apps/web/src/**"],
       "rules": {
         "no-restricted-imports": [

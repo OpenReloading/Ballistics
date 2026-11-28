@@ -20,7 +20,7 @@ const fixture: Record<string, { source: string; rules: string[] }> = JSON.parse(
 )
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const oxlint = join(root, 'node_modules/.bin/oxlint')
-/** The configurations the mirror lints with: the root one, the bases of the logic and the UI packages and the own ones that extend them. */
+/** The configurations the mirror lints with: the root one, the bases of the logic and the UI packages and of the apps, and the own ones that extend them. */
 const configs = [
   '.oxlintrc.json',
   'packages/oxlint.logic.json',
@@ -37,6 +37,8 @@ const configs = [
   'packages/use-cases/.oxlintrc.json',
   'packages/target-recognition/.oxlintrc.json',
   'packages/ui/.oxlintrc.json',
+  'apps/oxlint.app.json',
+  'apps/cli/.oxlintrc.json',
 ]
 
 let mirror = ''

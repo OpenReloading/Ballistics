@@ -96,14 +96,14 @@ export async function loadModel(spec: string): Promise<Model> {
     throw new NoInputError(`the model ${spec} is neither "${builtInName}" nor a file`)
   let loaded: { interior?: unknown }
   try {
-    loaded = (await import(pathToFileURL(path).href)) as { interior?: unknown }
+    loaded = await import(pathToFileURL(path).href)
   } catch (error) {
     const cause = String(error instanceof Error ? error.message : error).split('\n')[0]
     throw new DataError(`the model module ${spec} cannot be loaded: ${cause}`)
   }
   if (typeof loaded.interior !== 'function')
     throw new DataError(`the model module ${spec} exports no function "interior"`)
-  const candidate = loaded.interior as InteriorModel
+  const candidate = loaded.interior
   return {
     name: spec,
     // a throw of the candidate is bad input, not an internal error; its refusal stays a refused row

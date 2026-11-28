@@ -1,0 +1,78 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../oxlint.app.json"],
+  "overrides": [
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@rangefoundry/*",
+                  "@rangefoundry/*/**",
+                  "!@rangefoundry/units",
+                  "!@rangefoundry/units/**",
+                  "!@rangefoundry/statistics",
+                  "!@rangefoundry/statistics/**",
+                  "!@rangefoundry/ballistics",
+                  "!@rangefoundry/ballistics/**",
+                  "!@rangefoundry/shot-groups",
+                  "!@rangefoundry/shot-groups/**",
+                  "!@rangefoundry/catalog",
+                  "!@rangefoundry/catalog/**",
+                  "!@rangefoundry/svg-drawings",
+                  "!@rangefoundry/svg-drawings/**",
+                  "!@rangefoundry/schema",
+                  "!@rangefoundry/schema/**",
+                  "!@rangefoundry/use-cases",
+                  "!@rangefoundry/use-cases/**",
+                  "!@rangefoundry/api/catalogue",
+                  "!@rangefoundry/catalog-files"
+                ],
+                "message": "cli-imports-logic-catalog-drawing-schema-only: apps/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog and its file reader catalog-files, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs."
+              },
+              {
+                "regex": "^(\\.\\./)+(web|docs|e2e|packages|apps)/",
+                "message": "cli-imports-logic-catalog-drawing-schema-only: apps/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog and its file reader catalog-files, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "scripts/temperature-energy.mts",
+        "src/commands.ts",
+        "src/evaluate.ts",
+        "src/fit.ts",
+        "src/main.ts",
+        "src/metrics.ts",
+        "src/published-rows.ts",
+        "src/unseen.ts",
+        "test/**"
+      ],
+      "rules": {
+        "complexity": "off",
+        "max-lines-per-function": "off",
+        "max-params": "off",
+        "no-nested-ternary": "off",
+        "no-shadow": "off",
+        "typescript/await-thenable": "off",
+        "typescript/consistent-return": "off",
+        "typescript/no-unnecessary-type-assertion": "off",
+        "typescript/no-unsafe-type-assertion": "off",
+        "typescript/no-useless-default-assignment": "off",
+        "unicorn/consistent-function-scoping": "off",
+        "unicorn/no-array-sort": "off",
+        "unicorn/no-useless-spread": "off",
+        "vitest/require-mock-type-parameters": "off",
+        "vitest/require-to-throw-message": "off"
+      }
+    }
+  ]
+}

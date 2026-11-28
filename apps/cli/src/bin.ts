@@ -6,7 +6,7 @@ const argv = process.argv.slice(2)
 const io = {
   stdout: (text: string) => process.stdout.write(text),
   stderr: (text: string) => process.stderr.write(text),
-  tty: process.stdout.isTTY === true,
+  tty: process.stdout.isTTY,
 }
 
 // a reader that stops early (head, a pager) closes the pipe: that ends the run, it is no failure

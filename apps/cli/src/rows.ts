@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { DataError, NoInputError } from './errors.ts'
+import { systemErrorCode } from './system-error.ts'
 
 /** One load row: records by id, the load and the printed result. */
 export interface Row {
@@ -68,12 +69,13 @@ const columns = {
   table: 'text',
 } as const
 type Column = keyof typeof columns
+const isColumn = (name: string): name is Column => Object.hasOwn(columns, name)
 const required: Column[] = ['cartridge', 'bullet', 'powder', 'charge_g', 'velocity_ms']
 /** Most problems one file reports before the rest is counted only. */
 const reportLimit = 10
 
 /** One cell: a double-quoted field (doubled quotes inside) or plain text, and what ends it. */
-const cell = /(?:"((?:[^"]|"")*)"|([^,"\r\n]*))(,|\r?\n|$)/y
+const cellPattern = /(?:"((?:[^"]|"")*)"|([^,"\r\n]*))(,|\r?\n|$)/y
 
 /** The fields of the CSV records of `text`: commas, double-quoted fields, LF or CRLF; blank lines are skipped. */
 function records(text: string, name: string): { fields: string[]; line: number }[] {
@@ -82,8 +84,8 @@ function records(text: string, name: string): { fields: string[]; line: number }
   let line = 1
   let start = 1
   for (let at = 0; ; ) {
-    cell.lastIndex = at
-    const m = cell.exec(text)
+    cellPattern.lastIndex = at
+    const m = cellPattern.exec(text)
     if (!m) throw new DataError(`${name}:${line}: a quote is misplaced or not closed`)
     const [whole, quoted, plain = '', end] = m
     fields.push(quoted === undefined ? plain : quoted.replaceAll('""', '"'))
@@ -103,7 +105,11 @@ const decimal = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/
 function valueProblem(kind: (typeof columns)[Column], value: string): string | undefined {
   if (kind === 'text') return undefined
   if (kind === 'id') return value === '' ? 'is empty' : undefined
-  if (value === '') return undefined
+  return value === '' ? undefined : numberProblem(kind, value)
+}
+
+/** The problem with a non-empty value of a number kind, or undefined. */
+function numberProblem(kind: (typeof columns)[Column], value: string): string | undefined {
   // Number() also reads 0x1F, 0b11 and 0o7: only decimal and exponent forms are numbers here
   const x = decimal.test(value) ? Number(value) : Number.NaN
   if (!Number.isFinite(x)) return 'is not a number'
@@ -165,13 +171,11 @@ function headerOf(fields: string[]): Column[] | string {
   // a first line without any required name is data, whose values are never printed
   if (!required.some((r) => names.includes(r)))
     return `the first line is not a header: it names none of ${required.join(', ')}`
-  const unknown = names.flatMap((n, i) =>
-    Object.hasOwn(columns, n) ? [] : [n || `(empty, column ${i + 1})`],
-  )
+  const unknown = names.flatMap((n, i) => (isColumn(n) ? [] : [n || `(empty, column ${i + 1})`]))
   if (unknown.length > 0) return `the header has unknown column(s) ${unknown.join(', ')}`
   if (new Set(names).size !== names.length) return 'the header repeats a column'
   const missing = required.filter((r) => !names.includes(r))
-  return missing.length > 0 ? `the header lacks ${missing.join(', ')}` : (names as Column[])
+  return missing.length > 0 ? `the header lacks ${missing.join(', ')}` : names.filter(isColumn)
 }
 
 /** The rows of one CSV file's text; a `DataError` lists each problem as file, line and reason. */
@@ -214,15 +218,17 @@ function filesOf(path: string): string[] {
   return names.map((n) => join(path, n))
 }
 
+/** The bytes of a rows file, or of standard input for 0. */
+function read(file: string | 0) {
+  try {
+    return readFileSync(file) // NOSONAR: the path is the argument the user gave
+  } catch (error) {
+    throw new NoInputError(`the rows cannot be read: ${systemErrorCode(error)}`)
+  }
+}
+
 /** Reads the rows of a file, of every `.csv` file of a folder, or of standard input for `-`. */
 export function readRows(path: string): RowFiles {
-  const read = (file: string | 0) => {
-    try {
-      return readFileSync(file) // NOSONAR: as above
-    } catch (error) {
-      throw new NoInputError(`the rows cannot be read: ${(error as NodeJS.ErrnoException).code}`)
-    }
-  }
   const files =
     path === '-'
       ? [{ file: 'stdin', bytes: read(0) }]
