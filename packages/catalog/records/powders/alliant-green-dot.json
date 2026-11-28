@@ -1,0 +1,169 @@
+{
+  "id": "alliant-green-dot",
+  "manufacturer": "alliant",
+  "name": "Green Dot",
+  "country": "US",
+  "scope": ["shotgun"],
+  "grainForm": "flake",
+  "propellantBase": "double",
+  "composition": [
+    {
+      "name": "Nitrocellulose",
+      "cas": "9004-70-0",
+      "min": 54,
+      "max": 96
+    },
+    {
+      "name": "Nitroglycerin",
+      "cas": "55-63-0",
+      "min": 4,
+      "max": 40
+    },
+    {
+      "name": "Rosin",
+      "cas": "8050-09-7",
+      "min": 0,
+      "max": 4
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "N,N'-diethyl-N,N'-diphenylurea",
+      "cas": "85-98-3",
+      "min": 0,
+      "max": 1
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.3C",
+      "unNumber": "UN0161"
+    },
+    {
+      "hazardClass": "1.4C",
+      "unNumber": "UN0509"
+    }
+  ],
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 20
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 8
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 6
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 4
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 10
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "alliant-powder-reloader-s-guide-2023",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "alliant-safety-data-sheet-15-25-smokeless-powder",
+        "url": "https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf",
+        "retrieved": "2026-10-13",
+        "page": "section 9",
+        "fields": ["grainForm"],
+        "kind": "derived"
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "alliant-safety-data-sheet-15-25-smokeless-powder",
+        "url": "https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf",
+        "retrieved": "2026-11-15",
+        "page": "pp. 2-3",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "source": "alliant-safety-data-sheet-15-25-smokeless-powder",
+        "url": "https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 3",
+        "fields": ["propellantBase"],
+        "kind": "derived"
+      },
+      {
+        "title": "Alliant Powder product page, Green Dot",
+        "publisher": "Alliant Powder",
+        "url": "https://www.alliantpowder.com/products/powder/green_dot.aspx",
+        "retrieved": "2026-11-15",
+        "fields": ["scope"],
+        "terms": "https://www.thekineticgroup.com/termsconditions.html",
+        "kind": "published"
+      },
+      {
+        "source": "alliant-safety-data-sheet-15-25-smokeless-powder",
+        "url": "https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 1",
+        "fields": ["country"],
+        "kind": "published"
+      },
+      {
+        "source": "alliant-safety-data-sheet-15-25-smokeless-powder",
+        "url": "https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 14",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

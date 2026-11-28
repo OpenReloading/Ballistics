@@ -1,0 +1,34 @@
+{
+  "id": "ramshot-grand",
+  "manufacturer": "ramshot",
+  "name": "Grand",
+  "scope": ["rifle"],
+  "grainForm": "ball",
+  "propellantBase": "double",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 163
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, Ramshot Grand® Rifle Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/ramshot-grand/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase", "scope"],
+        "terms": "https://hodgdonpowderco.com/terms-of-service/"
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

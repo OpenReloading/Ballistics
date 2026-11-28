@@ -1,0 +1,63 @@
+{
+  "id": "rottweil-r-901",
+  "manufacturer": "rottweil",
+  "name": "R 901",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 17
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 19
+    },
+    {
+      "chart": {
+        "manufacturer": "norma",
+        "edition": "2026-11-14"
+      },
+      "position": 15
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 23
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "rws-reloading-data-page-wiederladen-powder",
+        "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "norma-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

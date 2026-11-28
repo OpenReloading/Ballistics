@@ -1,0 +1,135 @@
+{
+  "id": "ramshot-x-terminator",
+  "manufacturer": "ramshot",
+  "name": "X-Terminator",
+  "scope": ["rifle"],
+  "grainForm": "ball",
+  "propellantBase": "double",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 92
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 21
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 21
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 30
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.67116,
+      "standardUncertainty": 0.018
+    },
+    "energy": {
+      "value": 3355500,
+      "standardUncertainty": 91000
+    },
+    "gamma": 1.2202,
+    "covolume": {
+      "value": 0.000983
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0.8
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 128,
+    "trainingCartridges": 7
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, Ramshot X-Terminator® Rifle Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/ramshot-x-terminator/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase", "scope"],
+        "terms": "https://hodgdonpowderco.com/terms-of-service/"
+      },
+      {
+        "source": "hodgdon-annual-manual-2025-rifle-and-pistol",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "western-powders-handloading-guide-8-0",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/WesternPowdersHandloadingGuide8.0_WEB-1.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

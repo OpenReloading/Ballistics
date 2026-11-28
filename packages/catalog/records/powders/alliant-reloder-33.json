@@ -1,0 +1,153 @@
+{
+  "id": "alliant-reloder-33",
+  "manufacturer": "alliant",
+  "name": "Reloder 33",
+  "country": "US",
+  "scope": ["rifle"],
+  "grainForm": "extruded",
+  "perforation": "single",
+  "composition": [
+    {
+      "name": "Nitrocellulose",
+      "cas": "9004-70-0",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "Nitroglycerin",
+      "cas": "55-63-0",
+      "min": 0,
+      "max": 18
+    },
+    {
+      "name": "Diisopentyl phthalate",
+      "cas": "605-50-5",
+      "min": 0,
+      "max": 3
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0,
+      "max": 2
+    },
+    {
+      "name": "N,N'-diethyl-N,N'-diphenylurea",
+      "cas": "85-98-3",
+      "min": 0,
+      "max": 2
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.3C",
+      "unNumber": "UN0161"
+    }
+  ],
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 172
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 39
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 43
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 37
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "alliant-powder-reloader-s-guide-2023",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "alliant-safety-data-sheet-for-reloder-17-26-33",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_17_26_33_50_SDS_NA.pdf",
+        "retrieved": "2026-10-13",
+        "page": "section 9",
+        "fields": ["grainForm"],
+        "kind": "derived"
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "alliant-safety-data-sheet-for-reloder-17-26-33",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_17_26_33_50_SDS_NA.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 2",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "title": "Alliant Powder product page, Reloder 33",
+        "publisher": "Alliant Powder",
+        "url": "https://www.alliantpowder.com/products/powder/reloder33.aspx",
+        "retrieved": "2026-11-15",
+        "fields": ["scope"],
+        "terms": "https://www.thekineticgroup.com/termsconditions.html",
+        "kind": "published"
+      },
+      {
+        "source": "alliant-safety-data-sheet-for-reloder-17-26-33",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_17_26_33_50_SDS_NA.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 1",
+        "fields": ["country"],
+        "kind": "published"
+      },
+      {
+        "source": "alliant-safety-data-sheet-for-reloder-17-26-33",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_17_26_33_50_SDS_NA.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 14",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "source": "alliant-safety-data-sheet-for-reloder-17-26-33",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_17_26_33_50_SDS_NA.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 9",
+        "fields": ["perforation"],
+        "kind": "published"
+      }
+    ]
+  }
+}

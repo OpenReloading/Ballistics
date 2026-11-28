@@ -1,0 +1,119 @@
+{
+  "id": "rottweil-r-904",
+  "manufacturer": "rottweil",
+  "name": "R 904",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 28
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 31
+    },
+    {
+      "chart": {
+        "manufacturer": "norma",
+        "edition": "2026-11-14"
+      },
+      "position": 54
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 38
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity"],
+    "vivacity": {
+      "value": 0.34139,
+      "standardUncertainty": 0.0033
+    },
+    "energy": {
+      "value": 4479600
+    },
+    "gamma": 1.2313,
+    "covolume": {
+      "value": 0.001021
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 42,
+    "trainingCartridges": 11
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "rws-reloading-data-page-wiederladen-powder",
+        "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "rws-reloading-data-web-table-rottweil-powders",
+        "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
+        "retrieved": "2026-10-13",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "norma-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "hodgdon-trail-boss",
+  "manufacturer": "hodgdon",
+  "name": "Trail Boss",
+  "aliases": ["ADI Trail Boss"],
+  "scope": ["rifle", "handgun"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 23
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 2
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, Hodgdon Trail Boss® Cowboy Action Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-trail-boss/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "terms": "https://hodgdonpowderco.com/terms-of-service/"
+      },
+      {
+        "source": "adi-world-class-powders-faq-is-hodgdon",
+        "url": "https://www.adiworldclass.com.au/faq-items/is-hodgdon-propellant-the-same-as-adi-propellant/",
+        "retrieved": "2026-10-13",
+        "fields": ["aliases"]
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "title": "Hodgdon Powder Co. product page, Hodgdon Trail Boss® Cowboy Action Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-trail-boss/",
+        "retrieved": "2026-11-15",
+        "fields": ["scope"],
+        "terms": "https://hodgdonpowderco.com/terms-of-service/",
+        "kind": "published"
+      }
+    ]
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "id": "hodgdon-retumbo",
+  "manufacturer": "hodgdon",
+  "name": "Retumbo",
+  "aliases": ["ADI AR2225"],
+  "country": "US",
+  "scope": ["rifle"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "composition": [
+    {
+      "name": "Nitrocellulose",
+      "cas": "9004-70-0",
+      "min": 60,
+      "max": 100
+    },
+    {
+      "name": "2,4-Dinitrotoluene",
+      "cas": "121-14-2",
+      "min": 0,
+      "max": 15
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "Not hazardous, not named",
+      "min": 0,
+      "max": 5
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.3C",
+      "unNumber": "UN0161"
+    }
+  ],
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 166
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 36
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 42
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 45
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.37193,
+      "standardUncertainty": 0.017
+    },
+    "energy": {
+      "value": 3528300,
+      "standardUncertainty": 170000
+    },
+    "gamma": 1.2425,
+    "covolume": {
+      "value": 0.001059
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 62,
+    "trainingCartridges": 8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, Hodgdon Retumbo® Extreme Rifle® Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-retumbo/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase", "scope"],
+        "terms": "https://hodgdonpowderco.com/terms-of-service/"
+      },
+      {
+        "source": "adi-world-class-powders-faq-is-hodgdon",
+        "url": "https://www.adiworldclass.com.au/faq-items/is-hodgdon-propellant-the-same-as-adi-propellant/",
+        "retrieved": "2026-10-13",
+        "fields": ["aliases"]
+      },
+      {
+        "source": "hodgdon-annual-manual-2025-rifle-and-pistol",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 3",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 1",
+        "fields": ["country"],
+        "kind": "published"
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "pp. 1, 13",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

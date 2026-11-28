@@ -1,0 +1,184 @@
+{
+  "id": "hodgdon-h4227",
+  "manufacturer": "hodgdon",
+  "name": "H4227",
+  "country": "US",
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "composition": [
+    {
+      "name": "Nitrocellulose",
+      "cas": "9004-70-0",
+      "min": 60,
+      "max": 100
+    },
+    {
+      "name": "2,4-Dinitrotoluene",
+      "cas": "121-14-2",
+      "min": 0,
+      "max": 15
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "Not hazardous, not named",
+      "min": 0,
+      "max": 5
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.3C",
+      "unNumber": "UN0161"
+    }
+  ],
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 16
+    },
+    {
+      "chart": {
+        "manufacturer": "norma",
+        "edition": "2026-11-14"
+      },
+      "position": 8
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 23
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.98967,
+      "standardUncertainty": 0.091
+    },
+    "energy": {
+      "value": 3887200,
+      "standardUncertainty": 360000
+    },
+    "gamma": 1.2313,
+    "covolume": {
+      "value": 0.001021
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 36,
+    "trainingCartridges": 8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hodgdon-annual-manual-2025",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "page": "82",
+        "fields": ["name"]
+      },
+      {
+        "source": "hodgdon-annual-manual-2025-rifle-and-pistol",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "norma-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 3",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 3",
+        "fields": ["propellantBase"],
+        "kind": "derived"
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 1",
+        "fields": ["grainForm"],
+        "kind": "derived"
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 1",
+        "fields": ["country"],
+        "kind": "published"
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "pp. 1, 13",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

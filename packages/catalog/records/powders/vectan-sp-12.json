@@ -1,0 +1,97 @@
+{
+  "id": "vectan-sp-12",
+  "manufacturer": "vectan",
+  "name": "Sp 12",
+  "country": "FR",
+  "grainForm": "ball",
+  "propellantBase": "double",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 35
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity"],
+    "vivacity": {
+      "value": 0.29537,
+      "standardUncertainty": 0.0025
+    },
+    "energy": {
+      "value": 4980500
+    },
+    "gamma": 1.2202,
+    "covolume": {
+      "value": 0.000983
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0.8
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 75,
+    "trainingCartridges": 18
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "page": "3",
+        "fields": ["name", "grainForm", "propellantBase"]
+      },
+      {
+        "source": "vectan-catalogue-2023-12",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-11-15",
+        "page": "36",
+        "fields": ["country"],
+        "kind": "published"
+      }
+    ]
+  }
+}

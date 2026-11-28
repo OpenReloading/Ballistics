@@ -1,0 +1,107 @@
+{
+  "id": "vectan-ba6-1-2",
+  "manufacturer": "vectan",
+  "name": "Ba6 1/2",
+  "country": "FR",
+  "scope": ["rifle", "handgun"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 15
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity"],
+    "vivacity": {
+      "value": 1.1511,
+      "standardUncertainty": 0.054
+    },
+    "energy": {
+      "value": 4024700
+    },
+    "gamma": 1.2425,
+    "covolume": {
+      "value": 0.001059
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 18,
+    "trainingCartridges": 4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "page": "3",
+        "fields": ["name", "grainForm", "propellantBase"]
+      },
+      {
+        "source": "vectan-catalogue-2023-12",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "title": "Vectan web page, Range of powders",
+        "publisher": "Vectan",
+        "url": "https://www.vectan.fr/UK/range-of-powders",
+        "retrieved": "2026-11-15",
+        "fields": ["scope"],
+        "terms": "https://www.vectan.fr/FR/mentions-legales",
+        "kind": "published"
+      },
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-11-15",
+        "page": "36",
+        "fields": ["country"],
+        "kind": "published"
+      }
+    ]
+  }
+}
