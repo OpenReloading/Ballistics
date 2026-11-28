@@ -75,13 +75,8 @@ function rowConstruction(row: Row, records: Records) {
   return named ?? constructionOf(records.bullets.get(row.bullet))
 }
 
-/** The volume behind the seated bullet (m3) and the bullet travel (m) of a row, or why they are not known. */
-function seated(
-  row: Row,
-  cartridge: Cartridge,
-  bullet: Bullet,
-  records: Records,
-): { volume: number; travel: number } | Reason {
+/** What `seat` needs of a row besides the water density, or why it is not known. */
+function seatInputs(row: Row, cartridge: Cartridge, bullet: Bullet, records: Records) {
   const water = loadWaterCapacity({
     case: records.cases.get(row.cartridge),
     cartridgeDefault: records.capacities.get(row.cartridge),
@@ -93,14 +88,26 @@ function seated(
   if (!dimensions) return 'noBulletLength'
   if (row.barrel === undefined) return 'noBarrelLength'
   if (!chamber || coal === undefined) return 'missingCartridgeValue'
+  return { dimensions, chamber, water: water.grams, barrel: row.barrel, coal }
+}
+
+/** The volume behind the seated bullet (m3) and the bullet travel (m) of a row, or why they are not known. */
+function seated(
+  row: Row,
+  cartridge: Cartridge,
+  bullet: Bullet,
+  records: Records,
+): { volume: number; travel: number } | Reason {
+  const inputs = seatInputs(row, cartridge, bullet, records)
+  if (typeof inputs === 'string') return inputs
   try {
     const s = seat({
-      bullet: dimensions,
-      chamber,
-      waterCapacity: water.grams,
+      bullet: inputs.dimensions,
+      chamber: inputs.chamber,
+      waterCapacity: inputs.water,
       waterDensity: waterDensityGramsPerCm3,
-      barrelLength: row.barrel,
-      by: { kind: 'overallLength', value: coal },
+      barrelLength: inputs.barrel,
+      by: { kind: 'overallLength', value: inputs.coal },
     })
     if (!s.volumeBehindBullet || !s.travel) return 'noCaseCapacity'
     return {
@@ -113,8 +120,8 @@ function seated(
   }
 }
 
-/** The load of a row from its records, or why it cannot be built. */
-export function loadOf(row: Row, records: Records): InteriorLoad | Reason {
+/** The cartridge, bullet and powder records of a row, or why one is missing. */
+function recordsOf(row: Row, records: Records) {
   const cartridge = records.cartridges.get(row.cartridge)
   const bullet = records.bullets.get(row.bullet)
   const powder = records.powders.get(row.powder)
@@ -122,6 +129,14 @@ export function loadOf(row: Row, records: Records): InteriorLoad | Reason {
   if (!bullet) return 'unknownBullet'
   if (!powder) return 'unknownPowder'
   if (!powder.interior) return 'noPowderModel'
+  return { cartridge, bullet, powder }
+}
+
+/** The load of a row from its records, or why it cannot be built. */
+export function loadOf(row: Row, records: Records): InteriorLoad | Reason {
+  const found = recordsOf(row, records)
+  if (typeof found === 'string') return found
+  const { cartridge, bullet, powder } = found
   const geometry = seated(row, cartridge, bullet, records)
   if (typeof geometry === 'string') return geometry
   try {
@@ -179,6 +194,7 @@ function projectileOf(bullet: Bullet | undefined): Projectile | undefined {
       drag: { kind: 'bc', model, bands },
     }
   }
+  return undefined
 }
 
 /** Air of the flight to the measuring point: the ICAO standard atmosphere at sea level. */

@@ -45,15 +45,7 @@
       }
     },
     {
-      "files": [
-        "scripts/temperature-energy.mts",
-        "src/commands.ts",
-        "src/evaluate.ts",
-        "src/fit.ts",
-        "src/main.ts",
-        "src/unseen.ts",
-        "test/**"
-      ],
+      "files": ["scripts/temperature-energy.mts", "src/commands.ts", "src/main.ts", "test/**"],
       "rules": {
         "complexity": "off",
         "max-lines-per-function": "off",
