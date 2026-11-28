@@ -80,6 +80,8 @@
         "sidebars.ts",
         "src/theme/SearchBar.tsx",
         "src/theme/NavbarItem/ComponentTypes.tsx",
+        // imported by .mdx pages, which knip does not read
+        "src/components/UiEmbed.tsx",
         // the doc examples: the library pages import them as text, scripts/examples.test.mts runs them
         "examples/**/*.ts"
       ],

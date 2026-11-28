@@ -104,6 +104,7 @@ const sidebars: SidebarsConfig = {
     'ci-tools',
     'workbench-search',
     'translating',
+    'interface',
     'accessibility',
     'browsers',
     'feedback-tasks',

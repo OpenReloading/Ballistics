@@ -155,3 +155,8 @@
     clip-path: inset(50%);
   }
 }
+
+/* src/components/UiEmbed.tsx: the space below a paragraph */
+.ui-embed {
+  margin-bottom: var(--ifm-leading);
+}
