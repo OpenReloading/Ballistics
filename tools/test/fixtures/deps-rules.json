@@ -195,6 +195,10 @@
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
+  "apps/cli/src/into-api.ts": {
+    "source": "import { buildApp } from '../../api/src/app.ts'\nexport { buildApp }",
+    "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
+  },
   "apps/cli/src/web-sibling.ts": {
     "source": "import type { SpecValue } from '../../web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
@@ -249,6 +253,10 @@
   },
   "apps/web/src/lib/api-advisories.ts": {
     "source": "import { advisoryText } from '@rangefoundry/api/advisories'\nexport { advisoryText }",
+    "rules": ["web-reads-api-only"]
+  },
+  "apps/web/src/lib/into-api.ts": {
+    "source": "import { buildApp } from '../../../api/src/app.ts'\nexport { buildApp }",
     "rules": ["web-reads-api-only"]
   },
   "apps/web/src/lib/api-server.ts": {
@@ -440,7 +448,7 @@
     "rules": ["logic-no-dom"]
   },
   "packages/use-cases/src/into-api.ts": {
-    "source": "import { buildApp } from '../../api/src/app.ts'\nexport { buildApp }",
+    "source": "import { buildApp } from '../../../apps/api/src/app.ts'\nexport { buildApp }",
     "rules": ["use-cases-imports-logic-only"]
   },
   "apps/web/src/lib/refusal-words.ts": {
