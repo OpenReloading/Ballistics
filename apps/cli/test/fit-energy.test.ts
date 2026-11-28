@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { fit, verify } from '../src/commands.ts'
-import { UsageError } from '../src/errors.ts'
+import { DataError } from '../src/errors.ts'
 import { loadRecords } from '../src/records.ts'
 import { dp40, options, sp20 } from './fit-rows.ts'
 import { recordRoots, records, rowsCsv, writeRows } from './fixture.ts'
@@ -177,13 +177,13 @@ describe('--energy prior', { timeout: 120_000 }, () => {
         truth,
       ),
     )
-    await expect(fit({ ...demo, rows, energy: 'prior' })).rejects.toThrow(UsageError)
+    await expect(fit({ ...demo, rows, energy: 'prior' })).rejects.toThrow(DataError)
   })
 
   it('is bad input without a powder record with a thermochemistry', async () => {
     const rows = writeRows(rowsCsv(training(dp40), truth))
     await expect(fit({ ...demo, rows, records: [catalog], energy: 'prior' })).rejects.toThrow(
-      UsageError,
+      DataError,
     )
   })
 

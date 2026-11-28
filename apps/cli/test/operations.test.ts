@@ -97,9 +97,9 @@ describe('run offline', () => {
       '--input',
       bodyFile('bad', { model: 'm3' }),
     ])
-    expect(code).toBe(2)
+    expect(code).toBe(65)
     const error = errorOf(stderr)
-    expect(error.kind).toBe('usage')
+    expect(error.kind).toBe('data')
     expect(error.issues.length).toBeGreaterThan(0)
     expect(error.issues[0]).toHaveProperty('path')
     // the message alone, as a terminal shows it, names the first issue
@@ -168,7 +168,7 @@ describe('run offline', () => {
   it('refuses an unknown record id as bad input', async () => {
     const body = { ...(defined(operation('interior')).example as object), cartridge: 'no-such' }
     const { code, stderr } = await cli(['run', 'interior', '--input', bodyFile('id', body)])
-    expect(code).toBe(2)
+    expect(code).toBe(65)
     expect(errorOf(stderr)).toMatchObject({
       message: 'recordNotFound (kind: cartridge, id: no-such)',
       code: 'recordNotFound',
@@ -180,19 +180,25 @@ describe('run offline', () => {
     [
       ['run', 'nothing', '--input', example],
       'unknown operation nothing: one of exterior/trajectory',
+      64,
     ],
-    [['run', 'interior'], 'usage: ballistics run'],
-    [['run', 'interior', 'extra', '--input', example], 'usage: ballistics run'],
+    [['run', 'interior'], 'usage: ballistics run', 64],
+    [['run', 'interior', 'extra', '--input', example], 'usage: ballistics run', 64],
     [
       ['run', 'interior', '--input', join(dir, 'missing.json')],
       'the --input cannot be read: ENOENT',
+      66,
     ],
-    [['run', 'interior', '--input', bodyFile('text', 'not json')], 'the --input is not JSON'],
-    [['run', 'interior', '--input', example, '--records', join(dir, 'none')], 'the --records path'],
-    [['operations', '--input', example], "Unknown option '--input'"],
-  ])('refuses %j as bad input', async (args, message) => {
+    [['run', 'interior', '--input', bodyFile('text', 'not json')], 'the --input is not JSON', 65],
+    [
+      ['run', 'interior', '--input', example, '--records', join(dir, 'none')],
+      'the --records path',
+      66,
+    ],
+    [['operations', '--input', example], "Unknown option '--input'", 64],
+  ])('refuses %j as bad input', async (args, message, exit) => {
     const { code, stderr } = await cli(args)
-    expect(code).toBe(2)
+    expect(code).toBe(exit)
     expect(errorOf(stderr).message).toContain(message)
   })
 })

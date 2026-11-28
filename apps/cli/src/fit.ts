@@ -6,7 +6,7 @@ import {
 } from '@rangefoundry/ballistics'
 import { compareKeys, fromSi, type Powder, toSi } from '@rangefoundry/schema'
 import { InputError, nth } from '@rangefoundry/statistics'
-import { Refusal, UsageError } from './errors.ts'
+import { DataError, Refusal } from './errors.ts'
 import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
@@ -566,7 +566,7 @@ function fitAtRecordEnergy(
   return { ...fit, ...choices, pressure: { sigma: pressureSigma, by, factors } }
 }
 
-/** The prior impetus of a powder of `records`, J/kg, and its kind; a `UsageError` without a powder with a thermochemistry. */
+/** The prior impetus of a powder of `records`, J/kg, and its kind; a `DataError` without a powder with a thermochemistry. */
 function priorsOf(records: Records) {
   const own = [...records.powders.values()].flatMap((p) =>
     p.thermochemistry ? [{ base: p.propellantBase, impetus: p.thermochemistry.impetus.value }] : [],
@@ -576,7 +576,7 @@ function priorsOf(records: Records) {
     0.5,
   )
   if (pooled === undefined)
-    throw new UsageError('--energy prior needs a powder record with a thermochemistry')
+    throw new DataError('--energy prior needs a powder record with a thermochemistry')
   return (powder: Powder): { value: number; prior: PriorKind } => {
     const impetus = powder.thermochemistry?.impetus.value
     if (impetus !== undefined) return { value: impetus, prior: 'own' }
@@ -610,7 +610,7 @@ const energyOf = (level: number, impetus: number, gamma: number) => (level * imp
 // an effective energy-level factor: it takes whatever separates the thermochemical impetus from the level the model needs (heat to the bore, what the lumped model leaves out, how the pressures were measured)
 const levels = Array.from({ length: 9 }, (_, i) => (60 + 5 * i) / 100)
 
-/** As {@link fitPowders}, with each powder's energy from its prior impetus times one energy-level factor of `levels`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio over the same rows at every factor that takes part); with `exponent` `family`, the family choice runs at each factor; a `UsageError` without a training row that prints a pressure. */
+/** As {@link fitPowders}, with each powder's energy from its prior impetus times one energy-level factor of `levels`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio over the same rows at every factor that takes part); with `exponent` `family`, the family choice runs at each factor; a `DataError` without a training row that prints a pressure. */
 function fitWithPrior(
   rows: readonly Row[],
   records: Records,
@@ -623,7 +623,7 @@ function fitWithPrior(
     (r) => r.pressure !== undefined && splits.includes(splitOf(r.cartridge)),
   )
   if (pressured.length === 0)
-    throw new UsageError('--energy prior needs training rows that print a pressure in bar')
+    throw new DataError('--energy prior needs training rows that print a pressure in bar')
   const named = namedPriors(rows, records)
   const runs = levels.map((level) => {
     const powders = new Map(records.powders)

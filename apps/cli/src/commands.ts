@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { readPublishedLoads } from '@rangefoundry/catalog-files'
 import { compareKeys, type SourceRecord, sourceRecord } from '@rangefoundry/schema'
-import { Refusal, UsageError } from './errors.ts'
+import { DataError, ExpectedError, NoInputError, Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, type Outcome, outcomes } from './evaluate.ts'
 import { fitPowders, notFittedReasons, type PressureKey, priorLines, withFit } from './fit.ts'
 import { foldCount, foldPool, foldSalt, foldSplits, foldsOf } from './folds.ts'
@@ -149,7 +149,7 @@ function catalogueRows(options: FitOptions) {
       `${errors.length} problem(s) in the published load files; those files are left out\n`,
     )
   const { rows, skipped } = rowsFromPublished(files, new Set(records.cartridges.keys()))
-  if (rows.length === 0) throw new UsageError('the published loads give no row')
+  if (rows.length === 0) throw new DataError('the published loads give no row')
   const published = { files: files.length, rows: rows.length, skipped }
   const bytes = files.map((f) => Buffer.from(JSON.stringify(f)))
   return { rows: fillInputs(rows, records), files: bytes, records, published }
@@ -425,14 +425,12 @@ const errorsOf = (scored: readonly Outcome[], estimated: readonly Outcome[]) =>
     ...rowErrors(estimated).map((e) => ({ ...e, capacity: 'estimated' as const })),
   ].toSorted((a, b) => a.row - b.row)
 
-/** `fit()`, with the number of the fold in the message of the `UsageError` or `Refusal` it throws, since the rows of one fold may lack what the whole training split has. */
+/** `fit()`, with the number of the fold in the message of the expected error it throws, since the rows of one fold may lack what the whole training split has. */
 function foldFit<T>(fold: number, fit: () => T): T {
   try {
     return fit()
   } catch (error) {
-    if (error instanceof UsageError)
-      throw new UsageError(`fold ${fold}: ${error.message}`, error.details)
-    if (error instanceof Refusal) throw new Refusal(`fold ${fold}: ${error.message}`, error.details)
+    if (error instanceof ExpectedError) error.message = `fold ${fold}: ${error.message}`
     throw error
   }
 }
@@ -568,7 +566,7 @@ const savedKinds = {
   family: { command: 'fit', schema: fitResult, noun: 'the family fit' },
 } as const
 
-/** The `verify` result a `--baseline` file holds, or the `fit` result of a `--fit` or `--family` file; a `UsageError` for a file that is not one. */
+/** The `verify` result a `--baseline` file holds, or the `fit` result of a `--fit` or `--family` file; a `NoInputError` for a file that cannot be read and a `DataError` for one that is not such a result. */
 function savedResult(path: string, option: 'baseline'): VerifyResult
 function savedResult(path: string, option: 'fit' | 'family'): FitResult
 function savedResult(path: string, option: keyof typeof savedKinds): VerifyResult | FitResult {
@@ -577,7 +575,7 @@ function savedResult(path: string, option: keyof typeof savedKinds): VerifyResul
   try {
     text = readFileSync(path, 'utf8') // NOSONAR: the path is the argument the user gave
   } catch (error) {
-    throw new UsageError(
+    throw new NoInputError(
       `the --${option} file cannot be read: ${(error as NodeJS.ErrnoException).code}`,
     )
   }
@@ -585,7 +583,7 @@ function savedResult(path: string, option: keyof typeof savedKinds): VerifyResul
   try {
     json = JSON.parse(text.replace(/^\uFEFF/, ''))
   } catch {
-    throw new UsageError(`the --${option} file is not JSON`)
+    throw new DataError(`the --${option} file is not JSON`)
   }
   // before the schema, which would call a result of the earlier rule "not a verify result"
   if ((json as { command?: unknown } | null)?.command === command) {
@@ -596,7 +594,7 @@ function savedResult(path: string, option: keyof typeof savedKinds): VerifyResul
       )
   }
   const parsed = schema.safeParse(json)
-  if (!parsed.success) throw new UsageError(`${noun} file is not a ${command} result`)
+  if (!parsed.success) throw new DataError(`${noun} file is not a ${command} result`)
   return parsed.data
 }
 

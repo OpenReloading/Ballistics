@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { UsageError } from '../src/errors.ts'
+import { DataError } from '../src/errors.ts'
 import { parseRows, readRows } from '../src/rows.ts'
 
 const head = 'cartridge,bullet,powder,charge_g,velocity_ms'
@@ -148,7 +148,7 @@ describe('parseRows', () => {
   ])('refuses the header %j', (text, part) => {
     expect(() => parseRows(text, 'f.csv')).toThrow(part)
     expect(() => parseRows(text, 'f.csv')).not.toThrow('308-win')
-    expect(() => parseRows(text, 'f.csv')).toThrow(UsageError)
+    expect(() => parseRows(text, 'f.csv')).toThrow(DataError)
   })
 })
 

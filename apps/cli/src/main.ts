@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { type ParseArgsConfig, parseArgs } from 'node:util'
 import type { Options } from './commands.ts'
-import { Refusal, UsageError } from './errors.ts'
+import { ExpectedError, internalCode, UsageError } from './errors.ts'
 import type { Grouping } from './metrics.ts'
 import { compareTable, fitTable, verifyTable } from './report.ts'
 import { type Split, splits } from './split.ts'
@@ -76,7 +76,8 @@ options:
   -h, --help         this text
   --version          the version
 
-exit codes: 0 done, 1 refused run, 2 bad input, 3 internal error`
+exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
+unreadable input, 70 internal error`
 
 /** The help of `run` and `operations`, each with an example that runs from the repository root. */
 const commandHelp = {
@@ -85,7 +86,7 @@ const commandHelp = {
 Runs one compute operation offline and writes its answer as JSON: the answer of the
 route POST /v1/<operation> to the body in the --input file (- for stdin). Record ids
 resolve against --records (repeatable, default BALLISTICS_RECORDS, else the repository
-records). A body the schema rejects is bad input (exit 2), a 422 answer a refusal (exit 1).
+records). A body the schema rejects is bad data (exit 65), a 422 answer a refusal (exit 1).
 
 example:
   node apps/cli/dist/bin.js run interior --input apps/cli/examples/interior.json`,
@@ -344,23 +345,18 @@ async function estimate(args: string[], env: NodeJS.ProcessEnv) {
   return writeEstimatedCapacities(roots, values.out)
 }
 
-/** What went wrong: bad input (exit 2), a refused run (1) or an internal error (3). */
-type ErrorKind = 'usage' | 'refused' | 'internal'
-
 /** The kind, exit code and message of an error a run ends with. */
 function failure(error: unknown): {
-  kind: ErrorKind
+  kind: ExpectedError['kind'] | 'internal'
   code: number
   message: string
   details?: Record<string, unknown> | undefined
 } {
-  if (error instanceof Refusal)
-    return { kind: 'refused', code: 1, message: error.message, details: error.details }
-  if (error instanceof UsageError)
-    return { kind: 'usage', code: 2, message: error.message, details: error.details }
+  if (error instanceof ExpectedError)
+    return { kind: error.kind, code: error.code, message: error.message, details: error.details }
   return {
     kind: 'internal',
-    code: 3,
+    code: internalCode,
     message: error instanceof Error ? error.message : String(error),
   }
 }
@@ -371,8 +367,8 @@ export function report(error: unknown, argv: string[], io: Io): number {
   const json = argv.includes('--json') || !io.tty
   if (json) io.stderr(`${JSON.stringify({ error: { kind, message, ...details } })}\n`)
   else if (kind === 'refused') io.stderr(`refused: ${message}\n`)
-  else if (kind === 'usage') io.stderr(`${message}\n`)
-  else io.stderr(`error: ${message}\n`.replace(/\n(?!$)/g, ' '))
+  else if (kind === 'internal') io.stderr(`error: ${message}\n`.replace(/\n(?!$)/g, ' '))
+  else io.stderr(`${message}\n`)
   return code
 }
 

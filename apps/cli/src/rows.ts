@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { UsageError } from './errors.ts'
+import { DataError, NoInputError } from './errors.ts'
 
 /** One load row: records by id, the load and the printed result. */
 export interface Row {
@@ -84,7 +84,7 @@ function records(text: string, name: string): { fields: string[]; line: number }
   for (let at = 0; ; ) {
     cell.lastIndex = at
     const m = cell.exec(text)
-    if (!m) throw new UsageError(`${name}:${line}: a quote is misplaced or not closed`)
+    if (!m) throw new DataError(`${name}:${line}: a quote is misplaced or not closed`)
     const [whole, quoted, plain = '', end] = m
     fields.push(quoted === undefined ? plain : quoted.replaceAll('""', '"'))
     line += whole.split('\n').length - 1
@@ -174,12 +174,12 @@ function headerOf(fields: string[]): Column[] | string {
   return missing.length > 0 ? `the header lacks ${missing.join(', ')}` : (names as Column[])
 }
 
-/** The rows of one CSV file's text; a `UsageError` lists each problem as file, line and reason. */
+/** The rows of one CSV file's text; a `DataError` lists each problem as file, line and reason. */
 export function parseRows(text: string, name: string): Row[] {
   const [head, ...body] = records(text.replace(/^\uFEFF/, ''), name)
-  if (!head) throw new UsageError(`${name}: the file is empty`)
+  if (!head) throw new DataError(`${name}: the file is empty`)
   const header = headerOf(head.fields)
-  if (typeof header === 'string') throw new UsageError(`${name}:${head.line}: ${header}`)
+  if (typeof header === 'string') throw new DataError(`${name}:${head.line}: ${header}`)
   const rows: Row[] = []
   const problems: string[] = []
   for (const { fields, line } of body) {
@@ -188,7 +188,7 @@ export function parseRows(text: string, name: string): Row[] {
     else problems.push(`${name}:${line}: ${parsed.problems.join('; ')}`)
   }
   if (problems.length > 0)
-    throw new UsageError(
+    throw new DataError(
       [
         ...problems.slice(0, reportLimit),
         ...(problems.length > reportLimit ? [`${problems.length - reportLimit} more`] : []),
@@ -203,14 +203,14 @@ function filesOf(path: string): string[] {
   try {
     isDirectory = statSync(path).isDirectory() // NOSONAR: the path is the argument the user gave
   } catch {
-    throw new UsageError('the --rows path (or BALLISTICS_ROWS) does not exist')
+    throw new NoInputError('the --rows path (or BALLISTICS_ROWS) does not exist')
   }
   if (!isDirectory) return [path]
   const names = readdirSync(path) // NOSONAR: as above
     .filter((n) => /\.csv$/i.test(n))
     .toSorted()
   if (names.length === 0)
-    throw new UsageError('the --rows folder (or BALLISTICS_ROWS) holds no .csv file')
+    throw new NoInputError('the --rows folder (or BALLISTICS_ROWS) holds no .csv file')
   return names.map((n) => join(path, n))
 }
 
@@ -220,7 +220,7 @@ export function readRows(path: string): RowFiles {
     try {
       return readFileSync(file) // NOSONAR: as above
     } catch (error) {
-      throw new UsageError(`the rows cannot be read: ${(error as NodeJS.ErrnoException).code}`)
+      throw new NoInputError(`the rows cannot be read: ${(error as NodeJS.ErrnoException).code}`)
     }
   }
   const files =
@@ -230,6 +230,6 @@ export function readRows(path: string): RowFiles {
   const rows = files.flatMap(({ file, bytes }) =>
     parseRows(bytes.toString('utf8'), file.split('/').at(-1) ?? file),
   )
-  if (rows.length === 0) throw new UsageError('the rows file holds no row')
+  if (rows.length === 0) throw new DataError('the rows file holds no row')
   return { rows, files: files.map((f) => f.bytes) }
 }

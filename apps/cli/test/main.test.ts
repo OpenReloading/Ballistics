@@ -190,13 +190,9 @@ describe('exit codes', () => {
     [['verify', '--rows', 'x.csv', '--split', 'all']],
     [['verify', '--rows', 'x.csv', '--json', '--table']],
     [['verify', '--rows', 'x.csv', '--nope']],
-    [['verify', '--rows', '/nonexistent/rows.csv']],
     [['compare', ...data, '--baseline', 'm3']],
-    [['verify', ...data, '--model', '/nonexistent/model.mjs']],
     [['verify', ...data, '--group-by', 'rifle']],
     [['verify', ...data, '--params', 'other']],
-    [['verify', '--rows', rowsPath, '--records', '/nonexistent/records']],
-    [['verify', ...data, '--records', rowsPath]],
     [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--model', 'm3']],
     [['verify', ...data, '--candidate', 'm3']],
     [['verify', ...data, '--baseline', 'm3']],
@@ -207,9 +203,20 @@ describe('exit codes', () => {
     [['fit', ...pressured, '--energy', 'prior', '--pressure-sigma', '0.05']],
     [['fit', ...pressured, '--pressure-factor', 'table']],
     [['fit', ...pressured, '--pressure-sigma', '0.05', '--pressure-factor', 'lot']],
-  ])('is 2 for bad input: %j', async (args) => {
+  ])('is 64 for a command line that does not hold: %j', async (args) => {
     const { code, stdout } = await cli(args)
-    expect(code).toBe(2)
+    expect(code).toBe(64)
+    expect(stdout).toBe('')
+  })
+
+  it.each([
+    [['verify', '--rows', '/nonexistent/rows.csv']],
+    [['verify', ...data, '--model', '/nonexistent/model.mjs']],
+    [['verify', '--rows', rowsPath, '--records', '/nonexistent/records']],
+    [['verify', ...data, '--records', rowsPath]],
+  ])('is 66 for a path that does not exist or is not what it should be: %j', async (args) => {
+    const { code, stdout } = await cli(args)
+    expect(code).toBe(66)
     expect(stdout).toBe('')
   })
 
@@ -231,15 +238,15 @@ describe('exit codes', () => {
     expect(r).toEqual({ code: 0, stdout: `ballistics ${version}\n`, stderr: '' })
   })
 
-  it('is 2 with the usage on stderr for no command and for an unknown option', async () => {
+  it('is 64 with the usage on stderr for no command and for an unknown option', async () => {
     const none = await cli([], {}, true)
-    expect(none.code).toBe(2)
+    expect(none.code).toBe(64)
     expect(none.stderr).toMatch(/^usage:/)
     const unknown = await cli(['verify', '--rows', 'x.csv', '--nope'], {}, true)
-    expect(unknown.code).toBe(2)
+    expect(unknown.code).toBe(64)
     expect(unknown.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
     const top = await cli(['--nope'], {}, true)
-    expect(top.code).toBe(2)
+    expect(top.code).toBe(64)
     expect(top.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
   })
 
@@ -251,9 +258,9 @@ describe('exit codes', () => {
       ['estimate-capacities', '--table'],
       /usage: ballistics estimate-capacities /,
     ],
-  ])('is 2 with the help of %s for an unknown option of it', async (_, args, help) => {
+  ])('is 64 with the help of %s for an unknown option of it', async (_, args, help) => {
     const { code, stderr } = await cli(args, {}, true)
-    expect(code).toBe(2)
+    expect(code).toBe(64)
     expect(stderr).toMatch(/^Unknown option '--table'/)
     expect(stderr).toMatch(help)
     expect(stderr).not.toContain('--group-by')
@@ -272,7 +279,7 @@ describe('exit codes', () => {
     expect(stderr).toBe('refused: interior: input (propellant.gamma)\n')
   })
 
-  it('is 2 for a rows file with a bad value, naming line and column', async () => {
+  it('is 65 for a rows file with a bad value, naming line and column', async () => {
     const { writeRows } = await import('./fixture.ts')
     const bad = writeRows('cartridge,bullet,powder,charge_g,velocity_ms\n308-match,b,p,x,800\n')
     const { code, stderr } = await cli([
@@ -281,13 +288,13 @@ describe('exit codes', () => {
       bad,
       ...recordRoots.flatMap((r) => ['--records', r]),
     ])
-    expect(code).toBe(2)
+    expect(code).toBe(65)
     expect(stderr).toContain(':2: charge_g is not a number')
   })
 })
 
 describe('estimate-capacities', () => {
-  it('writes the estimates and their summary, and is 2 without --out', async () => {
+  it('writes the estimates and their summary, and is 64 without --out', async () => {
     const out = mkdtempSync(join(tmpdir(), 'cli-estimates-'))
     const r = await cli(['estimate-capacities', '--out', out, ...data.slice(2)])
     expect(r.code).toBe(0)
@@ -297,7 +304,7 @@ describe('estimate-capacities', () => {
       folder: join(out, 'capacities'),
     })
     expect(summary.written).toBeGreaterThan(0)
-    expect((await cli(['estimate-capacities', ...data.slice(2)])).code).toBe(2)
+    expect((await cli(['estimate-capacities', ...data.slice(2)])).code).toBe(64)
   })
 })
 
@@ -329,27 +336,36 @@ describe('an unexpected error', () => {
       new URL('./fixtures/coded-type-error-model.mjs', import.meta.url).pathname,
     ],
     ['a directory given as the candidate', join(import.meta.dirname, 'fixtures')],
-  ])('ends with one line and exit 2: %s', async (_name, model) => {
+  ])('ends with one line and exit 65: %s', async (_name, model) => {
     const { code, stdout, stderr } = await cli(['verify', ...data, '--model', model], {}, true)
-    expect(code).toBe(2)
+    expect(code).toBe(65)
     expect(stdout).toBe('')
     expect(stderr).toMatch(/^[^\n]+\n$/)
     expect(stderr).not.toContain('    at ')
     expect(JSON.parse((await cli(['verify', ...data, '--model', model])).stderr).error.kind).toBe(
-      'usage',
+      'data',
     )
   })
 })
 
 describe('an error', () => {
+  const badRows = writeRows('cartridge,bullet,powder,charge_g,velocity_ms\n308-match,b,p,x,800\n')
   const full = () => {
     throw new Error('no space left\non the device')
   }
 
   it.each([
-    ['usage', 2, ['verify', '--rows', 'x.csv', '--nope'], undefined, /^Unknown option '--nope'/],
+    ['usage', 64, ['verify', '--rows', 'x.csv', '--nope'], undefined, /^Unknown option '--nope'/],
+    ['data', 65, ['verify', '--rows', badRows, ...data.slice(2)], undefined, /:2: charge_g /],
+    [
+      'no-input',
+      66,
+      ['run', 'interior', '--input', '/nonexistent/body.json'],
+      undefined,
+      /^the --input cannot be read: ENOENT\n$/,
+    ],
     ['refused', 1, ['verify', ...data, '--split', 'test'], undefined, /^refused: the test split/],
-    ['internal', 3, ['verify', ...data], full, /^error: no space left on the device\n$/],
+    ['internal', 70, ['verify', ...data], full, /^error: no space left on the device\n$/],
   ] as const)(
     'of kind %s exits %i, one JSON object on stderr when piped or with --json, else text',
     async (kind, exit, args, write, text) => {
@@ -388,7 +404,7 @@ describe('the process', () => {
   })
 
   it.runIf(existsSync('/dev/full'))(
-    'reports a failed stdout write as the JSON error and ends with 3',
+    'reports a failed stdout write as the JSON error and ends with 70',
     () => {
       // every write to /dev/full fails with ENOSPC
       const full = openSync('/dev/full', 'w')
@@ -400,7 +416,7 @@ describe('the process', () => {
       expect(JSON.parse(r.stderr)).toEqual({
         error: { kind: 'internal', message: expect.stringContaining('ENOSPC') },
       })
-      expect(r.status).toBe(3)
+      expect(r.status).toBe(70)
     },
   )
 
