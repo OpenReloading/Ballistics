@@ -2,9 +2,9 @@ services:
   api:
     build:
       context: .
-      dockerfile: packages/api/Dockerfile
+      dockerfile: apps/api/Dockerfile
     ports:
-      - "${API_PORT:-3000}:3000"
+      - "127.0.0.1:${API_PORT:-3000}:3000"
     healthcheck:
       # node, because the slim image has no curl
       test:

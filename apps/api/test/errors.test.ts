@@ -7,7 +7,7 @@ import { API_PREFIX } from '../src/version.ts'
 import { bundle } from './fixtures.ts'
 import { testCatalogue } from './setup.ts'
 
-const reason = 'cannot read /app/packages/api/dist/catalogue/records.json: EACCES'
+const reason = 'cannot read /app/apps/api/dist/catalogue/records.json: EACCES'
 
 /** A catalogue whose record file cannot be read: the error carries a path, a code and a stack. */
 const failingCatalogue = {

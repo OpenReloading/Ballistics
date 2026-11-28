@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-/** The fields every 200 compute answer carries, which say what produced it (the API fills them, `packages/api/src/routes/identity.ts`). */
+/** The fields every 200 compute answer carries, which say what produced it (the API fills them, `apps/api/src/routes/identity.ts`). */
 export const identity: { inputHash: z.ZodString; apiVersion: z.ZodString; dataHash: z.ZodString } =
   {
     inputHash: z

@@ -43,7 +43,7 @@ The measured water capacity is not a field of the group: `capacity` names the us
 
 ## API
 
-Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /cases` filters by `cartridge=<id>` and `manufacturer=<id>`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. Each item carries the cartridge and manufacturer ids, the material, and the stated water capacity and empty mass where the record has them. `GET /cases/:id` answers the record with its `origin` and `revision`.
+Served under `/v1` (`apps/api/src/routes/components.ts`): `GET /cases` filters by `cartridge=<id>` and `manufacturer=<id>`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. Each item carries the cartridge and manufacturer ids, the material, and the stated water capacity and empty mass where the record has them. `GET /cases/:id` answers the record with its `origin` and `revision`.
 
 ## Validation
 

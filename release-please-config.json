@@ -26,7 +26,7 @@
     "packages/svg-drawings": { "component": "svg-drawings" },
     "packages/importers": { "component": "importers" },
     "packages/catalog": { "component": "catalog" },
-    "packages/api": { "component": "api" },
+    "apps/api": { "component": "api" },
     "apps/cli": { "component": "cli", "release-as": "0.1.0" },
     "apps/web": { "component": "web" },
     "apps/docs": { "component": "docs" }

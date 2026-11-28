@@ -345,10 +345,25 @@ describe('the request failures of the app', () => {
   })
 })
 
+/** The workspaces whose messages can reach the app through the API, with the folder each lives in. */
+const folders = {
+  statistics: 'packages',
+  ballistics: 'packages',
+  'use-cases': 'packages',
+  api: 'apps',
+}
+
+/** The URL of a source given from its workspace, `<workspace>/src/...`. */
+const sourceUrl = (file: string) =>
+  new URL(
+    `../../../${folders[file.split('/')[0] as keyof typeof folders]}/${file}`,
+    import.meta.url,
+  )
+
 /** The package sources whose messages can reach the app through the API. */
 const sources = [
-  ...(['statistics', 'ballistics', 'use-cases', 'api'] as const).flatMap((pkg) =>
-    readdirSync(new URL(`../../../packages/${pkg}/src`, import.meta.url), {
+  ...Object.keys(folders).flatMap((pkg) =>
+    readdirSync(sourceUrl(`${pkg}/src`), {
       recursive: true,
       encoding: 'utf8',
     })
@@ -488,7 +503,7 @@ function messageOf(src: string, match: RegExpMatchArray): string | undefined {
 function scan(sample: string): Found[] {
   const found: Found[] = []
   for (const file of sources) {
-    const src = readFileSync(new URL(`../../../packages/${file}`, import.meta.url), 'utf8')
+    const src = readFileSync(sourceUrl(file), 'utf8')
     for (const match of src.matchAll(calls)) {
       const where = `${file}:${src.slice(0, match.index).split('\n').length}`
       const arg = messageOf(src, match)

@@ -476,7 +476,7 @@
       }
     },
     {
-      "files": ["packages/api/src/**"],
+      "files": ["apps/api/src/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -502,11 +502,11 @@
                   "!@rangefoundry/use-cases",
                   "!@rangefoundry/use-cases/**"
                 ],
-                "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
+                "message": "api-imports-logic-catalog-schema-only: apps/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
-                "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
+                "regex": "^(\\.\\./)+(web|docs|e2e|cli|packages|apps)/",
+                "message": "api-imports-logic-catalog-schema-only: apps/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               }
             ]
           }

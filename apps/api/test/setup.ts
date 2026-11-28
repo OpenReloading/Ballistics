@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { buildApp } from '../src/app.ts'
 import { bundle } from './fixtures.ts'
 
-export { undescribed } from '../../use-cases/test/described.ts'
+export { undescribed } from '../../../packages/use-cases/test/described.ts'
 
 const emptyBundle: Bundle = {
   cartridges: [],

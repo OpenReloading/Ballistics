@@ -1,9 +1,6 @@
 import { createRequire } from 'node:module'
 
-/**
- * Contract version of the API: the version of `@rangefoundry/api` (`packages/api/package.json`,
- * set by release-please). The API document carries it as `info.version`.
- */
+/** Contract version of the API, `info.version` of its document: the version in `apps/api/package.json` that release-please sets. */
 export const API_VERSION: string = createRequire(import.meta.url)('../package.json').version
 
 /** The source of this version (AGPL section 13): the release tag of `API_VERSION`, from which the image is built. */

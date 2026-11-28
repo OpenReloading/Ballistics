@@ -46,7 +46,7 @@ A published load row names its primer as printed text, optionally with catalogue
 
 ## API
 
-Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /primers` filters by `manufacturer=<id>`, `size=<size>` and `compound=<compound>`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. `GET /primers/:id` answers the record.
+Served under `/v1` (`apps/api/src/routes/components.ts`): `GET /primers` filters by `manufacturer=<id>`, `size=<size>` and `compound=<compound>`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. `GET /primers/:id` answers the record.
 
 ## Validation
 

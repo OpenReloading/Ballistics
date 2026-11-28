@@ -141,7 +141,7 @@ The schemas reject any key they do not define, and `data:validate` an unknown ca
 
 ## API
 
-Served under `/v1` (`packages/api/src/routes/federations.ts`). Each `/:id` route returns the record.
+Served under `/v1` (`apps/api/src/routes/federations.ts`). Each `/:id` route returns the record.
 
 | Route                                    | Items                                                                     |
 | ---------------------------------------- | ------------------------------------------------------------------------- |

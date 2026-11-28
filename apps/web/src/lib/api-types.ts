@@ -1,4 +1,4 @@
-/** The fields of API responses the pages read (`packages/api/src/catalogue/`, `packages/use-cases/src/`, `packages/api/src/routes/`). */
+/** The fields of API responses the pages read (`apps/api/src/catalogue/`, `packages/use-cases/src/`, `apps/api/src/routes/`). */
 
 import type { InteriorResult } from '@rangefoundry/ballistics'
 import type {

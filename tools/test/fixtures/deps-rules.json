@@ -159,11 +159,11 @@
     "source": "import { waterDensity } from '@rangefoundry/ballistics'\nexport { waterDensity }",
     "rules": ["catalog-imports-schema-only"]
   },
-  "packages/api/src/logic-catalog-schema.ts": {
+  "apps/api/src/logic-catalog-schema.ts": {
     "source": "import { waterDensity } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@rangefoundry/catalog'\nimport { Load } from '@rangefoundry/schema'\nimport { runTask } from '@rangefoundry/use-cases'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, runTask, Fastify }",
     "rules": []
   },
-  "packages/api/src/importers.ts": {
+  "apps/api/src/importers.ts": {
     "source": "import { parse } from '@rangefoundry/importers'\nexport { parse }",
     "rules": ["api-imports-logic-catalog-schema-only"]
   },
@@ -199,16 +199,20 @@
     "source": "import type { SpecValue } from '../../web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
-  "packages/api/src/into-use-cases.ts": {
-    "source": "import { ComputeBusy } from '../../use-cases/src/tasks.ts'\nexport { ComputeBusy }",
+  "apps/api/src/into-use-cases.ts": {
+    "source": "import { ComputeBusy } from '../../../packages/use-cases/src/tasks.ts'\nexport { ComputeBusy }",
     "rules": ["api-imports-logic-catalog-schema-only"]
   },
   "packages/ballistics/src/into-use-cases.ts": {
     "source": "import { runTask } from '../../use-cases/src/index.ts'\nexport { runTask }",
     "rules": ["ballistics-imports-units-and-statistics"]
   },
-  "packages/api/src/web.ts": {
+  "apps/api/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
+    "rules": ["api-imports-logic-catalog-schema-only"]
+  },
+  "apps/api/src/web-sibling.ts": {
+    "source": "import type { SpecValue } from '../../web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["api-imports-logic-catalog-schema-only"]
   },
   "apps/web/src/lib/allowed.ts": {
@@ -475,8 +479,8 @@
     "source": "import { peaksOf } from '../../target-recognition/src/index.ts'\nexport { peaksOf }",
     "rules": ["ballistics-imports-units-and-statistics"]
   },
-  "packages/api/src/into-target-recognition.ts": {
-    "source": "import { peaksOf } from '../../target-recognition/src/index.ts'\nexport { peaksOf }",
+  "apps/api/src/into-target-recognition.ts": {
+    "source": "import { peaksOf } from '../../../packages/target-recognition/src/index.ts'\nexport { peaksOf }",
     "rules": ["api-imports-logic-catalog-schema-only"]
   }
 }

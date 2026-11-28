@@ -142,7 +142,7 @@ it('fails on a platform package that notShipped does not name', () => {
 it('leaves out sharp and the @img scope by default and starts from the API and the web app', () => {
   const shipped: Lock = {
     importers: {
-      'packages/api': {
+      'apps/api': {
         dependencies: {
           sharp: { version: '0.1.0' },
           '@img/sharp-wasm32': { version: '0.1.0' },

@@ -69,7 +69,7 @@
     "apps/cli": {
       "entry": ["src/bin.ts", "scripts/*.mts"]
     },
-    "packages/api": {
+    "apps/api": {
       "entry": [
         "src/openapi.ts",
         "src/static.ts",

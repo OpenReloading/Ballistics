@@ -1,4 +1,4 @@
-/** Writes the contract document of the current routes (`buildOpenApi`) for oasdiff (`api-check`, `api-baseline`) and Schemathesis (`api-conformance`) to a destination fixed in code, never an argument: `baseline` writes `packages/api/openapi.baseline.json`, no argument `openapi.json` in `TMPDIR`; needs `pnpm run build` at the root. */
+/** Writes the contract document of the current routes (`buildOpenApi`) for oasdiff (`api-check`, `api-baseline`) and Schemathesis (`api-conformance`) to a destination fixed in code, never an argument: `baseline` writes `apps/api/openapi.baseline.json`, no argument `openapi.json` in `TMPDIR`; needs `pnpm run build` at the root. */
 import { writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -10,6 +10,6 @@ if (rest.length > 0 || (mode !== undefined && mode !== 'baseline'))
   throw new Error('usage: node src/openapi.ts [baseline]')
 const target =
   mode === 'baseline'
-    ? fileURLToPath(new URL('../../packages/api/openapi.baseline.json', import.meta.url))
+    ? fileURLToPath(new URL('../../apps/api/openapi.baseline.json', import.meta.url))
     : join(tmpdir(), 'openapi.json')
 writeFileSync(target, `${JSON.stringify(await buildOpenApi(), null, 2)}\n`)

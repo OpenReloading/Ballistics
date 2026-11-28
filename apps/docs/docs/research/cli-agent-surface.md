@@ -15,7 +15,7 @@ Command line (`apps/cli`): can a person, a script and an AI agent use it as a fu
 Decided before measuring:
 
 - Measurement: the pre-release integration branch at commit `e568b86f`, `npm ci` and `npm run build` on the host (Node 26.11.1). `node packages/cli/dist/bin.js` was run with no arguments, `--help`, `--version`, unknown commands and options, the sealed split, a missing and a `-` rows path, and `verify` and `compare` on the synthetic rows of `packages/cli/test/data.ts` (25 rows) with the records of the data package and of `packages/cli/test/fixtures/records`. Recorded: exit code, bytes on stdout, the first line on stderr, byte equality of two runs, and wall time (median of 5 runs).
-- Web app computations: the compute routes of the API (`packages/api/src/routes/compute.ts`), the browser compute entry (`packages/api/src/compute/browser.ts`) and the core functions the web app imports.
+- Web app computations: the compute routes of the API (`apps/api/src/routes/compute.ts`), the browser compute entry (`apps/api/src/compute/browser.ts`) and the core functions the web app imports.
 - Simplicity test: a script of about ten lines over the existing packages that runs one load offline. If it works, a command earns its place only through the contract (help, schema listing, notice, exit codes, stdin); each proposed command is checked on who runs it and what it replaces.
 - Checklist: the issue's six items, each graded met, partly met or missing, with the command and its output.
 - Sources: primary only, read on 2026-10-30: the Command Line Interface Guidelines ([clig.dev](https://clig.dev/)), POSIX Utility Syntax Guidelines ([IEEE Std 1003.1-2024, chapter 12](https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html)), GNU coding standards ([`--help`](https://www.gnu.org/prep/standards/html_node/_002d_002dhelp.html), [`--version`](https://www.gnu.org/prep/standards/html_node/_002d_002dversion.html)), the tool-protocol specification ([MCP 2025-11-25, Tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)), [JSON Schema 2020-12 core](https://json-schema.org/draft/2020-12/json-schema-core), [OpenAPI 3.1.1](https://spec.openapis.org/oas/v3.1.1.html), [sysexits(3)](https://man.freebsd.org/cgi/man.cgi?query=sysexits&sektion=3) and the [llms.txt proposal](https://llmstxt.org/).
@@ -62,7 +62,7 @@ Reuse decision:
 
 - Thin client over the REST API: fails item 4 (no network access needed) and needs a running server. Rejected.
 - Command line over core directly: copies the compute routes' request schemas, record resolution, limits and answer shapes, the contract the OpenAPI baseline guards. Rejected.
-- Command line over the API's browser entries (`@rangefoundry/api/compute`, `@rangefoundry/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test runs a load offline through them. Recommended. Blocked by the lint rule `cli-imports-logic-catalog-drawing-schema-only` in `.oxlintrc.json`, which permits only `@rangefoundry/api/catalogue`. `@rangefoundry/api` already appears in the CLI manifest, and `packages/api/package.json` exports neither `./compute` nor `./catalogue`. Changing the lint rule is open.
+- Command line over the API's browser entries (`@rangefoundry/api/compute`, `@rangefoundry/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test runs a load offline through them. Recommended. Blocked by the lint rule `cli-imports-logic-catalog-drawing-schema-only` in `.oxlintrc.json`, which permits only `@rangefoundry/api/catalogue`. `@rangefoundry/api` already appears in the CLI manifest, and `apps/api/package.json` exports neither `./compute` nor `./catalogue`. Changing the lint rule is open.
 - Must not be duplicated: the zod request and answer schemas, record resolution, the limit checks and warnings, the notice string, and the units of the answers.
 
 Simplicity gate per command:
@@ -96,7 +96,7 @@ measured: runs of the built CLI and of a 9-line script over the API compute entr
 - `apps/cli/schema/result.schema.json`: the result schema.
 - `apps/docs/docs/cli.md`: the docs.
 - `packages/use-cases/src/index.ts`: the use cases the web app, the command line and the API run.
-- `packages/api/src/routes/compute.ts`: the compute routes, exterior handlers inline.
+- `apps/api/src/routes/compute.ts`: the compute routes, exterior handlers inline.
 - `packages/use-cases/src/answer.ts`: the notice.
 - `.oxlintrc.json` (the dependency-cruiser configuration when this was written): the rule `cli-imports-core-data-drawing-schema-only`.
 - `apps/docs/scripts/research-index.mts`: the docs `llms.txt`.

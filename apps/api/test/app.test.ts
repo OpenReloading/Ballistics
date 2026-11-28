@@ -1,7 +1,7 @@
 import type { Bundle } from '@rangefoundry/catalog'
 import type { Cartridge, SpecValue } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
-import { revisionOf } from '../../use-cases/src/catalog/derive.ts'
+import { revisionOf } from '../../../packages/use-cases/src/catalog/derive.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'
 import { bundle } from './fixtures.ts'

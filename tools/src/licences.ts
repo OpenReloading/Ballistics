@@ -7,7 +7,7 @@ import { parse } from 'yaml'
 import { executable } from './executable.ts'
 
 /** The API image and the web app (its bundles ship in the static site): the workspaces whose production dependencies ship. */
-const images = ['packages/api', 'apps/web']
+const images = ['apps/api', 'apps/web']
 
 /** Packages installed for a shipped workspace that no shipped file contains, by name or name prefix (`*`), with why. */
 export const notShipped: Record<string, string> = {
