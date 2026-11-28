@@ -334,6 +334,11 @@ Cited by the manufacturer and case capacity records, grouped by maker or publish
 - Lapua, about page. <https://www.lapua.com/more/about/>
 - Lapua.
 
+### Lee Precision
+
+- Lee Precision knowledge base, VMD explanation. <https://support.leeprecision.net/en/knowledgebase/article/vmd-explanation>
+- Lee Precision, Powder VMD's (2024-01-08). <https://leeprecision.com/files/instruct/VMD.pdf>
+
 ### Lehigh Defense
 
 - Lehigh Defense store, product attributes (GraphQL).

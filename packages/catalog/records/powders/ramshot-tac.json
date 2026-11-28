@@ -5,6 +5,9 @@
   "scope": ["rifle"],
   "grainForm": "ball",
   "propellantBase": "double",
+  "bulkDensity": {
+    "value": 0.9657
+  },
   "composition": [
     {
       "name": "Nitrocellulose",
@@ -170,6 +173,18 @@
   "provenance": {
     "kind": "derived",
     "sources": [
+      {
+        "source": "lee-precision-powder-vmds-2024-01-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
+      {
+        "source": "lee-precision-knowledge-base-vmd-explanation",
+        "url": "https://support.leeprecision.net/en/knowledgebase/article/vmd-explanation",
+        "retrieved": "2026-10-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
       {
         "title": "Ramshot SDS \"Double Base Powders - Ramshot\", March 2022, TAC (inner sheet St. Marks Powder, revision 10, 12/11/2021)",
         "publisher": "Hodgdon Powder Co.",

@@ -6,6 +6,9 @@
   "scope": ["handgun", "shotgun"],
   "grainForm": "flake",
   "propellantBase": "double",
+  "bulkDensity": {
+    "value": 0.5934
+  },
   "composition": [
     {
       "name": "Nitrocellulose",
@@ -165,6 +168,18 @@
   "provenance": {
     "kind": "derived",
     "sources": [
+      {
+        "source": "lee-precision-powder-vmds-2024-01-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
+      {
+        "source": "lee-precision-knowledge-base-vmd-explanation",
+        "url": "https://support.leeprecision.net/en/knowledgebase/article/vmd-explanation",
+        "retrieved": "2026-10-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
       {
         "source": "alliant-powder-sds-30-40-smokeless-powder",
         "url": "https://www.alliantpowder.com/downloads/sds/30-40_Smokeless_Powder.pdf",
