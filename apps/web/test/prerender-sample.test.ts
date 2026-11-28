@@ -23,12 +23,14 @@ it('falls back to the first id when no sampled id exists, never to none', () => 
   expect(pickIds('unknown', ['x-1', 'x-2'], { PRERENDER: 'sample' })).toEqual(['x-1'])
 })
 
-it('cuts only the cartridge pages of the static site when sampling', () => {
+it('cuts the cartridge, bullet and powder pages of the static site when sampling', () => {
   const env = { PRERENDER: 'sample' }
   expect(exportIds('cartridge', all, env)).toEqual(['308-win'])
-  for (const what of ['bullet', 'powder', 'target-face'])
+  expect(exportIds('bullet', all, env)).toEqual(['demo-bullet-168'])
+  expect(exportIds('powder', all, env)).toEqual(['demo-powder-dp40'])
+  for (const what of ['target-face', 'case', 'primer'])
     expect(exportIds(what, all, env)).toEqual(all)
-  expect(exportIds('cartridge', all, {})).toEqual(all)
+  expect(exportIds('bullet', all, {})).toEqual(all)
 })
 
 it('samples at least one id per route', () => {

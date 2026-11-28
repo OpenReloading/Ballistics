@@ -136,12 +136,13 @@ it('leads a bullet, powder, case or primer title with the manufacturer name', ()
   expect(noHead).not.toContain('federations/x-1')
 })
 
-it('expects the sample cartridge pages only, and every other record, when sampling', () => {
-  const dir = site((r) => r !== 'cartridges/x-1')
+it('expects the sample cartridge, bullet and powder pages only, and every other record, when sampling', () => {
+  const unsampled = ['cartridges/x-1', 'bullets/x-1', 'powders/x-1']
+  const dir = site((r) => !unsampled.includes(r))
   expect(checkPages(dir, { PRERENDER: 'sample' }).missing).toEqual([])
-  expect(checkPages(dir, { PRERENDER: 'full' }).missing).toEqual(['cartridges/x-1'])
-  const bullet = site((r) => r !== 'bullets/x-1')
-  expect(checkPages(bullet, { PRERENDER: 'sample' }).missing).toEqual(['bullets/x-1'])
+  expect(checkPages(dir, { PRERENDER: 'full' }).missing).toEqual(unsampled)
+  const target = site((r) => r !== 'targets/x-1')
+  expect(checkPages(target, { PRERENDER: 'sample' }).missing).toEqual(['targets/x-1'])
 })
 
 it('fails on a kind without data files', () => {
