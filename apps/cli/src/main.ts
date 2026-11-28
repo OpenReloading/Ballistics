@@ -34,7 +34,8 @@ options:
   --records <dir>    a records root, repeatable (default: BALLISTICS_RECORDS, roots joined by : or
                      on Windows ;); a first root with every kind directory, as the records
                      folder of a repository clone, replaces the catalog bundle, other roots
-                     add their records to it
+                     add their records to it; the sources an added record cites must be
+                     records of the adding roots
   --split <name>     validation (default), training or test
   --final            required for the test split
   --group-by <key>   also group by powder, family, cartridge, bullet or construction

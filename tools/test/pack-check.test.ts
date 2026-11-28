@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { expect, it } from 'vitest'
-import { packProblems } from '../src/pack-check.ts'
+import { packProblems, publishedProblems } from '../src/pack-check.ts'
 
 /** A package in a fresh temporary folder with a README, with `files` written relative to it (`undefined` leaves one out). */
 function pkg(manifest: object, files: Record<string, string | undefined>) {
@@ -257,4 +257,31 @@ it('fails on a dependency on a private workspace package', () => {
     'depends on units, a private workspace package that npm does not have',
   ])
   expect(packProblems(dir)).toEqual([])
+})
+
+it('fails on a library that depends on a private package the 0.1.0 release publishes', () => {
+  const root = mkdtempSync(join(tmpdir(), 'pack-check-root-'))
+  writeFileSync(join(root, 'pnpm-workspace.yaml'), "packages:\n  - 'packages/*'\n")
+  mkdirSync(join(root, 'packages/units'), { recursive: true })
+  writeFileSync(
+    join(root, 'packages/units/package.json'),
+    '{ "name": "@rangefoundry/units", "version": "0.0.0", "private": true }',
+  )
+  const lib = join(root, 'packages/lib')
+  mkdirSync(join(lib, 'dist'), { recursive: true })
+  writeFileSync(
+    join(lib, 'package.json'),
+    JSON.stringify({
+      name: 'lib',
+      version: '1.0.0',
+      ...manifest,
+      dependencies: { '@rangefoundry/units': 'workspace:*' },
+    }),
+  )
+  writeFileSync(join(lib, 'README.md'), '# lib')
+  writeFileSync(join(lib, 'dist/index.js'), '')
+  writeFileSync(join(lib, 'dist/index.d.ts'), '')
+  expect(publishedProblems(root, 'packages/lib')).toEqual([
+    'depends on @rangefoundry/units, a private workspace package that npm does not have',
+  ])
 })

@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readdirSync, symlinkSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { isEstimatedCapacity } from '@rangefoundry/schema'
@@ -110,5 +110,11 @@ describe('writeEstimatedCapacities', () => {
     symlinkSync(target, join(out, 'capacities'))
     expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(Refusal)
     expect(existsSync(target)).toBe(false)
+  })
+
+  it('refuses a file as <out>', () => {
+    const out = join(mkdtempSync(join(tmpdir(), 'cli-estimates-')), 'a-file')
+    writeFileSync(out, '')
+    expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(Refusal)
   })
 })

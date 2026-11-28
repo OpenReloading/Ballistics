@@ -28,7 +28,7 @@ const published = [
 /** The folder of the command line, which the check also installs and runs. */
 const cli = 'apps/cli'
 
-/** Marked `private` until the 0.1.0 release publishes them, so a dependency on one passes the private-dependency check. */
+/** Marked `private` until the 0.1.0 release publishes them, so a dependency of the command line on one passes the private-dependency check. */
 const releasedWith010 = new Set(
   [
     'units',
@@ -148,11 +148,14 @@ function workspaces(root: string) {
   return new Map(found)
 }
 
-/** The names of the workspace packages marked `private` that the 0.1.0 release does not publish. */
-const privateWorkspaces = (all: ReturnType<typeof workspaces>) =>
+/** The names of the workspace packages marked `private` that the folder `dir` may not depend on: for the command line, which the release does not publish to npm, those the 0.1.0 release does not publish; for a library, all of them. */
+const privateWorkspaces = (all: ReturnType<typeof workspaces>, dir: string) =>
   new Set(
     [...all]
-      .filter(([name, { manifest }]) => manifest.private === true && !releasedWith010.has(name))
+      .filter(
+        ([name, { manifest }]) =>
+          manifest.private === true && (dir !== cli || !releasedWith010.has(name)),
+      )
       .map(([name]) => name),
   )
 
@@ -189,6 +192,10 @@ export function packProblems(dir: string, privates = new Set<string>()): string[
   }
   return problems
 }
+
+/** {@link packProblems} of the published folder `dir` of the workspace `root`, against the private packages that folder may not depend on. */
+export const publishedProblems = (root: string, dir: string) =>
+  packProblems(join(root, dir), privateWorkspaces(workspaces(root), dir))
 
 /** The workspace packages `name` depends on, itself included, each once. */
 function closure(name: string, all: ReturnType<typeof workspaces>, seen = new Set<string>()) {
@@ -251,10 +258,8 @@ export function installProblems(root: string, dir: string): string[] {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = fileURLToPath(new URL('../../', import.meta.url))
   let failed = false
-  const all = workspaces(root)
-  const privates = privateWorkspaces(all)
   for (const dir of published) {
-    const problems = packProblems(join(root, dir), privates)
+    const problems = publishedProblems(root, dir)
     if (dir === cli) problems.push(...installProblems(root, dir))
     for (const problem of problems) console.error(`${dir}: ${problem}`)
     failed ||= problems.length > 0
