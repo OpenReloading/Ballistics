@@ -202,7 +202,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       powderQuery,
       powderList,
       powder,
-      'Each item carries the burn parameters of its interior model where the record has them.',
+      'Each item carries the burn parameters of its interior model where the record has them. These are simulation inputs, not load data.',
     ],
     [
       '/bullets',

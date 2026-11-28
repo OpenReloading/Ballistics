@@ -1,4 +1,4 @@
-/** `PRERENDER=sample` (development and PR builds without record changes) prerenders only these cartridges; unset prerenders all. */
+/** `PRERENDER=sample` (development and PR builds without record changes) prerenders only these cartridges, bullets and powders; unset prerenders all. */
 export const sampleIds: Record<string, readonly string[]> = {
   // the records the e2e specs and the smoke set open, so their tests meet prerendered pages
   cartridge: [
@@ -51,11 +51,13 @@ export function pickIds(
   return picked.length > 0 ? picked : ids.slice(0, 1)
 }
 
-/** Left-out pages answer 404 and their links log it, so only the cartridge pages (about 85 % of the export) are cut. */
+/** The kinds whose record pages make up most of the export; left-out pages answer 404. */
+const cutKinds = new Set(['cartridge', 'bullet', 'powder'])
+
 export function exportIds(
   what: string,
   ids: string[],
   env: Record<string, string | undefined> = process.env,
 ) {
-  return what === 'cartridge' ? pickIds(what, ids, env) : ids
+  return cutKinds.has(what) ? pickIds(what, ids, env) : ids
 }

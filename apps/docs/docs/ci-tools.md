@@ -53,7 +53,7 @@ Not used: a hosted coverage service (Codecov), jscpd, Trivy (its action tags wer
 - `check=true|false`: lint, build, types and unit tests.
 - `e2e=true|false`: the API's conformance run and the e2e tests on the static export.
 - `docs=true|false`: the docs image of `compose.yaml`, whose build runs the docs site build; for a change of `apps/docs`, `packages/design-tokens`, `packages/api` (the site build prints its OpenAPI document), `compose.yaml`, `.dockerignore`, or one of the root files every build reads (the lockfile, `pnpm-workspace.yaml`, the root `package.json`, `tsconfig.base.json`, `.nvmrc`, `.github/pnpm`, `.github/actions`, `ci.yml`).
-- `prerender=full|sample`: every record page, or the cartridge sample of `src/lib/prerender-sample.ts`.
+- `prerender=full|sample`: every record page, or the cartridge, bullet and powder sample of `src/lib/prerender-sample.ts`.
 - `tests=`: the test jobs as JSON, one per group of workspaces the change reaches. pnpm's `--filter "...[<base>]"` adds every workspace that depends on a changed one.
 
 It fails closed. Anything but a pull request, a missing base commit, a failed git call or an empty change list gives every job, every test group and `prerender=full`. A change outside the workspaces (the lockfile, a root config, a workflow) or a failed pnpm call gives every test group.
