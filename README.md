@@ -3,8 +3,10 @@
 # RangeFoundry Workbench
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-eikelandin-db61a2?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/eikelandin)
-[![CI](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml)
-[![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue)](LICENSE)
+[![CI](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/OpenReloading/Ballistics/badge)](https://scorecard.dev/viewer/?uri=github.com/OpenReloading/Ballistics)
+[![License: AGPL-3.0-only, CC-BY-SA-4.0 data, MIT docs](https://img.shields.io/badge/license-AGPL--3.0--only%20%2B%20CC--BY--SA--4.0%20data-blue)](REUSE.toml)
+[![Release](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=web-v*)](https://github.com/OpenReloading/Ballistics/releases)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
 
 Simulate a handload before you take it to the range: muzzle velocity, peak pressure against the C.I.P. limit, and the bullet's trajectory, from cartridge, bullet, powder and firearm records that each name their source. The same app summarizes a chronograph session and measures group size from a target photo.
