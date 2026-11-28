@@ -251,6 +251,10 @@ msgstr "{count, plural, one {# Schuss dieses Wettkampfs zur Schusszahl von {name
 msgid "log.addRounds"
 msgstr "{count, plural, one {# Schuss zur Schusszahl von {name} hinzufügen?} other {# Schuss zur Schusszahl von {name} hinzufügen?}}"
 
+# en: "{count, plural, one {Facts as {publishers} publishes them. {publishers} has not reviewed this record; its terms apply.} other {Facts as {publishers} publish them. They have not reviewed this record; their terms apply.}}"
+msgid "recordSources.lead"
+msgstr "{count, plural, one {Angaben, wie {publishers} sie veröffentlicht. {publishers} hat diesen Datensatz nicht geprüft; es gelten die Nutzungsbedingungen von {publishers}.} other {Angaben, wie {publishers} sie veröffentlichen. Sie haben diesen Datensatz nicht geprüft; es gelten ihre Nutzungsbedingungen.}}"
+
 # en: "{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}"
 msgid "bulletCompare.notFoundIds"
 msgstr "{count, plural, one {Kein Geschoss mit der ID {ids}.} other {Keine Geschosse mit den IDs {ids}.}}"
@@ -4348,6 +4352,10 @@ msgstr "Tasten"
 msgid "faceRecord.column.kind"
 msgstr "Art"
 
+# en: "Kind"
+msgid "recordSources.column.kind"
+msgstr "Art"
+
 # en: "kneeling"
 msgid "disciplines.rule.kneeling"
 msgstr "kniend"
@@ -8287,12 +8295,12 @@ msgid "targetDesigner.tenthRingsCircular"
 msgstr "Zehntelwertungen brauchen kreisförmige Ringe"
 
 # en: "Terms"
-msgid "recordSources.terms"
+msgid "recordSources.column.terms"
 msgstr "Nutzungsbedingungen"
 
-# en: "Terms: {terms}"
-msgid "recordSources.termsText"
-msgstr "Nutzungsbedingungen: {terms}"
+# en: "Terms"
+msgid "recordSources.terms"
+msgstr "Nutzungsbedingungen"
 
 # en: "That record is not a design of this kind."
 msgid "recordLink.otherKind"
@@ -9161,6 +9169,10 @@ msgstr "Werte fehlen: keine Abbrandwerte"
 # en: "Values missing: the record only names the bullet"
 msgid "bulletRecord.valuesMissing"
 msgstr "Werte fehlen: Der Datensatz enthält vom Geschoss nur den Namen"
+
+# en: "Values of kind derived, computed or fitted are worked out by this project from the cited source; the Kind column shows which."
+msgid "recordSources.worked"
+msgstr "Werte der Art abgeleitet, berechnet oder angepasst ermittelt dieses Projekt aus der zitierten Quelle; die Spalte Art zeigt, welche."
 
 # en: "Values of the design"
 msgid "designer.values"

@@ -34,6 +34,7 @@ import { PowderFit } from './powder-fit.tsx'
 import { LinkButton } from './record-actions.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
+import { SimulationNotice } from './simulation-notice.tsx'
 import { VivacityPanel } from './vivacity-panel.tsx'
 
 loadEnglish(englishMessages)
@@ -133,6 +134,7 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
       }
       values={
         <>
+          {p.interior && <SimulationNotice />}
           {isFitted(curve) && parameters.length > 0 && (
             <FieldPanel
               id="model-parameters"

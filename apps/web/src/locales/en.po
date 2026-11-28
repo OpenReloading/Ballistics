@@ -190,6 +190,9 @@ msgstr "{count, plural, one {Add # round of this event to the round count of {na
 msgid "log.addRounds"
 msgstr "{count, plural, one {Add # round to the round count of {name}?} other {Add # rounds to the round count of {name}?}}"
 
+msgid "recordSources.lead"
+msgstr "{count, plural, one {Facts as {publishers} publishes them. {publishers} has not reviewed this record; its terms apply.} other {Facts as {publishers} publish them. They have not reviewed this record; their terms apply.}}"
+
 msgid "bulletCompare.notFoundIds"
 msgstr "{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}"
 
@@ -3263,6 +3266,9 @@ msgstr "Keys"
 msgid "faceRecord.column.kind"
 msgstr "Kind"
 
+msgid "recordSources.column.kind"
+msgstr "Kind"
+
 msgid "disciplines.rule.kneeling"
 msgstr "kneeling"
 
@@ -6217,11 +6223,11 @@ msgstr "Tenth-ring values"
 msgid "targetDesigner.tenthRingsCircular"
 msgstr "tenth-ring values need circular rings"
 
-msgid "recordSources.terms"
+msgid "recordSources.column.terms"
 msgstr "Terms"
 
-msgid "recordSources.termsText"
-msgstr "Terms: {terms}"
+msgid "recordSources.terms"
+msgstr "Terms"
 
 msgid "recordLink.otherKind"
 msgstr "That record is not a design of this kind."
@@ -6873,6 +6879,9 @@ msgstr "Values missing: no burn values"
 
 msgid "bulletRecord.valuesMissing"
 msgstr "Values missing: the record only names the bullet"
+
+msgid "recordSources.worked"
+msgstr "Values of kind derived, computed or fitted are worked out by this project from the cited source; the Kind column shows which."
 
 msgid "designer.values"
 msgstr "Values of the design"
