@@ -250,6 +250,38 @@ describe('exit codes', () => {
     expect(top.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
   })
 
+  it('is 64 for a misspelled option, naming it and the option it is close to', async () => {
+    const { code, stdout, stderr } = await cli(['verify', ...data, '--per-rows'], {}, true)
+    expect(code).toBe(64)
+    expect(stdout).toBe('')
+    expect(stderr).toMatch(
+      /^Unknown option '--per-rows'\n\(Did you mean --per-row\?\)\n\nusage: ballistics verify /,
+    )
+  })
+
+  it('is 64 for an option whose separate value starts with a dash', async () => {
+    const { code, stdout, stderr } = await cli(['verify', '--rows', '--json'])
+    expect(code).toBe(64)
+    expect(stdout).toBe('')
+    expect(JSON.parse(stderr).error.kind).toBe('usage')
+    expect(JSON.parse(stderr).error.message).toMatch(
+      /^Option '--rows' argument is ambiguous\.\n.*\nTo specify an option argument starting with a dash use '--rows=-XYZ'\./,
+    )
+  })
+
+  it('is 0 with the help for --help where an option value belongs', async () => {
+    const missing = join(tmpdir(), 'ballistics-no-records')
+    const { code, stdout } = await cli([
+      'estimate-capacities',
+      '--records',
+      missing,
+      '--out',
+      '--help',
+    ])
+    expect(code).toBe(0)
+    expect(stdout).toMatch(/^usage: ballistics estimate-capacities /)
+  })
+
   it.each([
     ['run', ['run', 'interior', '--input', 'x.json', '--table'], /usage: ballistics run </],
     ['operations', ['operations', '--table'], /usage: ballistics operations\n/],

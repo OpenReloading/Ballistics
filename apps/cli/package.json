@@ -30,6 +30,7 @@
     "test": "vitest run --coverage && publint --strict"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "catalog:",
     "@rangefoundry/ballistics": "workspace:*",
     "@rangefoundry/catalog": "workspace:*",
     "@rangefoundry/catalog-files": "workspace:*",
@@ -38,6 +39,7 @@
     "@rangefoundry/statistics": "workspace:*",
     "@rangefoundry/units": "workspace:*",
     "@rangefoundry/use-cases": "workspace:*",
+    "commander": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
