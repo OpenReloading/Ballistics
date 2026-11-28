@@ -1,0 +1,30 @@
+{
+  "id": "adi-aps950",
+  "manufacturer": "adi",
+  "name": "APS950",
+  "country": "AU",
+  "scope": ["handgun"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "adi-world-class-powders-pistol-load-data-page",
+        "url": "https://www.adiworldclass.com.au/pistol/",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "adi-load-data-web-pages-rifle-and-pistol-2026-10",
+        "url": "https://www.adiworldclass.com.au/data-pistol/",
+        "retrieved": "2026-10-13",
+        "fields": ["scope"]
+      },
+      {
+        "source": "adi-world-class-powders-contact-page",
+        "url": "https://www.adiworldclass.com.au/contact/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "imr-red",
+  "manufacturer": "imr",
+  "name": "Red",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 2
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hodgdon-annual-manual-2025",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "page": "147",
+        "fields": ["name"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "imr-blue",
+  "manufacturer": "imr",
+  "name": "Blue",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 13
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 12
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hodgdon-annual-manual-2025",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "page": "149",
+        "fields": ["name"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

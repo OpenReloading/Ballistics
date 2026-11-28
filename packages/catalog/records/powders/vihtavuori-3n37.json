@@ -1,0 +1,221 @@
+{
+  "id": "vihtavuori-3n37",
+  "manufacturer": "vihtavuori",
+  "name": "3N37",
+  "country": "FI",
+  "scope": ["handgun"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "grainDimensions": {
+    "length": {
+      "value": 0.6
+    },
+    "diameter": {
+      "value": 0.6
+    }
+  },
+  "composition": [
+    {
+      "name": "Cellulose nitrate",
+      "cas": "9004-70-0",
+      "min": 80,
+      "max": 99
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0.1,
+      "max": 2
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.4C",
+      "unNumber": "UN0509"
+    }
+  ],
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 47
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 11
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 11
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 10
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 14
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 3.0281,
+      "standardUncertainty": 0.25
+    },
+    "energy": {
+      "value": 2744500,
+      "standardUncertainty": 110000
+    },
+    "gamma": 1.2425,
+    "covolume": {
+      "value": 0.001059
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 102,
+    "trainingCartridges": 6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "page": "1",
+        "fields": ["name"]
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "page": "section 3",
+        "fields": ["propellantBase"],
+        "kind": "derived"
+      },
+      {
+        "title": "Vihtavuori product page, 3N37",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/3n37-powder/",
+        "retrieved": "2026-10-13",
+        "fields": ["grainForm"],
+        "terms": "https://vihtavuori.com/company/disclaimers/legal-notice/"
+      },
+      {
+        "source": "vihtavuori-reloading-data-release-14-9-2026",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/09/LecasyFile14.9.2026-10.34.48.json",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-19",
+        "page": "section 1.3",
+        "fields": ["country"]
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 2",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "title": "Vihtavuori product page, 3N37",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/3n37-powder/",
+        "retrieved": "2026-11-15",
+        "fields": ["scope"],
+        "terms": "https://vihtavuori.com/company/disclaimers/legal-notice/",
+        "kind": "published"
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 14",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "title": "Vihtavuori product page, 3N37",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/3n37-powder/",
+        "retrieved": "2026-11-15",
+        "fields": ["grainDimensions"],
+        "terms": "https://vihtavuori.com/company/disclaimers/legal-notice/",
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

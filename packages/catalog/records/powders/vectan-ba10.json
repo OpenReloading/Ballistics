@@ -1,0 +1,73 @@
+{
+  "id": "vectan-ba10",
+  "manufacturer": "vectan",
+  "name": "Ba10",
+  "country": "FR",
+  "scope": ["handgun"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 3
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 2
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 4
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "page": "3",
+        "fields": ["name", "grainForm", "propellantBase"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-11-15",
+        "page": "3",
+        "fields": ["scope"],
+        "kind": "published"
+      },
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-11-15",
+        "page": "36",
+        "fields": ["country"],
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

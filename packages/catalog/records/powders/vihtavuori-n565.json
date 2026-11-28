@@ -1,0 +1,199 @@
+{
+  "id": "vihtavuori-n565",
+  "manufacturer": "vihtavuori",
+  "name": "N565",
+  "country": "FI",
+  "scope": ["rifle"],
+  "grainForm": "extruded",
+  "propellantBase": "double",
+  "perforation": "single",
+  "bulkDensity": {
+    "value": 0.96
+  },
+  "composition": [
+    {
+      "name": "Cellulose nitrate",
+      "cas": "9004-70-0",
+      "min": 80,
+      "max": 99
+    },
+    {
+      "name": "Nitroglycerin",
+      "cas": "55-63-0",
+      "min": 3,
+      "max": 20
+    },
+    {
+      "name": "3-methyl-1,1-diphenylurea",
+      "cas": "13114-72-2",
+      "min": 1,
+      "max": 3
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.4C",
+      "unNumber": "UN0509"
+    }
+  ],
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 157
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 37
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 40
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.4592,
+      "standardUncertainty": 0.014
+    },
+    "energy": {
+      "value": 3299800,
+      "standardUncertainty": 85000
+    },
+    "gamma": 1.2202,
+    "covolume": {
+      "value": 0.000983
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 189,
+    "trainingCartridges": 12
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "page": "1, section 9",
+        "fields": ["name", "grainForm"]
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "page": "section 3",
+        "fields": ["propellantBase"],
+        "kind": "derived"
+      },
+      {
+        "source": "vihtavuori-reloading-data-release-14-9-2026",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/09/LecasyFile14.9.2026-10.34.48.json",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-10-19",
+        "page": "section 1.3",
+        "fields": ["country"]
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 2",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "title": "Vihtavuori product page, Vihtavuori N565 rifle powder",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/n565-high-energy-powder/",
+        "retrieved": "2026-11-15",
+        "fields": ["bulkDensity", "scope"],
+        "terms": "https://vihtavuori.com/company/disclaimers/legal-notice/",
+        "kind": "published"
+      },
+      {
+        "source": "vihtavuori-product-page-vihtavuori-n550-rifle",
+        "url": "https://vihtavuori.com/powder/n550-high-energy-powder/",
+        "retrieved": "2026-11-15",
+        "fields": ["propellantBase"],
+        "kind": "derived"
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 14",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "title": "Vihtavuori product page, Vihtavuori N565 rifle powder",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/n565-high-energy-powder/",
+        "retrieved": "2026-11-15",
+        "fields": ["perforation"],
+        "terms": "https://vihtavuori.com/company/disclaimers/legal-notice/",
+        "kind": "published"
+      }
+    ]
+  }
+}

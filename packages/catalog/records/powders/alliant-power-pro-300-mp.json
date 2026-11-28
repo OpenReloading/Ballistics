@@ -1,0 +1,62 @@
+{
+  "id": "alliant-power-pro-300-mp",
+  "manufacturer": "alliant",
+  "name": "Power Pro 300-MP",
+  "scope": ["rifle", "handgun"],
+  "grainForm": "ball",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 70
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 15
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 17
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "alliant-powder-reloader-s-guide-2023",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "title": "Alliant Powder product page, Power Pro 300-MP",
+        "publisher": "Alliant Powder",
+        "url": "https://www.alliantpowder.com/products/powder/power_pro_300.aspx",
+        "retrieved": "2026-11-15",
+        "fields": ["grainForm", "scope"],
+        "terms": "https://www.thekineticgroup.com/termsconditions.html",
+        "kind": "published"
+      }
+    ]
+  }
+}

@@ -255,9 +255,12 @@ test('the Powders tab copies its table as CSV and keeps its mode and filters wit
   await tab.getByRole('textbox', { name: 'Case fill' }).fill('90')
   await tab.getByRole('button', { name: 'Compute' }).click()
   // every powder of the catalogue runs, three at a time
-  await expect(tab.getByRole('status')).toHaveText(/^\d+ powders, \d+ not computed\.$/, {
-    timeout: 150_000,
-  })
+  await expect(tab.getByRole('status')).toHaveText(
+    /^\d+ powders, \d+ not computed\.( Shotgun-only powders left out: \d+\.)?$/,
+    {
+      timeout: 150_000,
+    },
+  )
   const [file] = await Promise.all([
     page.waitForEvent('download'),
     tab.getByRole('button', { name: 'Download CSV' }).click(),

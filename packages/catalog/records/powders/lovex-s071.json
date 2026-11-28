@@ -1,0 +1,78 @@
+{
+  "id": "lovex-s071",
+  "manufacturer": "lovex",
+  "name": "S071",
+  "country": "CZ",
+  "scope": ["rifle"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 35
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 31
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 42
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lovex-reloading-guide-en-37-explosia-a-s",
+        "fields": ["name"]
+      },
+      {
+        "source": "explosia-a-s-propellants-civil-catalogue-2023-en",
+        "page": "3",
+        "fields": ["propellantBase"],
+        "kind": "derived"
+      },
+      {
+        "source": "explosia-a-s-propellants-civil-catalogue-2023-en",
+        "page": "7",
+        "fields": ["grainForm"],
+        "kind": "derived"
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "8-9",
+        "fields": ["scope"],
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "56",
+        "fields": ["country"],
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

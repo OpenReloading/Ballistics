@@ -1,0 +1,266 @@
+{
+  "id": "vihtavuori-n133",
+  "manufacturer": "vihtavuori",
+  "name": "N133",
+  "country": "FI",
+  "scope": ["rifle"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "grainDimensions": {
+    "length": {
+      "value": 1.1
+    },
+    "diameter": {
+      "value": 0.8
+    }
+  },
+  "composition": [
+    {
+      "name": "Cellulose nitrate",
+      "cas": "9004-70-0",
+      "min": 80,
+      "max": 99
+    },
+    {
+      "name": "Diethyl diphenylurea",
+      "cas": "85-98-3",
+      "min": 1,
+      "max": 5
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0.1,
+      "max": 2
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.4C",
+      "unNumber": "UN0509"
+    }
+  ],
+  "thermochemistry": {
+    "loadingDensity": {
+      "value": 0.1
+    },
+    "flameTemperature": {
+      "value": 2876.5,
+      "min": 2458.5,
+      "max": 3284.5
+    },
+    "impetus": {
+      "value": 1008900,
+      "min": 917300,
+      "max": 1078900
+    },
+    "gamma": {
+      "value": 1.2402,
+      "min": 1.2237,
+      "max": 1.2583
+    },
+    "molarMass": {
+      "value": 23.705,
+      "min": 22.284,
+      "max": 25.312
+    },
+    "covolume": {
+      "value": 0.0010577,
+      "min": 0.00099699,
+      "max": 0.0011287
+    }
+  },
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 89
+    },
+    {
+      "chart": {
+        "manufacturer": "vihtavuori",
+        "edition": "2025-11-25"
+      },
+      "position": 21
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 23
+    },
+    {
+      "chart": {
+        "manufacturer": "norma",
+        "edition": "2026-11-14"
+      },
+      "position": 21
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 22
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 30
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.85749,
+      "standardUncertainty": 0.036
+    },
+    "energy": {
+      "value": 2887900,
+      "standardUncertainty": 70000
+    },
+    "gamma": 1.2402,
+    "covolume": {
+      "value": 0.0010577
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 143,
+    "trainingCartridges": 15
+  },
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-12",
+        "page": "p. 2",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "page": "1, section 9",
+        "fields": ["grainForm"],
+        "kind": "published"
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "page": "section 3",
+        "fields": ["propellantBase"],
+        "kind": "derived"
+      },
+      {
+        "source": "openreloading-constant-volume-equilibrium-solver",
+        "fields": ["thermochemistry"],
+        "kind": "computed"
+      },
+      {
+        "source": "vihtavuori-reloading-data-release-14-9-2026",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/09/LecasyFile14.9.2026-10.34.48.json",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-19",
+        "page": "section 1.3",
+        "fields": ["country"]
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "vihtavuori-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "norma-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "title": "Vihtavuori product page, Vihtavuori N133 rifle powder",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/n133-rifle-powder/",
+        "retrieved": "2026-11-15",
+        "fields": ["scope"],
+        "terms": "https://vihtavuori.com/company/disclaimers/legal-notice/",
+        "kind": "published"
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-11-15",
+        "page": "section 14",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "title": "Vihtavuori product page, Vihtavuori N133 rifle powder",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/n133-rifle-powder/",
+        "retrieved": "2026-11-15",
+        "fields": ["grainDimensions"],
+        "terms": "https://vihtavuori.com/company/disclaimers/legal-notice/",
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}

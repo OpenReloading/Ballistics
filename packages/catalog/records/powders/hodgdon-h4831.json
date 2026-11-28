@@ -1,0 +1,228 @@
+{
+  "id": "hodgdon-h4831",
+  "manufacturer": "hodgdon",
+  "name": "H4831",
+  "country": "US",
+  "scope": ["rifle"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "composition": [
+    {
+      "name": "Nitrocellulose",
+      "cas": "9004-70-0",
+      "min": 60,
+      "max": 100
+    },
+    {
+      "name": "2,4-Dinitrotoluene",
+      "cas": "121-14-2",
+      "min": 0,
+      "max": 15
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "Not hazardous, not named",
+      "min": 0,
+      "max": 5
+    }
+  ],
+  "transport": [
+    {
+      "hazardClass": "1.3C",
+      "unNumber": "UN0161"
+    }
+  ],
+  "thermochemistry": {
+    "loadingDensity": {
+      "value": 0.1
+    },
+    "flameTemperature": {
+      "value": 2916.4,
+      "min": 2428.6,
+      "max": 3371.7
+    },
+    "impetus": {
+      "value": 981020,
+      "min": 848170,
+      "max": 1088700
+    },
+    "gamma": {
+      "value": 1.2316,
+      "min": 1.2058,
+      "max": 1.2558
+    },
+    "molarMass": {
+      "value": 24.717,
+      "min": 22.71,
+      "max": 27.16
+    },
+    "covolume": {
+      "value": 0.0010338,
+      "min": 0.0009508,
+      "max": 0.0011278
+    }
+  },
+  "burnRateCharts": [
+    {
+      "chart": {
+        "manufacturer": "hodgdon",
+        "edition": "rev. Aug'26"
+      },
+      "position": 146
+    },
+    {
+      "chart": {
+        "manufacturer": "reload-swiss",
+        "edition": "2024-11-05"
+      },
+      "position": 36
+    },
+    {
+      "chart": {
+        "manufacturer": "norma",
+        "edition": "2026-11-14"
+      },
+      "position": 66
+    },
+    {
+      "chart": {
+        "manufacturer": "shooters-world",
+        "edition": "2025-03"
+      },
+      "position": 31
+    },
+    {
+      "chart": {
+        "manufacturer": "lovex",
+        "edition": "Version 2019 Edition 1"
+      },
+      "position": 42
+    }
+  ],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.45037,
+      "standardUncertainty": 0.012
+    },
+    "energy": {
+      "value": 3309200,
+      "standardUncertainty": 83000
+    },
+    "gamma": 1.2316,
+    "covolume": {
+      "value": 0.0010338
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "trainingRows": 157,
+    "trainingCartridges": 18
+  },
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-10-12",
+        "page": "p. 3",
+        "fields": ["composition"],
+        "kind": "published"
+      },
+      {
+        "title": "Hodgdon Powder Co. product page, H4831® Extreme Rifle® Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-h4831/",
+        "retrieved": "2026-10-13",
+        "fields": ["grainForm", "propellantBase", "scope"],
+        "terms": "https://hodgdonpowderco.com/terms-of-service/",
+        "kind": "published"
+      },
+      {
+        "source": "openreloading-constant-volume-equilibrium-solver",
+        "fields": ["thermochemistry"],
+        "kind": "computed"
+      },
+      {
+        "source": "hodgdon-annual-manual-2025-rifle-and-pistol",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb"
+        }
+      },
+      {
+        "source": "hodgdon-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "reload-swiss-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "norma-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "shooters-world-burn-rate-2026-11-14",
+        "fields": ["burnRateCharts"]
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "p. 1",
+        "fields": ["country"],
+        "kind": "published"
+      },
+      {
+        "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",
+        "retrieved": "2026-11-15",
+        "page": "pp. 1, 13",
+        "fields": ["transport"],
+        "kind": "published"
+      },
+      {
+        "source": "lovex-reloading-guide-2019-edition-1-explosia",
+        "page": "55",
+        "fields": ["burnRateCharts"]
+      }
+    ]
+  }
+}
