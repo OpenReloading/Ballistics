@@ -51,8 +51,6 @@
         "src/evaluate.ts",
         "src/fit.ts",
         "src/main.ts",
-        "src/metrics.ts",
-        "src/published-rows.ts",
         "src/unseen.ts",
         "test/**"
       ],
