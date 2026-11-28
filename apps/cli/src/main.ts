@@ -110,7 +110,7 @@ function rowsOptions() {
     ),
     pressureFactor: new Option(
       '--pressure-factor <key>',
-      "with --pressure-sigma: the key of a pressure factor, the row's pressure basis (default), its table, its cartridge or both",
+      "with --pressure-sigma: the key of a pressure factor, basis (the row's pressure basis, default), table, cartridge or table-cartridge (both)",
     ),
     energy: new Option(
       '--energy <energy>',
@@ -248,7 +248,7 @@ function program(env: NodeJS.ProcessEnv, io: Io) {
     .helpOption('-h, --help', 'this text')
     .helpCommand(false)
     .version(`ballistics ${version}`, '--version', 'the version')
-    .addHelpText('after', `\n${exitCodes}`)
+    .addHelpText('afterAll', `\n${exitCodes}`)
   root.exitOverride(usageError(root))
   const o = rowsOptions()
 
@@ -414,10 +414,32 @@ export function report(error: unknown, argv: string[], io: Io): number {
   return code
 }
 
+/** Refuses a separate option value that starts with `-` (not `-` alone), so an option missing its value never takes the next option; help and version there still answer. */
+function checkOptionLikeValues(root: ReturnType<typeof program>, argv: string[]) {
+  const command = root.commands.find((c) => c.name() === argv[0])
+  if (command === undefined) return argv
+  const takesValue = new Set(
+    command.options.filter((o) => o.required || o.optional).map((o) => o.long),
+  )
+  for (const [i, word] of argv.entries()) {
+    if (word === '--') break
+    const value = argv[i + 1]
+    if (!takesValue.has(word) || value === undefined || value.length < 2 || !value.startsWith('-'))
+      continue
+    if (value === '--help' || value === '-h' || value === '--version')
+      return argv.filter((_, j) => j !== i)
+    throw new UsageError(
+      `Option '${word}' argument is ambiguous.\nDid you forget to specify the option argument for '${word}'?\nTo specify an option argument starting with a dash use '${word}=-XYZ'.\n\n${command.helpInformation().trimEnd()}`,
+    )
+  }
+  return argv
+}
+
 /** Runs the command line `argv` (without the program), writes the result and returns the exit code. */
 export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promise<number> {
   try {
-    await program(env, io).parseAsync(argv, { from: 'user' })
+    const root = program(env, io)
+    await root.parseAsync(checkOptionLikeValues(root, argv), { from: 'user' })
     return 0
   } catch (error) {
     // commander ends help and version by throwing with exit code 0
