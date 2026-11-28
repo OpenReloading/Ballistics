@@ -115,6 +115,7 @@ it('builds the docs image for the docs site, what its build imports and the comp
     'apps/docs/Dockerfile',
     'packages/design-tokens/css/tokens.css',
     'packages/units/src/index.ts',
+    'packages/schema/src/index.ts',
     'packages/api/src/openapi.ts',
     'compose.yaml',
     'pnpm-lock.yaml',
