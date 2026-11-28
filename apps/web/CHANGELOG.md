@@ -1,5 +1,113 @@
 # Changelog
 
+## [0.1.0](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.7...web-v0.1.0) (2026-11-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **web:** the Start app is the only web app ([#1363](https://github.com/OpenReloading/Ballistics/issues/1363))
+* **catalog:** require the cartridge and default to its generic primer and brass case ([#1337](https://github.com/OpenReloading/Ballistics/issues/1337))
+* license the code under AGPL-3.0-only ([#1332](https://github.com/OpenReloading/Ballistics/issues/1332))
+* **web:** the workbench starts empty, without example loads ([#1229](https://github.com/OpenReloading/Ballistics/issues/1229))
+
+### Features
+
+* **catalog:** require the cartridge and default to its generic primer and brass case ([#1337](https://github.com/OpenReloading/Ballistics/issues/1337)) ([cb49223](https://github.com/OpenReloading/Ballistics/commit/cb49223d1b47aab5449050a043007c04cab043e3))
+* **cli:** fit the powder energy under a family prior (--energy family) ([#1242](https://github.com/OpenReloading/Ballistics/issues/1242)) ([0ef1331](https://github.com/OpenReloading/Ballistics/commit/0ef13313fabc86d8e8632b84d6a20605b7a34b80))
+* **docs:** library reference for every published package ([#1375](https://github.com/OpenReloading/Ballistics/issues/1375)) ([acc7aa4](https://github.com/OpenReloading/Ballistics/commit/acc7aa42e08b429074ef280ea0039e0f65671f40))
+* **importers:** typed codes for table and kind-guess refusals ([#1198](https://github.com/OpenReloading/Ballistics/issues/1198)) ([66b4730](https://github.com/OpenReloading/Ballistics/commit/66b4730f9bfddb9f3db8351f01b3243ff4818ccd))
+* **interior:** revolver cylinder gap and barrel length from the forcing cone ([#1256](https://github.com/OpenReloading/Ballistics/issues/1256)) ([e9f741a](https://github.com/OpenReloading/Ballistics/commit/e9f741a6e0d04b7f40430850988bb550cd15a455))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+* **schema:** optional provenance on every record kind ([#1224](https://github.com/OpenReloading/Ballistics/issues/1224)) ([7b69c19](https://github.com/OpenReloading/Ballistics/commit/7b69c19cf0be25e34f9bde004bf5b986cd37f959))
+* **target-recognition:** learned detector behind the inference port ([#1275](https://github.com/OpenReloading/Ballistics/issues/1275)) ([69ec584](https://github.com/OpenReloading/Ballistics/commit/69ec5846fc18a535a773fa226cb59d5db86045ed))
+* **web:** bullet and burn-rate comparisons on Lingui message ids ([#1311](https://github.com/OpenReloading/Ballistics/issues/1311)) ([06be436](https://github.com/OpenReloading/Ballistics/commit/06be4368dd96c5c3768d3a0371b08be72742246e))
+* **web:** bullet lot, each lot under its record choice and one Lots line ([#1258](https://github.com/OpenReloading/Ballistics/issues/1258)) ([374bf81](https://github.com/OpenReloading/Ballistics/commit/374bf817222370fc2e257f1a277b8e2381b1b3de))
+* **web:** bullet photo notes, photo quality notes and session summary on Lingui message ids ([#1317](https://github.com/OpenReloading/Ballistics/issues/1317)) ([a387b2f](https://github.com/OpenReloading/Ballistics/commit/a387b2f683f17d17b309b79f8eb4d9c6e49424f1))
+* **web:** burn-rate reasons, bullet record rows and page titles on Lingui message ids ([#1313](https://github.com/OpenReloading/Ballistics/issues/1313)) ([7e22d85](https://github.com/OpenReloading/Ballistics/commit/7e22d85eb962f86242159523b4141ecb14b343c2))
+* **web:** cartridge and powder records, record actions on Lingui message ids ([#1310](https://github.com/OpenReloading/Ballistics/issues/1310)) ([3b05459](https://github.com/OpenReloading/Ballistics/commit/3b0545935b9aff3632c68fb1fc5ca58b8fd8491e))
+* **web:** cartridge record rows, target face words and powder comparison reasons on Lingui message ids ([#1315](https://github.com/OpenReloading/Ballistics/issues/1315)) ([8683d32](https://github.com/OpenReloading/Ballistics/commit/8683d32eb72dfa9d9a55cb2dbd86a7b2d0ac9dba))
+* **web:** compare picks and the discipline record on Lingui message ids ([#1307](https://github.com/OpenReloading/Ballistics/issues/1307)) ([e08b439](https://github.com/OpenReloading/Ballistics/commit/e08b43925735cc1fa6b7b435cc93c53793a6fe5c))
+* **web:** core message table on Lingui message ids ([#1318](https://github.com/OpenReloading/Ballistics/issues/1318)) ([0665fbd](https://github.com/OpenReloading/Ballistics/commit/0665fbd1dd926a036b42754b85486ef7cd829625))
+* **web:** designers, powder tune and firearms on the Start app ([#1286](https://github.com/OpenReloading/Ballistics/issues/1286)) ([5f2982a](https://github.com/OpenReloading/Ballistics/commit/5f2982aa0fce4d15137cd15d2a43120afcd52f8f))
+* **web:** detect holes with the learned model by default ([#1341](https://github.com/OpenReloading/Ballistics/issues/1341)) ([67ffabe](https://github.com/OpenReloading/Ballistics/commit/67ffabebeec006b150a939039769d5045940ccb1))
+* **web:** federation, target face, bullet, case and primer records on Lingui message ids ([#1309](https://github.com/OpenReloading/Ballistics/issues/1309)) ([16a9e62](https://github.com/OpenReloading/Ballistics/commit/16a9e62b72e8d780fcacc2ef85221bf8d8925936))
+* **web:** filter powders by stated use and set shotgun-only powders apart ([#1231](https://github.com/OpenReloading/Ballistics/issues/1231)) ([9a7fcb4](https://github.com/OpenReloading/Ballistics/commit/9a7fcb4c584fd48db64ab43bad2c56e5389cc8fb))
+* **web:** fitted-model views and the powder API show the simulation notice ([#1368](https://github.com/OpenReloading/Ballistics/issues/1368)) ([a9caddc](https://github.com/OpenReloading/Ballistics/commit/a9caddc149f167f399d61653ac9a338307d9bd97))
+* **web:** keep bullet, cartridge and case drafts in the browser ([#1255](https://github.com/OpenReloading/Ballistics/issues/1255)) ([a4be4a2](https://github.com/OpenReloading/Ballistics/commit/a4be4a205df7406107a78533c1df4d5bda00412f))
+* **web:** lay out the workbench input cards as one row grid ([#1257](https://github.com/OpenReloading/Ballistics/issues/1257)) ([bf9a81c](https://github.com/OpenReloading/Ballistics/commit/bf9a81c10bcd37e0c1ac919b270c9b011ea1f12d))
+* **web:** library lists and events on Lingui message ids ([#1302](https://github.com/OpenReloading/Ballistics/issues/1302)) ([811389b](https://github.com/OpenReloading/Ballistics/commit/811389babd219d10a83eac054dbeae19dc099921))
+* **web:** library lists and events on the Start app ([#1283](https://github.com/OpenReloading/Ballistics/issues/1283)) ([0607f9d](https://github.com/OpenReloading/Ballistics/commit/0607f9d458393eef059d52d3dca102bb511042b1))
+* **web:** list counts, states, unit settings and record values on Lingui message ids ([#1306](https://github.com/OpenReloading/Ballistics/issues/1306)) ([aa14e93](https://github.com/OpenReloading/Ballistics/commit/aa14e9314c91fc007ba04fac01c2d2ce9c81fd43))
+* **web:** list the picks the search or a filter hides, each with its untick ([#1252](https://github.com/OpenReloading/Ballistics/issues/1252)) ([6bc2404](https://github.com/OpenReloading/Ballistics/commit/6bc24041a4802017f503739a42162b90f6ad23dd))
+* **web:** load English per module and move the shooting log to Lingui ids ([#1326](https://github.com/OpenReloading/Ballistics/issues/1326)) ([92377a2](https://github.com/OpenReloading/Ballistics/commit/92377a2a50f44db046b53b26091cc9752e7e3fa7))
+* **web:** load workbench, session summary, shot groups and range mode on the Start app ([#1284](https://github.com/OpenReloading/Ballistics/issues/1284)) ([2d5541e](https://github.com/OpenReloading/Ballistics/commit/2d5541ed9d1c41e50541a2a1fdcb26ac4013408a))
+* **web:** Lucide icons in place of Phosphor ([#1277](https://github.com/OpenReloading/Ballistics/issues/1277)) ([6adadb2](https://github.com/OpenReloading/Ballistics/commit/6adadb2230b2c1e5ca388534ec80278ed25262c8))
+* **web:** message table in its own Lingui catalog, interior refusal words on ids ([#1321](https://github.com/OpenReloading/Ballistics/issues/1321)) ([7851672](https://github.com/OpenReloading/Ballistics/commit/7851672afa9f65c1d19d0eabb00279fe282b1186))
+* **web:** move hole detection to Lingui ids ([#1329](https://github.com/OpenReloading/Ballistics/issues/1329)) ([dbd86be](https://github.com/OpenReloading/Ballistics/commit/dbd86bee2c77df807d1443807f80a20066be35f8))
+* **web:** move powder tuning to Lingui ids ([#1343](https://github.com/OpenReloading/Ballistics/issues/1343)) ([9d03b54](https://github.com/OpenReloading/Ballistics/commit/9d03b547dd56a22ce17f6555b390090fa904dc0f))
+* **web:** move the bullet and cartridge designers to Lingui ids ([#1340](https://github.com/OpenReloading/Ballistics/issues/1340)) ([24850bd](https://github.com/OpenReloading/Ballistics/commit/24850bd61a9368afc294d6bea2d8528dca510dd0))
+* **web:** move the first part of the target editor to Lingui ids ([#1333](https://github.com/OpenReloading/Ballistics/issues/1333)) ([8c4626b](https://github.com/OpenReloading/Ballistics/commit/8c4626b3e7d372900f9e2e20d0382c39575715b4))
+* **web:** move the last say readers to Lingui ids and remove say and Wording ([#1347](https://github.com/OpenReloading/Ballistics/issues/1347)) ([fce6d66](https://github.com/OpenReloading/Ballistics/commit/fce6d6603bb36628fe85fd5b934e99855fde2463))
+* **web:** move the photo tool messages and the brass group editor to Lingui ids ([#1346](https://github.com/OpenReloading/Ballistics/issues/1346)) ([8b3ac3a](https://github.com/OpenReloading/Ballistics/commit/8b3ac3ac769ffa81d05d73796abb5c4da1608f5c))
+* **web:** move the powder designer and its field labels to Lingui ids ([#1339](https://github.com/OpenReloading/Ballistics/issues/1339)) ([c02460a](https://github.com/OpenReloading/Ballistics/commit/c02460a9af6d936da216f18d906c9134fb478898))
+* **web:** move the powder designer leftovers and record links to Lingui ids ([#1344](https://github.com/OpenReloading/Ballistics/issues/1344)) ([cb5e47c](https://github.com/OpenReloading/Ballistics/commit/cb5e47c591fc13d6c5521f6eedf26a9248d6e1ad))
+* **web:** move the remaining shell texts to Lingui ids ([#1350](https://github.com/OpenReloading/Ballistics/issues/1350)) ([7d2f610](https://github.com/OpenReloading/Ballistics/commit/7d2f610817320d36dc51bc99c196b598d12a63ec))
+* **web:** move the rest of the target editor and the powder comparison to Lingui ids ([#1338](https://github.com/OpenReloading/Ballistics/issues/1338)) ([6d6c092](https://github.com/OpenReloading/Ballistics/commit/6d6c092c9589734638870d5041bd2665662b2df7))
+* **web:** move the shell, home, offline and error page texts to Lingui ids ([#1348](https://github.com/OpenReloading/Ballistics/issues/1348)) ([3a63e53](https://github.com/OpenReloading/Ballistics/commit/3a63e532d1867283c00ce7186f35a45a27b9ec39))
+* **web:** move the shell, offline, not-found and Start error texts to Lingui ids ([#1349](https://github.com/OpenReloading/Ballistics/issues/1349)) ([351d9b5](https://github.com/OpenReloading/Ballistics/commit/351d9b5abb08383bb31a9998a68d71ba7e7c1662))
+* **web:** move the target designer to Lingui ids ([#1342](https://github.com/OpenReloading/Ballistics/issues/1342)) ([793d488](https://github.com/OpenReloading/Ballistics/commit/793d4889372bc30b7a8e71dd983ec2aa1abb29ae))
+* **web:** package messages shown through the Lingui instance only ([#1320](https://github.com/OpenReloading/Ballistics/issues/1320)) ([0088e1b](https://github.com/OpenReloading/Ballistics/commit/0088e1b26fbefb654e3e5fd512264c60f79b141a))
+* **web:** photo tool, charge target, firearm library and log summary on Lingui ids ([#1325](https://github.com/OpenReloading/Ballistics/issues/1325)) ([8ea6345](https://github.com/OpenReloading/Ballistics/commit/8ea6345cb7741e7e2ad2865ad6f103ac0432e898))
+* **web:** powder, case and primer record rows, field tables and tool page titles on Lingui message ids ([#1314](https://github.com/OpenReloading/Ballistics/issues/1314)) ([eef0ea5](https://github.com/OpenReloading/Ballistics/commit/eef0ea5beb6ebe458e4f9807a06b363ca2a08554))
+* **web:** record pages, bullet compare and burn rates on the Start app ([#1285](https://github.com/OpenReloading/Ballistics/issues/1285)) ([c2fd56f](https://github.com/OpenReloading/Ballistics/commit/c2fd56f9788b8198369aa382cda00319f559bcb1))
+* **web:** record sources show the kind and the publisher's terms ([#1366](https://github.com/OpenReloading/Ballistics/issues/1366)) ([6fe7798](https://github.com/OpenReloading/Ballistics/commit/6fe779896ee62f2aba2d53d8bff5b7438dc4f9a9))
+* **web:** refusal words and message call sites on Lingui message ids ([#1319](https://github.com/OpenReloading/Ballistics/issues/1319)) ([6c90303](https://github.com/OpenReloading/Ballistics/commit/6c903038df798aebd0fccd9919d20549aae9dea6))
+* **web:** revised safety notice ([#1237](https://github.com/OpenReloading/Ballistics/issues/1237)) ([4ef9526](https://github.com/OpenReloading/Ballistics/commit/4ef952618499e797cc022bd78d857837d2d30b85))
+* **web:** run the learned hole detector through ONNX Runtime Web ([#1330](https://github.com/OpenReloading/Ballistics/issues/1330)) ([0f110de](https://github.com/OpenReloading/Ballistics/commit/0f110decef529cb60ec6de3e1d0b2808c71504cb))
+* **web:** serve the hole detection model file and its manifest ([#1328](https://github.com/OpenReloading/Ballistics/issues/1328)) ([8009622](https://github.com/OpenReloading/Ballistics/commit/8009622af1bbaffb92f5b5d9d041c72360cc59c5))
+* **web:** shared list table, filters and sources on Lingui message ids ([#1305](https://github.com/OpenReloading/Ballistics/issues/1305)) ([45caa32](https://github.com/OpenReloading/Ballistics/commit/45caa32754ab4e49e6bdcbf4e28ca82a5288742f))
+* **web:** shared record wording, field tables and sources on Lingui message ids ([#1308](https://github.com/OpenReloading/Ballistics/issues/1308)) ([846ccbc](https://github.com/OpenReloading/Ballistics/commit/846ccbc9ba45cdefe13a55df977acaa22479b4d1))
+* **web:** show field names and field errors in the language shown ([#1352](https://github.com/OpenReloading/Ballistics/issues/1352)) ([5cc5e78](https://github.com/OpenReloading/Ballistics/commit/5cc5e78c34826a8ef08bd60c216253c87a211d45))
+* **web:** the firearm library lists the firearms saved in this browser only ([#1228](https://github.com/OpenReloading/Ballistics/issues/1228)) ([7f01cea](https://github.com/OpenReloading/Ballistics/commit/7f01cea2ff549ff35174f14ecda78a835ee6b446))
+* **web:** the Start app is the only web app ([#1363](https://github.com/OpenReloading/Ballistics/issues/1363)) ([93bf26f](https://github.com/OpenReloading/Ballistics/commit/93bf26fb0b6a7bfe0c91a618a6f4f3c3cbcf169d))
+* **web:** the Start shell with the app's providers, header, home, offline page and manifest ([#1279](https://github.com/OpenReloading/Ballistics/issues/1279)) ([b1d0971](https://github.com/OpenReloading/Ballistics/commit/b1d09713111c1d0f8f64d07d1947e883ee5d8918))
+* **web:** the workbench starts empty, without example loads ([#1229](https://github.com/OpenReloading/Ballistics/issues/1229)) ([5667bef](https://github.com/OpenReloading/Ballistics/commit/5667bef98324e997e55dab35e7f1263bb948800f))
+
+
+### Bug fixes
+
+* bind the prerender preview to IPv4 and run story browsers with reduced motion ([#1297](https://github.com/OpenReloading/Ballistics/issues/1297)) ([f36a49b](https://github.com/OpenReloading/Ballistics/commit/f36a49b9003bf8383ea14ecd68749b482797fd4b))
+* **web:** hydrate the not-found page of an unknown path without React [#418](https://github.com/OpenReloading/Ballistics/issues/418) ([#1280](https://github.com/OpenReloading/Ballistics/issues/1280)) ([cb1c921](https://github.com/OpenReloading/Ballistics/commit/cb1c9218706880f0c7addaca393511ffd9176b9a))
+* **web:** keep record pages from preloading a not-found chunk they never run ([#1289](https://github.com/OpenReloading/Ballistics/issues/1289)) ([ea33b46](https://github.com/OpenReloading/Ballistics/commit/ea33b46a7d11b5c37e256a7251e30e154b58821f))
+* **web:** keep the burn rate chart's tooltip when the run's band arrives ([#1304](https://github.com/OpenReloading/Ballistics/issues/1304)) ([d812f3f](https://github.com/OpenReloading/Ballistics/commit/d812f3f92f04c6a88e48e73bf83836f4396c52a0))
+* **web:** keep the leave guard from taking the app's own Back for the user's ([#1301](https://github.com/OpenReloading/Ballistics/issues/1301)) ([05d6623](https://github.com/OpenReloading/Ballistics/commit/05d66233a2edf95f5831dadc9010b628bf041ffc))
+* **web:** metric, common use is the default for every browser ([#1335](https://github.com/OpenReloading/Ballistics/issues/1335)) ([c310129](https://github.com/OpenReloading/Ballistics/commit/c3101294802f4eac9e960c1c7422972c5685c9e9))
+* **web:** pin the designers' record search at the top of the window from 48em ([#1250](https://github.com/OpenReloading/Ballistics/issues/1250)) ([f611bdf](https://github.com/OpenReloading/Ballistics/commit/f611bdf8ea66292de756be2efc8c6e14e9c85afc))
+* **web:** preload only the in-browser API chunk when a page reads it ([#1298](https://github.com/OpenReloading/Ballistics/issues/1298)) ([061b0e7](https://github.com/OpenReloading/Ballistics/commit/061b0e7ab7ea98bcbd52ef161901e9931b0f2c87))
+* **web:** show the bullet designer's check-the-unit flag on blur, up to 1500 gr ([#1251](https://github.com/OpenReloading/Ballistics/issues/1251)) ([4826acc](https://github.com/OpenReloading/Ballistics/commit/4826acc78b6292e97d9fa2fcd680eb99606e0f81))
+
+
+### Documentation
+
+* neutral wording without decision history ([#1226](https://github.com/OpenReloading/Ballistics/issues/1226)) ([02e6626](https://github.com/OpenReloading/Ballistics/commit/02e662617f53f5e007db3c8ef043dbd3ff9a437f))
+* provenance of the hole models ([#1362](https://github.com/OpenReloading/Ballistics/issues/1362)) ([7870612](https://github.com/OpenReloading/Ballistics/commit/787061233dae70eca605bf9fabee381a059a62bb))
+
+
+### Chores
+
+* license the code under AGPL-3.0-only ([#1332](https://github.com/OpenReloading/Ballistics/issues/1332)) ([56a3b5a](https://github.com/OpenReloading/Ballistics/commit/56a3b5ae38ac12dd00353cfe1e1e685d08e9f5cf))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/api bumped to 0.1.0
+    * @rangefoundry/catalog bumped to 0.1.0
+    * @rangefoundry/svg-drawings bumped to 0.1.0
+    * @rangefoundry/importers bumped to 0.1.0
+    * @rangefoundry/schema bumped to 0.1.0
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.6...web-v0.0.7) (2026-11-12)
 
 

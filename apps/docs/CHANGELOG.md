@@ -1,5 +1,114 @@
 # Changelog
 
+## [0.1.0](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.7...docs-v0.1.0) (2026-11-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **web:** the Start app is the only web app ([#1363](https://github.com/OpenReloading/Ballistics/issues/1363))
+* **catalog:** require the cartridge and default to its generic primer and brass case ([#1337](https://github.com/OpenReloading/Ballistics/issues/1337))
+* license the code under AGPL-3.0-only ([#1332](https://github.com/OpenReloading/Ballistics/issues/1332))
+* **web:** the workbench starts empty, without example loads ([#1229](https://github.com/OpenReloading/Ballistics/issues/1229))
+
+### Features
+
+* **catalog:** admit fitted maker sources, maker documents without a URL and more maker fields ([#1364](https://github.com/OpenReloading/Ballistics/issues/1364)) ([665bae4](https://github.com/OpenReloading/Ballistics/commit/665bae49842da816ff9c49fffa3b5c16a845f70f))
+* **catalog:** case capacities from published articles ([#1372](https://github.com/OpenReloading/Ballistics/issues/1372)) ([12a78cf](https://github.com/OpenReloading/Ballistics/commit/12a78cf5111e52cfba5cc6d19cced5448ee24a04))
+* **catalog:** gate public records by field class and maker source id ([#1225](https://github.com/OpenReloading/Ballistics/issues/1225)) ([b2a656b](https://github.com/OpenReloading/Ballistics/commit/b2a656baca31cc4fe8e9f17be3afcc22ef4915e0))
+* **catalog:** maker bullets, cited by maker ([#1369](https://github.com/OpenReloading/Ballistics/issues/1369)) ([7910816](https://github.com/OpenReloading/Ballistics/commit/79108167b77a31bedef84844344e4dcf52be686b))
+* **catalog:** maker powders with fitted models, cited by maker ([#1370](https://github.com/OpenReloading/Ballistics/issues/1370)) ([7b7cd24](https://github.com/OpenReloading/Ballistics/commit/7b7cd242154538bb1d6655b02cc30038f93ea401))
+* **catalog:** powder bulk densities from Lee Precision's VMD chart ([#1374](https://github.com/OpenReloading/Ballistics/issues/1374)) ([3e52b99](https://github.com/OpenReloading/Ballistics/commit/3e52b994a343ddcd6b6d431d531381c312543fbf))
+* **catalog:** published firing and range measurements ([#1371](https://github.com/OpenReloading/Ballistics/issues/1371)) ([3ab9bc6](https://github.com/OpenReloading/Ballistics/commit/3ab9bc63a4d1914122d6c583532e42f3c18fa68f))
+* **catalog:** require the cartridge and default to its generic primer and brass case ([#1337](https://github.com/OpenReloading/Ballistics/issues/1337)) ([cb49223](https://github.com/OpenReloading/Ballistics/commit/cb49223d1b47aab5449050a043007c04cab043e3))
+* **cli:** --exponent family and --energy prior combine in one fit ([#1190](https://github.com/OpenReloading/Ballistics/issues/1190)) ([e13a3f7](https://github.com/OpenReloading/Ballistics/commit/e13a3f7ac71eb85247f9c70929add2f872243a33))
+* **cli:** a pressure factor per table or cartridge, and --pressure-sigma with --exponent family ([#1216](https://github.com/OpenReloading/Ballistics/issues/1216)) ([e337188](https://github.com/OpenReloading/Ballistics/commit/e33718800ff279406f0ceb90abcb4aa636185ff4))
+* **cli:** carry the printed bullet text and group stand-ins by its construction words ([#1260](https://github.com/OpenReloading/Ballistics/issues/1260)) ([3b30f71](https://github.com/OpenReloading/Ballistics/commit/3b30f713dc5e622bff85bdfbf55f12b7f5fb5dc1))
+* **cli:** cross-validate fits over five cartridge folds with --folds ([#1236](https://github.com/OpenReloading/Ballistics/issues/1236)) ([9bca1e9](https://github.com/OpenReloading/Ballistics/commit/9bca1e9040a3165fe0372b550993bbb4961ba2b7))
+* **cli:** default to the catalog bundle and pack as a publishable command ([#1380](https://github.com/OpenReloading/Ballistics/issues/1380)) ([8ae23b4](https://github.com/OpenReloading/Ballistics/commit/8ae23b416aeebb6a24eef160ef045f320b979665))
+* **cli:** estimate case capacity from the cartridge outline, reported apart ([#1234](https://github.com/OpenReloading/Ballistics/issues/1234)) ([b543b49](https://github.com/OpenReloading/Ballistics/commit/b543b49c18c3ffdfc39d26e4f6a1e2313c3a572f))
+* **cli:** evaluate a saved fit with --fit, reuse a family choice with --family ([#1233](https://github.com/OpenReloading/Ballistics/issues/1233)) ([6853e36](https://github.com/OpenReloading/Ballistics/commit/6853e3645e8448cc1f6e592fff21dac1dac02757))
+* **cli:** exit with the sysexits subset ([#1377](https://github.com/OpenReloading/Ballistics/issues/1377)) ([a3f15dd](https://github.com/OpenReloading/Ballistics/commit/a3f15ddd9f4a91e34e7805f4b27f508a3adacffb))
+* **cli:** fit the powder energy under a family prior (--energy family) ([#1242](https://github.com/OpenReloading/Ballistics/issues/1242)) ([0ef1331](https://github.com/OpenReloading/Ballistics/commit/0ef13313fabc86d8e8632b84d6a20605b7a34b80))
+* **cli:** name the format of every JSON result ([#1381](https://github.com/OpenReloading/Ballistics/issues/1381)) ([12167c3](https://github.com/OpenReloading/Ballistics/commit/12167c30c56e4d901150ac0bbf37cb1c37dc97b2))
+* **cli:** per-row errors and a paired bootstrap change in compare ([#1189](https://github.com/OpenReloading/Ballistics/issues/1189)) ([34a3627](https://github.com/OpenReloading/Ballistics/commit/34a3627a738afcb027e28ccf8b3fb529f356c22f))
+* **cli:** report median and P90 per barrel class beside the pooled figures ([#1261](https://github.com/OpenReloading/Ballistics/issues/1261)) ([cc99db0](https://github.com/OpenReloading/Ballistics/commit/cc99db0badda168fd4515366e27d6b6d8ff51c88))
+* **cli:** set the interval half width per barrel class on the band distance ([#1267](https://github.com/OpenReloading/Ballistics/issues/1267)) ([86eecc2](https://github.com/OpenReloading/Ballistics/commit/86eecc224e114e1664d97e3b8e9e6c22e9126e40))
+* **cli:** the split rule takes a salt, which seals a new test split ([#1185](https://github.com/OpenReloading/Ballistics/issues/1185)) ([17cd87f](https://github.com/OpenReloading/Ballistics/commit/17cd87f80053d7ba821bd8978cd4702772b23f60))
+* **docs:** doc examples as type-checked and executed .ts files ([#1353](https://github.com/OpenReloading/Ballistics/issues/1353)) ([05b6f74](https://github.com/OpenReloading/Ballistics/commit/05b6f74e5a031f5520763105178dba020b48f9b2))
+* **docs:** KaTeX strict mode and fail on render errors ([#1351](https://github.com/OpenReloading/Ballistics/issues/1351)) ([d130b97](https://github.com/OpenReloading/Ballistics/commit/d130b974aa952a00d1fd8e8c33921dad3bd7d3c7))
+* **docs:** library reference for every published package ([#1375](https://github.com/OpenReloading/Ballistics/issues/1375)) ([acc7aa4](https://github.com/OpenReloading/Ballistics/commit/acc7aa42e08b429074ef280ea0039e0f65671f40))
+* **docs:** render UI base components in docs pages on the server ([#1376](https://github.com/OpenReloading/Ballistics/issues/1376)) ([6174387](https://github.com/OpenReloading/Ballistics/commit/6174387ed4509dc85f5102c159ca163771abaa08))
+* **interior:** revolver cylinder gap and barrel length from the forcing cone ([#1256](https://github.com/OpenReloading/Ballistics/issues/1256)) ([e9f741a](https://github.com/OpenReloading/Ballistics/commit/e9f741a6e0d04b7f40430850988bb550cd15a455))
+* **schema:** add perforation, grain dimensions, heat of explosion and transport to powders ([#1235](https://github.com/OpenReloading/Ballistics/issues/1235)) ([56454ef](https://github.com/OpenReloading/Ballistics/commit/56454efd4b60b8b30ea376e4674dcab17d296923))
+* **schema:** default case capacity on the cartridge ([#1263](https://github.com/OpenReloading/Ballistics/issues/1263)) ([22b4225](https://github.com/OpenReloading/Ballistics/commit/22b4225d252016389403d2a0b71dc276cc60e29b))
+* **schema:** let a maker's sheet source the powder kernel and transport fields, and tighten the transport patterns ([#1240](https://github.com/OpenReloading/Ballistics/issues/1240)) ([213105a](https://github.com/OpenReloading/Ballistics/commit/213105a79e13283d5a9c98456aff58f369d66e4a))
+* **schema:** makers' burn-rate charts and stated uses on powders ([#1230](https://github.com/OpenReloading/Ballistics/issues/1230)) ([1c61622](https://github.com/OpenReloading/Ballistics/commit/1c616227fce25dc6bad8f6d4b9f9e2f93286a6f0))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+* **schema:** optional provenance on every record kind ([#1224](https://github.com/OpenReloading/Ballistics/issues/1224)) ([7b69c19](https://github.com/OpenReloading/Ballistics/commit/7b69c19cf0be25e34f9bde004bf5b986cd37f959))
+* **target-recognition:** accuracy gate runner over a frozen holdout ([#1327](https://github.com/OpenReloading/Ballistics/issues/1327)) ([3554b20](https://github.com/OpenReloading/Ballistics/commit/3554b2029ec22f5927d6b9673a34e83dfadbe98a))
+* **target-recognition:** add a label set schema, Label Studio converter and labeler agreement ([#1262](https://github.com/OpenReloading/Ballistics/issues/1262)) ([7432177](https://github.com/OpenReloading/Ballistics/commit/743217719b513d286dd35acee9779dd0efec689f))
+* **target-recognition:** add the model manifest schema ([#1266](https://github.com/OpenReloading/Ballistics/issues/1266)) ([bb1b63b](https://github.com/OpenReloading/Ballistics/commit/bb1b63b7a04b5bab682117b57384d6aee9acbd6b))
+* **target-recognition:** learned detector behind the inference port ([#1275](https://github.com/OpenReloading/Ballistics/issues/1275)) ([69ec584](https://github.com/OpenReloading/Ballistics/commit/69ec5846fc18a535a773fa226cb59d5db86045ed))
+* **training:** hole model training project from scratch ([#1276](https://github.com/OpenReloading/Ballistics/issues/1276)) ([3fa446b](https://github.com/OpenReloading/Ballistics/commit/3fa446be7cc0891accf3cd6af21c14b48ca1c496))
+* **web:** bullet lot, each lot under its record choice and one Lots line ([#1258](https://github.com/OpenReloading/Ballistics/issues/1258)) ([374bf81](https://github.com/OpenReloading/Ballistics/commit/374bf817222370fc2e257f1a277b8e2381b1b3de))
+* **web:** bullet photo notes, photo quality notes and session summary on Lingui message ids ([#1317](https://github.com/OpenReloading/Ballistics/issues/1317)) ([a387b2f](https://github.com/OpenReloading/Ballistics/commit/a387b2f683f17d17b309b79f8eb4d9c6e49424f1))
+* **web:** burn-rate reasons, bullet record rows and page titles on Lingui message ids ([#1313](https://github.com/OpenReloading/Ballistics/issues/1313)) ([7e22d85](https://github.com/OpenReloading/Ballistics/commit/7e22d85eb962f86242159523b4141ecb14b343c2))
+* **web:** core message table on Lingui message ids ([#1318](https://github.com/OpenReloading/Ballistics/issues/1318)) ([0665fbd](https://github.com/OpenReloading/Ballistics/commit/0665fbd1dd926a036b42754b85486ef7cd829625))
+* **web:** detect holes with the learned model by default ([#1341](https://github.com/OpenReloading/Ballistics/issues/1341)) ([67ffabe](https://github.com/OpenReloading/Ballistics/commit/67ffabebeec006b150a939039769d5045940ccb1))
+* **web:** filter powders by stated use and set shotgun-only powders apart ([#1231](https://github.com/OpenReloading/Ballistics/issues/1231)) ([9a7fcb4](https://github.com/OpenReloading/Ballistics/commit/9a7fcb4c584fd48db64ab43bad2c56e5389cc8fb))
+* **web:** lay out the workbench input cards as one row grid ([#1257](https://github.com/OpenReloading/Ballistics/issues/1257)) ([bf9a81c](https://github.com/OpenReloading/Ballistics/commit/bf9a81c10bcd37e0c1ac919b270c9b011ea1f12d))
+* **web:** load English per module and move the shooting log to Lingui ids ([#1326](https://github.com/OpenReloading/Ballistics/issues/1326)) ([92377a2](https://github.com/OpenReloading/Ballistics/commit/92377a2a50f44db046b53b26091cc9752e7e3fa7))
+* **web:** message table in its own Lingui catalog, interior refusal words on ids ([#1321](https://github.com/OpenReloading/Ballistics/issues/1321)) ([7851672](https://github.com/OpenReloading/Ballistics/commit/7851672afa9f65c1d19d0eabb00279fe282b1186))
+* **web:** move hole detection to Lingui ids ([#1329](https://github.com/OpenReloading/Ballistics/issues/1329)) ([dbd86be](https://github.com/OpenReloading/Ballistics/commit/dbd86bee2c77df807d1443807f80a20066be35f8))
+* **web:** package messages shown through the Lingui instance only ([#1320](https://github.com/OpenReloading/Ballistics/issues/1320)) ([0088e1b](https://github.com/OpenReloading/Ballistics/commit/0088e1b26fbefb654e3e5fd512264c60f79b141a))
+* **web:** record sources show the kind and the publisher's terms ([#1366](https://github.com/OpenReloading/Ballistics/issues/1366)) ([6fe7798](https://github.com/OpenReloading/Ballistics/commit/6fe779896ee62f2aba2d53d8bff5b7438dc4f9a9))
+* **web:** refusal words and message call sites on Lingui message ids ([#1319](https://github.com/OpenReloading/Ballistics/issues/1319)) ([6c90303](https://github.com/OpenReloading/Ballistics/commit/6c903038df798aebd0fccd9919d20549aae9dea6))
+* **web:** revised safety notice ([#1237](https://github.com/OpenReloading/Ballistics/issues/1237)) ([4ef9526](https://github.com/OpenReloading/Ballistics/commit/4ef952618499e797cc022bd78d857837d2d30b85))
+* **web:** run the learned hole detector through ONNX Runtime Web ([#1330](https://github.com/OpenReloading/Ballistics/issues/1330)) ([0f110de](https://github.com/OpenReloading/Ballistics/commit/0f110decef529cb60ec6de3e1d0b2808c71504cb))
+* **web:** serve the hole detection model file and its manifest ([#1328](https://github.com/OpenReloading/Ballistics/issues/1328)) ([8009622](https://github.com/OpenReloading/Ballistics/commit/8009622af1bbaffb92f5b5d9d041c72360cc59c5))
+* **web:** the Start app is the only web app ([#1363](https://github.com/OpenReloading/Ballistics/issues/1363)) ([93bf26f](https://github.com/OpenReloading/Ballistics/commit/93bf26fb0b6a7bfe0c91a618a6f4f3c3cbcf169d))
+* **web:** the workbench starts empty, without example loads ([#1229](https://github.com/OpenReloading/Ballistics/issues/1229)) ([5667bef](https://github.com/OpenReloading/Ballistics/commit/5667bef98324e997e55dab35e7f1263bb948800f))
+
+
+### Bug fixes
+
+* **docs:** use GitHub Octicons in the repository widget ([#1336](https://github.com/OpenReloading/Ballistics/issues/1336)) ([1f7b80e](https://github.com/OpenReloading/Ballistics/commit/1f7b80e79ded637bc11ef6666ee1c6e2b367236c))
+* **statistics:** Student t quantile near level 1 ([#1195](https://github.com/OpenReloading/Ballistics/issues/1195)) ([275c42e](https://github.com/OpenReloading/Ballistics/commit/275c42e4aeb8a33d0e0ab1f10f0273dc4e2f47bf))
+* **web:** hydrate the not-found page of an unknown path without React [#418](https://github.com/OpenReloading/Ballistics/issues/418) ([#1280](https://github.com/OpenReloading/Ballistics/issues/1280)) ([cb1c921](https://github.com/OpenReloading/Ballistics/commit/cb1c9218706880f0c7addaca393511ffd9176b9a))
+* **web:** misses under next/ get that edition's not-found page ([#1271](https://github.com/OpenReloading/Ballistics/issues/1271)) ([4e286ff](https://github.com/OpenReloading/Ballistics/commit/4e286ffafa5f35c1626dd70033a2716364f00355))
+
+
+### Reverts
+
+* **catalog:** remove published firing and range measurements ([#1373](https://github.com/OpenReloading/Ballistics/issues/1373)) ([fa3529f](https://github.com/OpenReloading/Ballistics/commit/fa3529f398303ad3d47290c40f77fe69cee6df9d))
+
+
+### Documentation
+
+* **cli:** the stop reasons at the iteration limit and the run time of the combined fit ([#1207](https://github.com/OpenReloading/Ballistics/issues/1207)) ([138f599](https://github.com/OpenReloading/Ballistics/commit/138f599a96b8eb9bfb4f369ed4485e0a135383bc))
+* neutral wording without decision history ([#1226](https://github.com/OpenReloading/Ballistics/issues/1226)) ([02e6626](https://github.com/OpenReloading/Ballistics/commit/02e662617f53f5e007db3c8ef043dbd3ff9a437f))
+* **research:** stage builder rule checks with the clause list ([#1254](https://github.com/OpenReloading/Ballistics/issues/1254)) ([d08e69b](https://github.com/OpenReloading/Ballistics/commit/d08e69b68c4762e0760a1254dd4cbf91460f8b7a))
+* type-checked and executed library examples ([#1211](https://github.com/OpenReloading/Ballistics/issues/1211)) ([2d5cb29](https://github.com/OpenReloading/Ballistics/commit/2d5cb29694c328b685c4c0f732aeb930bd1bfe23))
+
+
+### Chores
+
+* license the code under AGPL-3.0-only ([#1332](https://github.com/OpenReloading/Ballistics/issues/1332)) ([56a3b5a](https://github.com/OpenReloading/Ballistics/commit/56a3b5ae38ac12dd00353cfe1e1e685d08e9f5cf))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/api bumped to 0.1.0
+  * devDependencies
+    * @rangefoundry/cli bumped to 0.1.0
+    * @rangefoundry/catalog bumped to 0.1.0
+    * @rangefoundry/svg-drawings bumped to 0.1.0
+    * @rangefoundry/importers bumped to 0.1.0
+    * @rangefoundry/schema bumped to 0.1.0
+    * @rangefoundry/web bumped to 0.1.0
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.6...docs-v0.0.7) (2026-11-12)
 
 

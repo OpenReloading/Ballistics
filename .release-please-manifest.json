@@ -1,10 +1,10 @@
 {
-  "packages/schema": "0.0.7",
-  "packages/svg-drawings": "0.0.6",
-  "packages/importers": "0.0.7",
-  "packages/catalog": "0.0.7",
-  "packages/api": "0.0.7",
-  "apps/cli": "0.0.3",
-  "apps/web": "0.0.7",
-  "apps/docs": "0.0.7"
+  "packages/schema": "0.1.0",
+  "packages/svg-drawings": "0.1.0",
+  "packages/importers": "0.1.0",
+  "packages/catalog": "0.1.0",
+  "packages/api": "0.1.0",
+  "apps/cli": "0.1.0",
+  "apps/web": "0.1.0",
+  "apps/docs": "0.1.0"
 }
