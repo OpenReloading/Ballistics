@@ -47,3 +47,18 @@ test("adds the browser's own powder to the burn-rate overlay, marked as a user d
     page.getByRole('img', { name: /Dynamic vivacity of the chosen powders/ }),
   ).toBeVisible()
 })
+
+test('shows the simulation notice once on screen and above the table in print', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/powders')
+  const notice = page
+    .getByText('Simulation, not load data', { exact: true })
+    .filter({ visible: true })
+  await expect(notice).toHaveCount(1)
+  await page.emulateMedia({ media: 'print' })
+  await expect(notice).toHaveCount(1)
+  const noticeBox = await notice.boundingBox()
+  const tableBox = await page.locator('table').first().boundingBox()
+  expect(noticeBox?.y).toBeLessThan(tableBox?.y ?? 0)
+})
