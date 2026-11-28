@@ -1,0 +1,51 @@
+{
+  "id": "hammer-257-cal-107gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869056177",
+  "name": ".257 Cal-107gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 6.933
+  },
+  "length": {
+    "value": 35.31
+  },
+  "noseLength": {
+    "value": 20.32
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.257
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.51
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338972",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338972",
+  "name": "SPCE, .308, 150 gr (bullet 2936)",
+  "productLine": "SPCE",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.29
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

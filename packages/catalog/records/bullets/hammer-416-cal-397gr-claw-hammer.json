@@ -1,0 +1,37 @@
+{
+  "id": "hammer-416-cal-397gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "2139",
+  "name": ".416 Cal-397gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566
+  },
+  "mass": {
+    "value": 25.725
+  },
+  "length": {
+    "value": 38.43
+  },
+  "meplatDiameter": {
+    "value": 9.525
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.436
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "meplatDiameter", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

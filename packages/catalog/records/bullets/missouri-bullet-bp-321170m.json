@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-321170m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-321170M",
+  "name": "#1 .32-40 - Black Powder, 170 Grain RNFP",
+  "caliber": ".321",
+  "diameter": {
+    "value": 8.153
+  },
+  "mass": {
+    "value": 11.016
+  },
+  "length": {
+    "value": 21.72
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

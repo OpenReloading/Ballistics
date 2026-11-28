@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-459410gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-459410GL",
+  "name": "#1 SOCOM-Grooveless, 410 Grain RNFP - Grooveless",
+  "caliber": ".459",
+  "diameter": {
+    "value": 11.659
+  },
+  "mass": {
+    "value": 26.568
+  },
+  "length": {
+    "value": 27.03
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

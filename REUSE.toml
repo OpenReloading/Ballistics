@@ -37,6 +37,18 @@ path = "packages/catalog/records/**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
+# Facts makers and other publishers print (packages/catalog/LICENSE).
+[[annotations]]
+path = ["packages/catalog/records/bullets/*.json", "packages/catalog/records/powders/*.json"]
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "LicenseRef-Published-Facts AND CC-BY-SA-4.0"
+
+# The demo records are the project's own.
+[[annotations]]
+path = ["packages/catalog/records/bullets/demo-*.json", "packages/catalog/records/powders/demo-*.json"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
 # Records derived from Wikipedia: the Wikipedia contributors hold rights in them too.
 [[annotations]]
 path = "packages/catalog/records/capacities/*-wikipedia.json"

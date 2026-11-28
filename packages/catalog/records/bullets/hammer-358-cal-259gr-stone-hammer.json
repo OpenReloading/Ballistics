@@ -1,0 +1,37 @@
+{
+  "id": "hammer-358-cal-259gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "1624",
+  "name": ".358 Cal-259gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 16.783
+  },
+  "length": {
+    "value": 38.86
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.454
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

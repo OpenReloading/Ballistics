@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-452255m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452255M",
+  "name": ".45 Elmer K, 250 Grain SWC",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 16.2
+  },
+  "length": {
+    "value": 17.5
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

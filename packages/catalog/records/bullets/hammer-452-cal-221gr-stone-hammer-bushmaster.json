@@ -1,0 +1,47 @@
+{
+  "id": "hammer-452-cal-221gr-stone-hammer-bushmaster",
+  "manufacturer": "hammer",
+  "productNumber": "813869027352",
+  "name": ".452 Cal-221gr Stone Hammer® Bushmaster",
+  "productLine": "Stone Hammer Bushmaster",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 14.321
+  },
+  "length": {
+    "value": 22.1
+  },
+  "noseLength": {
+    "value": 14.19
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.206
+    }
+  ],
+  "slowestTwist": {
+    "value": 762
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

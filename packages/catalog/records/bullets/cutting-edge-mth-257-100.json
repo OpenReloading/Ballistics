@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-mth-257-100",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 257 100",
+  "name": "MTH 257 100 (MTH, 100 gr)",
+  "productLine": "MTH",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "length": {
+    "value": 28.85
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.42
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

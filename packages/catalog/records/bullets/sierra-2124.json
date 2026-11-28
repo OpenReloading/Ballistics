@@ -1,0 +1,52 @@
+{
+  "id": "sierra-2124",
+  "manufacturer": "sierra",
+  "productNumber": "2124",
+  "name": "30 CAL 135 GR HP VarmintKing (SVK)",
+  "caliber": "0.308",
+  "country": "US",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 8.748
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.308
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-135-gr-hp-varmintking-svk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

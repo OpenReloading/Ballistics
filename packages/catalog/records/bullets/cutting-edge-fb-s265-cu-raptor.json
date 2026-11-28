@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-fb-s265-cu-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB S265 CU Raptor",
+  "name": "FB S265 CU Raptor (Flat Base Raptor, 265 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633
+  },
+  "mass": {
+    "value": 17.172
+  },
+  "length": {
+    "value": 31.42
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.215
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

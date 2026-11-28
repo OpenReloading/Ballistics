@@ -1,0 +1,31 @@
+{
+  "id": "hammer-313-cal-86gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "7398",
+  "name": ".313 Cal-86gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95
+  },
+  "mass": {
+    "value": 5.573
+  },
+  "length": {
+    "value": 16.51
+  },
+  "slowestTwist": {
+    "value": 508
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

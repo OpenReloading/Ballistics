@@ -1,0 +1,57 @@
+{
+  "id": "lehigh-04264110sp",
+  "manufacturer": "lehigh",
+  "productNumber": "04264110SP",
+  "name": ".264 diameter, 110 grain Match Solid Bullets (50 count)",
+  "productLine": "Match Solid",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 7.128
+  },
+  "length": {
+    "value": 31.04
+  },
+  "construction": {
+    "raw": "Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.405
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.208
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lehigh-defense-store-product-attributes-graphql",
+        "url": "https://lehighdefense.com/graphql?query=%7Bproducts%28filter%3A%7Bcategory_uid%3A%7Beq%3A%22MTA%3D%22%7D%7D%2CpageSize%3A500%29%7Btotal_count%20items%7Bsku%20name%20url_key%20all_reloading_diameter%20all_reloading_weight_grains%20all_reloading_ld_tech%20all_reloading_ld_material%20all_reloading_ld_g1%20all_reloading_ld_g7%20all_reloading_ld_length%20all_reloading_ld_ogive_length%20all_reloading_ld_minimum_twist%20all_reloading_ld_sectional%7D%7D%7D",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "construction.raw",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

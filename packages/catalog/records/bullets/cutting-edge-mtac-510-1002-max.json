@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mtac-510-1002-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 510 1002 MAX",
+  "name": "MTAC 510 1002 MAX (MTAC, 1002 gr)",
+  "productLine": "MTAC",
+  "caliber": ".510",
+  "diameter": {
+    "value": 12.954
+  },
+  "mass": {
+    "value": 64.929
+  },
+  "length": {
+    "value": 75.16
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 1.175
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.601
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

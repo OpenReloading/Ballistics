@@ -1,0 +1,47 @@
+{
+  "id": "hammer-408-cal-272gr-pittman-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869027529",
+  "name": ".408 Cal-272gr Pittman Hammer",
+  "productLine": "Pittman Hammer",
+  "caliber": ".408",
+  "diameter": {
+    "value": 10.363
+  },
+  "mass": {
+    "value": 17.625
+  },
+  "length": {
+    "value": 35.43
+  },
+  "noseLength": {
+    "value": 20.11
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.399
+    }
+  ],
+  "slowestTwist": {
+    "value": 444.5
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

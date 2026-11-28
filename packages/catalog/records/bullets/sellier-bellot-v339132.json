@@ -1,0 +1,34 @@
+{
+  "id": "sellier-bellot-v339132",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339132",
+  "name": "FMJ, .277, 110 gr (bullet 2340)",
+  "productLine": "FMJ",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036
+  },
+  "mass": {
+    "value": 7.128
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.307
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

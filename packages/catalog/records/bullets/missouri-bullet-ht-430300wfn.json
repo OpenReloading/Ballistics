@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-430300wfn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-430300WFN",
+  "name": ".44 Hammer - Hi-Tek, 300 Grain WFN",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 19.44
+  },
+  "length": {
+    "value": 20.98
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

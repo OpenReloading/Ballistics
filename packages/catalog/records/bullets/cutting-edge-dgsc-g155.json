@@ -1,0 +1,29 @@
+{
+  "id": "cutting-edge-dgsc-g155",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGSC G155",
+  "name": "DGSC G155 (Safari Raptor, Solid & Lever+, 155 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 10.044
+  },
+  "length": {
+    "value": 34.85
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

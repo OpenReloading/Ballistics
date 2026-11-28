@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-430174cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-430174CB",
+  "name": "Cowboy #12 - Hi-Tek, 174 Grain TCFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 11.275
+  },
+  "length": {
+    "value": 13.56
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

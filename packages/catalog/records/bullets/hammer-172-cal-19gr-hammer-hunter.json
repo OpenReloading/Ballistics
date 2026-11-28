@@ -1,0 +1,37 @@
+{
+  "id": "hammer-172-cal-19gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "890",
+  "name": ".172 Cal-19gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".172",
+  "diameter": {
+    "value": 4.369
+  },
+  "mass": {
+    "value": 1.231
+  },
+  "length": {
+    "value": 12.7
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.151
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

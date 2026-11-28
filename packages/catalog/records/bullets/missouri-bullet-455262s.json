@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-455262s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "455262S",
+  "name": "Webley #1, 262 Grain RNFP",
+  "caliber": ".455",
+  "diameter": {
+    "value": 11.557
+  },
+  "mass": {
+    "value": 16.977
+  },
+  "length": {
+    "value": 17.68
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

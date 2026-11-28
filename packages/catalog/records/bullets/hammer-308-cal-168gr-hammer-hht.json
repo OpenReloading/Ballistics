@@ -1,0 +1,47 @@
+{
+  "id": "hammer-308-cal-168gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869039835",
+  "name": ".308 Cal-168gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "length": {
+    "value": 36.25
+  },
+  "noseLength": {
+    "value": 18.29
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.241
+    }
+  ],
+  "slowestTwist": {
+    "value": 285.75
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

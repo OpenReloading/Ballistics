@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-411225rnfp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "411225RNFP",
+  "name": ".41 Outlaw, 225 Grain RNFP",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439
+  },
+  "mass": {
+    "value": 14.58
+  },
+  "length": {
+    "value": 18.57
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

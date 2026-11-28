@@ -1,0 +1,31 @@
+{
+  "id": "hammer-427-cal-185gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "2439",
+  "name": ".427 Cal 185gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".427",
+  "diameter": {
+    "value": 10.846
+  },
+  "mass": {
+    "value": 12.053
+  },
+  "length": {
+    "value": 16.61
+  },
+  "slowestTwist": {
+    "value": 889
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

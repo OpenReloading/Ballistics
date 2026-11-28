@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-358158rnfp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-358158RNFP",
+  "name": "Cowboy #15 - Black Powder, 158 Grain RNFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 10.238
+  },
+  "length": {
+    "value": 16.33
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

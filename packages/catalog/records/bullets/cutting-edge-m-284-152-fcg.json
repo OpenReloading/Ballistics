@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-284-152-fcg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.284 152 FCG",
+  "name": "M.284 152 FCG (MAXIMUS, 152 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": "7MM (.284)",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 9.849
+  },
+  "length": {
+    "value": 36.17
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.473
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.235
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

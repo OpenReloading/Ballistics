@@ -1,0 +1,52 @@
+{
+  "id": "sierra-8310",
+  "manufacturer": "sierra",
+  "productNumber": "8310",
+  "name": "38 CAL 125 GR JSP SPORTS MASTER",
+  "caliber": "0.357",
+  "country": "US",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 8.1
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.133
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/38-cal-125-gr-jsp-sports-master/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

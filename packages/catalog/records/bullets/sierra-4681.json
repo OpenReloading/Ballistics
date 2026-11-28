@@ -1,0 +1,53 @@
+{
+  "id": "sierra-4681",
+  "manufacturer": "sierra",
+  "productNumber": "4681",
+  "name": "30 CAL 180 GR TIPPED GAMEKING (TGK) (Optimized for 30-06)",
+  "caliber": "0.308",
+  "country": "US",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.543
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.264
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-180-gr-tipped-gameking-tgk-optimized-for-30-06/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

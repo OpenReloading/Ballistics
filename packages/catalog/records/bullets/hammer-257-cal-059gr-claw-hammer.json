@@ -1,0 +1,47 @@
+{
+  "id": "hammer-257-cal-059gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869066572",
+  "name": ".257 Cal-059gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 3.823
+  },
+  "length": {
+    "value": 14.25
+  },
+  "noseLength": {
+    "value": 6.34
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.17
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

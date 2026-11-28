@@ -1,0 +1,37 @@
+{
+  "id": "hammer-338-cal-255gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "861",
+  "name": ".338 Cal-255gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 16.524
+  },
+  "length": {
+    "value": 40.64
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.501
+    }
+  ],
+  "slowestTwist": {
+    "value": 298.45
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

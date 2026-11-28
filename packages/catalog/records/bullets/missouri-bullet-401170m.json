@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-401170m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "401170M",
+  "name": "IDP #2, 170 Grain SWC",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185
+  },
+  "mass": {
+    "value": 11.016
+  },
+  "length": {
+    "value": 16.08
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

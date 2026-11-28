@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v318972",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318972",
+  "name": "JHP, .452, 230 gr (for 45 AUTO, 45 GAP)",
+  "productLine": "JHP",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 14.904
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

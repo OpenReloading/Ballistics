@@ -1,0 +1,25 @@
+{
+  "id": "sellier-bellot-v319842",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319842",
+  "name": "TFMJ, .355, 124 gr",
+  "productLine": "TFMJ",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.017
+  },
+  "mass": {
+    "value": 8.035
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

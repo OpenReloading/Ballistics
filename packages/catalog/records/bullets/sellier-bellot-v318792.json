@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v318792",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318792",
+  "name": "JHP, .400, 180 gr (for 40 S&W)",
+  "productLine": "JHP",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

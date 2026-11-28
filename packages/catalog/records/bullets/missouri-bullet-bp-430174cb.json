@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-430174cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-430174CB",
+  "name": "Cowboy #12 - Black Powder, 174 Grain TCFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 11.275
+  },
+  "length": {
+    "value": 13.56
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

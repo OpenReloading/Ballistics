@@ -1,0 +1,47 @@
+{
+  "id": "hammer-308-cal-180-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "10132",
+  "name": ".308 Cal-180 Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "length": {
+    "value": 37.59
+  },
+  "noseLength": {
+    "value": 21.72
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.243
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

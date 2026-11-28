@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v318842",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318842",
+  "name": "FMJ, .400, 165 gr (for 40 S&W)",
+  "productLine": "FMJ",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16
+  },
+  "mass": {
+    "value": 10.692
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

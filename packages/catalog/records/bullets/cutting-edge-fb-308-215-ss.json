@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-fb-308-215-ss",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 308 215 SS",
+  "name": "FB 308 215 SS (Flat Base Raptor, 215 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 13.932
+  },
+  "length": {
+    "value": 41.25
+  },
+  "slowestTwist": {
+    "value": 177.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

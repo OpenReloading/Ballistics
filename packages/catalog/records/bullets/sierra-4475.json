@@ -1,0 +1,53 @@
+{
+  "id": "sierra-4475",
+  "manufacturer": "sierra",
+  "productNumber": "4475",
+  "name": "270 CAL 175 GR Tipped GameKing (TGK)",
+  "caliber": "0.277",
+  "country": "US",
+  "diameter": {
+    "value": 7.036
+  },
+  "mass": {
+    "value": 11.34
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.633
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.315
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/270-cal-175-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

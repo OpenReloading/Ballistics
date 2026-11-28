@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-358158cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-358158CB",
+  "name": "Cowboy #11 - Black Powder, 158 Grain RN",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 10.238
+  },
+  "length": {
+    "value": 17.4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

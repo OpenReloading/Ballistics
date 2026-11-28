@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-430240cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "430240CB",
+  "name": "Cowboy #3, 240 Grain TCFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 15.552
+  },
+  "length": {
+    "value": 18.29
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

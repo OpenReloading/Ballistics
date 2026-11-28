@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338892",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338892",
+  "name": "EDGE, .264, 120 gr (bullet 9315)",
+  "productLine": "EDGE",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 7.776
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.348
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

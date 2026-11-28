@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v318622",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318622",
+  "name": "FMJ, .357, 158 gr (for 38 SPECIAL)",
+  "productLine": "FMJ",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 10.238
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

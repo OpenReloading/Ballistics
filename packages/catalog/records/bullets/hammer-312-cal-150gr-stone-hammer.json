@@ -1,0 +1,47 @@
+{
+  "id": "hammer-312-cal-150gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869028050",
+  "name": ".312 Cal-150gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".312",
+  "diameter": {
+    "value": 7.925
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "length": {
+    "value": 29.26
+  },
+  "noseLength": {
+    "value": 13.3
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.338
+    }
+  ],
+  "slowestTwist": {
+    "value": 342.9
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

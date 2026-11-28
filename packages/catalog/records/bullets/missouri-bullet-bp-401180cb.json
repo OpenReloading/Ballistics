@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-401180cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-401180CB",
+  "name": "Cowboy #10 - Black Powder, 180 Grain RNFP",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "length": {
+    "value": 15.04
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

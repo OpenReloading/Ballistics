@@ -1,0 +1,37 @@
+{
+  "id": "hammer-323-cal-265gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "7872",
+  "name": ".323 Cal-265gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204
+  },
+  "mass": {
+    "value": 17.172
+  },
+  "length": {
+    "value": 49.78
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.34
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

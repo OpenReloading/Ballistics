@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-mth-243-77-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 243 77 Gen2",
+  "name": "MTH 243 77 Gen2 (MTH, 77 gr)",
+  "productLine": "MTH",
+  "caliber": ".243 (6mm)",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 4.99
+  },
+  "length": {
+    "value": 25.98
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.37
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

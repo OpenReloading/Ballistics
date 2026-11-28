@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mth-338-265-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 338 265 MAX",
+  "name": "MTH 338 265 MAX (MTH, 265 gr)",
+  "productLine": "MTH",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 17.172
+  },
+  "length": {
+    "value": 46.38
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.767
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.393
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

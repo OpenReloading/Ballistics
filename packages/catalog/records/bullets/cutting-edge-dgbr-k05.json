@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-k05",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR K05",
+  "name": "DGBR K05 (Safari Raptor, Solid & Lever+, 350 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744
+  },
+  "mass": {
+    "value": 22.68
+  },
+  "length": {
+    "value": 32.36
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.17
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

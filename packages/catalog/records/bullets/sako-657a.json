@@ -1,0 +1,40 @@
+{
+  "id": "sako-657a",
+  "manufacturer": "sako",
+  "productNumber": "657A",
+  "name": "SAKO BLADE 657A",
+  "productLine": "BLADE",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "construction": {
+    "raw": "Expanding Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.41
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9, 16, 20",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

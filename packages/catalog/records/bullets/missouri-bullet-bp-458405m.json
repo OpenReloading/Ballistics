@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-458405m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-458405M",
+  "name": "#1 Buffalo - Black Powder, 405 Grain RNFP",
+  "caliber": ".459",
+  "diameter": {
+    "value": 11.659
+  },
+  "mass": {
+    "value": 26.244
+  },
+  "length": {
+    "value": 26.42
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

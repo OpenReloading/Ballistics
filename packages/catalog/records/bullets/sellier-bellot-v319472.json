@@ -1,0 +1,25 @@
+{
+  "id": "sellier-bellot-v319472",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319472",
+  "name": "WC, .314, 100 gr (for 32 S&W LONG)",
+  "productLine": "WC",
+  "caliber": ".314",
+  "diameter": {
+    "value": 7.976
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

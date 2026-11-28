@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-356115m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356115M",
+  "name": "Parabellum, 115 Grain 9MM RN",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042
+  },
+  "mass": {
+    "value": 7.452
+  },
+  "length": {
+    "value": 13.67
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

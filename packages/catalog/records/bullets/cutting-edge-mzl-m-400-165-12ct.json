@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mzl-m-400-165-12ct",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MZL M.400 165 12ct",
+  "name": "MZL M.400 165 12ct (MAXIMUS, 165 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16
+  },
+  "mass": {
+    "value": 10.692
+  },
+  "length": {
+    "value": 19.58
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.173
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.087
+    }
+  ],
+  "slowestTwist": {
+    "value": 762
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

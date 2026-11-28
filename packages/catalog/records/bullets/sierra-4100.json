@@ -1,0 +1,53 @@
+{
+  "id": "sierra-4100",
+  "manufacturer": "sierra",
+  "productNumber": "4100",
+  "name": "6MM 90 GR Tipped GameKing (TGK)",
+  "caliber": "0.243",
+  "country": "US",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 5.832
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.49
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.211
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6mm-90-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

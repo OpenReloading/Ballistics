@@ -1,0 +1,37 @@
+{
+  "id": "hammer-323-cal-192gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "6773",
+  "name": ".323 Cal-192gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204
+  },
+  "mass": {
+    "value": 12.441
+  },
+  "length": {
+    "value": 36.58
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.404
+    }
+  ],
+  "slowestTwist": {
+    "value": 292.1
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

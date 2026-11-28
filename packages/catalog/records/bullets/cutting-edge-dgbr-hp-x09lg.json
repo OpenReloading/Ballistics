@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-hp-x09lg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP X09LG",
+  "name": "DGBR-HP X09LG (Safari Raptor, Solid & Lever+, 350 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".510",
+  "diameter": {
+    "value": 12.954
+  },
+  "mass": {
+    "value": 22.68
+  },
+  "length": {
+    "value": 25.96
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.15
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "10",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

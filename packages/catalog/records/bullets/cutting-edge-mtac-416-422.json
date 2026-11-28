@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mtac-416-422",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 416 422",
+  "name": "MTAC 416 422 (MTAC, 422 gr)",
+  "productLine": "MTAC",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566
+  },
+  "mass": {
+    "value": 27.345
+  },
+  "length": {
+    "value": 50.19
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.801
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.41
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

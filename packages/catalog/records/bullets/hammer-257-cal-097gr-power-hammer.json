@@ -1,0 +1,47 @@
+{
+  "id": "hammer-257-cal-097gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869030407",
+  "name": ".257 Cal-097gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 6.285
+  },
+  "length": {
+    "value": 27.69
+  },
+  "noseLength": {
+    "value": 13.76
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.322
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

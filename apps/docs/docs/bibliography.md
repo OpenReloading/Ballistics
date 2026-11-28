@@ -317,6 +317,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Hornady Manufacturing
 
 - Hornady 2026 Product Catalog.
+- Hornady, rifle bullet product page. <https://www.hornady.com/bullets/rifle/30-cal-308-168-gr-bthp-match>
 - Hornady, contact page. <https://www.hornady.com/contact>
 
 ### IMR
@@ -391,6 +392,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Sellier & Bellot
 
 - Sellier & Bellot, component bullets (pistol and revolver table).
+- Sellier & Bellot, component bullets (rifle table).
 - Sellier & Bellot, contacts page. <https://www.sellier-bellot.cz/en/contacts/>
 
 ### Shooters World
@@ -458,6 +460,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Own methods
 
 - Constant-volume equilibrium solver (tools/src/thermo). <https://openreloading.github.io/Ballistics/docs/research/thermochemistry-ingredient-heats>
+- Mapping of the maker wording to bullet construction fields. <https://openreloading.github.io/Ballistics/docs/data/bullet-construction>
 
 ### Wikipedia
 

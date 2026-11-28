@@ -1,0 +1,40 @@
+{
+  "id": "sako-633a",
+  "manufacturer": "sako",
+  "productNumber": "633A",
+  "name": "SAKO BLADE X 633A",
+  "productLine": "BLADE X",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 7.776
+  },
+  "construction": {
+    "raw": "Expanding Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.284
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9, 16",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

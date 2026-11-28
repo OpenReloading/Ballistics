@@ -1,0 +1,35 @@
+{
+  "id": "hornady-24550",
+  "manufacturer": "hornady",
+  "productNumber": "24550",
+  "name": "6mm ELD-X, .243, 103 gr",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 6.674
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.512
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.258
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "80",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

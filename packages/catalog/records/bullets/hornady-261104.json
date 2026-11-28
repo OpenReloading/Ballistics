@@ -1,0 +1,35 @@
+{
+  "id": "hornady-261104",
+  "manufacturer": "hornady",
+  "productNumber": "261104",
+  "name": "6.5mm CX, .264, 120 gr",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 7.776
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.428
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.215
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "82",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

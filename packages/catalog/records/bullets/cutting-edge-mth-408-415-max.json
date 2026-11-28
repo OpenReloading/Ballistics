@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mth-408-415-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 408 415 MAX",
+  "name": "MTH 408 415 MAX (MTH, 415 gr)",
+  "productLine": "MTH",
+  "caliber": ".408",
+  "diameter": {
+    "value": 10.363
+  },
+  "mass": {
+    "value": 26.892
+  },
+  "length": {
+    "value": 50.44
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.783
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.393
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-243-77",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.243 77",
+  "name": "M.243 77 (MAXIMUS, 77 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 4.99
+  },
+  "length": {
+    "value": 25.93
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.344
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.172
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-hp-y05ne",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP Y05NE",
+  "name": "DGBR-HP Y05NE (Safari Raptor, Solid & Lever+, 600 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".585",
+  "diameter": {
+    "value": 14.859
+  },
+  "mass": {
+    "value": 38.879
+  },
+  "length": {
+    "value": 33.3
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.16
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "10",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

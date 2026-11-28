@@ -1,0 +1,34 @@
+{
+  "id": "sellier-bellot-v339372",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339372",
+  "name": "FMJ, .323, 196 gr (bullet 2910)",
+  "productLine": "FMJ",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204
+  },
+  "mass": {
+    "value": 12.701
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.509
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

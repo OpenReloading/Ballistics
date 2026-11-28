@@ -1,0 +1,49 @@
+{
+  "id": "sierra-8325",
+  "manufacturer": "sierra",
+  "productNumber": "8325",
+  "name": "38 CAL 140 GR JHP SPORTS MASTER",
+  "caliber": "0.357",
+  "country": "US",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 9.072
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.078
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/38-cal-140-gr-jhp-sports-master/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "hornady-17016",
+  "manufacturer": "hornady",
+  "productNumber": "17016",
+  "name": "17 Cal. NTX, .172, 15.5 gr",
+  "caliber": ".172",
+  "diameter": {
+    "value": 4.369
+  },
+  "mass": {
+    "value": 1.004
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "91",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

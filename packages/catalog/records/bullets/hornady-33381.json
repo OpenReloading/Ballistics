@@ -1,0 +1,35 @@
+{
+  "id": "hornady-33381",
+  "manufacturer": "hornady",
+  "productNumber": "33381",
+  "name": "338 Cal. ELD Match, .338, 285 gr",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 18.468
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.829
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.417
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "75",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

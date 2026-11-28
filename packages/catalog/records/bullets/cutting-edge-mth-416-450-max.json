@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mth-416-450-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 416 450 MAX",
+  "name": "MTH 416 450 MAX (MTH, 450 gr)",
+  "productLine": "MTH",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566
+  },
+  "mass": {
+    "value": 29.16
+  },
+  "length": {
+    "value": 53.26
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.817
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.418
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

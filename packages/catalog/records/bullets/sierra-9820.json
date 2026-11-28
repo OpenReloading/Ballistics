@@ -1,0 +1,52 @@
+{
+  "id": "sierra-9820",
+  "manufacturer": "sierra",
+  "productNumber": "9820",
+  "name": "45 CAL 200 GR JHP - Sig V-Crown",
+  "caliber": "0.4515",
+  "country": "US",
+  "diameter": {
+    "value": 11.468
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.118
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/45-cal-200-gr-jhp-sig-v-crown/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-452200m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452200M",
+  "name": "IDP #1, 200 Grain SWC",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 16.41
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

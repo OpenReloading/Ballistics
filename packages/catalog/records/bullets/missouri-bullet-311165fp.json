@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-311165fp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "311165FP",
+  "name": "#4 Whitetail, 165 Grain RNFP",
+  "caliber": ".311",
+  "diameter": {
+    "value": 7.899
+  },
+  "mass": {
+    "value": 10.692
+  },
+  "length": {
+    "value": 23.52
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

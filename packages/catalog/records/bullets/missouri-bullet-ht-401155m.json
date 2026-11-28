@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-401155m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-401155M",
+  "name": "IDP #9 - Hi-Tek, 155 Grain SWC",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185
+  },
+  "mass": {
+    "value": 10.044
+  },
+  "length": {
+    "value": 14.73
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

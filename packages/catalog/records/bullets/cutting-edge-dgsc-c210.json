@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgsc-c210",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGSC C210",
+  "name": "DGSC C210 (Safari Raptor, Solid & Lever+, 210 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 13.608
+  },
+  "length": {
+    "value": 34.06
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.24
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

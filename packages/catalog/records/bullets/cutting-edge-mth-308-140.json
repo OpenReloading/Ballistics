@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mth-308-140",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 308 140",
+  "name": "MTH 308 140 (MTH, 140 gr)",
+  "productLine": "MTH",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 9.072
+  },
+  "length": {
+    "value": 29.79
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.394
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.202
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "hornady-40047",
+  "manufacturer": "hornady",
+  "productNumber": "40047",
+  "name": "10mm FMJ-FP, .400, 180 gr",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "97",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

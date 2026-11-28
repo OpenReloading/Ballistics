@@ -1,0 +1,35 @@
+{
+  "id": "hornady-245301",
+  "manufacturer": "hornady",
+  "productNumber": "245301",
+  "name": "6mm ELD Match, .243, 109 gr",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 7.063
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.585
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.295
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "74",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

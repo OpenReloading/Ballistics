@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-338-225-fcg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.338 225 FCG",
+  "name": "M.338 225 FCG (MAXIMUS, 225 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 14.58
+  },
+  "length": {
+    "value": 37.95
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.486
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.243
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

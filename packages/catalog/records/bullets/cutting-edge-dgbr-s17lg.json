@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-s17lg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR S17LG",
+  "name": "DGBR S17LG (Safari Raptor, Solid & Lever+, 325 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633
+  },
+  "mass": {
+    "value": 21.06
+  },
+  "length": {
+    "value": 25.76
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.17
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

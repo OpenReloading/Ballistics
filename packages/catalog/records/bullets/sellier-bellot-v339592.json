@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v339592",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339592",
+  "name": "EDGE, .308, 165 gr (bullet 9318)",
+  "productLine": "EDGE",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.692
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.357
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

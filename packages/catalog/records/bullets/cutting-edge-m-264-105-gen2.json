@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-264-105-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.264 105 Gen2",
+  "name": "M.264 105 Gen2 (MAXIMUS, 105 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 6.804
+  },
+  "length": {
+    "value": 28.88
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.423
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.212
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

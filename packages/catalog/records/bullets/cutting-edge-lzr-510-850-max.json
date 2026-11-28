@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-lzr-510-850-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 510 850 MAX",
+  "name": "LZR 510 850 MAX (Lazer, 850 gr)",
+  "productLine": "Lazer",
+  "caliber": ".510",
+  "diameter": {
+    "value": 12.954
+  },
+  "mass": {
+    "value": 55.079
+  },
+  "length": {
+    "value": 69.77
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 1.125
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.562
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

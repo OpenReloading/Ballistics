@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-361145sw",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "361145SW",
+  "name": ".38 S&W, 145 Grain RN",
+  "caliber": ".361",
+  "diameter": {
+    "value": 9.169
+  },
+  "mass": {
+    "value": 9.396
+  },
+  "length": {
+    "value": 16.26
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}
