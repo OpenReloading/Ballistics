@@ -1,6 +1,6 @@
-import { mkdtempSync, readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { run } from '../src/main.ts'
 import { rowsPath } from './data.ts'
@@ -18,16 +18,18 @@ const worse = join(import.meta.dirname, 'fixtures/worse-model.mjs')
 const records = recordRoots.flatMap((r) => ['--records', r])
 const data = ['--rows', rowsPath, ...records]
 // a fit runs the model many times per powder: five rows of one powder keep it short
-const few = [
-  '--rows',
+const fewRows = dirname(
   writeRows(
-    rowsCsv([
-      ...[2.0, 2.2, 2.4].map((charge) => ({ cartridge: '30-br', charge, velocity: 0.01 })),
-      ...[2.0, 2.2].map((charge) => ({ cartridge: '308-match', charge, velocity: 0.01 })),
-    ]),
+    rowsCsv([2.0, 2.2, 2.4].map((charge) => ({ cartridge: '30-br', charge, velocity: 0.01 }))),
+    'a.csv',
   ),
-  ...records,
-]
+)
+// a second file in the folder makes the rows fingerprint hash more than one file
+writeFileSync(
+  join(fewRows, 'b.csv'),
+  rowsCsv([2.0, 2.2].map((charge) => ({ cartridge: '308-match', charge, velocity: 0.01 }))),
+)
+const few = ['--rows', fewRows, ...records]
 const example = JSON.parse(
   readFileSync(join(import.meta.dirname, '../examples/interior.json'), 'utf8'),
 )
@@ -89,19 +91,20 @@ const cases: Record<
   'exit-70-internal-table': { args: ['verify', ...data], tty: true, write: throwOnWrite },
 }
 
-/** The operations list with each JSON Schema replaced by a marker, in the command's own layout. */
+/** The operations list with each JSON Schema replaced by a marker, once the command's own layout is checked. */
 function withoutSchemas(text: string) {
+  expect(text).toBe(`${JSON.stringify(JSON.parse(text), null, 2)}\n`)
   const { operations } = JSON.parse(text) as { operations: Record<string, unknown>[] }
   const marked = operations.map((o) => ({ ...o, input: '<JSON Schema>', output: '<JSON Schema>' }))
   return `${JSON.stringify({ operations: marked }, null, 2)}\n`
 }
 
-/** Replaces what differs between machines and releases: temporary folders, the clone, hashes and the version. */
+/** Replaces what differs between machines and releases: temporary folders, the clone, the model versions (they hash the built sources) and the version; the rows and records fingerprints stay. */
 function stable(text: string) {
   return text
     .replaceAll(/[^\s"']*\/cli-(?:rows|estimates)-[A-Za-z0-9]+/g, '<tmp>')
     .replaceAll(repo, '<repo>')
-    .replaceAll(/\b[0-9a-f]{64}\b/g, '<sha256>')
+    .replaceAll(/("modelVersion": "|\bversion )[0-9a-f]{64}\b/g, '$1<sha256>')
     .replaceAll(`ballistics ${version}`, 'ballistics <version>')
 }
 

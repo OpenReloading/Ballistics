@@ -6,8 +6,8 @@ exit 0
   "format": "rangefoundry-cli-fit",
   "command": "fit",
   "inputs": {
-    "rows": "<sha256>",
-    "records": "<sha256>"
+    "rows": "9ccecaaaa38860d49da04d0abf27c06494b2ee9dbce1dcb27ad607903ea9b030",
+    "records": "7595eaf50cfa271d50eac4f6fc0347fd17300adadedbc121fad43d7673c6f2f1"
   },
   "model": "m3",
   "modelVersion": "<sha256>",
