@@ -14,6 +14,7 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "catalog:",
     "@rangefoundry/api": "workspace:*",
     "@rangefoundry/ballistics": "workspace:*",
     "@rangefoundry/catalog": "workspace:*",
@@ -23,6 +24,7 @@
     "@rangefoundry/tools": "workspace:*",
     "@rangefoundry/units": "workspace:*",
     "@rangefoundry/use-cases": "workspace:*",
+    "commander": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

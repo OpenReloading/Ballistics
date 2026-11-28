@@ -1,5 +1,11 @@
 import { readFileSync } from 'node:fs'
-import { type ParseArgsConfig, parseArgs } from 'node:util'
+import {
+  Command,
+  CommanderError,
+  Help,
+  InvalidArgumentError,
+  Option,
+} from '@commander-js/extra-typings'
 import type { Options } from './commands.ts'
 import { ExpectedError, internalCode, UsageError } from './errors.ts'
 import type { Grouping } from './metrics.ts'
@@ -14,226 +20,144 @@ export interface Io {
   tty: boolean
 }
 
-const usage = `usage:
-  ballistics verify  --rows <path> [--model m3|<module>] [options]
-  ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
-  ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>]
-                     [--exponent family [--family <fit.json>]]
-                     [--pressure-sigma <fraction> [--pressure-factor <key>]] [--energy prior|family]
-                     [--folds] [--records <dir>] [--json | --table]
-  ballistics run <operation> --input <file|-> [--records <dir>]
-  ballistics estimate-capacities --out <dir> [--records <dir>]
-  ballistics operations
-  ballistics --help | --version
-
-options:
-  --rows <path>      a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS);
-                     catalogue for the published loads of the records, or a folder
-                     laid out as records/loads/ (maker tables only)
-  --records <dir>    a records root, repeatable (default: BALLISTICS_RECORDS, else the repository records)
-  --split <name>     validation (default), training or test
-  --final            required for the test split
-  --group-by <key>   also group by powder, family, cartridge, bullet or construction
-  --leave-one-powder-out
-                     verify: add the line of the powder not in the fitted set
-  --per-row          verify: add the error of each used row, which a compare against
-                     this result as --baseline pairs (in the JSON, not the table)
-  --params records|fit-on-training
-                     the powder parameters of the records (default), or the burn
-                     coefficients fitted to the training rows
-  --fit <fit.json>   verify and compare, instead of --params: evaluate the values of a saved
-                     fit of the same rows and records without fitting; the result is
-                     marked as a screen with this build's version and carries the fit's
-                     model version
-  --velocity-sigma <fraction>
-                     fit and --params fit-on-training: velocity sigma of a row, a fraction
-                     of its velocity (default 0.03)
-  --exponent family  fit and --params fit-on-training: choose the pressure exponent per
-                     powder family and fit each burn coefficient at it
-  --family <fit.json>
-                     with --exponent family: take the family choice of a saved fit of the
-                     same rows, records, velocity sigma and build instead of making it
-  --pressure-sigma <fraction>
-                     fit and --params fit-on-training: fit the printed pressures too, with
-                     this sigma, a fraction of the pressure, and one factor per key
-  --pressure-factor basis|table|cartridge|table-cartridge
-                     with --pressure-sigma: the key of a pressure factor, the row's pressure
-                     basis (default), its table, its cartridge or both
-  --energy prior     fit and --params fit-on-training: each powder's energy is its prior
-                     from thermochemistry times one energy-level factor chosen on the
-                     training pressures; only the burn coefficient is fitted per powder
-  --energy family    fit and --params fit-on-training: each powder's energy is fitted with
-                     its burn coefficient, under a prior on its family's median impetus
-                     (all reference powders' for a family with fewer than 5) that
-                     tightens as its used rows (below 20) or cartridges (below 4) fall
-  --folds            fit and verify: cross-validate over 5 folds of the cartridges of the
-                     training and validation splits (the fold of a cartridge is its place,
-                     mod 5, in the order of the SHA-256 of 2026-11-14/<cartridge id>); each
-                     fold is scored by a fit, with the fit options, on the other four, and
-                     the result holds each fold and all folds together; the test split is
-                     not read; verify takes no --split, --params or --fit with it
-  --json | --table   output format (default: JSON unless stdout is a terminal)
-  -h, --help         this text
-  --version          the version
-
-exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
+const exitCodes = `exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
 unreadable input, 70 internal error`
 
-/** The help of `run` and `operations`, each with an example that runs from the repository root. */
-const commandHelp = {
-  run: `usage: ballistics run <operation> --input <file|-> [--records <dir>]
-
-Runs one compute operation offline and writes its answer as JSON: the answer of the
-route POST /v1/<operation> to the body in the --input file (- for stdin). Record ids
-resolve against --records (repeatable, default BALLISTICS_RECORDS, else the repository
-records). A body the schema rejects is bad data (exit 65), a 422 answer a refusal (exit 1).
-
-example:
-  node apps/cli/dist/bin.js run interior --input apps/cli/examples/interior.json`,
-  'estimate-capacities': `usage: ballistics estimate-capacities --out <dir> [--records <dir>]
-
-Writes a capacity record (provenance kind derived) for each cartridge of the records that has
-a case outline and neither a capacity nor a case with one, to <dir>/capacities/, a folder that
-must not exist yet: the outline volume times the median of capacity over outline volume of the
-cartridges with a capacity record. Pass <dir> as one more --records root: verify and compare
-report its rows as estimatedCapacity, apart from the other rows, and fit does not read them.
-Writes the fill factor, its cartridges, its leave-one-out error and the count as JSON.
-
-example:
-  node apps/cli/dist/bin.js estimate-capacities --out /tmp/estimates`,
-  operations: `usage: ballistics operations
-
-Writes every operation of run as JSON: its name, summary, description, and the JSON Schema
-(2020-12) of its input body and of its answer.
-
-example:
-  node apps/cli/dist/bin.js operations`,
+/** The values of the options of verify, compare and fit, each command taking its own subset. */
+interface Values {
+  rows?: string | undefined
+  records?: string[] | undefined
+  split?: Split | undefined
+  final?: true | undefined
+  model?: string | undefined
+  baseline?: string | undefined
+  candidate?: string | undefined
+  json?: true | undefined
+  table?: true | undefined
+  groupBy?: string | undefined
+  params?: 'records' | 'fit-on-training' | undefined
+  leaveOnePowderOut?: true | undefined
+  perRow?: true | undefined
+  velocitySigma?: number | undefined
+  exponent?: 'family' | undefined
+  pressureSigma?: number | undefined
+  pressureFactor?: string | undefined
+  energy?: 'prior' | 'family' | undefined
+  fit?: string | undefined
+  family?: string | undefined
+  folds?: true | undefined
 }
 
-/** Parses a command line, an unknown or malformed option is bad input with `help`. */
-function parse<T extends ParseArgsConfig>(config: T, help = usage) {
-  try {
-    return parseArgs(config)
-  } catch (error) {
-    // parseArgs reports an unknown or malformed option as a TypeError with a code
-    if (error instanceof TypeError && 'code' in error)
-      throw new UsageError(`${error.message}\n\n${help}`)
-    throw error
+/** A sigma option's fraction, bad input outside (0, 1). */
+function fraction(value: string) {
+  const sigma = Number(value)
+  if (!Number.isFinite(sigma) || sigma <= 0 || sigma >= 1)
+    throw new InvalidArgumentError('It is a fraction above 0 and below 1.')
+  return sigma
+}
+
+/** The options of verify, compare and fit with today's descriptions; each command adds its own. */
+function rowsOptions() {
+  const sigma = (flags: `--${string} <fraction>`, description: string) =>
+    new Option(flags, description).argParser(fraction)
+  return {
+    rows: new Option(
+      '--rows <path>',
+      'a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS); catalogue for the published loads of the records, or a folder laid out as records/loads/ (maker tables only)',
+    ),
+    records: new Option(
+      '--records <dir>',
+      'a records root, repeatable (default: BALLISTICS_RECORDS, else the repository records)',
+    ).argParser((value, previous: string[] = []) => [...previous, value]),
+    split: new Option('--split <name>', 'the split (default: validation)').choices(splits),
+    final: new Option('--final', 'required for the test split'),
+    model: new Option(
+      '--model <m3|module>',
+      'm3 (default), the model of the installed @rangefoundry/ballistics, or a module that exports interior(load, options?)',
+    ),
+    json: new Option(
+      '--json',
+      'output format JSON (default: JSON unless stdout is a terminal)',
+    ).conflicts('table'),
+    table: new Option('--table', 'output format a table (default on a terminal)'),
+    groupBy: new Option(
+      '--group-by <key>',
+      'also group by powder, family, cartridge, bullet or construction',
+    ),
+    params: new Option(
+      '--params <params>',
+      'the powder parameters of the records (default), or the burn coefficients fitted to the training rows',
+    ).choices(['records', 'fit-on-training']),
+    fit: new Option(
+      '--fit <fit.json>',
+      'instead of --params: evaluate the values of a saved fit of the same rows and records without fitting; the result is marked as a screen with this build version and carries the fit model version',
+    ),
+    velocitySigma: sigma(
+      '--velocity-sigma <fraction>',
+      'fit and --params fit-on-training: velocity sigma of a row, a fraction of its velocity (default 0.03)',
+    ),
+    exponent: new Option(
+      '--exponent <exponent>',
+      'fit and --params fit-on-training: choose the pressure exponent per powder family and fit each burn coefficient at it',
+    ).choices(['family']),
+    family: new Option(
+      '--family <fit.json>',
+      'with --exponent family: take the family choice of a saved fit of the same rows, records, velocity sigma and build instead of making it',
+    ),
+    pressureSigma: sigma(
+      '--pressure-sigma <fraction>',
+      'fit and --params fit-on-training: fit the printed pressures too, with this sigma, a fraction of the pressure, and one factor per key',
+    ),
+    pressureFactor: new Option(
+      '--pressure-factor <key>',
+      "with --pressure-sigma: the key of a pressure factor, the row's pressure basis (default), its table, its cartridge or both",
+    ),
+    energy: new Option(
+      '--energy <energy>',
+      "fit and --params fit-on-training: prior, each powder's energy is its prior from thermochemistry times one energy-level factor chosen on the training pressures and only the burn coefficient is fitted per powder; family, each powder's energy is fitted with its burn coefficient, under a prior on its family's median impetus (all reference powders' for a family with fewer than 5) that tightens as its used rows (below 20) or cartridges (below 4) fall",
+    ).choices(['prior', 'family']),
+    folds: new Option(
+      '--folds',
+      'cross-validate over 5 folds of the cartridges of the training and validation splits (the fold of a cartridge is its place, mod 5, in the order of the SHA-256 of 2026-11-14/<cartridge id>); each fold is scored by a fit, with the fit options, on the other four, and the result holds each fold and all folds together; the test split is not read; verify takes no --split, --params or --fit with it',
+    ),
   }
 }
 
-/** Refuses an option value that is not one of its choices. */
+/** Refuses an option value that is not one of the choices of the libraries, which load after the command line parses. */
 function checkChoices(
-  values: {
-    json?: boolean | undefined
-    table?: boolean | undefined
-    params?: string | undefined
-    exponent?: string | undefined
-    energy?: string | undefined
-    'pressure-factor'?: string | undefined
-  },
-  split: string,
-  by: string | undefined,
+  values: Values,
   choices: { groupings: readonly Grouping[]; pressureKeys: readonly string[] },
 ) {
   const { groupings, pressureKeys } = choices
-  if (!splits.includes(split as Split))
-    throw new UsageError(`--split is one of ${splits.join(', ')}`)
-  if (values.json && values.table) throw new UsageError('--json and --table exclude each other')
-  if (by !== undefined && !groupings.includes(by as Grouping))
+  if (values.groupBy !== undefined && !groupings.includes(values.groupBy as Grouping))
     throw new UsageError(`--group-by is one of ${groupings.join(', ')}`)
-  if (
-    values.params !== undefined &&
-    values.params !== 'records' &&
-    values.params !== 'fit-on-training'
-  )
-    throw new UsageError('--params is records or fit-on-training')
-  if (values.exponent !== undefined && values.exponent !== 'family')
-    throw new UsageError('--exponent is family')
-  if (values.energy !== undefined && values.energy !== 'prior' && values.energy !== 'family')
-    throw new UsageError('--energy is prior or family')
-  const key = values['pressure-factor']
+  const key = values.pressureFactor
   if (key !== undefined && !pressureKeys.includes(key))
     throw new UsageError(`--pressure-factor is one of ${pressureKeys.join(', ')}`)
 }
 
-/** The fraction of the sigma option `name`, undefined without it; bad input outside (0, 1). */
-function sigmaOf(name: string, value: string | undefined) {
-  if (value === undefined) return
-  const sigma = Number(value)
-  if (!Number.isFinite(sigma) || sigma <= 0 || sigma >= 1)
-    throw new UsageError(`--${name} is a fraction above 0 and below 1`)
-  return sigma
-}
-
 /** The commands that evaluate or fit on rows. */
-type Command = 'verify' | 'compare' | 'fit'
-
-/** The options each command does not take. */
-const foreignOptions = {
-  verify: ['baseline', 'candidate'],
-  compare: ['model', 'leave-one-powder-out', 'per-row', 'folds'],
-  fit: [
-    'fit',
-    'split',
-    'final',
-    'baseline',
-    'candidate',
-    'group-by',
-    'params',
-    'leave-one-powder-out',
-    'per-row',
-  ],
-} as const
+type RowsCommand = 'verify' | 'compare' | 'fit'
 
 /** The options of the command line, with the environment's defaults. */
 function optionsOf(
-  command: Command,
-  args: string[],
+  command: RowsCommand,
+  values: Values,
   env: NodeJS.ProcessEnv,
   warn: Io['stderr'],
-  choices: Parameters<typeof checkChoices>[3],
+  choices: Parameters<typeof checkChoices>[1],
 ) {
-  const { values } = parse({
-    args,
-    strict: true,
-    options: {
-      rows: { type: 'string' },
-      records: { type: 'string', multiple: true },
-      split: { type: 'string' },
-      final: { type: 'boolean' },
-      model: { type: 'string' },
-      baseline: { type: 'string' },
-      candidate: { type: 'string' },
-      json: { type: 'boolean' },
-      table: { type: 'boolean' },
-      'group-by': { type: 'string' },
-      params: { type: 'string' },
-      'leave-one-powder-out': { type: 'boolean' },
-      'per-row': { type: 'boolean' },
-      'velocity-sigma': { type: 'string' },
-      exponent: { type: 'string' },
-      'pressure-sigma': { type: 'string' },
-      'pressure-factor': { type: 'string' },
-      energy: { type: 'string' },
-      fit: { type: 'string' },
-      family: { type: 'string' },
-      folds: { type: 'boolean' },
-    },
-  })
-  const foreign = foreignOptions[command].filter((o) => values[o] !== undefined)
-  if (foreign.length > 0) throw new UsageError(`${command} takes no --${foreign.join(' or --')}`)
-  for (const option of [
-    'velocity-sigma',
-    'exponent',
-    'pressure-sigma',
-    'pressure-factor',
-    'energy',
-    'family',
+  for (const [option, value] of [
+    ['velocity-sigma', values.velocitySigma],
+    ['exponent', values.exponent],
+    ['pressure-sigma', values.pressureSigma],
+    ['pressure-factor', values.pressureFactor],
+    ['energy', values.energy],
+    ['family', values.family],
   ] as const)
     if (
       command !== 'fit' &&
-      values[option] !== undefined &&
+      value !== undefined &&
       values.params !== 'fit-on-training' &&
       !values.folds
     )
@@ -244,41 +168,39 @@ function optionsOf(
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
   if (values.folds && values.split !== undefined)
     throw new UsageError('--folds reads the training and validation splits and takes no --split')
-  const split = values.split ?? 'validation'
-  const by = values['group-by']
-  checkChoices(values, split, by, choices)
+  checkChoices(values, choices)
   const fromEnv = env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
   const options: Options = {
     rows,
     records: values.records ?? fromEnv,
-    split: split as Split,
+    split: values.split ?? 'validation',
     final: values.final === true,
-    leaveOnePowderOut: values['leave-one-powder-out'] === true,
-    perRow: values['per-row'] === true,
+    leaveOnePowderOut: values.leaveOnePowderOut === true,
+    perRow: values.perRow === true,
     warn,
-    ...(by !== undefined && { groupBy: by as Grouping }),
-    params: values.params as Options['params'],
-    velocitySigma: sigmaOf('velocity-sigma', values['velocity-sigma']),
-    exponent: values.exponent as Options['exponent'],
-    pressureSigma: sigmaOf('pressure-sigma', values['pressure-sigma']),
-    pressureFactor: values['pressure-factor'] as Options['pressureFactor'],
-    energy: values.energy as Options['energy'],
+    ...(values.groupBy !== undefined && { groupBy: values.groupBy as Grouping }),
+    params: values.params,
+    velocitySigma: values.velocitySigma,
+    exponent: values.exponent,
+    pressureSigma: values.pressureSigma,
+    pressureFactor: values.pressureFactor as Options['pressureFactor'],
+    energy: values.energy,
     fit: values.fit,
     family: values.family,
     folds: values.folds === true,
   }
-  return { options, values }
+  return options
 }
 
 /** Runs `command` with its options and returns the text of the result. */
-async function execute(command: Command, args: string[], env: NodeJS.ProcessEnv, io: Io) {
+async function execute(command: RowsCommand, values: Values, env: NodeJS.ProcessEnv, io: Io) {
   // the libraries load after --help and --version have answered
   const [{ compare, fit, verify }, { groupings }, { pressureKeys }] = await Promise.all([
     import('./commands.ts'),
     import('./metrics.ts'),
     import('./fit.ts'),
   ])
-  const { options, values } = optionsOf(command, args, env, io.stderr, { groupings, pressureKeys })
+  const options = optionsOf(command, values, env, io.stderr, { groupings, pressureKeys })
   const json = values.json === true || (values.table !== true && !io.tty)
   if (command === 'fit') {
     const result = await fit(options, values.model)
@@ -294,55 +216,175 @@ async function execute(command: Command, args: string[], env: NodeJS.ProcessEnv,
   return json ? JSON.stringify(result, null, 2) : compareTable(result)
 }
 
-/** Runs `run` or `operations` with its options and returns the answer. */
-async function operate(
-  command: 'run' | 'operations',
-  args: string[],
-  env: NodeJS.ProcessEnv,
-  io: Io,
-) {
-  const { listOperations, runOperation } = await import('./operations.ts')
-  if (command === 'operations') {
-    parse({ args, strict: true, options: { json: { type: 'boolean' } } }, commandHelp.operations)
-    return listOperations()
+/** Ends a parse error of `command` as bad usage followed by its help; help and version end the run with 0. */
+function usageError(command: { helpInformation: () => string }) {
+  return (error: CommanderError): never => {
+    if (error.exitCode === 0) throw error
+    const help = command.helpInformation().trimEnd()
+    if (error.code === 'commander.help') throw new UsageError(help)
+    // commander starts its messages with "error: ", which the stderr line already says by its kind
+    const message = error.message.replace(/^error: (.)/, (_, first: string) => first.toUpperCase())
+    throw new UsageError(`${message}\n\n${help}`)
   }
-  const { values, positionals } = parse(
-    {
-      args,
-      strict: true,
-      allowPositionals: true,
-      options: {
-        input: { type: 'string' },
-        records: { type: 'string', multiple: true },
-        json: { type: 'boolean' },
-      },
-    },
-    commandHelp.run,
-  )
-  const [name, ...extra] = positionals
-  if (name === undefined || extra.length > 0 || values.input === undefined)
-    throw new UsageError(commandHelp.run)
-  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
-  return await runOperation(name, values.input, roots, io.stderr)
 }
 
-/** Runs `estimate-capacities` with its options and returns its summary. */
-async function estimate(args: string[], env: NodeJS.ProcessEnv) {
-  const { values } = parse(
-    {
-      args,
-      strict: true,
-      options: {
-        out: { type: 'string' },
-        records: { type: 'string', multiple: true },
+/** The command line of one run, writing help and version to stdout and each result through `io`. */
+function program(env: NodeJS.ProcessEnv, io: Io) {
+  const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+  const roots = (records: string[] | undefined) =>
+    records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+  const root = new Command('ballistics')
+    .description(
+      'Measures how far the interior model is from printed load rows it was not fitted to, says whether a changed model got better, and runs the compute operations of the REST API offline. Results are simulations compared with printed values, never load data.',
+    )
+    .configureOutput({ writeOut: io.stdout, writeErr: () => {} })
+    .configureHelp({
+      styleTitle: (title) => title.toLowerCase(),
+      // operations sets a blank usage, as commander replaces an empty one with its own
+      commandUsage(command) {
+        return Help.prototype.commandUsage.call(this, command).trimEnd()
       },
-    },
-    commandHelp['estimate-capacities'],
-  )
-  if (values.out === undefined) throw new UsageError(commandHelp['estimate-capacities'])
-  const { writeEstimatedCapacities } = await import('./capacity.ts')
-  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
-  return writeEstimatedCapacities(roots, values.out)
+    })
+    .helpOption('-h, --help', 'this text')
+    .helpCommand(false)
+    .version(`ballistics ${version}`, '--version', 'the version')
+    .addHelpText('after', `\n${exitCodes}`)
+  root.exitOverride(usageError(root))
+  const o = rowsOptions()
+
+  const verify = root
+    .command('verify')
+    .summary('evaluate one model on a split of the rows')
+    .usage('--rows <path> [--model m3|<module>] [options]')
+    .addOption(o.rows)
+    .addOption(o.model)
+    .addOption(o.records)
+    .addOption(o.split)
+    .addOption(o.final)
+    .addOption(o.groupBy)
+    .option('--leave-one-powder-out', 'add the line of the powder not in the fitted set')
+    .option(
+      '--per-row',
+      'add the error of each used row, which a compare against this result as --baseline pairs (in the JSON, not the table)',
+    )
+    .addOption(o.params)
+    .addOption(o.fit)
+    .addOption(o.velocitySigma)
+    .addOption(o.exponent)
+    .addOption(o.family)
+    .addOption(o.pressureSigma)
+    .addOption(o.pressureFactor)
+    .addOption(o.energy)
+    .addOption(o.folds)
+    .addOption(o.json)
+    .addOption(o.table)
+    .action(async (values) => io.stdout(`${await execute('verify', values, env, io)}\n`))
+  verify.exitOverride(usageError(verify))
+
+  const compare = root
+    .command('compare')
+    .summary('compare a candidate model with a baseline on the same rows and split')
+    .usage('--rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]')
+    .addOption(o.rows)
+    .option('--baseline <m3|module|verify.json>', 'm3, a module or a saved verify result')
+    .option('--candidate <m3|module>', 'm3 or a module')
+    .addOption(o.records)
+    .addOption(o.split)
+    .addOption(o.final)
+    .addOption(o.groupBy)
+    .addOption(o.params)
+    .addOption(o.fit)
+    .addOption(o.velocitySigma)
+    .addOption(o.exponent)
+    .addOption(o.family)
+    .addOption(o.pressureSigma)
+    .addOption(o.pressureFactor)
+    .addOption(o.energy)
+    .addOption(o.json)
+    .addOption(o.table)
+    .action(async (values) => io.stdout(`${await execute('compare', values, env, io)}\n`))
+  compare.exitOverride(usageError(compare))
+
+  const fit = root
+    .command('fit')
+    .summary('fit the burn coefficient of each powder the rows name')
+    .usage('--rows <path> [--model m3|<module>] [options]')
+    .addOption(o.rows)
+    .addOption(o.model)
+    .addOption(o.records)
+    .addOption(o.velocitySigma)
+    .addOption(o.exponent)
+    .addOption(o.family)
+    .addOption(o.pressureSigma)
+    .addOption(o.pressureFactor)
+    .addOption(o.energy)
+    .addOption(o.folds)
+    .addOption(o.json)
+    .addOption(o.table)
+    .action(async (values) => io.stdout(`${await execute('fit', values, env, io)}\n`))
+  fit.exitOverride(usageError(fit))
+
+  const run = root
+    .command('run')
+    .summary('run one compute operation offline')
+    .description(
+      'Runs one compute operation offline and writes its answer as JSON: the answer of the route POST /v1/<operation> to the body in the --input file (- for stdin). Record ids resolve against --records (repeatable, default BALLISTICS_RECORDS, else the repository records). A body the schema rejects is bad data (exit 65), a 422 answer a refusal (exit 1).',
+    )
+    .usage('<operation> --input <file|-> [--records <dir>]')
+    .argument('<operation>')
+    .requiredOption('--input <file|->', 'the body, - for stdin')
+    .addOption(o.records)
+    .option('--json', 'output format JSON, the only one')
+    .addHelpText(
+      'after',
+      '\nexample:\n  node apps/cli/dist/bin.js run interior --input apps/cli/examples/interior.json',
+    )
+    .action(async (name, values) => {
+      const { runOperation } = await import('./operations.ts')
+      const answer = await runOperation(name, values.input, roots(values.records), io.stderr)
+      io.stdout(`${JSON.stringify(answer, null, 2)}\n`)
+    })
+  run.exitOverride(usageError(run))
+
+  const estimate = root
+    .command('estimate-capacities')
+    .summary('write an estimated capacity record for each cartridge with a case outline only')
+    .description(
+      'Writes a capacity record (provenance kind derived) for each cartridge of the records that has a case outline and neither a capacity nor a case with one, to <dir>/capacities/, a folder that must not exist yet: the outline volume times the median of capacity over outline volume of the cartridges with a capacity record. Pass <dir> as one more --records root: verify and compare report its rows as estimatedCapacity, apart from the other rows, and fit does not read them. Writes the fill factor, its cartridges, its leave-one-out error and the count as JSON.',
+    )
+    .usage('--out <dir> [--records <dir>]')
+    .option('--out <dir>', 'the folder to write capacities/ into')
+    .addOption(o.records)
+    .addHelpText(
+      'after',
+      '\nexample:\n  node apps/cli/dist/bin.js estimate-capacities --out /tmp/estimates',
+    )
+    .action(async (values) => {
+      // checked here, not as a required option, so that an unknown option is named first
+      if (values.out === undefined)
+        return estimate.error("error: required option '--out <dir>' not specified")
+      const { writeEstimatedCapacities } = await import('./capacity.ts')
+      const summary = await writeEstimatedCapacities(roots(values.records), values.out)
+      io.stdout(`${JSON.stringify(summary, null, 2)}\n`)
+    })
+  estimate.exitOverride(usageError(estimate))
+
+  const operations = root
+    .command('operations')
+    .summary('list every operation of run')
+    .description(
+      'Writes every operation of run as JSON: its name, summary, description, and the JSON Schema (2020-12) of its input body and of its answer.',
+    )
+    .usage(' ')
+    .option('--json', 'output format JSON, the only one')
+    .addHelpText('after', '\nexample:\n  node apps/cli/dist/bin.js operations')
+    .action(async () => {
+      const { listOperations } = await import('./operations.ts')
+      io.stdout(`${JSON.stringify(listOperations(), null, 2)}\n`)
+    })
+  operations.exitOverride(usageError(operations))
+
+  return root
 }
 
 /** The kind, exit code and message of an error a run ends with. */
@@ -374,36 +416,12 @@ export function report(error: unknown, argv: string[], io: Io): number {
 
 /** Runs the command line `argv` (without the program), writes the result and returns the exit code. */
 export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promise<number> {
-  const [command = '', ...args] = argv
-  if (argv.includes('--help') || argv.includes('-h')) {
-    io.stdout(
-      `${Object.hasOwn(commandHelp, command) ? commandHelp[command as keyof typeof commandHelp] : usage}\n`,
-    )
-    return 0
-  }
-  if (argv.includes('--version')) {
-    const { version } = JSON.parse(
-      readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
-    )
-    io.stdout(`ballistics ${version}\n`)
-    return 0
-  }
   try {
-    if (command === 'run' || command === 'operations') {
-      io.stdout(`${JSON.stringify(await operate(command, args, env, io), null, 2)}\n`)
-      return 0
-    }
-    if (command === 'estimate-capacities') {
-      io.stdout(`${JSON.stringify(await estimate(args, env), null, 2)}\n`)
-      return 0
-    }
-    if (command !== 'verify' && command !== 'compare' && command !== 'fit') {
-      parse({ args: argv, strict: true, allowPositionals: true, options: {} })
-      throw new UsageError(usage)
-    }
-    io.stdout(`${await execute(command, args, env, io)}\n`)
+    await program(env, io).parseAsync(argv, { from: 'user' })
     return 0
   } catch (error) {
+    // commander ends help and version by throwing with exit code 0
+    if (error instanceof CommanderError && error.exitCode === 0) return 0
     return report(error, argv, io)
   }
 }

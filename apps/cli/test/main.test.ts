@@ -250,6 +250,15 @@ describe('exit codes', () => {
     expect(top.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
   })
 
+  it('is 64 for a misspelled option, naming it and the option it is close to', async () => {
+    const { code, stdout, stderr } = await cli(['verify', ...data, '--grop-by', 'powder'], {}, true)
+    expect(code).toBe(64)
+    expect(stdout).toBe('')
+    expect(stderr).toMatch(
+      /^Unknown option '--grop-by'\n\(Did you mean --group-by\?\)\n\nusage: ballistics verify /,
+    )
+  })
+
   it.each([
     ['run', ['run', 'interior', '--input', 'x.json', '--table'], /usage: ballistics run </],
     ['operations', ['operations', '--table'], /usage: ballistics operations\n/],
