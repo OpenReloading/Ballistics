@@ -1,0 +1,24 @@
+---
+title: Interface base
+description: The shared interface base of the web app, Mantine on the design tokens, with its controls rendered into this page.
+---
+
+import { Button, Group, TextInput } from '@mantine/core'
+import UiEmbed from '@site/src/components/UiEmbed'
+
+# Interface base
+
+`@rangefoundry/ui` is the interface base of the web app: Mantine with the theme of `@rangefoundry/design-tokens`, the control sizes as component defaults, the app frame, the page bar and the navigation items. Its components render without a browser, so a page of this site can show them as the web app does.
+
+<UiEmbed>
+  <Group align="end">
+    <TextInput label="Charge (gr)" defaultValue="42.5" />
+    <Button>Save load</Button>
+  </Group>
+</UiEmbed>
+
+The field and the button are at the bar size: 36 px high under a fine pointer and 44 px under a coarse one (`--size-control-bar` of `tokens.css`).
+
+## Embed a component
+
+Wrap the components in `UiEmbed` (`src/components/UiEmbed.tsx`) on an `.mdx` page. It provides the theme, the messages of `@rangefoundry/ui` and the site's color mode. The site build renders the embed into the page's HTML; a component that reads `window` or `document` while it renders fails the build. `pnpm --filter @rangefoundry/docs run test:site` checks this page's HTML after `site:build`.

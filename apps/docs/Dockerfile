@@ -40,6 +40,8 @@ COPY apps/docs apps/docs
 # the API the REST page links to, no link when unset
 ARG API_URL
 RUN pnpm --filter @rangefoundry/docs run site:build
+# the embeds of @rangefoundry/ui are in the built HTML
+RUN pnpm --filter @rangefoundry/docs run test:site
 
 # unprivileged variant: listens on 8080, runs as `nginx`
 FROM docker.io/nginxinc/nginx-unprivileged:1.31-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e

@@ -171,18 +171,36 @@ importers:
       '@docusaurus/theme-classic':
         specifier: 3.10.2
         version: 3.10.2(@swc/core@1.16.20(@swc/helpers@0.5.23))(@types/react@19.3.0)(clean-css@5.3.3)(cssnano@6.1.2(postcss@8.5.32))(csso@5.0.5)(debug@4.4.3(supports-color@8.1.1))(esbuild@0.28.2)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sharp@0.35.5(@types/node@26.6.6))(supports-color@8.1.1)(svgo@3.3.5)(typescript@6.0.3)
+      '@lingui/core':
+        specifier: 6.12.0
+        version: 6.12.0(@babel/core@7.29.7(supports-color@8.1.1))
+      '@lingui/react':
+        specifier: 6.12.0
+        version: 6.12.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.3.1)
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 9.8.2(@mantine/hooks@9.8.2(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.8.2(react@19.3.1)
       '@rangefoundry/api':
         specifier: workspace:*
         version: link:../../packages/api
       '@rangefoundry/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@rangefoundry/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@scalar/api-reference':
         specifier: 1.83.0
         version: 1.83.0(@oxc-project/types@0.156.0)(esbuild@0.28.2)(lightningcss@1.33.0)(nprogress@0.2.0)(oxc-parser@0.156.0)(rolldown@1.2.18)(supports-color@8.1.1)(tailwindcss@4.3.3)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))(webpack@5.112.0(@swc/core@1.16.20(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@6.1.2(postcss@8.5.32))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@26.6.6))(svgo@3.3.5))(zod@4.6.7)
       katex:
         specifier: 0.19.1
         version: 0.19.1
+      lucide-react:
+        specifier: 1.78.0
+        version: 1.78.0(@types/react@19.3.0)(react@19.3.1)
       pagefind:
         specifier: 1.6.0
         version: 1.6.0
