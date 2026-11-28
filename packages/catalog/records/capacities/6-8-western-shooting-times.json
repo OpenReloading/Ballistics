@@ -1,0 +1,29 @@
+{
+  "id": "6-8-western-shooting-times",
+  "origin": "catalogue",
+  "cartridge": "catalogue:6-8-western",
+  "fillLevel": "mouth",
+  "waterCapacity": {
+    "value": 4.795
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "6.8 Western: What You Need to Know About the .277-Caliber Cartridge",
+        "publisher": "Shooting Times",
+        "edition": "2021-06-02",
+        "url": "https://www.shootingtimes.com/editorial/68-western-short-action-277-caliber-cartridge/393061",
+        "retrieved": "2026-11-18",
+        "terms": "https://www.outdoorsg.com/about/terms-of-service/"
+      },
+      {
+        "title": "6.8 Western",
+        "publisher": "Handloader",
+        "url": "https://www.handloadermagazine.com/6-8-western",
+        "retrieved": "2026-11-18",
+        "terms": "https://www.handloadermagazine.com/"
+      }
+    ]
+  }
+}

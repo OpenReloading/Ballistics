@@ -7,9 +7,10 @@ federation rule books). The project is not affiliated with or endorsed by the
 Bundesverwaltungsamt (BVA), the shooting sport federations or the C.I.P.
 
 The bullet and powder records (packages/catalog/records/bullets/ and powders/, except the demo-
-records) state facts as a maker or another publisher prints them. They carry no project license
-(LicenseRef-Published-Facts, LICENSES/LicenseRef-Published-Facts.txt): the project claims no rights
-in these facts, and the publisher's terms apply, as each citation links them. The project is not
+records) and the case capacity records whose citations link a publisher's terms state facts as a
+maker or another publisher prints them. They carry no project license (LicenseRef-Published-Facts,
+LICENSES/LicenseRef-Published-Facts.txt): the project claims no rights in these facts, and the
+publisher's terms apply, as each citation links them. The project is not
 affiliated with or endorsed by these makers and publishers.
 
 ---
