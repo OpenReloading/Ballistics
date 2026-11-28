@@ -232,7 +232,7 @@ export function checkCoverage(record: {
 }, kind?: FieldClassKind): string[];
 
 // @public
-export function checkFittedSources(powder: Powder, loadTables: LoadTables): string[];
+export function checkFittedSources(powder: Powder, loadTables: LoadTables | undefined): string[];
 
 // @public
 export function checkPowder(powder: Powder): Finding[];
@@ -478,7 +478,7 @@ export interface RecordOfKind {
 export type RecordsRead = {
     bundle: Bundle;
     published: LocatedPublishedLoads[];
-    loadTables: LoadTables;
+    loadTables: LoadTables | undefined;
     singleRoot: boolean;
 };
 

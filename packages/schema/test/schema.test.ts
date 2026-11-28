@@ -83,6 +83,11 @@ describe('source', () => {
     expect(source.safeParse({ entry: 'targetDesigner' }).success).toBe(true)
     expectIssueAt(source, { page: '12' }, 'title')
   })
+
+  it('rejects an unknown key in the fit run', () => {
+    const run = { version: 'a'.repeat(16), reportPath: 'fits/report.md' }
+    expectIssueAt(source, { title: 'Fit', kind: 'fitted', run }, 'run')
+  })
 })
 
 describe('load', () => {

@@ -45,15 +45,17 @@ export const powderBasicFields: readonly string[] = [
 
 /**
  * Dot paths of the detailed fields a maker's published source (site, table, catalogue, safety data
- * sheet) may cover: the bullet geometry, and the powder composition, kernel and transport classification.
- * A path covers the fields below it.
- * Model values, thermochemistry, listed cartridges and load data never come from a maker source.
+ * sheet) may cover: the country of origin, the bullet geometry, and the powder aliases, bulk density,
+ * composition, kernel and transport classification. A path covers the fields below it.
+ * Thermochemistry, listed cartridges and load data never come from a maker source. A maker's load
+ * table is the data a `fitted` source names: such a source covers `interior` and nothing else.
  */
 export const makerSourceFields: {
   readonly bullet: readonly string[]
   readonly powder: readonly string[]
 } = {
   bullet: [
+    'country',
     'base.length',
     'base.diameter',
     'base.angle',
@@ -69,7 +71,16 @@ export const makerSourceFields: {
     'bearingLength',
     'construction.jacket.thickness',
   ],
-  powder: ['composition', 'perforation', 'grainDimensions', 'heatOfExplosion', 'transport'],
+  powder: [
+    'country',
+    'aliases',
+    'bulkDensity',
+    'composition',
+    'perforation',
+    'grainDimensions',
+    'heatOfExplosion',
+    'transport',
+  ],
 }
 
 /** Detailed paths below a basic one; the longest matching path decides a field's class. */
