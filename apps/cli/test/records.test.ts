@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { loadRecords, withoutEstimates } from '../src/records.ts'
 import { recordRoots, rootWithEstimate } from './fixture.ts'
@@ -22,6 +22,23 @@ function rootWith(id: string, value: number) {
   )
   return root
 }
+
+describe('loadRecords over the catalog bundle', () => {
+  it('adds the records of a root without every kind directory to the bundle', () => {
+    const root = mkdtempSync(join(tmpdir(), 'cli-records-'))
+    for (const [kind, from] of [
+      ['powders', 'fixtures/records/powders/demo-powder-sp20.json'],
+      ['sources', '../../../packages/catalog/records/sources/synthetic-test-data.json'],
+    ] as const) {
+      mkdirSync(join(root, kind))
+      writeFileSync(join(root, kind, basename(from)), readFileSync(join(import.meta.dirname, from)))
+    }
+    const r = loadRecords([root])
+    expect(r.powders.has('demo-powder-sp20')).toBe(true)
+    expect(r.powders.has('accurate-2015')).toBe(true)
+    expect(r.issues).toBe(0)
+  })
+})
 
 describe('loadRecords', () => {
   it('takes the capacity of a cartridge that is first by id, whatever root it comes from', () => {

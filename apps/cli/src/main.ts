@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { delimiter } from 'node:path'
 import {
   Command,
   CommanderError,
@@ -63,11 +64,11 @@ function rowsOptions() {
   return {
     rows: new Option(
       '--rows <path>',
-      'a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS); catalogue for the published loads of the records, or a folder laid out as records/loads/ (maker tables only)',
+      'a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS); catalogue for the published loads of a first --records root with every kind directory, or a folder laid out as records/loads/ (maker tables only)',
     ),
     records: new Option(
       '--records <dir>',
-      'a records root, repeatable (default: BALLISTICS_RECORDS, else the repository records)',
+      'a records root, repeatable (default: BALLISTICS_RECORDS, roots joined by : or on Windows ;); a first root with every kind directory, as the records folder of a repository clone, replaces the catalog bundle, other roots add their records to it; the sources an added record cites must be records of the adding roots',
     ).argParser((value, previous: string[] = []) => [...previous, value]),
     split: new Option('--split <name>', 'the split (default: validation)').choices(splits),
     final: new Option('--final', 'required for the test split'),
@@ -169,7 +170,7 @@ function optionsOf(
   if (values.folds && values.split !== undefined)
     throw new UsageError('--folds reads the training and validation splits and takes no --split')
   checkChoices(values, choices)
-  const fromEnv = env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+  const fromEnv = env.BALLISTICS_RECORDS?.split(delimiter).filter(Boolean) ?? []
   const options: Options = {
     rows,
     records: values.records ?? fromEnv,
@@ -232,7 +233,7 @@ function usageError(command: { helpInformation: () => string }) {
 function program(env: NodeJS.ProcessEnv, io: Io) {
   const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
   const roots = (records: string[] | undefined) =>
-    records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+    records ?? env.BALLISTICS_RECORDS?.split(delimiter).filter(Boolean) ?? []
   const root = new Command('ballistics')
     .description(
       'Measures how far the interior model is from printed load rows it was not fitted to, says whether a changed model got better, and runs the compute operations of the REST API offline. Results are simulations compared with printed values, never load data.',
@@ -328,7 +329,7 @@ function program(env: NodeJS.ProcessEnv, io: Io) {
     .command('run')
     .summary('run one compute operation offline')
     .description(
-      'Runs one compute operation offline and writes its answer as JSON: the answer of the route POST /v1/<operation> to the body in the --input file (- for stdin). Record ids resolve against --records (repeatable, default BALLISTICS_RECORDS, else the repository records). A body the schema rejects is bad data (exit 65), a 422 answer a refusal (exit 1).',
+      'Runs one compute operation offline and writes its answer as JSON: the answer of the route POST /v1/<operation> to the body in the --input file (- for stdin). Record ids resolve against the catalog bundle and the records each --records root (repeatable, default BALLISTICS_RECORDS) adds, or a first root with every kind directory in its place. A body the schema rejects is bad data (exit 65), a 422 answer a refusal (exit 1).',
     )
     .usage('<operation> --input <file|-> [--records <dir>]')
     .argument('<operation>')

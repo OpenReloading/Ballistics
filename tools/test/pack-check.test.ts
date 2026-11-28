@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { expect, it } from 'vitest'
-import { packProblems } from '../src/pack-check.ts'
+import { packProblems, publishedProblems } from '../src/pack-check.ts'
 
 /** A package in a fresh temporary folder with a README, with `files` written relative to it (`undefined` leaves one out). */
 function pkg(manifest: object, files: Record<string, string | undefined>) {
@@ -47,6 +47,14 @@ it('fails on an entry point of exports that is missing', () => {
     { 'dist/index.js': '', 'dist/index.d.ts': '' },
   )
   expect(packProblems(dir)).toEqual(['entry point dist/extra.js is not in the tarball'])
+})
+
+it('fails on a bin target that is missing', () => {
+  const dir = pkg(
+    { ...manifest, bin: { p: 'dist/bin.js' } },
+    { 'dist/index.js': '', 'dist/index.d.ts': '' },
+  )
+  expect(packProblems(dir)).toEqual(['entry point dist/bin.js is not in the tarball'])
 })
 
 it('passes a subpath pattern of exports that matches a packed file', () => {
@@ -249,4 +257,31 @@ it('fails on a dependency on a private workspace package', () => {
     'depends on units, a private workspace package that npm does not have',
   ])
   expect(packProblems(dir)).toEqual([])
+})
+
+it('fails on a library that depends on a private package the 0.1.0 release publishes', () => {
+  const root = mkdtempSync(join(tmpdir(), 'pack-check-root-'))
+  writeFileSync(join(root, 'pnpm-workspace.yaml'), "packages:\n  - 'packages/*'\n")
+  mkdirSync(join(root, 'packages/units'), { recursive: true })
+  writeFileSync(
+    join(root, 'packages/units/package.json'),
+    '{ "name": "@rangefoundry/units", "version": "0.0.0", "private": true }',
+  )
+  const lib = join(root, 'packages/lib')
+  mkdirSync(join(lib, 'dist'), { recursive: true })
+  writeFileSync(
+    join(lib, 'package.json'),
+    JSON.stringify({
+      name: 'lib',
+      version: '1.0.0',
+      ...manifest,
+      dependencies: { '@rangefoundry/units': 'workspace:*' },
+    }),
+  )
+  writeFileSync(join(lib, 'README.md'), '# lib')
+  writeFileSync(join(lib, 'dist/index.js'), '')
+  writeFileSync(join(lib, 'dist/index.d.ts'), '')
+  expect(publishedProblems(root, 'packages/lib')).toEqual([
+    'depends on @rangefoundry/units, a private workspace package that npm does not have',
+  ])
 })

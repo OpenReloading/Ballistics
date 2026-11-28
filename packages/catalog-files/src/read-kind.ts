@@ -3,8 +3,13 @@ import { basename, join } from 'node:path'
 import { resolveRecord, type SourceIndex } from '@rangefoundry/catalog'
 import type { z } from 'zod'
 
-/** Where reading adds its errors, the source records that resolve references, where given, and whether the kind's directory may be missing from every root. */
-type ReadContext = { errors: string[]; sources?: SourceIndex; optional?: boolean }
+/** Where reading adds its errors, the source records that resolve references, where given, whether the kind's directory may be missing from every root, and the records the roots add to. */
+type ReadContext<T = unknown> = {
+  errors: string[]
+  sources?: SourceIndex
+  optional?: boolean
+  base?: readonly T[] | undefined
+}
 
 /** Parses the JSON file at `path`, or adds an `invalid JSON` error under `where`. */
 export function readJsonFile(
@@ -55,16 +60,16 @@ export function readKind<T extends { id: string }>(
   roots: string[],
   dir: string,
   schema: z.ZodType<T>,
-  context: ReadContext,
+  context: ReadContext<T>,
 ): T[] {
-  const { errors, optional } = context
+  const { errors, optional, base = [] } = context
   // Every kind has a directory in the first root (an empty one holds a .gitkeep), so a wrong or partial records root cannot pass as empty data; further roots may lack it, and so may every root for an `optional` kind.
-  const records: T[] = []
-  const owner = new Map<string, string>()
+  const records: T[] = [...base]
+  const owner = new Map(base.map((r) => [r.id, 'the base bundle']))
   roots.forEach((root, rootIndex) => {
     const path = join(root, dir)
     if (!existsSync(path)) {
-      if (rootIndex === 0 && !optional) errors.push(`${dir}/: missing directory`)
+      if (rootIndex === 0 && !optional && !context.base) errors.push(`${dir}/: missing directory`)
       return
     }
     const files = readdirSync(path)

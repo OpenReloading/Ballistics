@@ -366,20 +366,6 @@ describe('verify on published loads', () => {
     expect(r.interval.trainingRows).toBe(3)
   })
 
-  it('leaves out a source record that does not parse', async () => {
-    const extra = mkdtempSync(join(tmpdir(), 'cli-bad-source-'))
-    mkdirSync(join(extra, 'sources'))
-    writeFileSync(join(extra, 'sources', 'broken.json'), '{ not json')
-    const folder = writeLoads([validation(), training()])
-    const r = await verify({
-      rows: folder,
-      records: [...recordRoots, extra],
-      split: 'validation',
-      final: false,
-    })
-    expect(r.overall.rows.used).toBe(3)
-  })
-
   it('compares a V5 row uncorrected only where it has no distance', () => {
     const own = loadRecords(recordRoots)
     const row: Row = {
@@ -441,6 +427,14 @@ describe('verify on published loads', () => {
       final: false,
     })
     expect(r.published).toEqual({ files: 2, rows: 6, skipped: {} })
+  })
+
+  it('needs a first --records root with every kind directory for --rows catalogue', async () => {
+    let stderr = ''
+    const io = { stdout: () => {}, stderr: (t: string) => (stderr += t), tty: false }
+    expect(await run(['verify', '--rows', 'catalogue'], {}, io)).toBe(66)
+    expect(JSON.parse(stderr).error).toMatchObject({ kind: 'no-input' })
+    expect(JSON.parse(stderr).error.message).toContain('--records')
   })
 
   it('is uncorrected the speed at 5 m, below the muzzle value', () => {

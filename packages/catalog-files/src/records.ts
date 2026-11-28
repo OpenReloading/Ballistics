@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   type Bundle,
@@ -112,46 +112,79 @@ export type ReadRecordsResult = {
   citations: SourceIndex['citations']
 }
 
-/** Reads every kind directory of `roots`, in this order, the source records first. */
+/** The kind directories every full records root holds; `firings`, `range` and `event-types` may be missing. */
+const kindDirectories = [
+  'sources',
+  'cartridges',
+  'caliber-classes',
+  'manufacturers',
+  'powders',
+  'primers',
+  'bullets',
+  'cases',
+  'capacities',
+  'loads',
+  'chrono',
+  'target-faces',
+  'federations',
+  'disciplines',
+  'target-mappings',
+] as const
+
+/** Whether `root` holds every kind directory of a records root, which {@link readRecords} needs of its first root without a base bundle. */
+export const holdsEveryKind = (root: string) =>
+  kindDirectories.every((dir) =>
+    statSync(join(root, dir), { throwIfNoEntry: false })?.isDirectory(),
+  )
+
+/** Reads every kind directory of `roots`, in this order, the source records first, each kind after the records of `base`. */
 function readBundle(
   roots: string[],
   errors: string[],
+  base: Bundle | undefined,
 ): { bundle: Bundle; published: LocatedPublishedLoads[]; citations: SourceIndex['citations'] } {
-  const sources = sourceIndex(readKind(roots, 'sources', sourceRecord, { errors }))
-  const read = <T extends { id: string }>(dir: string, schema: z.ZodType<T>, optional = false) =>
-    readKind(roots, dir, schema, { errors, sources, optional })
+  const sources = sourceIndex(
+    readKind(roots, 'sources', sourceRecord, { errors, base: base && [] }),
+  )
+  const read = <T extends { id: string }>(
+    dir: string,
+    schema: z.ZodType<T>,
+    records: readonly T[] | undefined,
+    optional = false,
+  ) => readKind(roots, dir, schema, { errors, sources, optional, base: base && (records ?? []) })
   const bundle = {
-    cartridges: read('cartridges', cartridge),
-    caliberClasses: read('caliber-classes', caliberClass),
-    manufacturers: read('manufacturers', manufacturer),
-    powders: read('powders', powder),
-    primers: read('primers', primer),
-    bullets: read('bullets', bullet),
-    cases: read('cases', catalogueCase),
-    capacities: read('capacities', catalogueCaseCapacity),
-    loads: read('loads', catalogueLoad),
-    chronoSessions: read('chrono', catalogueSession),
-    firings: read('firings', firingSeries, true),
-    rangeFirings: read('range', rangeFirings, true),
-    targetFaces: read('target-faces', targetFace),
-    federations: read('federations', federation),
-    disciplines: read('disciplines', discipline),
-    targetMappings: read('target-mappings', targetMapping),
-    eventTypes: read('event-types', eventType, true),
+    cartridges: read('cartridges', cartridge, base?.cartridges),
+    caliberClasses: read('caliber-classes', caliberClass, base?.caliberClasses),
+    manufacturers: read('manufacturers', manufacturer, base?.manufacturers),
+    powders: read('powders', powder, base?.powders),
+    primers: read('primers', primer, base?.primers),
+    bullets: read('bullets', bullet, base?.bullets),
+    cases: read('cases', catalogueCase, base?.cases),
+    capacities: read('capacities', catalogueCaseCapacity, base?.capacities),
+    loads: read('loads', catalogueLoad, base?.loads),
+    chronoSessions: read('chrono', catalogueSession, base?.chronoSessions),
+    firings: read('firings', firingSeries, base?.firings, true),
+    rangeFirings: read('range', rangeFirings, base?.rangeFirings, true),
+    targetFaces: read('target-faces', targetFace, base?.targetFaces),
+    federations: read('federations', federation, base?.federations),
+    disciplines: read('disciplines', discipline, base?.disciplines),
+    targetMappings: read('target-mappings', targetMapping, base?.targetMappings),
+    eventTypes: read('event-types', eventType, base?.eventTypes, true),
   }
   const published = readPublishedLoads(roots, sources, errors)
   checkSources(sources, errors)
   return { bundle, published, citations: sources.citations }
 }
 
-/** Under `root`, or under several roots read as one set (the first holds every kind directory, the `load-tables.json` of every root lists tables). */
-export function readRecords(root: string | readonly string[]): ReadRecordsResult {
+/** Under `root`, or under several roots read as one set (the first holds every kind directory, the `load-tables.json` of every root lists tables); with `base`, a bundle such as `@rangefoundry/catalog/bundle.json`, the roots add their records to it and none needs every kind directory. */
+export function readRecords(root: string | readonly string[], base?: Bundle): ReadRecordsResult {
   const roots = typeof root === 'string' ? [root] : [...root]
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')
   const errors: string[] = []
-  const { bundle, published, citations } = readBundle(roots, errors)
+  const { bundle, published, citations } = readBundle(roots, errors, base)
   const loadTables = readRootsLoadTables(roots, errors)
-  const checked = checkRecords({ bundle, published, loadTables, singleRoot: roots.length === 1 })
+  const singleRoot = roots.length === 1 && !base
+  const checked = checkRecords({ bundle, published, loadTables, singleRoot })
   return {
     bundle,
     publishedLoads: published.map((p) => p.file),

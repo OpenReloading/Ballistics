@@ -2,20 +2,35 @@
   "name": "@rangefoundry/cli",
   "version": "0.0.3",
   "private": true,
+  "description": "The ballistics command: runs the RangeFoundry compute operations offline and verifies and fits interior ballistics models on load data.",
   "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "apps/cli"
+  },
   "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
   "bin": {
     "ballistics": "dist/bin.js"
   },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
+    "examples",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "schema": "node src/write-json-schema.ts && biome format --write schema",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage && publint --strict"
   },
   "dependencies": {
     "@commander-js/extra-typings": "catalog:",
-    "@rangefoundry/api": "workspace:*",
     "@rangefoundry/ballistics": "workspace:*",
     "@rangefoundry/catalog": "workspace:*",
     "@rangefoundry/catalog-files": "workspace:*",
@@ -28,9 +43,11 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@rangefoundry/api": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "ajv": "catalog:",
+    "publint": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

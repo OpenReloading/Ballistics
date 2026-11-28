@@ -18,7 +18,7 @@ import {
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { foldAggregate, pairedChange, type RowError, rowErrors } from './paired.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
-import { loadRecords, packageRecords, type Records, withoutEstimates } from './records.ts'
+import { fullRoot, loadRecords, type Records, withoutEstimates } from './records.ts'
 import {
   type CompareResult,
   type Evaluation,
@@ -131,14 +131,20 @@ function sourcesOf(roots: readonly string[]) {
   }
 }
 
-/** Of the catalogue's published load files (`catalogue`), or of a folder laid out as `records/loads/` only, their source references resolved from the records' sources. */
+/** Of the published load files of a full first records root (`catalogue`), or of a folder laid out as `records/loads/` only, their source references resolved from the sources of the records roots, else of the folder's own root. */
 function catalogueRows(options: FitOptions) {
   const folder = options.rows === 'catalogue' ? undefined : resolve(options.rows)
   if (folder !== undefined && basename(folder) !== 'loads')
     throw new UsageError('a --rows folder of published loads is named loads, as records/loads/')
+  // the catalog bundle holds no published loads
+  if (folder === undefined && !fullRoot(options.records))
+    throw new NoInputError(
+      '--rows catalogue reads the published loads of a records folder with every kind directory, as in a repository clone: give it as the first --records root',
+    )
   const records = loadRecords(options.records)
   const errors: string[] = []
-  const roots = options.records.length > 0 ? options.records : [packageRecords()]
+  const roots =
+    options.records.length > 0 || folder === undefined ? options.records : [dirname(folder)]
   const files = (
     folder === undefined
       ? records.published
