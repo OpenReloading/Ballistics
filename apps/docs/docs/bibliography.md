@@ -221,7 +221,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 - Accurate SDS "Single Base Powders - Accurate", March 2022 (inner sheet General Dynamics SDS-18F003 rev. 2).
 - Hodgdon Annual Manual 2025, rifle and pistol tables.
 - Hodgdon Annual Manual 2025.
-- Hodgdon Powder Co. product page, Accuarte No. 5® Pistol Powder. <https://shop.hodgdon.com/accurate-no-5/>
+- Hodgdon Powder Co. product page, Accurate No. 5® Pistol Powder. <https://shop.hodgdon.com/accurate-no-5/>
 - Hodgdon Powder Co. product page, Accurate #7 Pistol Powder. <https://shop.hodgdon.com/accurate-no-7/>
 - Hodgdon Powder Co. product page, Accurate #9® Pistol Powder. <https://shop.hodgdon.com/accurate-no-9/>
 - Hodgdon Powder Co. product page, Accurate 2015® Rifle Powder. <https://shop.hodgdon.com/accurate-2015/>
@@ -459,7 +459,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 
 ### Own methods
 
-- Constant-volume equilibrium solver (tools/src/thermo). <https://openreloading.github.io/Ballistics/docs/research/thermochemistry-ingredient-heats>
+- Constant-volume equilibrium solver. <https://openreloading.github.io/Ballistics/docs/research/thermochemistry-ingredient-heats>
 - Mapping of the maker wording to bullet construction fields. <https://openreloading.github.io/Ballistics/docs/data/bullet-construction>
 
 ### Wikipedia
