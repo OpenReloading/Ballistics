@@ -48,7 +48,7 @@ Settings:
 
 - `PAGES_BASE_PATH`: the path the site is served under, empty for a site root, `/Ballistics` on the project site.
 - `PAGES_URL`: the site's origin, which sets the docs' `url`, the social image's address and the sitemap.
-- `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered and no docs site, for the review and e2e loop. The data files stay complete.
+- `--sample`: only the cartridge, bullet and powder pages of `apps/web/src/lib/prerender-sample.ts` prerendered and no docs site, for the review and e2e loop. The data files stay complete.
 - `--no-docs`: no docs site, every record prerendered (the e2e jobs' full build).
 
 `pnpm run pages:serve` serves `pages/` under `PAGES_BASE_PATH` on `PORT` (default 3003), as GitHub Pages does:
