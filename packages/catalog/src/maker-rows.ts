@@ -93,6 +93,7 @@ export interface MakerRow {
 /** A cited source as the gate reads it. */
 interface CitedSource {
   title?: string | undefined
+  publisher?: string | undefined
   kind?: string | undefined
   origin?: string | undefined
   url?: string | undefined
@@ -130,21 +131,34 @@ const isCommunityLengthList = (kind: 'bullet' | 'powder', source: CitedSource) =
 const lacksTermsUrl = (kind: 'bullet' | 'powder', source: CitedSource) =>
   (!source.terms || !isWebLink(source.terms)) && !isCommunityLengthList(kind, source)
 
-/** Why the maker source `source` may not stand in a bullet or powder record: an unpublished source, a missing field list or terms URL (none asked of a community list, {@link isCommunityLengthList}), a license, or a detailed field outside {@link makerSourceFields}. */
+/** True when `source` is a powder's `fitted` source (its own kind or the record's) that names only `interior`: the fit to a maker's load table. */
+const isFittedInterior = (kind: 'bullet' | 'powder', record: Cited, source: CitedSource) =>
+  kind === 'powder' &&
+  (source.kind ?? record.provenance?.kind) === 'fitted' &&
+  !!source.fields?.length &&
+  source.fields.every((f) => f === 'interior' || f.startsWith('interior.'))
+
+/** Why the maker source `source` may not stand as published: no URL and no title and publisher of a document cited by title, a missing field list or terms URL (none asked of a community list, {@link isCommunityLengthList}), or a license. */
+function publicationFindings(kind: 'bullet' | 'powder', source: CitedSource, name: string) {
+  // a source without an address that is no document cited by title is data a maker sent us, which has no rules yet
+  if (source.url === undefined && (source.title === undefined || source.publisher === undefined))
+    return [
+      `source "${source.title}" is not a listed non-maker source and has no URL: it counts as data received directly from a maker, which is not yet supported`,
+    ]
+  const findings: string[] = []
+  if (!source.fields) findings.push(`${name}: names no fields`)
+  if (lacksTermsUrl(kind, source)) findings.push(`${name}: needs a terms URL`)
+  if (source.license !== undefined) findings.push(`${name}: carries a license`)
+  return findings
+}
+
+/** Why the maker source `source` may not stand in a bullet or powder record: the {@link publicationFindings}, or a detailed field outside {@link makerSourceFields} and, for a {@link isFittedInterior} source, `interior`. */
 function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: CitedSource) {
   const name = `source "${source.title}" (not a listed non-maker source)`
-  const findings: string[] = []
-  // a source without an address is data a maker sent us, which has no rules yet
-  if (source.url === undefined)
-    findings.push(
-      `source "${source.title}" is not a listed non-maker source and has no URL: it counts as data received directly from a maker, which is not yet supported`,
-    )
-  else {
-    if (!source.fields) findings.push(`${name}: names no fields`)
-    if (lacksTermsUrl(kind, source)) findings.push(`${name}: needs a terms URL`)
-    if (source.license !== undefined) findings.push(`${name}: carries a license`)
-  }
-  const allowed = makerSourceFields[kind]
+  const findings = publicationFindings(kind, source, name)
+  const allowed = isFittedInterior(kind, record, source)
+    ? [...makerSourceFields[kind], 'interior']
+    : makerSourceFields[kind]
   for (const path of detailedFields(kind, record)) {
     const covered = !source.fields || source.fields.some((f) => overlaps(path, f))
     if (covered && !allowed.some((a) => path === a || path.startsWith(`${a}.`)))
@@ -204,7 +218,7 @@ function findingsOf(kind: string, record: Cited, ids: Ids): string[] {
  * The records of `bundle` the public catalog may not hold, by kind, in the order of the bundle;
  * kinds without one are left out. `citations` gives the cited source ids of each record file. A
  * bullet or powder may cite a maker's published source for the fields of `makerSourceFields`
- * only, and a listed source for the fields of its {@link nonMakerSources} entry only, named unless
+ * only, a powder a fitted maker source for `interior` only, and a listed source for the fields of its {@link nonMakerSources} entry only, named unless
  * it is `synthetic-test-data`; a catalogue load or a published-load file (`publishedLoads`, by
  * `<cartridge>/<id>`) no maker source and only a listed source that may stand in a load, and a
  * record of another kind no manufacturer-origin source or fitted source without an origin.

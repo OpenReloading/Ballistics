@@ -88,7 +88,7 @@ resolve against --records (repeatable, default BALLISTICS_RECORDS, else the repo
 records). A body the schema rejects is bad input (exit 2), a 422 answer a refusal (exit 1).
 
 example:
-  node packages/cli/dist/bin.js run interior --input packages/cli/examples/interior.json`,
+  node apps/cli/dist/bin.js run interior --input apps/cli/examples/interior.json`,
   'estimate-capacities': `usage: ballistics estimate-capacities --out <dir> [--records <dir>]
 
 Writes a capacity record (provenance kind derived) for each cartridge of the records that has
@@ -99,14 +99,14 @@ report its rows as estimatedCapacity, apart from the other rows, and fit does no
 Writes the fill factor, its cartridges, its leave-one-out error and the count as JSON.
 
 example:
-  node packages/cli/dist/bin.js estimate-capacities --out /tmp/estimates`,
+  node apps/cli/dist/bin.js estimate-capacities --out /tmp/estimates`,
   operations: `usage: ballistics operations
 
 Writes every operation of run as JSON: its name, summary, description, and the JSON Schema
 (2020-12) of its input body and of its answer.
 
 example:
-  node packages/cli/dist/bin.js operations`,
+  node apps/cli/dist/bin.js operations`,
 }
 
 /** Parses a command line, an unknown or malformed option is bad input with `help`. */

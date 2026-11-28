@@ -107,7 +107,7 @@ Measured: load rows that are not in the repository, aggregates only. The 76 mm t
 - `packages/ballistics/src/interior/bore-resistance.ts`
 - `packages/ballistics/src/interior/start-pressure.ts`
 - `packages/ballistics/src/interior/record-load.ts`
-- `packages/cli/src/evaluate.ts`
+- `apps/cli/src/evaluate.ts`
 - [M3 interior model](../models/interior-m3.md#bore-resistance)
 
 ## Confidence

@@ -76,8 +76,8 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     'apps/web/test/api.test.ts',
     'tools/src/load-fit.ts',
     'tools/src/audit.ts',
-    'packages/cli/src/rows.ts',
-    'packages/cli/package.json',
+    'apps/cli/src/rows.ts',
+    'apps/cli/package.json',
     '.github/workflows/release.yml',
     'README.md',
     'apps/docs/docs/models/bullet-fit.md',
@@ -212,6 +212,10 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
   ).toEqual([
     { name: 'drawing', filter: '--filter @rangefoundry/svg-drawings', e2eUnit: false },
     { name: 'web', filter: '--filter @rangefoundry/web', e2eUnit: false },
+    { name: 'cli', filter: '--filter @rangefoundry/cli', e2eUnit: false },
+  ])
+  expect(plan(['apps/cli/src/main.ts'], closure, ['cli', 'docs']).tests).toEqual([
+    { name: 'packages', filter: '--filter @rangefoundry/docs', e2eUnit: false },
     { name: 'cli', filter: '--filter @rangefoundry/cli', e2eUnit: false },
   ])
   expect(plan(['apps/e2e/tests/web/groups.spec.ts'], closure, ['e2e']).tests).toEqual([

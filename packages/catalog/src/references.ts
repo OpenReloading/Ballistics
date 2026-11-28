@@ -219,7 +219,7 @@ export function checkManufacturerReferences(
     Bundle,
     'powders' | 'primers' | 'bullets' | 'cases' | 'capacities' | 'chronoSessions' | 'loads'
   >,
-  loadTables: LoadTables,
+  loadTables: LoadTables | undefined,
   ids: RecordIds,
   errors: string[],
 ): void {
@@ -234,6 +234,6 @@ export function checkManufacturerReferences(
   for (const s of bundle.chronoSessions)
     check(`chrono/${s.id}.json`, 'device.manufacturer', parseRef(s.device.manufacturer)?.id)
   for (const l of bundle.loads) checkLoadMakers(l, check)
-  for (const [file, table] of Object.entries(loadTables))
+  for (const [file, table] of Object.entries(loadTables ?? {}))
     check(`load-tables.json: ${file}`, 'manufacturer', table.manufacturer)
 }

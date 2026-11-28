@@ -8,7 +8,7 @@ description: Whether a person, a script and a language-model agent can use the c
 
 ## Question
 
-Command line (`packages/cli`): can a person, a script and an AI agent use it as a full load simulator without the web app? If not, what is the smallest command surface and output contract that makes it one, reusing instead of rebuilding?
+Command line (`apps/cli`): can a person, a script and an AI agent use it as a full load simulator without the web app? If not, what is the smallest command surface and output contract that makes it one, reusing instead of rebuilding?
 
 ## Method
 
@@ -80,7 +80,7 @@ no change. Not adopted in code. Recommendation (medium confidence): the CLI is n
 Plan, in order:
 
 1. Issue #653 (small, no dependency): error objects on stderr with `--json`, exit code 3 for an internal error, `--version`, `--rows -`, `notice` in the result, `$id` in the schema, `--help` before the libraries load.
-2. Allow `packages/cli` to import `@rangefoundry/api/compute` and `@rangefoundry/api/catalogue` (the rule and the package rule).
+2. Allow `apps/cli` to import `@rangefoundry/api/compute` and `@rangefoundry/api/catalogue` (the rule and the package rule).
 3. Issue #654 (medium, useful alone): move the exterior handlers and the load file computation into run functions exported from the compute entry, OpenAPI unchanged.
 4. Issue #655 (medium, after 2; exterior and load file operations after 3): `ballistics run <operation> [--input <file>|-]` and `ballistics operations` with input and output schemas from the same zod definitions, docs page, an agent loop description, an example that runs, a line in `llms.txt`.
 
@@ -92,8 +92,8 @@ measured: runs of the built CLI and of a 9-line script over the API compute entr
 
 ## Where in the app
 
-- `packages/cli/src/main.ts`: commands, options, exit codes, the error catch.
-- `packages/cli/schema/result.schema.json`: the result schema.
+- `apps/cli/src/main.ts`: commands, options, exit codes, the error catch.
+- `apps/cli/schema/result.schema.json`: the result schema.
 - `apps/docs/docs/cli.md`: the docs.
 - `packages/use-cases/src/index.ts`: the use cases the web app, the command line and the API run.
 - `packages/api/src/routes/compute.ts`: the compute routes, exterior handlers inline.

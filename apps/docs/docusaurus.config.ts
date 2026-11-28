@@ -22,7 +22,7 @@ const config = async (): Promise<Config> => ({
   url: process.env.DOCS_URL ?? 'https://openreloading.github.io',
   baseUrl,
   // the CLI's result schema at the address of its $id
-  staticDirectories: ['static', '../../packages/cli/schema'],
+  staticDirectories: ['static', '../../apps/cli/schema'],
   // broken links never fail the build; explicit, as onBrokenLinks defaults to throw (anchors in v4)
   onBrokenLinks: 'warn',
   onBrokenAnchors: 'warn',

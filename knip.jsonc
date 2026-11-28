@@ -63,7 +63,7 @@
         "src/target/index.ts"
       ]
     },
-    "packages/cli": {
+    "apps/cli": {
       "entry": ["src/bin.ts", "scripts/*.mts"]
     },
     "packages/api": {

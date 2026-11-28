@@ -19,7 +19,7 @@ COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
 COPY packages/api/package.json packages/api/
 COPY packages/svg-drawings/package.json packages/svg-drawings/
-COPY packages/cli/package.json packages/cli/
+COPY apps/cli/package.json apps/cli/
 COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
@@ -33,6 +33,8 @@ COPY tools/src/catalog tools/src/catalog
 # the libraries the docs document and the API its REST page describes (the docs also depend on web, cli and tools,
 # whose files their tests read; the site needs no build of them)
 RUN pnpm --filter "@rangefoundry/api..." --filter "@rangefoundry/svg-drawings..." --filter "@rangefoundry/importers..." run build
+# the CLI's result schema, a static folder of the site
+COPY apps/cli/schema apps/cli/schema
 COPY apps/docs apps/docs
 # the API the REST page links to, no link when unset
 ARG API_URL

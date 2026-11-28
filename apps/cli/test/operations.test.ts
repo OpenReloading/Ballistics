@@ -216,7 +216,7 @@ describe('operations', () => {
 
 describe('help', () => {
   it.each(['run', 'operations'])('of %s has an example that runs', (command) => {
-    const help = spawnSync('node', ['packages/cli/src/bin.ts', command, '--help'], {
+    const help = spawnSync('node', ['apps/cli/src/bin.ts', command, '--help'], {
       cwd: root,
       encoding: 'utf8',
     })
@@ -239,7 +239,7 @@ describe('help', () => {
   })
 
   it('reads the body from stdin', () => {
-    const ran = spawnSync('node', ['packages/cli/src/bin.ts', 'run', 'interior', '--input', '-'], {
+    const ran = spawnSync('node', ['apps/cli/src/bin.ts', 'run', 'interior', '--input', '-'], {
       cwd: root,
       encoding: 'utf8',
       input: readFileSync(example),

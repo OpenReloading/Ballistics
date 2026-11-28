@@ -70,8 +70,9 @@ export function readLoadTables(dir: string, errors?: string[]): LoadTables {
   return tables
 }
 
-/** The load tables of every root; a file two roots list is an error, the first entry stays. */
-function readRootsLoadTables(roots: readonly string[], errors: string[]): LoadTables {
+/** The load tables of every root, none when no root has a `load-tables.json`; a file two roots list is an error, the first entry stays. */
+function readRootsLoadTables(roots: readonly string[], errors: string[]): LoadTables | undefined {
+  if (!roots.some((r) => existsSync(join(r, 'load-tables.json')))) return undefined
   const tables: LoadTables = {}
   for (const r of roots)
     for (const [file, table] of Object.entries(readLoadTables(r, errors))) {
