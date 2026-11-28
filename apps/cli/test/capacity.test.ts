@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readdirSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { isEstimatedCapacity } from '@rangefoundry/schema'
@@ -101,6 +101,20 @@ describe('writeEstimatedCapacities', () => {
     expect(isEstimatedCapacity(loaded.capacities.get('7-62-x-54-r') as never)).toBe(true)
     expect(isEstimatedCapacity(loaded.capacities.get('308-match') as never)).toBe(false)
     expect(existsSync(join(out, 'capacities'))).toBe(true)
+    expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(Refusal)
+  })
+
+  it('refuses a dangling symbolic link as <out>/capacities and creates nothing at its target', () => {
+    const out = mkdtempSync(join(tmpdir(), 'cli-estimates-'))
+    const target = join(out, 'elsewhere')
+    symlinkSync(target, join(out, 'capacities'))
+    expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(Refusal)
+    expect(existsSync(target)).toBe(false)
+  })
+
+  it('refuses a file as <out>', () => {
+    const out = join(mkdtempSync(join(tmpdir(), 'cli-estimates-')), 'a-file')
+    writeFileSync(out, '')
     expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(Refusal)
   })
 })

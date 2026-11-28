@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { lstatSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Cartridge, CatalogueCaseCapacity } from '@rangefoundry/schema'
 import { isEstimatedCapacity } from '@rangefoundry/schema'
@@ -89,12 +89,24 @@ export function estimateCapacities(records: Records) {
   return { fill, estimates }
 }
 
-/** `estimate-capacities`: writes the estimated capacity records of the records of `roots` to `<out>/capacities/`, a folder that must not exist yet. */
+/** `estimate-capacities`: writes the estimated capacity records of the records of `roots` to `<out>/capacities/`, which must not exist yet as a folder, file or symbolic link. */
 export function writeEstimatedCapacities(roots: readonly string[], out: string) {
   const folder = join(out, 'capacities')
-  if (existsSync(folder)) throw new Refusal(`${folder} exists: give a new --out folder`) // NOSONAR: the path is the argument the user gave
+  const exists = new Refusal(`${folder} exists: give a new --out folder`)
+  if (statSync(out, { throwIfNoEntry: false })?.isDirectory() === false)
+    // NOSONAR: the path is the argument the user gave
+    throw new Refusal(`${out} is not a folder: give a new --out folder`)
+  // lstat, as a dangling symbolic link passes existsSync
+  if (lstatSync(folder, { throwIfNoEntry: false })) throw exists // NOSONAR: as above
   const { fill, estimates } = estimateCapacities(loadRecords(roots))
-  mkdirSync(folder, { recursive: true }) // NOSONAR: as above
+  mkdirSync(out, { recursive: true }) // NOSONAR: as above
+  try {
+    mkdirSync(folder) // NOSONAR: as above
+  } catch (error) {
+    // anything created there since the check
+    if ((error as NodeJS.ErrnoException).code === 'EEXIST') throw exists
+    throw error
+  }
   for (const record of estimates)
     writeFileSync(join(folder, `${record.id}.json`), `${JSON.stringify(record, null, 2)}\n`) // NOSONAR: as above
   return { command: 'estimate-capacities', ...fill, written: estimates.length, folder }

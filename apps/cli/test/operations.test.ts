@@ -165,6 +165,22 @@ describe('run offline', () => {
     expect(stderr).toMatch(/^\d+ problem\(s\) in the records/)
   })
 
+  it('refuses a records file that is not JSON as bad data and names it', async () => {
+    const records = join(dir, 'unparsed')
+    mkdirSync(join(records, 'powders'), { recursive: true })
+    writeFileSync(join(records, 'powders', 'broken.json'), '{ not json')
+    const { code, stderr } = await cli([
+      'run',
+      'interior',
+      '--input',
+      example,
+      '--records',
+      records,
+    ])
+    expect(code).toBe(65)
+    expect(errorOf(stderr)).toMatchObject({ kind: 'data', files: ['powders/broken.json'] })
+  })
+
   it('refuses an unknown record id as bad input', async () => {
     const body = { ...(defined(operation('interior')).example as object), cartridge: 'no-such' }
     const { code, stderr } = await cli(['run', 'interior', '--input', bodyFile('id', body)])

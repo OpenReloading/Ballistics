@@ -1,6 +1,7 @@
-import { statSync } from 'node:fs'
+import { readFileSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { readRecords } from '@rangefoundry/catalog-files'
+import type { Bundle } from '@rangefoundry/catalog'
+import { holdsEveryKind, type ReadRecordsResult, readRecords } from '@rangefoundry/catalog-files'
 import type {
   Bullet,
   Cartridge,
@@ -10,7 +11,7 @@ import type {
   PublishedLoads,
 } from '@rangefoundry/schema'
 import { compareKeys, defaultCapacity, isEstimatedCapacity, parseRef } from '@rangefoundry/schema'
-import { NoInputError } from './errors.ts'
+import { DataError, NoInputError } from './errors.ts'
 
 /** The records a run reads, by id; a cartridge's capacity is its default (`defaultCapacity`), only without one its case is the first by id with a stated water capacity, and with neither its capacity is an estimate. */
 export interface Records {
@@ -47,19 +48,34 @@ export const withoutEstimates = (records: Records): Records => ({
   capacities: new Map([...records.capacities].filter(([, c]) => !isEstimatedCapacity(c))),
 })
 
-/** The records folder of the catalog package, read without roots. */
-export const packageRecords = () =>
-  fileURLToPath(new URL('../records', import.meta.resolve('@rangefoundry/catalog')))
+/** The bundle of the installed `@rangefoundry/catalog`, resolved from this module and never from the working directory. */
+const catalogBundle = (): Bundle =>
+  JSON.parse(
+    readFileSync(fileURLToPath(import.meta.resolve('@rangefoundry/catalog/bundle.json')), 'utf8'),
+  )
 
-/** Reads the records of `roots` as one set, or the records of the catalog package without roots; a `NoInputError` for a root that is not a folder. */
-export function readBundle(roots: readonly string[]) {
+/** Whether the first of `roots` holds every kind directory, as the records folder of a repository clone: it then replaces the catalog bundle. */
+export const fullRoot = (roots: readonly string[]) =>
+  roots[0] !== undefined && holdsEveryKind(roots[0])
+
+/** Reads the records of `roots` as one set: a first root with every kind directory replaces the catalog bundle, other roots add their records to it, and without roots the bundle alone; a `NoInputError` for a root that is not a folder, a `DataError` for a record file that is not JSON. */
+export function readBundle(
+  roots: readonly string[],
+): Pick<ReadRecordsResult, 'bundle' | 'errors' | 'publishedLoads'> {
   for (const [i, root] of roots.entries())
     if (!statSync(root, { throwIfNoEntry: false })?.isDirectory())
       // NOSONAR: the path is the argument the user gave
       throw new NoInputError(
         `the --records path${roots.length > 1 ? ` ${i + 1} of ${roots.length}` : ''} (or BALLISTICS_RECORDS) does not exist or is not a folder`,
       )
-  return readRecords(roots.length > 0 ? roots : packageRecords())
+  if (roots.length === 0) return { bundle: catalogBundle(), errors: [], publishedLoads: [] }
+  const read = fullRoot(roots) ? readRecords(roots) : readRecords(roots, catalogBundle())
+  const unparsed = read.errors.filter((e) => e.includes(': invalid JSON: '))
+  if (unparsed.length > 0)
+    throw new DataError(`a file of the --records roots is not JSON: ${unparsed[0]}`, {
+      files: unparsed.map((e) => e.slice(0, e.indexOf(': invalid JSON: '))),
+    })
+  return read
 }
 
 /** The records of {@link readBundle} by id. */
