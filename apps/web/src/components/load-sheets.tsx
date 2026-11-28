@@ -1,5 +1,3 @@
-'use client'
-
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { localDay } from '../lib/dates.ts'

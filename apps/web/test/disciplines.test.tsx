@@ -35,7 +35,7 @@ const labelOf = (w: LinguiWording) => sayLingui(linguiOf('en'), w)
 
 // the list renders its tab bar, which reads the route and the router
 const route = vi.hoisted(() => ({ path: '/disciplines' }))
-vi.mock('next/navigation', () => ({
+vi.mock('@/platform/navigation.ts', () => ({
   usePathname: () => route.path,
   useRouter: () => ({ push: () => {} }),
 }))

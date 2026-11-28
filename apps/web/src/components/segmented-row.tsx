@@ -1,5 +1,3 @@
-'use client'
-
 import { Tooltip } from '@mantine/core'
 import { tipEvents } from '../lib/theme.ts'
 

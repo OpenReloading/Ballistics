@@ -1,6 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder, height, problems } from './a11y.ts'
-import { isNextEdition, noOfflineWorker, storageName } from './edition.ts'
 import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
@@ -82,7 +81,7 @@ test('German is chosen in Settings, switches the home page and the dialog, and i
 
 // the axe sweep of both pages in German is in a11y-states.spec.ts
 test('the Database list and a record page show in German', async ({ page }) => {
-  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
 
   await gotoHydrated(page, '/cartridges/')
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
@@ -105,7 +104,7 @@ test('the Database list and a record page show in German', async ({ page }) => {
 test('a target sheet created on a full page load in German names its first group in German', async ({
   page,
 }) => {
-  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
 
   // the German catalog loads after the editor's first render, which is English
   await gotoHydrated(page, '/groups')
@@ -131,7 +130,7 @@ test('the designers in German at 1280 px keep the title, every action, Safety an
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height })
-  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
   for (const [path, title] of [
     ['/bullets/designer/', 'Geschoss-Editor'],
     ['/cartridges/designer/', 'Patronen-Editor'],
@@ -161,7 +160,7 @@ test('the designers in German at 1280 px keep the title, every action, Safety an
 
 test('the workbench in German at 1280 px keeps Run off the page bar status', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height })
-  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
   await gotoHydrated(page, '/workbench/')
   const bar = page.locator('.page-bar')
   await expect(bar.locator('.bar-result')).toHaveText('Nicht ausgeführt')
@@ -181,7 +180,7 @@ test('the workbench in German at 1280 px keeps Run off the page bar status', asy
 test.describe('offline', () => {
   // the offline layer's worker answers the reload
   test.use({ serviceWorkers: 'allow' })
-  test.skip(({ baseURL }) => isNextEdition(baseURL), noOfflineWorker)
+  test.fixme(true, 'the app registers no offline layer worker yet')
 
   test('the German interface opens offline after a visit', async ({ page, context }) => {
     await gotoHydrated(page, '/')
@@ -206,7 +205,7 @@ test.describe('Safety notice', () => {
   test('German stands beside the English text, each with the line that English is binding', async ({
     page,
   }) => {
-    await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+    await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
     const dialog = page.getByRole('dialog', { name: 'Sicherheitsregeln' })
     const english = dialog.locator('[lang="en"]').first()
     const german = dialog.locator('[lang="de"]').first()

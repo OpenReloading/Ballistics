@@ -6,16 +6,16 @@ description: One compute operation of the API offline, the list of operations wi
 
 # Command line
 
-`packages/cli` (`@rangefoundry/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@rangefoundry/ballistics` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@rangefoundry/svg-drawings`. Results are simulations compared with printed values, never load data.
+`apps/cli` (`@rangefoundry/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@rangefoundry/ballistics` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@rangefoundry/svg-drawings`. Results are simulations compared with printed values, never load data.
 
 ```sh
 pnpm run build
-node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records
-node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
-node packages/cli/dist/bin.js verify --rows catalogue --split validation
-node packages/cli/dist/bin.js fit --rows rows.csv --records /path/to/records
-node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records --params fit-on-training
-node packages/cli/dist/bin.js fit --rows rows.csv --records /path/to/records --exponent family
+node apps/cli/dist/bin.js verify --rows rows.csv --records /path/to/records
+node apps/cli/dist/bin.js compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
+node apps/cli/dist/bin.js verify --rows catalogue --split validation
+node apps/cli/dist/bin.js fit --rows rows.csv --records /path/to/records
+node apps/cli/dist/bin.js verify --rows rows.csv --records /path/to/records --params fit-on-training
+node apps/cli/dist/bin.js fit --rows rows.csv --records /path/to/records --exponent family
 ```
 
 `--help` (or `-h`), alone or after a command, prints the usage and exits 0. `run --help` and `operations --help` print the help of that command with an example that runs on a committed synthetic body.
@@ -25,8 +25,8 @@ node packages/cli/dist/bin.js fit --rows rows.csv --records /path/to/records --e
 `run <operation> --input <file|->` runs one compute operation of the REST API offline and writes its answer as JSON on stdout: the answer of `POST /v1/<operation>` to the body in the file (`-` reads it from standard input). The operations are the compute routes: `exterior/trajectory`, `exterior/truing`, `exterior/range-strings/plan`, `exterior/range-strings/fit`, `interior`, `interior/load-file` and `interior/charge-target`. The body, the answer and the errors are those of the route, from the same code: the REST API page of this site (`/rest/`) documents each body. The answer has no `inputHash`, `apiVersion` or `dataHash`, which the server adds; `interior/load-file` answers without curves, as the route without `?curves=true`.
 
 ```sh
-node packages/cli/dist/bin.js run interior --input packages/cli/examples/interior.json
-node packages/cli/dist/bin.js operations
+node apps/cli/dist/bin.js run interior --input apps/cli/examples/interior.json
+node apps/cli/dist/bin.js operations
 ```
 
 Record ids in a body (`cartridge`, `bullet`, `powder`) resolve against the records of `--records <dir>` (repeatable, `BALLISTICS_RECORDS`), by default the records of the catalog package, as for `verify`. An unknown id is bad input: the error object carries `code` `recordNotFound` and `params` with the record's `kind` and `id`. A body the schema rejects is bad input with the issues in the error object (`issues`, each with `path` and `message`). An answer the route gives with 422 (an input the model refuses, a charge target out of reach, a load file without a value) is a refusal: the error object carries it as `answer`, a typed refusal of the model with its `code` and `params`. The message of a typed refusal or an unknown id is the code with its params after it (`recordNotFound (kind: cartridge, id: no-such)`): the command line does not word them.
@@ -192,8 +192,8 @@ No powder's own pressures decide its own values: the factor is shared and the bu
 `--folds`, with `fit` or `verify`, scores a fit by grouped cross-validation over the rows of the training and validation splits together, without reading the test split:
 
 ```sh
-node packages/cli/dist/bin.js verify --rows rows.csv --folds --table
-node packages/cli/dist/bin.js fit --rows rows.csv --folds --json
+node apps/cli/dist/bin.js verify --rows rows.csv --folds --table
+node apps/cli/dist/bin.js fit --rows rows.csv --folds --json
 ```
 
 - Folds: 5, by cartridge. The cartridges of the training and validation rows are sorted by the hex SHA-256 of `2026-11-14/<cartridge id>` (UTF-8, the id as the rows give it); a cartridge's fold is its position in that order mod 5, so all rows of a cartridge are in one fold. Rows of the test split are never read. Fewer than 5 such cartridges are refused.
@@ -229,7 +229,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify`, `compare` and `fit` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @rangefoundry/cli run schema`; a test validates real output of these commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify`, `compare` and `fit` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `apps/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @rangefoundry/cli run schema`; a test validates real output of these commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 

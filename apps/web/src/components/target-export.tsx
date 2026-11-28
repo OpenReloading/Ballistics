@@ -1,5 +1,3 @@
-'use client'
-
 import { ActionIcon, Button, Menu } from '@mantine/core'
 import type { ShotGroup } from '@rangefoundry/schema'
 import { Share } from 'lucide-react'

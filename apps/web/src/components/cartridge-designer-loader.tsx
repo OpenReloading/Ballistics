@@ -1,6 +1,4 @@
-'use client'
-
-import dynamic from 'next/dynamic'
+import dynamic from '@/platform/dynamic.tsx'
 import { loadEnglish } from '../i18n/lingui.ts'
 import englishMessages from '../locales/en/components/cartridge-designer-loader.json' with {
   type: 'json',
@@ -13,7 +11,6 @@ loadEnglish(englishMessages)
 const Designer = dynamic(
   () => import('./cartridge-designer.tsx').then((m) => m.CartridgeDesigner),
   {
-    ssr: false,
     loading: () => (
       <DesignerLoading
         title={/*i18n*/ { id: 'page.cartridgesDesigner', message: 'Cartridge designer' }}

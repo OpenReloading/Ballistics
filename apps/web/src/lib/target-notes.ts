@@ -1,4 +1,4 @@
-/** Placeholders `{key.unit}` resolved on every render; no React, DOM or Next.js. */
+/** Placeholders `{key.unit}` resolved on every render; no React or DOM. */
 import type { ShotGroup } from '@rangefoundry/schema'
 import type { GroupStatistics } from '@rangefoundry/shot-groups'
 import { formatNumber, plainNumber } from '../i18n/number.ts'

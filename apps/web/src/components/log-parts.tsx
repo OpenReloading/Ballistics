@@ -1,5 +1,3 @@
-'use client'
-
 /** Parts the shooting log and the competition events pages share: the discipline options and a bar button. */
 import { Button } from '@mantine/core'
 import { type ReactNode, useEffect, useMemo, useState } from 'react'

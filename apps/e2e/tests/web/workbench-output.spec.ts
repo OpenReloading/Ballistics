@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { showGerman } from './german.ts'
 import { choosePreset, storeUnits } from './units.ts'
 import { loadForm, openKeeping } from './workbench.ts'
@@ -216,7 +215,7 @@ const storedLoad = (page: Page) =>
     })
     db.close()
     return all.find((r) => r.kind === 'load')
-  }, storageName('rangefoundry-user-data'))
+  }, 'rangefoundry-user-data')
 
 test('the Powders tab keeps a typed target the same pressure when the units change', async ({
   page,

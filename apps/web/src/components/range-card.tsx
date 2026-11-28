@@ -1,5 +1,3 @@
-'use client'
-
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'

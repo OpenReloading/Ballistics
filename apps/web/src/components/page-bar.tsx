@@ -1,5 +1,3 @@
-'use client'
-
 import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { ActionIcon, Tooltip } from '@mantine/core'
@@ -167,7 +165,7 @@ export function PageBar({
 )) {
   const { i18n } = useLingui()
   const title = translated ? i18n._(given) : given
-  // React writes Next's English metadata title back after hydration: keep the tab in the language shown
+  // React writes the head's English title back after hydration: keep the tab in the language shown
   useEffect(() => {
     if (!translated) return
     const wanted = titleTemplate.replace('%s', title)

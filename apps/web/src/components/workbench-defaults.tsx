@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Stack, Switch } from '@mantine/core'
 import { useEffect, useState } from 'react'

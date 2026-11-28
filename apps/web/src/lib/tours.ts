@@ -1,5 +1,4 @@
 import { type Message, msg } from '../i18n/translate.ts'
-import { storageName } from './edition.ts'
 
 /** The first shown selector is taken, so a phone layout can name its own target. */
 export type TourStep = { target: string; title: Message; text: Message }
@@ -118,7 +117,7 @@ export const tours = {
 export type TourPage = keyof typeof tours
 
 /** `localStorage` key of the pages whose tour the viewer has seen, one page name per line. */
-const toursSeenKey = storageName('toursSeen')
+const toursSeenKey = 'toursSeen'
 
 /** The pages a stored value names. */
 export const parseSeen = (text: string | null) => new Set(text?.split('\n').filter(Boolean))

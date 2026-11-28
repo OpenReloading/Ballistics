@@ -1,5 +1,3 @@
-'use client'
-
 import { Affix, Button, Group, Notification, Text } from '@mantine/core'
 import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from '../i18n/language.ts'

@@ -1,0 +1,99 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { interior } from '@rangefoundry/ballistics'
+import { type InteriorModel, predict } from '../src/evaluate.ts'
+import { loadRecords, type Records } from '../src/records.ts'
+import type { Row } from '../src/rows.ts'
+
+/** The records of the data package and a synthetic root with case capacities and two more powders. */
+export const recordRoots = [
+  join(import.meta.dirname, '../../../packages/catalog/records'),
+  join(import.meta.dirname, 'fixtures/records'),
+]
+
+export const records = loadRecords(recordRoots)
+
+/** A new records root with one estimated capacity (provenance derived) of `cartridge`, first by id. */
+export function rootWithEstimate(cartridge: string, value: number) {
+  const root = mkdtempSync(join(tmpdir(), 'cli-estimate-'))
+  mkdirSync(join(root, 'capacities'))
+  const id = `a-${cartridge}-estimate`
+  writeFileSync(
+    join(root, 'capacities', `${id}.json`),
+    JSON.stringify({
+      id,
+      origin: 'catalogue',
+      cartridge: `catalogue:${cartridge}`,
+      waterCapacity: { value },
+      provenance: {
+        kind: 'derived',
+        sources: [{ title: 'Outline estimate', fields: ['waterCapacity'] }],
+      },
+    }),
+  )
+  return root
+}
+
+/** A row of the synthetic set: the printed values are the model's, moved by `velocity` and `pressure`. */
+export interface Spec {
+  cartridge: string
+  bullet?: string
+  powder?: string
+  charge: number
+  barrel?: number | null
+  /** The printed velocity is the model's divided by 1 + this, so the absolute relative error is |this|. */
+  velocity: number
+  /** The same for the peak pressure; none prints no pressure. */
+  pressure?: number
+  pressureBasis?: string
+  table?: string
+}
+
+const columns =
+  'cartridge,bullet,powder,charge_g,velocity_ms,pressure_bar,pressure_basis,barrel_mm,table'
+
+/** The CSV text of `specs`, printed by `model` from `truth`; a row the model refuses prints 800 m/s. */
+export function rowsCsv(
+  specs: readonly Spec[],
+  truth: Records = records,
+  model: InteriorModel = interior,
+): string {
+  const lines = specs.map((s) => {
+    const barrel = s.barrel === undefined ? 600 : s.barrel
+    const row: Row = {
+      line: 0,
+      cartridge: s.cartridge,
+      bullet: s.bullet ?? 'demo-bullet-168',
+      powder: s.powder ?? 'demo-powder-dp40',
+      charge: s.charge,
+      velocity: 0,
+      ...(barrel !== null && { barrel }),
+    }
+    const p = predict(row, truth, model)
+    const ok = 'velocity' in p
+    const velocity = ok ? p.velocity / (1 + s.velocity) : 800
+    const pressure = ok && s.pressure !== undefined ? p.pressure / 1e5 / (1 + s.pressure) : ''
+    return [
+      row.cartridge,
+      row.bullet,
+      row.powder,
+      s.charge,
+      velocity,
+      pressure,
+      s.pressureBasis ?? '',
+      barrel ?? '',
+      s.table ?? '',
+    ].join(',')
+  })
+  return `${columns}\n${lines.join('\n')}\n`
+}
+
+/** Writes `text` to a new folder and returns the file's path. */
+export function writeRows(text: string, name = 'rows.csv'): string {
+  const dir = mkdtempSync(join(tmpdir(), 'cli-rows-'))
+  mkdirSync(dir, { recursive: true })
+  const path = join(dir, name)
+  writeFileSync(path, text)
+  return path
+}

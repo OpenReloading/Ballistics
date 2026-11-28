@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { putRecords } from './user-store.ts'
 
 const pistol = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
@@ -41,7 +40,7 @@ const storedEvents = (page: Page) =>
     )
     db.close()
     return all.filter((r) => r.kind === 'event').sort((a, b) => a.id.localeCompare(b.id))
-  }, storageName('rangefoundry-user-data'))
+  }, 'rangefoundry-user-data')
 
 async function pick(page: Page, scope: ReturnType<Page['locator']>, name: string, option: string) {
   await scope.getByRole('combobox', { name }).click()
@@ -176,7 +175,7 @@ test('a person adds an IPSC event with two stages and a DSB ring event, sees the
       })
       db.close()
     },
-    [before.map((r) => r.id), storageName('rangefoundry-user-data')] as const,
+    [before.map((r) => r.id), 'rangefoundry-user-data'] as const,
   )
   await page.reload()
   await expect(count(page)).toHaveText('0 events')

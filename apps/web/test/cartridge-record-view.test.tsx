@@ -30,11 +30,8 @@ import { defined, missing } from './defined.ts'
 import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
 
-// the record page draws its figures in the self-hosted drawing font
-vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
-
 // the list renders its tab bar, which reads the route and the router
-vi.mock('next/navigation', () => ({
+vi.mock('@/platform/navigation.ts', () => ({
   usePathname: () => '/cartridges',
   useRouter: () => ({ push: () => {} }),
 }))

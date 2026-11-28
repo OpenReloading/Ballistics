@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { Plus } from 'lucide-react'

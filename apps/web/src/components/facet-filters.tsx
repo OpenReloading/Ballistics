@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Checkbox, Group, Popover, Stack } from '@mantine/core'
 import { ChevronDown } from 'lucide-react'

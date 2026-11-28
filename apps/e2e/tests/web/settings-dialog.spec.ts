@@ -1,6 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { showGerman } from './german.ts'
 import { based, exported, gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
@@ -12,10 +11,7 @@ test.beforeEach(({ page }) => storeUnits(page))
 const sidebarSettings = settingsEntry
 const unitsButton = (page: Page) => page.getByRole('button', { name: /^Units: / })
 const stored = (page: Page) =>
-  page.evaluate(
-    (store) => JSON.parse(localStorage.getItem(store) ?? '{}').preset,
-    storageName('units'),
-  )
+  page.evaluate((store) => JSON.parse(localStorage.getItem(store) ?? '{}').preset, 'units')
 
 /** Opens the dialog from `entry` and waits for it to be in view: it fades in. */
 async function openFrom(page: Page, entry: Locator) {
@@ -178,21 +174,17 @@ test('Appearance in General stores the theme as System, Light or Dark', async ({
   const html = page.locator('html')
   await theme.getByText('Light', { exact: true }).click()
   await expect(html).toHaveAttribute('data-mantine-color-scheme', 'light')
-  expect(await page.evaluate((store) => localStorage.getItem(store), storageName('theme'))).toBe(
-    'light',
-  )
+  expect(await page.evaluate((store) => localStorage.getItem(store), 'theme')).toBe('light')
   await theme.getByText('Dark', { exact: true }).click()
   await expect(html).toHaveAttribute('data-mantine-color-scheme', 'dark')
-  expect(await page.evaluate((store) => localStorage.getItem(store), storageName('theme'))).toBe(
-    'dark',
-  )
+  expect(await page.evaluate((store) => localStorage.getItem(store), 'theme')).toBe('dark')
   // System follows the system setting again
   await theme.getByText('System', { exact: true }).click()
   await page.emulateMedia({ colorScheme: 'light' })
   await expect(html).toHaveAttribute('data-mantine-color-scheme', 'light')
-  expect(
-    await page.evaluate((store) => localStorage.getItem(store), storageName('theme')),
-  ).not.toMatch(/^(light|dark)$/)
+  expect(await page.evaluate((store) => localStorage.getItem(store), 'theme')).not.toMatch(
+    /^(light|dark)$/,
+  )
 })
 
 test('Settings turns the single-key shortcuts off: "/" and "?" do nothing, the choice stays over a reload', async ({

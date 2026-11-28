@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Flex } from '@mantine/core'
 import { Plus, Redo2, RotateCcw, Undo2 } from 'lucide-react'
 import { memo } from 'react'

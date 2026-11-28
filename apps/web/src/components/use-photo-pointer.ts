@@ -1,5 +1,3 @@
-'use client'
-
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { pointLabels } from '../lib/bullet-photo-canvas.ts'

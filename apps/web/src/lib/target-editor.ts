@@ -1,4 +1,4 @@
-/** SI in and out (m, rad); no React, DOM or Next.js. */
+/** SI in and out (m, rad); no React or DOM. */
 
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import {

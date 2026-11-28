@@ -1,8 +1,6 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
-import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import type { GenericPrimer } from '../lib/generic-primer.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -14,9 +12,7 @@ import { RecordSearch, useChooser } from './record-search.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { notReached } from './workbench-outcome.ts'
 
-const PrimerChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.PrimerChooser), {
-  ssr: false,
-})
+const PrimerChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.PrimerChooser))
 
 /** Without a chosen record the load uses `generic`, the generic primer of its cartridge; an `id` the list lacks stays chosen under a generic label, so a saved reference is never dropped. */
 export function PrimerChoice({

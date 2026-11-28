@@ -49,8 +49,8 @@ path = [
   "apps/web/src/assets/ballistics-light.svg",
   "apps/web/src/assets/ballistics-dark.svg",
   "apps/web/public/opengraph-image.png",
-  "apps/web/src/app/icon.png",
-  "apps/web/src/app/apple-icon.png",
+  "apps/web/src/assets/icon.png",
+  "apps/web/src/assets/apple-icon.png",
   "apps/web/public/icon-192.png",
 ]
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"

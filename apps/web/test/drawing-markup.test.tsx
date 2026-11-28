@@ -1,11 +1,9 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { verified } from './drawing-rules.ts'
 import { figureSvgs } from './figure-svgs.tsx'
 import { sheetRecord } from './records.ts'
 
-// next/font is compiled by Next; here the drawing font class is a fixed name
-vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { TechnicalDrawing } = await import('../src/components/technical-drawing.tsx')
 
 /** 20 sample figures (every drawn table and its extremes), 284 Win. and 11,5 x 51. */

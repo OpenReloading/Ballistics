@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Tabs } from '@mantine/core'
 import { useEffect, useRef } from 'react'

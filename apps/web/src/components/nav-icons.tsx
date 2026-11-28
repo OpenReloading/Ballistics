@@ -1,5 +1,3 @@
-'use client'
-
 import { BulletIcon, CartridgeIcon, PowderIcon, RifleIcon } from '@rangefoundry/ui'
 import {
   ChartColumn,

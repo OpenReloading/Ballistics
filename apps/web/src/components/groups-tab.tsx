@@ -1,5 +1,3 @@
-'use client'
-
 import { useFocusTrap, useMediaQuery, useMergedRef } from '@mantine/hooks'
 import { chargeLadder } from '@rangefoundry/ballistics'
 import { type ComponentProps, useEffect, useState } from 'react'

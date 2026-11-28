@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
 import { useState } from 'react'

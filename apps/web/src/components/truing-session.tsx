@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Checkbox, NativeSelect, TextInput } from '@mantine/core'
 import type { RangeStringFit, TrajectoryInput, TruingPlan } from '@rangefoundry/ballistics'

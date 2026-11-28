@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { CloseButton, Group, Select, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
@@ -18,6 +16,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { basePath } from '@/platform/build-env.ts'
 import Link from '@/platform/link.tsx'
 import { loadEnglish } from '../i18n/lingui.ts'
 import {
@@ -28,7 +27,6 @@ import {
   readDirectory,
   writeDirectory,
 } from '../lib/directory.ts'
-import { basePath } from '../lib/edition.ts'
 import { type ListNoun, sortRows } from '../lib/lists.ts'
 import { pickRange } from '../lib/selection.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
@@ -156,7 +154,7 @@ const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
 
 const noFacetKeys: readonly string[] = []
 
-/** Read after mounting, not with `useSearchParams`, so the page stays prerendered with its first rows (Next.js renders a `useSearchParams` tree in the browser only); `facetKeys` is a constant of the list. */
+/** Read after mounting, not with `useSearchParams`, so the page stays prerendered with its first rows; `facetKeys` is a constant of the list. */
 export function useListState(facetKeys: readonly string[] = noFacetKeys) {
   const [state, setState] = useState<DirectoryState>(emptyDirectory)
   // oxlint-disable-next-line react-hooks/exhaustive-deps -- the keys of a list are fixed
@@ -692,7 +690,7 @@ function DirectoryRow<T extends { id: string }>({
             className="name-cell"
             data-action={action ? '' : undefined}
           >
-            {/* no prefetch: a long list of links (Next.js docs); a click fetches the page, which the offline worker stores */}
+            {/* no prefetch: a long list of links; a click fetches the page */}
             <Link
               href={href(row)}
               prefetch={false}

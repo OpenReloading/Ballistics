@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Popover, UnstyledButton } from '@mantine/core'

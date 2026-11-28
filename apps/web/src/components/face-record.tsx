@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import Link from '@/platform/link.tsx'
 import { loadEnglish } from '../i18n/lingui.ts'

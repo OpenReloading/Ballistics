@@ -1,5 +1,3 @@
-'use client'
-
 import { type CalibrationReference, fromSi, type TargetSheet, toSi } from '@rangefoundry/schema'
 import { dispersionEllipse, predictionEllipse } from '@rangefoundry/shot-groups'
 import {

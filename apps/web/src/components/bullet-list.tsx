@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'

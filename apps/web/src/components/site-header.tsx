@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
@@ -19,10 +17,10 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useDisclosure, useHotkeys, useMediaQuery } from '@mantine/hooks'
-import dynamic from 'next/dynamic'
 import { useContext, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '@/platform/edition.ts'
+import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '@/platform/build-env.ts'
+import dynamic from '@/platform/dynamic.tsx'
 import Image from '@/platform/image.tsx'
 import Link from '@/platform/link.tsx'
 import dark from '../assets/ballistics-dark.svg'
@@ -57,9 +55,7 @@ const searchLabel = /*i18n*/ { id: 'shell.search', message: 'Search' }
 const settingsLabel = /*i18n*/ { id: 'shell.settings', message: 'Settings' }
 
 // the search loads on its first use, so pages ship without it
-const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteSearch), {
-  ssr: false,
-})
+const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteSearch))
 
 const name = 'RangeFoundry Workbench'
 

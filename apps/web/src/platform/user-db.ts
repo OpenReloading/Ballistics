@@ -1,5 +1,4 @@
 /** Without the schema, so a page that only lists stored values stays small. */
-import { storageName } from '../lib/edition.ts'
 
 const request = <T>(r: IDBRequest<T>) =>
   new Promise<T>((resolve, reject) => {
@@ -12,7 +11,7 @@ type Store = 'records' | 'handles' | 'files'
 /** The database version. A database at a later one holds data of a pre-release version: refused, never read. */
 const version = 1
 
-const databaseName = storageName('rangefoundry-user-data')
+const databaseName = 'rangefoundry-user-data'
 
 /** Fired on the global scope when the database is refused: it holds data of a pre-release version. */
 export const refusedEvent = 'user-db-refused'

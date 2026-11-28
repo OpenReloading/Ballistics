@@ -17,7 +17,6 @@ vi.mock('../src/i18n/language.ts', async (original) => ({
   ...(await original<typeof import('../src/i18n/language.ts')>()),
   useTranslation: () => translator(),
 }))
-vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { CartridgeDrawing } = await import('../src/components/cartridge-drawing.tsx')
 
 /** Both sides as the record page draws them, one side, or the designer's figure (no side). */

@@ -1,5 +1,3 @@
-'use client'
-
 import type { ShotGroup, TargetSheet } from '@rangefoundry/schema'
 import type { Ref } from 'react'
 import { createPortal } from 'react-dom'
@@ -90,7 +88,6 @@ export function TargetPrint({
       </p>
       <div className="print-image" style={{ width: `${w}mm`, height: `${h}mm` }}>
         {photo && (
-          // oxlint-disable-next-line nextjs/no-img-element -- the photo's blob URL at a size in mm, for print only
           <img
             ref={photoRef}
             src={photo.url}

@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Badge } from '@mantine/core'
 import type { ReactNode } from 'react'

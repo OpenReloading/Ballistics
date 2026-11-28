@@ -1,5 +1,3 @@
-'use client'
-
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
 import { parseRef } from '@rangefoundry/schema'
 import { Copy, Download, Pencil, Printer, Trash } from 'lucide-react'

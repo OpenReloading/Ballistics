@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Popover, Tooltip } from '@mantine/core'
 import { ArrowLeftRight, EyeOff, X } from 'lucide-react'

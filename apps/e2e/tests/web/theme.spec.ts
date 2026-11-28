@@ -1,5 +1,4 @@
 import { expect, type Page, test } from '@playwright/test'
-import { isNextEdition, storageName } from './edition.ts'
 import { isDark } from './luminance.ts'
 import { gotoHydrated } from './nav.ts'
 
@@ -18,15 +17,13 @@ const bg = (page: Page) => page.evaluate(() => getComputedStyle(document.body).b
 const storeDark = (page: Page) =>
   page.addInitScript((store) => {
     localStorage.setItem(store, 'dark')
-  }, storageName('theme'))
+  }, 'theme')
 const themeSwitch = (page: Page) => page.getByRole('button', { name: 'Dark theme' })
 
 test('with nothing stored the system setting decides', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('./cartridges/308-win')
-  expect(
-    await page.evaluate((store) => localStorage.getItem(store), storageName('theme')),
-  ).toBeNull()
+  expect(await page.evaluate((store) => localStorage.getItem(store), 'theme')).toBeNull()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
   expect(isDark(await bg(page))).toBe(true)
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
@@ -52,9 +49,7 @@ test('the switch overrides the system setting and the choice survives a reload',
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'light')
   expect(isDark(await firstBg(page))).toBe(false)
-  expect(await page.evaluate((store) => localStorage.getItem(store), storageName('theme'))).toBe(
-    'light',
-  )
+  expect(await page.evaluate((store) => localStorage.getItem(store), 'theme')).toBe('light')
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'false')
 })
 
@@ -129,7 +124,7 @@ for (const scheme of ['light', 'dark'] as const)
   test(`the header shows the ${scheme} wordmark as the home link`, async ({ page }) => {
     await page.addInitScript(([s, store]) => localStorage.setItem(store, s), [
       scheme,
-      storageName('theme'),
+      'theme',
     ] as const)
     await page.goto('./cartridges/308-win')
     const logo = page
@@ -145,14 +140,8 @@ for (const scheme of ['light', 'dark'] as const)
     ).toBeGreaterThan(0)
   })
 
-test('icons are served as PNG, no social image without the origin', async ({
-  page,
-  request,
-  baseURL,
-}) => {
-  test.skip(isNextEdition(baseURL), 'the Start site of this run is built with its Pages origin')
+test('icons are served as PNG, no social image without the origin', async ({ page, request }) => {
   await page.goto('./cartridges/308-win')
-  // first(): Next.js may stream the metadata again into the head
   const head = page.locator('head')
   const hrefs = [
     await head.locator('link[rel="icon"]').first().getAttribute('href'),

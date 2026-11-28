@@ -1,5 +1,3 @@
-'use client'
-
 import { Modal } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'

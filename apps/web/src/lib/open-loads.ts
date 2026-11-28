@@ -1,12 +1,11 @@
 /** The home page reads the newest without the schema. */
 
 import { inStore } from '@/platform/user-db.ts'
-import { storageName } from './edition.ts'
 
 /** The saved loads open in the tabs and the one shown, stored in `localStorage` (`openLoads`). */
 type OpenLoads = { ids: string[]; active?: string | undefined }
 
-export const openLoadsKey = storageName('openLoads')
+export const openLoadsKey = 'openLoads'
 
 export const openLoadsText = (set: OpenLoads) => JSON.stringify(set)
 

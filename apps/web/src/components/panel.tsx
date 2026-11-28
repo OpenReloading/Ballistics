@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Paper } from '@mantine/core'
 import type { ReactNode } from 'react'

@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Group, MultiSelect, Pill } from '@mantine/core'
 import type { Powder } from '@rangefoundry/schema'

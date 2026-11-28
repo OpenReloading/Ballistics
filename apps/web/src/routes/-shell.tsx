@@ -14,6 +14,7 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '@/platform/build-env.ts'
 import { useBarEnd } from '../components/bar-end.ts'
 import { InstallButton } from '../components/install-button.tsx'
 import { NavIcon } from '../components/nav-icons.tsx'
@@ -37,7 +38,6 @@ import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
 import sectionsEnglish from '../locales/en/lib/sections.json' with { type: 'json' }
 import englishMessages from '../locales/en/routes/-shell.json' with { type: 'json' }
-import { docsAddress, noDocs, repositoryAddress, sourceAddress } from '../platform/edition.ts'
 import Link from '../platform/link.tsx'
 
 loadEnglish(englishMessages, sectionsEnglish)
@@ -81,7 +81,7 @@ function DialogRow({
   )
 }
 
-/** Search, the pages of every section in a list named by the section with the current one marked, Install from 75em, Settings and the docs, as the sidebar of the Next app has them; in the drawer below 75em also Report an issue and the repository, which the top bar shows from 75em. */
+/** Search, the pages of every section in a list named by the section with the current one marked, Install from 75em, Settings and the docs; in the drawer below 75em also Report an issue and the repository, which the top bar shows from 75em. */
 function Navigation({
   route,
   afterDrawer,
@@ -158,7 +158,7 @@ function Navigation({
   )
 }
 
-/** Install, Safety, Report an issue, the repository and the theme, as the Next app's header offers them, and the search that Search, Ctrl+K and the home page's field open. */
+/** Install, Safety, Report an issue, the repository and the theme, and the search that Search, Ctrl+K and the home page's field open. */
 function BarEnd({ route, onReport }: { route: string; onReport: () => void }) {
   // each request opens the site search; the workbench opens its own (`searchHost`)
   const [searches, setSearches] = useState(0)
@@ -217,7 +217,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <ResultsSkipLink />
       <SafetyDialog />
       <PreReleaseData />
-      {/* the Next shell's wrapper, so the app's styles frame a list window-high and keep a document's text measure */}
+      {/* the page wrapper, so the app's styles frame a list window-high and keep a document's text measure */}
       <div
         className="page-shell"
         data-width={isToolRoute(route) ? 'tool' : undefined}

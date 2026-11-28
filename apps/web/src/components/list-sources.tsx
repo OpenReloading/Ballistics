@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { ActionIcon, Badge, Button, Checkbox, Group, Popover, Stack, Tooltip } from '@mantine/core'
 import type { UserRecord } from '@rangefoundry/schema'

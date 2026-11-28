@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { compareTargetFaces, type TargetFace, type TargetMapping } from '@rangefoundry/schema'
 import {

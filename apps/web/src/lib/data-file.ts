@@ -1,4 +1,4 @@
-import { basePath, edition } from './edition.ts'
+import { basePath } from '@/platform/build-env.ts'
 import { recordsCache } from './offline.ts'
 
 const files = new Map<string, Promise<unknown>>()
@@ -7,7 +7,7 @@ const files = new Map<string, Promise<unknown>>()
 function keepForOffline(name: string, url: string, res: Response) {
   if (name.startsWith('catalogue/') || !('serviceWorker' in navigator)) return
   navigator.serviceWorker.ready
-    .then(() => caches.open(recordsCache(edition)))
+    .then(() => caches.open(recordsCache))
     .then((cache) => cache.put(url, res))
     .catch(() => {})
 }

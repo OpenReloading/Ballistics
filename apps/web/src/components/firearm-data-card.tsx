@@ -1,5 +1,3 @@
-'use client'
-
 import { Table } from '@mantine/core'
 import type { Firearm, Optic } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'

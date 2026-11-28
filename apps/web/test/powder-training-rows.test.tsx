@@ -8,7 +8,7 @@ import { linguiOf } from '../src/i18n/lingui.ts'
 import type { PowderSummary } from '../src/lib/api-types.ts'
 import { defined } from './defined.ts'
 
-vi.mock('next/navigation', () => ({
+vi.mock('@/platform/navigation.ts', () => ({
   usePathname: () => '/powders',
   useRouter: () => ({ push: () => {} }),
 }))

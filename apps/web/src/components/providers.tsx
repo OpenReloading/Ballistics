@@ -1,32 +1,22 @@
-'use client'
-
-import { I18nProvider, useLingui } from '@lingui/react'
-import { Button, Group, localStorageColorSchemeManager, MantineProvider } from '@mantine/core'
-import { LucideProvider } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
-import { startLanguage, useTranslation } from '../i18n/language.ts'
-import { linguiOf, loadEnglish } from '../i18n/lingui.ts'
-import { decimalMark } from '../i18n/number.ts'
+import { useLingui } from '@lingui/react'
+import { Button, Group } from '@mantine/core'
+import { type ReactNode, useCallback, useEffect, useState } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
+import { loadEnglish } from '../i18n/lingui.ts'
 import { useRoute } from './use-route.ts'
 import '../lib/navigation-guard.ts'
-import { colorSchemeKey, iconDefaults, themeFor } from '../lib/theme.ts'
 import englishMessages from '../locales/en/components/providers.json' with { type: 'json' }
 import { AppModal } from './app-modal.tsx'
-import { ConfirmHost } from './confirm.tsx'
 import { SettingsDialog, type SettingsTab } from './settings-dialog.ts'
 import { Loading } from './states.tsx'
-import { UnitsProvider } from './units-settings.tsx'
 
 // the forms load when the dialog first opens, so pages ship without them
 const SettingsSections = dynamic(
   () => import('./settings-sections.tsx').then((m) => m.SettingsSections),
-  { ssr: false, loading: () => <Loading what="the settings" /> },
+  { loading: () => <Loading what="the settings" /> },
 )
 
 loadEnglish(englishMessages)
-
-const colorSchemeManager = localStorageColorSchemeManager({ key: colorSchemeKey })
 
 /** The settings dialog over any page: every Settings and Units button opens it through `SettingsDialog`. */
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
@@ -65,35 +55,5 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
         <SettingsSections tab={tab} onTab={setTab} onClose={close} />
       </AppModal>
     </SettingsDialog>
-  )
-}
-
-/** Client boundary for the Mantine, units and settings dialog providers: the color scheme manager holds functions. */
-export function Providers({ children }: { children: React.ReactNode }) {
-  // the ready signal of the e2e specs: `html[data-hydrated]` once React has attached the handlers
-  useEffect(() => {
-    document.documentElement.dataset.hydrated = ''
-  }, [])
-  // the stored language applies after mounting: the server render and hydration are English
-  useEffect(startLanguage, [])
-  // one language for the views' own messages and the Lingui ones; number inputs write its decimal mark
-  const { language } = useTranslation()
-  const theme = useMemo(() => themeFor(decimalMark(language)), [language])
-  return (
-    <MantineProvider
-      theme={theme}
-      defaultColorScheme="auto"
-      colorSchemeManager={colorSchemeManager}
-    >
-      <I18nProvider i18n={linguiOf(language)}>
-        <LucideProvider {...iconDefaults}>
-          <UnitsProvider>
-            {/* first: its Escape listener is added before the page's dialogs add theirs */}
-            <ConfirmHost />
-            <SettingsDialogProvider>{children}</SettingsDialogProvider>
-          </UnitsProvider>
-        </LucideProvider>
-      </I18nProvider>
-    </MantineProvider>
   )
 }

@@ -5,12 +5,12 @@ import { pageCoversRoute, sections } from '../../../web/src/lib/sections.ts'
 import { problems, schemes, tall, widths } from './a11y.ts'
 import { gotoHydrated } from './nav.ts'
 
-const appDir = path.join(__dirname, '../../../web/src/app')
+const routesDir = path.join(__dirname, '../../../web/src/routes')
 
-// every page without a dynamic segment: the navigation reaches each of them, so each is swept
-const routes = readdirSync(appDir, { recursive: true, encoding: 'utf8' })
-  .filter((file) => path.basename(file) === 'page.tsx' && !file.includes('['))
-  .map((file) => `/${path.dirname(file)}`.replace(/^\/\.$/, '/'))
+// every page without a dynamic segment: the navigation reaches each of them, so each is swept; `-`, `__` and `$` files are no page of their own
+const routes = readdirSync(routesDir, { recursive: true, encoding: 'utf8' })
+  .filter((file) => file.endsWith('.tsx') && !/(^|\/)[-_$]/.test(file))
+  .map((file) => `/${file.replace(/(\/?index)?\.tsx$/, '')}`)
   .sort()
 
 test('every page without a dynamic segment is in the navigation, so the sweep covers it', () => {

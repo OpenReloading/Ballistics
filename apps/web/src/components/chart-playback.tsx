@@ -1,5 +1,3 @@
-'use client'
-
 import { ActionIcon, Button, Menu } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
 import { toSi } from '@rangefoundry/schema'

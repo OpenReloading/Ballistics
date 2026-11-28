@@ -1,4 +1,4 @@
-/** ONNX Runtime Web on WebAssembly without WebGPU; vite.config.mts and next.config.ts alias `onnxruntime-web/wasm` to the build that loads its WASM files from `wasmPaths`, so no build output holds them. */
+/** ONNX Runtime Web on WebAssembly without WebGPU; vite.config.mts aliases `onnxruntime-web/wasm` to the build that loads its WASM files from `wasmPaths`, so no build output holds them. */
 import { ModelContractError, type RunModel } from '@rangefoundry/target-recognition'
 
 /** One thread: threads need cross-origin isolation, which a static host does not send. */

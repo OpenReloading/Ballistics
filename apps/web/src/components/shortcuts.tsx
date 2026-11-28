@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Kbd, Table } from '@mantine/core'
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'

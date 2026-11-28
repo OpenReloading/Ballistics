@@ -1,5 +1,3 @@
-'use client'
-
 import { Popover, type PopoverProps } from '@mantine/core'
 
 /** `min(<size>, calc(100vw - 2rem))`: a width that leaves 1rem at each side of a narrow window. */

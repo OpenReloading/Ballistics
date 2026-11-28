@@ -256,11 +256,8 @@ if (import.meta.main) {
     await page.addInitScript((value) => {
       localStorage.setItem('safety-ack', value)
     }, safetyAck)
-    // both editions' keys: the next edition puts `next:` ahead of its own
     if (language)
-      await page.addInitScript((code) => {
-        for (const key of ['language', 'next:language']) localStorage.setItem(key, code)
-      }, language)
+      await page.addInitScript((code) => localStorage.setItem('language', code), language)
     const tiles: { file: string; caption: string }[] = []
     for (const url of pages)
       for (const width of widths)

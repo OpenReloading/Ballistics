@@ -39,7 +39,7 @@ An agent drove the app with Playwright and read the browser's accessibility tree
 
 Structured sample:
 
-- 23 routes without a dynamic segment (every `page.tsx` under `apps/web/src/app` without `[`), at 320, 390 and 1280 px in light and dark.
+- 23 routes without a dynamic segment (every route file under `apps/web/src/routes` without a `$` segment), at 320, 390 and 1280 px in light and dark.
 - One record page per record kind: cartridge (308 Win.), bullet, powder, case, primer, target, discipline, federation.
 - States: the first-visit Safety dialog, the workbench start card, the workbench after the example run with every result tab, the Open menu and Saved loads drawer, Chart data, the bullet search dialog, Settings (General, with its shortcut choice), Keyboard shortcuts, site search, the Safety notice, the photo tool with its sample photograph, the Import entry with a table and a refused file, the Page actions panel at 320 and 390 px, range mode with a saved load, a typed invalid number, a refused run, an unreadable chronograph file, tooltips by hover and by focus.
 

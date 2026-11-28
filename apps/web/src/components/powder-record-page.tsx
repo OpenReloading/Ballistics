@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import type { Cartridge, Powder } from '@rangefoundry/schema'
 import { ChartColumn } from 'lucide-react'

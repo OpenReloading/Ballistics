@@ -1,5 +1,3 @@
-'use client'
-
 import { usePathname } from '@/platform/navigation.ts'
 import { routeOf } from '../lib/sections.ts'
 

@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, NativeSelect, Select } from '@mantine/core'
 import { useWindowEvent } from '@mantine/hooks'
 import {

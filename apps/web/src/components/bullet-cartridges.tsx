@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { TextInput } from '@mantine/core'
 import { Search } from 'lucide-react'

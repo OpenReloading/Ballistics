@@ -9,13 +9,11 @@ import {
   recordProfile,
 } from '@rangefoundry/svg-drawings/bullet'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { bullet } from '../../../packages/schema/src/index.ts'
 import { type Laid, sideRules, textSize } from './drawing-rules.ts'
 import { catalogBundle } from './records.ts'
 
-// next/font is compiled by Next; here the drawing font class is a fixed name
-vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { TechnicalDrawing } = await import('../src/components/technical-drawing.tsx')
 
 const records = catalogBundle().bullets as Bullet[]

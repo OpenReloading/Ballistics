@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import type { Powder } from '@rangefoundry/schema'
 import Link from '@/platform/link.tsx'

@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'

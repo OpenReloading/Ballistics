@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import {
   Button,
@@ -15,8 +13,8 @@ import {
 } from '@mantine/core'
 import type { Bullet } from '@rangefoundry/schema'
 import { FlaskConical, Plus } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { type CSSProperties, type ReactNode, useState } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
 import Link from '@/platform/link.tsx'
 import { useRouter } from '@/platform/navigation.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
@@ -42,9 +40,8 @@ import { useUnits } from './units-settings.tsx'
 loadEnglish(englishMessages)
 
 /** The bullet search, a chunk of its own: the comparison loads it on the first Add bullet. */
-const CompareAddChooser = dynamic(
-  () => import('./compare-add-chooser.tsx').then((m) => m.CompareAddChooser),
-  { ssr: false },
+const CompareAddChooser = dynamic(() =>
+  import('./compare-add-chooser.tsx').then((m) => m.CompareAddChooser),
 )
 
 const markText = {

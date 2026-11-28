@@ -1,5 +1,3 @@
-'use client'
-
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { bulletKind } from './bullet-search-dialog.tsx'

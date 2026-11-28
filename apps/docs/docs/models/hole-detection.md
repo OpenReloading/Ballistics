@@ -354,7 +354,7 @@ Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a c
 
 ### Model file
 
-`hole-model` 0.1.0 is a heatmap net of 197,153 parameters, trained from random weights by `training/hole-model` and exported to ONNX opset 17. The file is `apps/web/public/models/hole-model-0.1.0.onnx` (792,640 bytes), licensed CC-BY-SA-4.0 and served by each edition under its own base path (`basePath` of `apps/web/src/platform/edition.ts`), on next at <https://openreloading.github.io/Ballistics/next/models/hole-model-0.1.0.onnx>; its manifest is `hole-model-0.1.0.json` beside it. The manifest's `url` and `wasmPaths` are relative to that base path. The service worker neither precaches nor stores it, and no script bundle holds it.
+`hole-model` 0.1.0 is a heatmap net of 197,153 parameters, trained from random weights by `training/hole-model` and exported to ONNX opset 17. The file is `apps/web/public/models/hole-model-0.1.0.onnx` (792,640 bytes), licensed CC-BY-SA-4.0 and served under the site's base path (`basePath` of `apps/web/src/platform/build-env.ts`), at <https://openreloading.github.io/Ballistics/models/hole-model-0.1.0.onnx>; its manifest is `hole-model-0.1.0.json` beside it. The manifest's `url` and `wasmPaths` are relative to that base path. No script bundle holds it.
 
 - Input: RGB in 0 to 1 with the expected hole at 16 px, width and height multiples of 16. Output: one heatmap channel at stride 2.
 - Training photos: 3,000 synthetic and 638 real third-party target photos with unchecked labels. Target kinds are not counted for this model. `NOTICE` credits the third-party photos in aggregate.
@@ -371,13 +371,13 @@ The detection worker of the web app runs the learned detector through ONNX Runti
 
 - the manifest `models/hole-model-0.1.0.json`;
 - the model file at the manifest's `file.url`, refused when its size or SHA-256 differs from the manifest's `bytes` and `sha256`;
-- the runtime's `ort-wasm-simd-threaded.mjs` and `ort-wasm-simd-threaded.wasm` from `onnxruntime-web/dist` of the version the app pins, in the manifest's `runtime.wasmPaths`. They are not in the repository: `scripts/model-runtime.mts` of the web app copies them from the installed package into `public/` at that path before `pnpm run dev`, `build` and `build:start` (and in `tools/src/start-site.ts`), and fails when the installed version is not the manifest's `runtime.version`.
+- the runtime's `ort-wasm-simd-threaded.mjs` and `ort-wasm-simd-threaded.wasm` from `onnxruntime-web/dist` of the version the app pins, in the manifest's `runtime.wasmPaths`. They are not in the repository: `scripts/model-runtime.mts` of the web app copies them from the installed package into `public/` at that path before `pnpm run dev` and `build`, and fails when the installed version is not the manifest's `runtime.version`.
 
 The whole load has a limit of 60 s: the model and the runtime, 4.6 MB with gzip, take about 23 s over a 1.6 Mbit/s mobile link. When the manifest, the model or the runtime does not load, does not match or passes the limit, the worker logs the error to the console, the classical detector answers, and the Detect step says so until the next run or another sheet, photo or group.
 
 An example pick, and a later run with the example's polarity or backing color, runs the classical detector without loading the model: the learned detector reads none of them and measures no hole size, which the example sets. Without a region or a target face, the learned detector works on the paper's outline (`paperOutline`), as the classical detector does, and coarsens a working image past 2 million px to fit, down to a hole of 8 working px, the smallest hole the model is trained on. Below that the classical detector answers, without the fallback note, as it works down to a hole of 4 working px.
 
-The model and the runtime load on demand and stay out of the offline layer's precache and the script output, so without a network a run falls back to the classical detector unless the browser's HTTP cache still holds them: the app imports `onnxruntime-web/wasm` through an alias to the package's build that loads its WASM files from `wasmPaths`, and both builds fail when their output holds a `.wasm` or `.onnx` file other than the files copied from `public/models/`, the runtime's among them (the Start build's client output, the service worker's precache list of the export).
+The model and the runtime load on demand and stay out of the script output, so without a network a run falls back to the classical detector unless the browser's HTTP cache still holds them: the app imports `onnxruntime-web/wasm` through an alias to the package's build that loads its WASM files from `wasmPaths`, and the build fails when its client output holds a `.wasm` or `.onnx` file other than the files copied from `public/models/`, the runtime's among them.
 
 Code: `apps/web/src/lib/hole-model.ts`, `servedDetector`; `apps/web/src/lib/onnx-model.ts`, `openOnnxModel`.
 

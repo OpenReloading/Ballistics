@@ -3,7 +3,6 @@ import path from 'node:path'
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { AxeBuilder, height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { openLadderGroups } from './ladder-groups.ts'
 import { gotoHydrated } from './nav.ts'
@@ -13,13 +12,13 @@ import { putRecords } from './user-store.ts'
 import { loadForm, openResultTab, openSavedLoad } from './workbench.ts'
 import { runSavedLoad } from './workbench-run.ts'
 
-// The states a visitor reaches after a click: a record page of each `[id]` route, the workbench after a run and every dialog or drawer; a11y-sweep.spec.ts has the pages as they load.
+// The states a visitor reaches after a click: a record page of each `$id` route, the workbench after a run and every dialog or drawer; a11y-sweep.spec.ts has the pages as they load.
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-const appDir = path.join(__dirname, '../../../web/src/app')
+const routesDir = path.join(__dirname, '../../../web/src/routes')
 
-/** One fixed record per `[id]` route, each in the export's sample (`prerender-sample.ts`); undefined where the catalogue holds no record of the kind. */
+/** One fixed record per `$id` route, each in the export's sample (`prerender-sample.ts`); undefined where the catalogue holds no record of the kind. */
 const records: Record<string, string | undefined> = {
   cartridges: '308-win',
   bullets: 'demo-bullet-168',
@@ -31,10 +30,10 @@ const records: Record<string, string | undefined> = {
   federations: 'dsb',
 }
 
-test('every route with an [id] segment has its record in the sweep', () => {
-  const dynamic = readdirSync(appDir, { recursive: true, encoding: 'utf8' })
-    .filter((file) => path.basename(file) === 'page.tsx' && file.includes('['))
-    .map((file) => path.dirname(file).split(path.sep)[0])
+test('every route with an $id segment has its record in the sweep', () => {
+  const dynamic = readdirSync(routesDir, { recursive: true, encoding: 'utf8' })
+    .filter((file) => path.basename(file) === '$id.tsx')
+    .map((file) => path.dirname(file))
   expect(new Set(Object.keys(records))).toEqual(new Set(dynamic))
 })
 
@@ -125,10 +124,7 @@ const states: State[] = [
     name: `${name} ${route}`,
     scrolls: true as const,
     open: async (page: Page, check: (view: string) => Promise<void>) => {
-      await page.addInitScript(
-        (store) => localStorage.setItem(store, 'de'),
-        storageName('language'),
-      )
+      await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
       await gotoHydrated(page, route ?? '')
       await expect(page.locator('html')).toHaveAttribute('lang', 'de')
       await expect(

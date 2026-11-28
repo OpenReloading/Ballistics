@@ -1,11 +1,10 @@
 import { defaultStartPressure, handgunBarrelLengthLimit } from '@rangefoundry/ballistics'
 import { msg } from '../i18n/translate.ts'
-import { storageName } from './edition.ts'
 import { interiorFields } from './interior-input.ts'
 import { storedChoice } from './stored-choice.ts'
 
 /** `localStorage` key of the user's workbench defaults: JSON of the tuned values, SI. */
-const defaultsKey = storageName('workbenchDefaults')
+const defaultsKey = 'workbenchDefaults'
 
 /** SI; `source` names where each value comes from, `effect` how it reaches the result. */
 export const citedDefaults = {
@@ -89,7 +88,7 @@ export function storeDefaults(d: WorkbenchDefaults) {
 
 /** The Run automatically switch: stored `off` when switched off, else absent. */
 const autoRun = storedChoice(
-  storageName('workbenchAutoRun'),
+  'workbenchAutoRun',
   (text) => text !== 'off',
   (on) => (on ? null : 'off'),
 )

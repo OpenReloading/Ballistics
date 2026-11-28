@@ -67,3 +67,23 @@ describe('checkFittedSources', () => {
     ])
   })
 })
+
+const publicFit: Source = { ...fitted, run: { version: 'a'.repeat(16) } }
+const publicFindings = (s: Source) => checkFittedSources(powder(product, s), undefined)
+
+describe('checkFittedSources in a records root without load tables', () => {
+  it('accepts a fitted source with its title, retrieval date and model version', () => {
+    expect(publicFindings(publicFit)).toEqual([])
+  })
+
+  it('fails one without a retrieval date or model version, or with a fit report', () => {
+    const at = `source 1 ("${table.title}")`
+    expect(publicFindings({ ...publicFit, retrieved: undefined })).toEqual([
+      `${at} names no retrieval date`,
+    ])
+    expect(publicFindings({ ...publicFit, run: undefined })).toEqual([
+      `${at} names no fit run (version)`,
+    ])
+    expect(publicFindings(fitted)).toEqual([`${at} names a fit report, which stays private`])
+  })
+})

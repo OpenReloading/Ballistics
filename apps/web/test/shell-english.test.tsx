@@ -44,7 +44,7 @@ function Commands() {
   return [...pages, ...commands].map((c) => c.label).join('|')
 }
 
-it('the Next shell has its English without a page: alpha note, navigation, Search and Settings', () => {
+it('the shell has its English without a page: alpha note, navigation, Search and Settings', () => {
   const { html, missing } = english(
     <AppShell>
       <SiteHeader />

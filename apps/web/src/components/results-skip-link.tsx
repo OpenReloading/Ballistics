@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { loadEnglish } from '../i18n/lingui.ts'
 import englishMessages from '../locales/en/components/results-skip-link.json' with { type: 'json' }

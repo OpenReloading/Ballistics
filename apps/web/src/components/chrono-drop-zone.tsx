@@ -1,5 +1,3 @@
-'use client'
-
 import { Tooltip } from '@mantine/core'
 import { type DragEvent, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'

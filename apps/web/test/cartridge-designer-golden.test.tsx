@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
 import { fromRecord } from '../src/lib/cartridge-designer.ts'
 import { draftSpec } from '../src/lib/cartridge-draft.ts'
@@ -12,7 +12,6 @@ import { verified } from './drawing-rules.ts'
 import { figureSvgs } from './figure-svgs.tsx'
 import { sheetRecord } from './records.ts'
 
-vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { TechnicalDrawing } = await import('../src/components/technical-drawing.tsx')
 const { CartridgeDrawing } = await import('../src/components/cartridge-drawing.tsx')
 

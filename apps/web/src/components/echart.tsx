@@ -1,5 +1,3 @@
-'use client'
-
 import { LineChart as Lines } from 'echarts/charts'
 import {
   GridComponent,

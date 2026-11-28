@@ -10,7 +10,7 @@ import {
   UntrainedScaleError,
 } from '@rangefoundry/target-recognition'
 
-/** The served model's manifest (`apps/web/public/models/`), relative to the edition's base path like the `file.url` and `runtime.wasmPaths` it names. */
+/** The served model's manifest (`apps/web/public/models/`), relative to the site's base path like the `file.url` and `runtime.wasmPaths` it names. */
 export const MODEL_MANIFEST = 'models/hole-model-0.1.0.json'
 
 /** The limit on loading the manifest, the model and the runtime: both files (4.6 MB compressed) take about 23 s over a 1.6 Mbit/s mobile link. */
@@ -27,7 +27,7 @@ export type ModelLoad = {
 /** The detector and whether a set model failed to load, so the page can say the classical detector answered. */
 export type RunDetector = { detector: InferencePort; fellBack: boolean }
 
-/** `root` (the edition's base path as an absolute URL ending in `/`, `editionRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. A run whose holes the working px cap shrinks below the model's trained sizes (`UntrainedScaleError`) gets the classical detector too, without `fellBack`. An example pick (`at`) and a run with the example's `polarity` or `backing` get the classical detector without a load: the learned one reads none of them and measures no hole size, which the example sets. */
+/** `root` (the site's base path as an absolute URL ending in `/`, `modelRoot`) serves `MODEL_MANIFEST`, the model at its `file.url` and the runtime's files at its `runtime.wasmPaths`; a failed, mismatched or late load is reported and the classical detector answers. A run whose holes the working px cap shrinks below the model's trained sizes (`UntrainedScaleError`) gets the classical detector too, without `fellBack`. An example pick (`at`) and a run with the example's `polarity` or `backing` get the classical detector without a load: the learned one reads none of them and measures no hole size, which the example sets. */
 export async function servedDetector(
   root: string | undefined,
   load: ModelLoad,

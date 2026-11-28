@@ -1,7 +1,6 @@
 /** The workspace folder picked for saving: its handle in the browser store and its write permission. */
 
 import { inStore } from '@/platform/user-db.ts'
-import { storageName } from './edition.ts'
 import { aborted, type Pickers, pickers } from './file-access.ts'
 
 type Permission = {
@@ -17,7 +16,7 @@ const storedFolder = () =>
   >
 
 /** Set while a stored folder is read; still set on the next load means that read crashed the page. */
-const restoring = storageName('user-data-folder-restoring')
+const restoring = 'user-data-folder-restoring'
 const flag = (set: boolean) => {
   try {
     if (set) localStorage.setItem(restoring, '1')

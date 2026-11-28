@@ -1,5 +1,4 @@
 import { expect, type Page, test } from '@playwright/test'
-import { storageName } from './edition.ts'
 import { isDark } from './luminance.ts'
 import { storeUnits } from './units.ts'
 import { runSavedLoad } from './workbench-run.ts'
@@ -38,7 +37,7 @@ test('the result chart returns to the panel width after printing', async ({ page
 })
 
 test('with dark stored the chart of the report prints in the light colors', async ({ page }) => {
-  await page.addInitScript((store) => localStorage.setItem(store, 'dark'), storageName('theme'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'dark'), 'theme')
   await runSavedLoad(page)
   const label = page.locator('.print-report .report-chart svg text').first()
   await expect(label).toBeAttached()

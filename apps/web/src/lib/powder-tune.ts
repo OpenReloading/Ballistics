@@ -8,7 +8,6 @@ import {
 } from '@rangefoundry/schema'
 import { parseNumber } from '../i18n/number.ts'
 import type { Shot } from './chrono.ts'
-import { storageName } from './edition.ts'
 import { cartridgeClass } from './input-defaults.ts'
 import { sessionRef, stringCharge } from './measurements.ts'
 
@@ -33,19 +32,19 @@ export const tuneHref = (ids: readonly string[]) =>
   `/powders/tune${ids.length > 0 ? `?${new URLSearchParams(ids.map((id) => ['session', id]))}` : ''}`
 
 /** The session storage key of the load the workbench hands to the tuning route for load `load`, a reference. */
-export const tuneLoadKey = (load: string) => storageName(`tuneLoad:${load}`)
+export const tuneLoadKey = (load: string) => `tuneLoad:${load}`
 
 /** The session storage key of the powder record of the load handed over for load `load`, a reference. */
-export const tuneBaseKey = (load: string) => storageName(`tunePowder:${load}`)
+export const tuneBaseKey = (load: string) => `tunePowder:${load}`
 
 /** The session storage key of the CIP table of the cartridge record of the load handed over for load `load`, a reference. */
-export const tuneTableKey = (load: string) => storageName(`tuneTable:${load}`)
+export const tuneTableKey = (load: string) => `tuneTable:${load}`
 
 /** Kept when the record was still loading, so the tuning route reads its table. */
-export const tuneCartridgeKey = (load: string) => storageName(`tuneCartridge:${load}`)
+export const tuneCartridgeKey = (load: string) => `tuneCartridge:${load}`
 
 /** The session storage key of the `action` of the firearm the load links, handed over for load `load`, a reference. */
-export const tuneActionKey = (load: string) => storageName(`tuneAction:${load}`)
+export const tuneActionKey = (load: string) => `tuneAction:${load}`
 
 /** A record still loading would leave nothing to hand over; one that failed (`failed`) does not hold the link. */
 export const tuneHeld = (asked: Record<string, { id: string; failed?: true } | undefined>) =>

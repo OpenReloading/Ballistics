@@ -1,5 +1,4 @@
 import { defineConfig, devices } from '@playwright/test'
-import { storageName } from './tests/web/edition.ts'
 import { safetyAck } from './tests/web/nav.ts'
 
 // a trailing slash, so the specs' `./path` stays below the base path
@@ -8,14 +7,6 @@ const webUrl = (process.env.WEB_URL ?? 'http://localhost:3003').replace(/\/?$/, 
 const pagesUrl = process.env.PAGES_URL?.replace(/\/?$/, '/')
 /** Set: projects `firefox` and `webkit` run the smoke spec against `WEB_URL`. */
 const allEngines = Boolean(process.env.ALL_ENGINES)
-/** `off`: no Start site build and no projects `start-*` (the drawing baseline, a local `--project full` run). */
-const startSite = process.env.START_SITE !== 'off'
-/** `off`: no project `next-chromium` (CI's `e2e` job, as the `e2e-next` job runs it). */
-const nextEdition = startSite && process.env.NEXT_EDITION !== 'off'
-const startUrl = 'http://localhost:3043/Ballistics/'
-/** A site with both editions as `pages.yml` deploys it, with its base path and a trailing slash. Unset: the export at `WEB_URL`, whose root `404.html` is the same page. */
-const editionsUrl = process.env.EDITIONS_URL ?? webUrl
-
 const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
   ...device,
   baseURL: url,
@@ -27,7 +18,7 @@ const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
     origins: [
       {
         origin: new URL(url).origin,
-        localStorage: [{ name: storageName('safety-ack', url), value: safetyAck }],
+        localStorage: [{ name: 'safety-ack', value: safetyAck }],
       },
     ],
   },
@@ -44,24 +35,6 @@ export default defineConfig({
   // the default without {-projectName}: a renamed project still finds the committed snapshots
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-snapshotSuffix}{ext}',
-  // both Start editions as one Pages site under a project-site base path, built once per run
-  webServer: startSite
-    ? [
-        {
-          command: 'node ../../tools/src/start-site.ts --sample --serve',
-          url: startUrl,
-          env: {
-            PAGES_BASE_PATH: '/Ballistics',
-            PAGES_URL: 'https://openreloading.github.io',
-            PORT: '3043',
-          },
-          // the build's output and client sizes show in the job log
-          stdout: 'pipe',
-          timeout: 180_000,
-          reuseExistingServer: !process.env.CI,
-        },
-      ]
-    : [],
   projects: [
     {
       name: 'full',
@@ -94,56 +67,17 @@ export default defineConfig({
           },
         ]
       : []),
-    ...(startSite
-      ? (
-          [
-            ['start-chromium', devices['Desktop Chrome']],
-            ['start-firefox', devices['Desktop Firefox']],
-            ['start-webkit', devices['Desktop Safari']],
-          ] as const
-        ).map(([name, device]) => ({
-          name,
-          testDir: './tests/start',
-          use: {
-            ...device,
-            baseURL: startUrl,
-            // both editions' Safety dialogs accepted: the shell's dialog would take the focus of a typed field
-            storageState: {
-              cookies: [],
-              origins: [
-                {
-                  origin: new URL(startUrl).origin,
-                  localStorage: ['safety-ack', 'next:safety-ack'].map((name) => ({
-                    name,
-                    value: safetyAck,
-                  })),
-                },
-              ],
-            },
-          },
-        }))
-      : []),
-    // the web specs on the Start site's next edition; in CI only the `e2e-next` job runs it
-    ...(nextEdition
-      ? [
-          {
-            name: 'next-chromium',
-            testDir: './tests/web',
-            use: browserAt(`${startUrl}next/`),
-          },
-        ]
-      : []),
+    // the app hydrates without a console message in every engine
     ...(
       [
-        ['editions-chromium', devices['Desktop Chrome']],
-        ['editions-firefox', devices['Desktop Firefox']],
-        ['editions-webkit', devices['Desktop Safari']],
+        ['hydration-chromium', devices['Desktop Chrome']],
+        ['hydration-firefox', devices['Desktop Firefox']],
+        ['hydration-webkit', devices['Desktop Safari']],
       ] as const
     ).map(([name, device]) => ({
       name,
-      testDir: './tests/editions',
-      // the root 404.html also answers below the stable edition's worker
-      use: { ...browserAt(editionsUrl, device), serviceWorkers: 'allow' as const },
+      testDir: './tests/hydration',
+      use: browserAt(webUrl, device),
     })),
   ],
 })
