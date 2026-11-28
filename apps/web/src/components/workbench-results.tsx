@@ -16,10 +16,10 @@ import { LadderTarget } from './ladder-target.tsx'
 import { LazyInteriorChart } from './lazy-chart.tsx'
 import { LoadLots, SessionNotes } from './load-notes.tsx'
 import { LotPanel } from './lot-rows.tsx'
-import { NavIcon } from './nav-icons.tsx'
 import { chartCopy } from './print-report.tsx'
 import { ResultNotes } from './result-notes.tsx'
 import { RunDownloads } from './run-downloads.tsx'
+import { SimulationNotice } from './simulation-notice.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
@@ -362,7 +362,6 @@ function RunLine({
   status: string
   echoed: boolean
 }) {
-  const { t } = useTranslation()
   return (
     <div className="run-line">
       {ok && identity && (
@@ -382,10 +381,8 @@ function RunLine({
       >
         {status}
       </p>
-      <span className="notice-text screen-only">
-        <NavIcon name="safety" size={14} />
-        {t('Simulation, not load data')}
-      </span>
+      {/* the printed report is its own sheet */}
+      <SimulationNotice screenOnly />
     </div>
   )
 }

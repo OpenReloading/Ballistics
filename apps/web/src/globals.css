@@ -10850,6 +10850,11 @@ main .page-bar h1 {
   }
 }
 
+/* a list's simulation notice after its count and selection */
+.page-bar-status > .notice-text {
+  margin-inline-start: var(--space-sm-md);
+}
+
 /* the state, a message and a failure as parts of one line, not sentences run together */
 .page-bar-status .file-status > span:not(:empty) ~ span:not(:empty)::before {
   content: " · ";

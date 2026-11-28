@@ -29,6 +29,7 @@ import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
 import { LinkButton } from './record-actions.tsx'
+import { SimulationNotice } from './simulation-notice.tsx'
 import { EmptyNote, ErrorNote, Loading } from './states.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
@@ -98,6 +99,9 @@ function OverlayBody({
       <p className="screen-only record-note">
         {i18n._(modelCaption)}
         {series.length === 1 && series[0]?.powder.spread !== undefined && ` ${i18n._(bandNote)}`}
+      </p>
+      <p className="record-note">
+        <SimulationNotice />
       </p>
       <Button
         className="curve-toggle"

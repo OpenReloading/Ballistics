@@ -42,6 +42,7 @@ import { type DirectoryColumn, DirectoryTable, useListState } from './directory-
 import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { MissingMark } from './missing-mark.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
+import { SimulationNotice } from './simulation-notice.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
 
 loadEnglish(englishMessages)
@@ -232,6 +233,8 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     ]
       .filter(Boolean)
       .join(' · ')
+  // the mean vivacity column shows a fitted model
+  const fitted = shown.some((r) => r.meanVivacity !== undefined)
   return (
     <DirectoryPage
       title={listTitles.powders}
@@ -239,13 +242,16 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       shown={shown.length}
       total={items.length}
       status={
-        <SelectionSummary
-          count={picked.length}
-          max={maxOverlay}
-          hidden={hiddenPicks(picked, shown, items, productLabel)}
-          onUntick={untick}
-          onClear={() => replace([])}
-        />
+        <>
+          <SelectionSummary
+            count={picked.length}
+            max={maxOverlay}
+            hidden={hiddenPicks(picked, shown, items, productLabel)}
+            onUntick={untick}
+            onClear={() => replace([])}
+          />
+          {fitted && <SimulationNotice />}
+        </>
       }
       actions={
         <>
@@ -271,48 +277,61 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       columns={columns}
       counts={counts}
       table={
-        <DirectoryTable
-          rows={shown}
-          columns={columns}
-          link="name"
-          href={(r) => (r.origin === 'user' ? designerHref('powders', r.id) : `/powders/${r.id}`)}
-          facts={facts}
-          label={productLabel}
-          caption={
-            named.length === 0
-              ? i18n._({ id: 'powders.all', message: 'All powders' })
-              : i18n._({
-                  id: 'powders.filtered',
-                  message: 'Powders, {filters}',
-                  values: { filters: named.join(', ') },
-                })
-          }
-          noun="powders"
-          sort={state.sort}
-          onSort={(sort) => set({ sort })}
-          selection={{
-            ids: picked,
-            max: maxOverlay,
-            onChange: replace,
-            can: inOverlay,
-          }}
-          phoneAction={(r, tabIndex) =>
-            r.origin === 'user' ? (
-              <DeleteRow row={r} name={productLabel(r)} onDelete={removeRow} tabIndex={tabIndex} />
-            ) : null
-          }
-          breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
-          empty={
-            items.length === 0 ? (
-              // the browser's own powders may still be on their way
-              read ? (
-                <NoPowders />
+        <>
+          {/* print hides the page bar's status */}
+          {fitted && (
+            <div className="print-only">
+              <SimulationNotice />
+            </div>
+          )}
+          <DirectoryTable
+            rows={shown}
+            columns={columns}
+            link="name"
+            href={(r) => (r.origin === 'user' ? designerHref('powders', r.id) : `/powders/${r.id}`)}
+            facts={facts}
+            label={productLabel}
+            caption={
+              named.length === 0
+                ? i18n._({ id: 'powders.all', message: 'All powders' })
+                : i18n._({
+                    id: 'powders.filtered',
+                    message: 'Powders, {filters}',
+                    values: { filters: named.join(', ') },
+                  })
+            }
+            noun="powders"
+            sort={state.sort}
+            onSort={(sort) => set({ sort })}
+            selection={{
+              ids: picked,
+              max: maxOverlay,
+              onChange: replace,
+              can: inOverlay,
+            }}
+            phoneAction={(r, tabIndex) =>
+              r.origin === 'user' ? (
+                <DeleteRow
+                  row={r}
+                  name={productLabel(r)}
+                  onDelete={removeRow}
+                  tabIndex={tabIndex}
+                />
               ) : null
-            ) : (
-              <EmptyList noun="powders" filters={filterText(named)} onClear={clear} />
-            )
-          }
-        />
+            }
+            breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
+            empty={
+              items.length === 0 ? (
+                // the browser's own powders may still be on their way
+                read ? (
+                  <NoPowders />
+                ) : null
+              ) : (
+                <EmptyList noun="powders" filters={filterText(named)} onClear={clear} />
+              )
+            }
+          />
+        </>
       }
     />
   )
