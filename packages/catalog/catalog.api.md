@@ -312,6 +312,7 @@ export type Finding = {
 export interface ListedSourceFields {
     // (undocumented)
     readonly bullet: readonly string[];
+    readonly bulletExact?: readonly string[];
     // (undocumented)
     readonly load: boolean;
     // (undocumented)

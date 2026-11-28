@@ -254,7 +254,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 
 ### Own methods
 
-- Mapping of the maker wording (tools/src/bullets/construction.ts). <https://openreloading.github.io/Ballistics/docs/data/bullet-construction>
+- Mapping of the maker wording to bullet construction fields. <https://openreloading.github.io/Ballistics/docs/data/bullet-construction>
 
 ### Wikipedia
 

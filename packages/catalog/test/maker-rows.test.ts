@@ -187,6 +187,24 @@ describe('makerRows of the wording map and a detailed path below a basic field',
       ],
     })
   })
+
+  it('admits the wording map for a jacket that states only its presence', () => {
+    const found = rows(
+      {
+        bullets: [
+          {
+            ...cited('jacketed', 'computed', {
+              title: 'Map',
+              fields: ['construction.core', 'construction.jacket'],
+            }),
+            construction: { raw: 'Jacketed Lead', core: { material: 'lead' }, jacket: {} },
+          },
+        ],
+      },
+      [['bullets/jacketed.json', [wording]]],
+    )
+    expect(found).toEqual({})
+  })
 })
 
 describe('makerRows of an id outside the list', () => {

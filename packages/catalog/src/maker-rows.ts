@@ -6,6 +6,8 @@ import type { SourceIndex } from './sources.ts'
 export interface ListedSourceFields {
   readonly bullet: readonly string[]
   readonly powder: readonly string[]
+  /** Dot paths of bullet fields it may name as written only, not the fields below them. */
+  readonly bulletExact?: readonly string[]
   readonly load: boolean
 }
 
@@ -37,6 +39,8 @@ export const nonMakerSources: Readonly<Record<string, ListedSourceFields>> = {
       'construction.unmapped',
     ],
     powder: [],
+    // an empty jacket states only that the bullet has one, which the maker's wording gives
+    bulletExact: ['construction.jacket'],
     load: false,
   },
   'synthetic-test-data': {
@@ -167,6 +171,13 @@ function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: C
   return findings
 }
 
+/** Whether the listed source `id` may name `field` of a record of `kind`. */
+function listedMayName(id: string, kind: 'bullet' | 'powder', field: string): boolean {
+  const entry = nonMakerSources[id]
+  if (kind === 'bullet' && entry?.bulletExact?.includes(field)) return true
+  return (entry?.[kind] ?? []).some((a) => field === a || field.startsWith(`${a}.`))
+}
+
 /** A listed source names only fields of its {@link nonMakerSources} entry, and names them unless it is `synthetic-test-data`. */
 function listedSourceFindings(kind: 'bullet' | 'powder', record: Cited, ids: Ids): string[] {
   return (record.provenance?.sources ?? []).flatMap((source, i) => {
@@ -174,9 +185,8 @@ function listedSourceFindings(kind: 'bullet' | 'powder', record: Cited, ids: Ids
     if (id === undefined || isMakerId(id)) return []
     if (!source.fields)
       return id === 'synthetic-test-data' ? [] : [`listed source "${id}" names no fields`]
-    const allowed = nonMakerSources[id]?.[kind] ?? []
     return source.fields
-      .filter((f) => !allowed.some((a) => f === a || f.startsWith(`${a}.`)))
+      .filter((f) => !listedMayName(id, kind, f))
       .map((f) => `listed source "${id}" names ${f}, which it may not supply`)
   })
 }

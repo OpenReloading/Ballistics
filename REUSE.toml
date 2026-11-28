@@ -41,7 +41,7 @@ SPDX-License-Identifier = "CC-BY-SA-4.0"
 [[annotations]]
 path = ["packages/catalog/records/bullets/*.json", "packages/catalog/records/powders/*.json"]
 SPDX-FileCopyrightText = "NONE"
-SPDX-License-Identifier = "LicenseRef-Published-Facts"
+SPDX-License-Identifier = "LicenseRef-Published-Facts AND CC-BY-SA-4.0"
 
 # The demo records are the project's own.
 [[annotations]]

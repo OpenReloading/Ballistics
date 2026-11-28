@@ -35,7 +35,7 @@
       },
       {
         "source": "mapping-of-the-maker-wording-tools-src-bullets",
-        "fields": ["construction.core"],
+        "fields": ["construction.core", "construction.jacket"],
         "kind": "derived"
       }
     ]
