@@ -7,7 +7,11 @@ import { skipReasons } from './published-rows.ts'
 import { splitSalt, splits } from './split.ts'
 
 /** Version of the JSON shape every result carries as `schemaVersion`. */
-export const schemaVersion = 1
+export const schemaVersion = 2
+
+/** The `format` of the result of `command`, which names what the file holds. */
+const format = <C extends string>(command: C) =>
+  z.literal(`rangefoundry-cli-${command}` as const).describe('What the result holds.')
 
 const count = z.int().nonnegative()
 const fraction = z.number().describe('A fraction: 0.034 is 3.4 %.')
@@ -350,6 +354,7 @@ export const verifyResult = z.object({
   split: z
     .enum([...splits, foldPool])
     .describe('The split scored; `training+validation` with `--folds`.'),
+  format: format('verify'),
   command: z.literal('verify'),
   ...evaluation.shape,
   folds,
@@ -419,6 +424,7 @@ const pairedQuantity = z
 
 const compareResult = z.object({
   ...common,
+  format: format('compare'),
   command: z.literal('compare'),
   baseline: evaluation,
   candidate: evaluation,
@@ -450,6 +456,7 @@ export type CompareResult = z.infer<typeof compareResult>
 export const fitResult = z.object({
   schemaVersion: z.literal(schemaVersion),
   notice: z.literal(notice),
+  format: format('fit'),
   command: z.literal('fit'),
   inputs,
   published,

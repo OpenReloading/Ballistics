@@ -70,6 +70,11 @@ const pressured = [
 
 const ajv = new Ajv2020({ allErrors: true, strict: false })
 const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')))
+const formats = {
+  verify: 'rangefoundry-cli-verify',
+  compare: 'rangefoundry-cli-compare',
+  fit: 'rangefoundry-cli-fit',
+}
 
 describe('the JSON result', () => {
   // the runs with a fit run the model many times, and the CI runner measures coverage: the default 30 s is too short there
@@ -127,6 +132,10 @@ describe('the JSON result', () => {
       expect(validate(json), JSON.stringify(validate.errors)).toBe(true)
       expect(json.notice).toBe('simulation, not load data')
       expect(result.safeParse(json).success).toBe(true)
+      expect(json.schemaVersion).toBe(2)
+      expect(json.format).toBe(formats[args[0] as keyof typeof formats])
+      const { format: _, ...unnamed } = json
+      expect(validate(unnamed)).toBe(false)
     }
   })
 

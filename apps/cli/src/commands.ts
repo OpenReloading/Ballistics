@@ -554,6 +554,7 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
   return {
     schemaVersion,
     notice,
+    format: 'rangefoundry-cli-verify',
     command: 'verify',
     split: options.folds ? foldPool : options.split,
     splitSalt,
@@ -610,6 +611,7 @@ async function baselineOf(spec: string, options: Options, data: Prepared): Promi
   const {
     schemaVersion: _v,
     notice: _n,
+    format: _fm,
     command: _c,
     split,
     splitSalt: _s,
@@ -654,6 +656,7 @@ export async function compare(
   return {
     schemaVersion,
     notice,
+    format: 'rangefoundry-cli-compare',
     command: 'compare',
     split: options.split,
     splitSalt,
@@ -694,6 +697,7 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
   return {
     schemaVersion,
     notice,
+    format: 'rangefoundry-cli-fit',
     command: 'fit',
     inputs: data.inputs,
     ...(data.published && { published: data.published }),

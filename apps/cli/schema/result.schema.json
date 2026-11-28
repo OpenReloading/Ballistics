@@ -7,7 +7,7 @@
       "properties": {
         "schemaVersion": {
           "type": "number",
-          "const": 1
+          "const": 2
         },
         "notice": {
           "type": "string",
@@ -74,6 +74,11 @@
           },
           "required": ["files", "rows", "skipped"],
           "additionalProperties": false
+        },
+        "format": {
+          "type": "string",
+          "const": "rangefoundry-cli-verify",
+          "description": "What the result holds."
         },
         "command": {
           "type": "string",
@@ -1903,6 +1908,7 @@
         "splitSalt",
         "final",
         "inputs",
+        "format",
         "command",
         "model",
         "modelVersion",
@@ -1918,7 +1924,7 @@
       "properties": {
         "schemaVersion": {
           "type": "number",
-          "const": 1
+          "const": 2
         },
         "notice": {
           "type": "string",
@@ -1984,6 +1990,11 @@
           },
           "required": ["files", "rows", "skipped"],
           "additionalProperties": false
+        },
+        "format": {
+          "type": "string",
+          "const": "rangefoundry-cli-compare",
+          "description": "What the result holds."
         },
         "command": {
           "type": "string",
@@ -4784,6 +4795,7 @@
         "splitSalt",
         "final",
         "inputs",
+        "format",
         "command",
         "baseline",
         "candidate",
@@ -4796,11 +4808,16 @@
       "properties": {
         "schemaVersion": {
           "type": "number",
-          "const": 1
+          "const": 2
         },
         "notice": {
           "type": "string",
           "const": "simulation, not load data"
+        },
+        "format": {
+          "type": "string",
+          "const": "rangefoundry-cli-fit",
+          "description": "What the result holds."
         },
         "command": {
           "type": "string",
@@ -5786,6 +5803,7 @@
       "required": [
         "schemaVersion",
         "notice",
+        "format",
         "command",
         "inputs",
         "model",

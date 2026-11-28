@@ -229,7 +229,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify`, `compare` and `fit` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `apps/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @rangefoundry/cli run schema`; a test validates real output of these commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify`, `compare` and `fit` carries `format`, the name of what it holds (`rangefoundry-cli-verify`, `rangefoundry-cli-compare` or `rangefoundry-cli-fit`), `schemaVersion` (2), the version of that shape, and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `apps/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @rangefoundry/cli run schema`; a test validates real output of these commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it. Releases up to 0.0.3 wrote `schemaVersion` 1 without `format`; `--baseline`, `--fit` and `--family` read only a result of version 2, so run a saved result again.
 
 `--version` prints `ballistics <version>` and exits 0.
 
