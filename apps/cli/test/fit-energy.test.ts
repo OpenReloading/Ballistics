@@ -15,6 +15,13 @@ vi.mock('@rangefoundry/tools/catalog', async (original) =>
 )
 
 describe('--energy prior', { timeout: 120_000 }, () => {
+  // the priors are medians over every powder with a thermochemistry, so the catalogue keeps only its demo powders
+  const catalog = mkdtempSync(join(tmpdir(), 'cli-catalog-'))
+  cpSync(recordRoots[0] as string, catalog, {
+    recursive: true,
+    filter: (path) => !/[/\\]powders[/\\](?!demo-)[^/\\]*$/.test(path),
+  })
+  const demo = { ...options, records: [catalog, recordRoots[1] as string] }
   const sp30 = 'demo-powder-sp30'
   /** The fixture records with each powder's energy, burn coefficient and, where given, pressure exponent set as given. */
   const plant = (
@@ -57,7 +64,7 @@ describe('--energy prior', { timeout: 120_000 }, () => {
 
   it('takes the energy-level factor of the planted energies from the training pressures', async () => {
     const rows = writeRows(rowsCsv([sp30, sp20, dp40].flatMap(training), truth))
-    const r = await fit({ ...options, rows, energy: 'prior' })
+    const r = await fit({ ...demo, rows, energy: 'prior' })
     expect(r.energy?.factor).toBe(0.8)
     expect(r.energy?.priors).toEqual({ own: 1, byBase: 1, pooled: 1 })
     expect(r.powders[sp30]?.energy).toEqual({ value: 3.2e6, prior: 'own' })
@@ -73,10 +80,10 @@ describe('--energy prior', { timeout: 120_000 }, () => {
   it('screens a fit with --energy prior under the version of a full run with it', async () => {
     const rows = writeRows(rowsCsv(training(sp30), truth))
     const saved = writeRows(
-      JSON.stringify(await fit({ ...options, rows, energy: 'prior' })),
+      JSON.stringify(await fit({ ...demo, rows, energy: 'prior' })),
       'fit.json',
     )
-    const on = { ...options, rows, split: 'training' } as const
+    const on = { ...demo, rows, split: 'training' } as const
     const full = await verify({ ...on, params: 'fit-on-training', energy: 'prior' })
     expect((await verify({ ...on, fit: saved })).screen?.version).toBe(full.modelVersion)
   })
@@ -84,7 +91,7 @@ describe('--energy prior', { timeout: 120_000 }, () => {
   it('leaves out a factor at which fewer than 90 % of the powders are fitted', async () => {
     const limit = new URL('./fixtures/burn-limit-model.mjs', import.meta.url).pathname
     const rows = writeRows(rowsCsv([sp30, sp20, dp40].flatMap(training), truth))
-    const r = await fit({ ...options, rows, energy: 'prior' }, limit)
+    const r = await fit({ ...demo, rows, energy: 'prior' }, limit)
     expect(r.energy?.objective.map((o) => o !== null)).toEqual([
       false,
       false,
@@ -125,7 +132,7 @@ describe('--energy prior', { timeout: 120_000 }, () => {
         })),
       )
     const rows = writeRows(rowsCsv(specs, ten))
-    const r = await fit({ ...options, rows, energy: 'prior' })
+    const r = await fit({ ...demo, rows, energy: 'prior' })
     // dp40 is not resolved at 0.60 and 0.65, which still take part with 9 of 10 powders
     expect(r.energy?.objective.every((o) => o !== null)).toBe(true)
     expect(r.energy?.pressureRows).toBe(18)
@@ -137,7 +144,7 @@ describe('--energy prior', { timeout: 120_000 }, () => {
     timeout: 180_000,
   }, async () => {
     const rows = writeRows(rowsCsv(training(sp30), plant({ [sp30]: [3.2e6, 3.6, 0.8] })))
-    const r = await fit({ ...options, rows, exponent: 'family', energy: 'prior' })
+    const r = await fit({ ...demo, rows, exponent: 'family', energy: 'prior' })
     expect(r.energy?.factor).toBe(0.8)
     expect(r.exponent?.families).toEqual({ 'single/ball': { exponent: 0.8, powders: 1 } })
     expect(r.powders[sp30]?.pressureExponent).toBe(0.8)
@@ -156,10 +163,10 @@ describe('--energy prior', { timeout: 120_000 }, () => {
         truth,
       ),
     )
-    const prior = await verify({ ...options, rows, params: 'fit-on-training', energy: 'prior' })
+    const prior = await verify({ ...demo, rows, params: 'fit-on-training', energy: 'prior' })
     expect(prior.overall.velocity?.median).toBeCloseTo(0, 4)
     expect(prior.overall.pressure?.median).toBeCloseTo(0, 4)
-    const record = await verify({ ...options, rows, params: 'fit-on-training' })
+    const record = await verify({ ...demo, rows, params: 'fit-on-training' })
     expect(record.overall.pressure?.median).toBeGreaterThan(0.02)
   })
 
@@ -170,14 +177,14 @@ describe('--energy prior', { timeout: 120_000 }, () => {
         truth,
       ),
     )
-    await expect(fit({ ...options, rows, energy: 'prior' })).rejects.toThrow(UsageError)
+    await expect(fit({ ...demo, rows, energy: 'prior' })).rejects.toThrow(UsageError)
   })
 
   it('is bad input without a powder record with a thermochemistry', async () => {
     const rows = writeRows(rowsCsv(training(dp40), truth))
-    await expect(
-      fit({ ...options, rows, records: [recordRoots[0] as string], energy: 'prior' }),
-    ).rejects.toThrow(UsageError)
+    await expect(fit({ ...demo, rows, records: [catalog], energy: 'prior' })).rejects.toThrow(
+      UsageError,
+    )
   })
 
   it('has another model version when a prior from a powder the rows do not name changes', async () => {
@@ -190,11 +197,11 @@ describe('--energy prior', { timeout: 120_000 }, () => {
     for (const key of ['impetus', 'flameTemperature'])
       for (const end of ['value', 'min', 'max']) sp31.thermochemistry[key][end] *= 1.1
     writeFileSync(path, JSON.stringify(sp31))
-    const a = await fit({ ...options, rows, energy: 'prior' })
+    const a = await fit({ ...demo, rows, energy: 'prior' })
     const b = await fit({
-      ...options,
+      ...demo,
       rows,
-      records: [recordRoots[0] as string, root],
+      records: [catalog, root],
       energy: 'prior',
     })
     expect(b.inputs).toEqual(a.inputs)
