@@ -15,6 +15,7 @@ COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/catalog/package.json packages/catalog/
+COPY packages/catalog-files/package.json packages/catalog-files/
 COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
 COPY packages/api/package.json packages/api/
@@ -28,7 +29,7 @@ COPY tooling/test-kit/package.json tooling/test-kit/
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@rangefoundry/docs..."
 COPY packages packages
 COPY tooling tooling
-# the catalog reader that the catalog build writes its bundle with
+# the wrapper of the catalog-files reader that the catalog build writes its bundle with
 COPY tools/src/catalog tools/src/catalog
 # the libraries the docs document and the API its REST page describes (the docs also depend on web, cli and tools,
 # whose files their tests read; the site needs no build of them)

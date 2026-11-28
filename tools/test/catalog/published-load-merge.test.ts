@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path'
 import type { PublishedLoads } from '@rangefoundry/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defined } from '../../../packages/catalog/test/defined.ts'
+import { readRecords } from '../../src/catalog/catalog-records.ts'
 import {
   formatRecord,
   main,
@@ -18,7 +19,6 @@ import {
   mergePublishedLoads,
   withLoadIds,
 } from '../../src/catalog/published-load-merge.ts'
-import { readRecords } from '../../src/catalog/records.ts'
 
 // Test data, not maker data: a made-up table of the test manufacturer for the test cartridge.
 

@@ -1,6 +1,6 @@
-import type * as reader from '@rangefoundry/tools/catalog'
+import type * as reader from '@rangefoundry/catalog-files'
 
-/** `readRecords` read once per set of roots and cloned on each call, as a test file runs the command line many times over the same record folders; use as `vi.mock('@rangefoundry/tools/catalog', async (original) => memoRecords(await original()))`. */
+/** `readRecords` read once per set of roots and cloned on each call, as a test file runs the command line many times over the same record folders; use as `vi.mock('@rangefoundry/catalog-files', async (original) => memoRecords(await original()))`. */
 export function memoRecords(original: typeof reader): typeof reader {
   const read = new Map<string, reader.ReadRecordsResult>()
   return {

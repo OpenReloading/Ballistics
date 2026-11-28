@@ -18,7 +18,7 @@ const webInputs = [
   /^apps\/web\//,
   /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|svg-drawings|catalog|target-recognition|use-cases|api|design-tokens)\//,
   // the catalog reader that writes the bundle the API serves
-  /^tools\/src\/catalog\//,
+  /^(tools\/src\/catalog|packages\/catalog-files)\//,
   ...rootInputs,
 ]
 
@@ -56,7 +56,7 @@ const recordInputs = [
   /^packages\/statistics\//,
   /^packages\/ballistics\//,
   /^packages\/catalog\//,
-  /^tools\/src\/catalog\//,
+  /^(tools\/src\/catalog|packages\/catalog-files)\//,
   /^packages\/schema\//,
   /^packages\/api\//,
   ...rootInputs,
@@ -215,9 +215,9 @@ const everything = (reason: string): Plan => ({
   reason,
 })
 
-/** A folder with a `package.json`, from which pnpm finds the workspaces a change reaches; the catalog reader of tools is not one: it writes the bundle the web and API tests read, which pnpm does not see. */
+/** A folder with a `package.json`, from which pnpm finds the workspaces a change reaches; the catalog reader is not one: it writes the bundle the web and API tests read, which pnpm does not see. */
 const inWorkspace = (file: string) => {
-  if (/^tools\/src\/catalog\//.test(file)) return false
+  if (/^(tools\/src\/catalog|packages\/catalog-files)\//.test(file)) return false
   const folder = /^((packages|apps|tooling)\/[^/]+|tools)\//.exec(file)?.[1]
   return folder !== undefined && existsSync(path.join(repoRoot, folder, 'package.json'))
 }

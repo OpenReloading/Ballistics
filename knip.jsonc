@@ -44,6 +44,9 @@
     "packages/catalog": {
       "entry": ["src/index.ts", "src/plausibility.ts"]
     },
+    "packages/catalog-files": {
+      "entry": ["src/records.ts"]
+    },
     "packages/use-cases": {
       "entry": ["src/index.ts", "src/advisory-text.ts", "src/catalog/browser.ts"]
     },

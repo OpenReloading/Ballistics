@@ -9,13 +9,13 @@ import {
   publishedLoads,
   sourceRecord,
 } from '@rangefoundry/schema'
+import { addIssues, readJsonFile, readKind } from '../../../packages/catalog-files/src/read-kind.ts'
 import {
   type IncomingLoads,
   type MergeReport,
   mergePublishedLoads,
   withLoadIds,
 } from './published-load-merge.ts'
-import { addIssues, readJsonFile, readKind } from './read-kind.ts'
 
 const repository = join(import.meta.dirname, '..', '..', '..')
 

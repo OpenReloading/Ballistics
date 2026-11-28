@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { checkPublishedLoadPlausibility } from '@rangefoundry/catalog'
 import type { PublishedLoads } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
-import { readRecords } from '../../src/catalog/records.ts'
+import { readRecords } from '../../src/catalog/catalog-records.ts'
 
 const fixtures = join(import.meta.dirname, 'fixtures', 'valid')
 

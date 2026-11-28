@@ -119,6 +119,9 @@ importers:
       '@rangefoundry/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
+      '@rangefoundry/catalog-files':
+        specifier: workspace:*
+        version: link:../../packages/catalog-files
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../../packages/schema
@@ -128,9 +131,6 @@ importers:
       '@rangefoundry/svg-drawings':
         specifier: workspace:*
         version: link:../../packages/svg-drawings
-      '@rangefoundry/tools':
-        specifier: workspace:*
-        version: link:../../tools
       '@rangefoundry/units':
         specifier: workspace:*
         version: link:../../packages/units
@@ -545,6 +545,31 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/browser-playwright@5.1.1)(@vitest/coverage-v8@5.1.1)(@vitest/ui@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
+  packages/catalog-files:
+    dependencies:
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../catalog
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../schema
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.25
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
 
   packages/design-tokens:
     devDependencies:
@@ -1072,12 +1097,12 @@ importers:
       '@rangefoundry/catalog':
         specifier: workspace:*
         version: link:../packages/catalog
+      '@rangefoundry/catalog-files':
+        specifier: workspace:*
+        version: link:../packages/catalog-files
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../packages/schema
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.7
     devDependencies:
       '@rangefoundry/importers':
         specifier: workspace:*

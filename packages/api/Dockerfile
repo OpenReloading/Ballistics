@@ -15,6 +15,7 @@ COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/catalog/package.json packages/catalog/
+COPY packages/catalog-files/package.json packages/catalog-files/
 COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
 COPY packages/api/package.json packages/api/
@@ -25,8 +26,9 @@ COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
 COPY tooling/test-kit/package.json tooling/test-kit/
-# tools: the catalog build writes its bundle with the catalog reader of tools/src/catalog
-RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@rangefoundry/api..." --filter @rangefoundry/tools
+# tools and catalog-files: the catalog build writes its bundle with the catalog reader of tools/src/catalog
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@rangefoundry/api..." --filter @rangefoundry/tools \
+  --filter @rangefoundry/catalog-files
 # the API Extractor configuration that the builds of the packages extend
 COPY packages/api-extractor.base.json packages/
 COPY packages/units packages/units
@@ -36,6 +38,7 @@ COPY packages/schema packages/schema
 COPY packages/catalog packages/catalog
 COPY packages/use-cases packages/use-cases
 COPY packages/api packages/api
+COPY packages/catalog-files packages/catalog-files
 COPY tools/src/catalog tools/src/catalog
 # statistics' tests draw on the test kit, a dev dependency the filter builds too
 COPY tooling/test-kit tooling/test-kit
@@ -58,6 +61,7 @@ COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/catalog/package.json packages/catalog/
+COPY packages/catalog-files/package.json packages/catalog-files/
 COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
 COPY packages/api/package.json packages/api/

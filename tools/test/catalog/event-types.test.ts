@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 // not part of the package's exports: readRecords runs it on the whole bundle
 import { checkEventTypes } from '../../../packages/catalog/src/event-types.ts'
 import { defined } from '../../../packages/catalog/test/defined.ts'
-import { readKind } from '../../src/catalog/read-kind.ts'
+import { readKind } from '../../../packages/catalog-files/src/read-kind.ts'
 
 const records = join(import.meta.dirname, '..', '..', '..', 'packages', 'catalog', 'records')
 
