@@ -4,7 +4,10 @@ import { join } from 'node:path'
 import type { Bundle } from '@rangefoundry/catalog'
 import { buildCatalogue, openCatalogue } from '@rangefoundry/use-cases/catalog'
 import { afterAll } from 'vitest'
-import { catalogueListContract, catalogueRecordContract } from '../../catalog/test/contract.ts'
+import {
+  catalogueListContract,
+  catalogueRecordContract,
+} from '../../../packages/catalog/test/contract.ts'
 import { loadCatalogue, writeCatalogue } from '../src/catalogue/node.ts'
 
 const dir = mkdtempSync(join(tmpdir(), 'catalogue-contract-'))

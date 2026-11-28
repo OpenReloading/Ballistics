@@ -41,7 +41,7 @@ The id is the slug of the name without the legal form: "Demo Powder Co." becomes
 
 ## API
 
-Served under `/v1` (`packages/api/src/routes/components.ts`):
+Served under `/v1` (`apps/api/src/routes/components.ts`):
 
 - `GET /manufacturers`: `{ total, items: [{ id, name, aliases?, website? }] }`, ordered by name; `GET /manufacturers/:id`: the record.
 - `GET /powders` and `GET /bullets` filter by `manufacturer=<id>` and order by manufacturer name, product name and id; `q` matches the manufacturer name or one of its aliases followed by the product name.

@@ -120,7 +120,7 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
       - name: Breaking changes of the API document (oasdiff)
-        run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo "$OASDIFF_IMAGE" breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
+        run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo "$OASDIFF_IMAGE" breaking apps/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
       - run: node tools/src/audit.ts
       # licenses of the production dependencies of the images and the generated list in NOTICE
       - run: node tools/src/licences.ts

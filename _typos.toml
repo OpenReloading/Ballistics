@@ -11,7 +11,7 @@ extend-exclude = [
   # generated or copied byte for byte from a tool
   "pnpm-lock.yaml",
   # the API contract as last released, rewritten only for a breaking change
-  "packages/api/openapi.baseline.json",
+  "apps/api/openapi.baseline.json",
   # generated from the commit titles of released versions
   "**/CHANGELOG.md",
   ".github/pnpm/package-lock.json",

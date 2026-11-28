@@ -476,7 +476,7 @@
       }
     },
     {
-      "files": ["packages/api/src/**"],
+      "files": ["apps/api/src/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -502,11 +502,11 @@
                   "!@rangefoundry/use-cases",
                   "!@rangefoundry/use-cases/**"
                 ],
-                "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
+                "message": "api-imports-logic-catalog-schema-only: apps/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
-                "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
+                "regex": "^(\\.\\./)+(web|docs|e2e|cli|packages|apps)/",
+                "message": "api-imports-logic-catalog-schema-only: apps/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               }
             ]
           }
@@ -547,7 +547,7 @@
                 "message": "cli-imports-logic-catalog-drawing-schema-only: apps/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog and its file reader catalog-files, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs."
               },
               {
-                "regex": "^(\\.\\./)+(web|docs|e2e|packages|apps)/",
+                "regex": "^(\\.\\./)+(web|docs|e2e|api|packages|apps)/",
                 "message": "cli-imports-logic-catalog-drawing-schema-only: apps/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog and its file reader catalog-files, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs."
               }
             ]
@@ -578,7 +578,7 @@
                 "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
-                "regex": "^(\\.\\./)+packages/",
+                "regex": "^(\\.\\./)+(packages|api)/",
                 "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
@@ -613,7 +613,7 @@
                 "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
-                "regex": "^(\\.\\./)+packages/",
+                "regex": "^(\\.\\./)+(packages|api)/",
                 "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               }
             ]

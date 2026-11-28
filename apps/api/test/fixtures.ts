@@ -13,7 +13,7 @@ import {
   userDataVersion,
 } from '@rangefoundry/schema'
 
-import { bundle } from '../../catalog/test/bundle.ts'
+import { bundle } from '../../../packages/catalog/test/bundle.ts'
 
 export { bundle }
 

@@ -61,12 +61,12 @@ jobs:
       # per-path outputs exist only for the components released in this run
       - id: images
         env:
-          API_VERSION: ${{ steps.release.outputs['packages/api--version'] }}
-          API_TAG: ${{ steps.release.outputs['packages/api--tag_name'] }}
+          API_VERSION: ${{ steps.release.outputs['apps/api--version'] }}
+          API_TAG: ${{ steps.release.outputs['apps/api--tag_name'] }}
         run: |
           matrix=$(jq -nc \
             --arg av "$API_VERSION" --arg at "$API_TAG" \
-            '[{name: "api", dockerfile: "packages/api/Dockerfile", version: $av, tag: $at,
+            '[{name: "api", dockerfile: "apps/api/Dockerfile", version: $av, tag: $at,
                licenses: "AGPL-3.0-only AND MIT AND CC-BY-SA-4.0 AND Apache-2.0"}]
              | map(select(.version != ""))')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"

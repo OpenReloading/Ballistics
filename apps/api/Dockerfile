@@ -1,4 +1,4 @@
-# Build context: repository root (docker build -f packages/api/Dockerfile .)
+# Build context: repository root (docker build -f apps/api/Dockerfile .)
 FROM docker.io/library/node:26-trixie-slim@sha256:e6bedef217677b276c591795e169840edd9096dbf13f29df8ef8d1856b8820bc AS build
 # pnpm as .github/pnpm/package-lock.json pins it; its native binary comes as an optional dependency, so no install script runs
 COPY .github/pnpm /opt/pnpm
@@ -18,7 +18,7 @@ COPY packages/catalog/package.json packages/catalog/
 COPY packages/catalog-files/package.json packages/catalog-files/
 COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
-COPY packages/api/package.json packages/api/
+COPY apps/api/package.json apps/api/
 COPY packages/svg-drawings/package.json packages/svg-drawings/
 COPY apps/cli/package.json apps/cli/
 COPY apps/web/package.json apps/web/
@@ -37,7 +37,7 @@ COPY packages/ballistics packages/ballistics
 COPY packages/schema packages/schema
 COPY packages/catalog packages/catalog
 COPY packages/use-cases packages/use-cases
-COPY packages/api packages/api
+COPY apps/api apps/api
 COPY packages/catalog-files packages/catalog-files
 COPY tools/src/catalog tools/src/catalog
 # statistics' tests draw on the test kit, a dev dependency the filter builds too
@@ -46,6 +46,8 @@ RUN pnpm --filter "@rangefoundry/api..." run build
 
 FROM docker.io/library/node:26-trixie-slim@sha256:e6bedef217677b276c591795e169840edd9096dbf13f29df8ef8d1856b8820bc
 ENV NODE_ENV=production
+# a container listens on every interface of its own network namespace; the published port decides who reaches it
+ENV HOST=0.0.0.0
 # pnpm as .github/pnpm/package-lock.json pins it; its native binary comes as an optional dependency, so no install script runs
 COPY .github/pnpm /opt/pnpm
 RUN cd /opt/pnpm && npm ci --ignore-scripts --no-audit --no-fund && ln -s /opt/pnpm/node_modules/.bin/pnpm /usr/local/bin/pnpm
@@ -64,7 +66,7 @@ COPY packages/catalog/package.json packages/catalog/
 COPY packages/catalog-files/package.json packages/catalog-files/
 COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
-COPY packages/api/package.json packages/api/
+COPY apps/api/package.json apps/api/
 COPY packages/svg-drawings/package.json packages/svg-drawings/
 COPY apps/cli/package.json apps/cli/
 COPY apps/web/package.json apps/web/
@@ -81,10 +83,10 @@ COPY --from=build /app/packages/ballistics/dist packages/ballistics/dist
 COPY --from=build /app/packages/schema/dist packages/schema/dist
 COPY --from=build /app/packages/catalog/dist packages/catalog/dist
 COPY --from=build /app/packages/use-cases/dist packages/use-cases/dist
-COPY --from=build /app/packages/api/dist packages/api/dist
+COPY --from=build /app/apps/api/dist apps/api/dist
 COPY LICENSE NOTICE ./
 COPY packages/catalog/LICENSE packages/catalog/
-WORKDIR /app/packages/api
+WORKDIR /app/apps/api
 USER node
 EXPOSE 3000
 CMD ["node", "dist/server.js"]

@@ -16,7 +16,8 @@ const rootInputs = [
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|svg-drawings|catalog|target-recognition|use-cases|api|design-tokens)\//,
+  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|svg-drawings|catalog|target-recognition|use-cases|design-tokens)\//,
+  /^apps\/api\//,
   // the catalog reader that writes the bundle the API serves
   /^(tools\/src\/catalog|packages\/catalog-files)\//,
   ...rootInputs,
@@ -41,6 +42,7 @@ const e2eInputs = [
 /** Files whose change needs the docs image built, which runs the docs site build: the site, the libraries of its reference (every package, each with a `typedoc.json` on the shared base) with the palette it imports, the API whose document it prints, and the compose service. */
 const docsInputs = [
   /^apps\/docs\//,
+  /^apps\/api\//,
   /^packages\/([^/]+\/|typedoc\.base\.json$)/,
   /^(compose\.yaml|\.dockerignore)$/,
   ...rootInputs,
@@ -58,7 +60,7 @@ const recordInputs = [
   /^packages\/catalog\//,
   /^(tools\/src\/catalog|packages\/catalog-files)\//,
   /^packages\/schema\//,
-  /^packages\/api\//,
+  /^apps\/api\//,
   ...rootInputs,
   /^apps\/web\/(package\.json|vite\.config\.mts|tsconfig\.json)$/,
   /^apps\/web\/scripts\/(ci-plan|check-prerender|prerender-list)\.mts$/,

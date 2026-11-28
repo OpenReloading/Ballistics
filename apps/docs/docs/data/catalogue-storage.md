@@ -6,7 +6,7 @@ description: Why the read-only catalogue needs no server database, the single se
 
 # Catalogue storage
 
-The catalogue (the records of `packages/catalog`) is read only, rebuilt from git on every build and small: about 3.6 thousand records in the public data. Code: the search matcher and sort order in `packages/schema` (`src/search.ts`, `src/order.ts`) and the in-process catalogue module in `packages/api` (`src/catalogue/`), which the API's routes and compute lookups read. Paths are relative to the repository root.
+The catalogue (the records of `packages/catalog`) is read only, rebuilt from git on every build and small: about 3.6 thousand records in the public data. Code: the search matcher and sort order in `packages/schema` (`src/search.ts`, `src/order.ts`) and the in-process catalogue module in `apps/api` (`src/catalogue/`), which the API's routes and compute lookups read. Paths are relative to the repository root.
 
 ## Decision
 
@@ -35,7 +35,7 @@ The load tables of the makers are `records/loads/<cartridge id>/<maker>.json`, o
 
 ## The module
 
-`packages/api/src/catalogue/`, read by the routes, the compute record lookups, the server and the static build:
+`apps/api/src/catalogue/`, read by the routes, the compute record lookups, the server and the static build:
 
 - `derive.ts`: one index row per record, `{ item, sortKey, search }`. `item` is the list item the route answers (the cartridge's sheet minima and case head, a bullet's first G1 and G7 coefficient, a target's caliber classes), `sortKey` and `search` come from the schema package's `sortKey` and `searchKey`. Also the revision: a synchronous 53-bit hash of the record's JSON text, the same in Node and the browser, for change detection only.
 - `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order) and the record file (every record by id, one map per kind). Both start with the header `format` and `derive`, see below. Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
@@ -43,7 +43,7 @@ The load tables of the makers are `records/loads/<cartridge id>/<maker>.json`, o
 - `list.ts`: the one filter, rank and page step. A query ranks by `score` and keeps the default order between equal ranks.
 - `browser.ts`: the entry `@rangefoundry/api/catalogue`. It imports ballistics, catalog and schema only, no Node API (`test/compute-imports.test.ts`). `node.ts` reads and writes the two files (`index.json`, `records.json`), `write.ts` is the build step (`pnpm run build` writes them into `dist/catalogue/`, also exported as `@rangefoundry/api/catalogue/*.json`). The server opens them at start (`loadCatalogue`, no database, no wait) and answers a record as stored, without the added `kind`, `origin` and `revision`; the API image gets the files from the same build.
 
-Checks in `packages/api/test/`: `catalogue.test.ts` (derive, build, open, files) and `catalogue-budget.test.ts`; `app.test.ts` and `competition-order.test.ts` hold the answers of the routes. The contract of the interface is `packages/catalog/test/contract.ts`: the same lists and records over one fixture bundle, run on every way the catalogue is opened (`catalogue-contract.test.ts` of the API in memory and from the written files, of the CLI, and of the web app's static site, lists only).
+Checks in `apps/api/test/`: `catalogue.test.ts` (derive, build, open, files) and `catalogue-budget.test.ts`; `app.test.ts` and `competition-order.test.ts` hold the answers of the routes. The contract of the interface is `packages/catalog/test/contract.ts`: the same lists and records over one fixture bundle, run on every way the catalogue is opened (`catalogue-contract.test.ts` of the API in memory and from the written files, of the CLI, and of the web app's static site, lists only).
 
 The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, 1,686 bullets, 248 powders, one machine): about 19 ms from the records, 3 ms from the prebuilt index (1.40 MB, the record file is 8.2 MB and read on the first `get`).
 
@@ -55,7 +55,7 @@ The index and the record file begin with two numbers. `format` is the layout of 
 
 ## The static site's data files
 
-`writeStaticApi` (`packages/api/src/static.ts`) writes `api/catalogue/index.json`, the index as `buildCatalogue` returns it (the record file stays out: 8.2 MB, read only on `get`), and one file per record, `api/<kind>/<id>.json`, the body of `GET /<kind>/<id>`; the data file and the API route build the cartridge body with `cartridgeAnswer`. The browser fetches the index once, opens it with `openCatalogue` and answers every list, with its filters, `q`, paging and order, through the catalogue (`apps/web/src/lib/static-api.ts`). A record is one file fetch. There are no per-kind list files, no `search.json` and no per-cartridge bullet lists: the `cartridge` filter of the bullets runs `bulletWindow` over the index.
+`writeStaticApi` (`apps/api/src/static.ts`) writes `api/catalogue/index.json`, the index as `buildCatalogue` returns it (the record file stays out: 8.2 MB, read only on `get`), and one file per record, `api/<kind>/<id>.json`, the body of `GET /<kind>/<id>`; the data file and the API route build the cartridge body with `cartridgeAnswer`. The browser fetches the index once, opens it with `openCatalogue` and answers every list, with its filters, `q`, paging and order, through the catalogue (`apps/web/src/lib/static-api.ts`). A record is one file fetch. There are no per-kind list files, no `search.json` and no per-cartridge bullet lists: the `cartridge` filter of the bullets runs `bulletWindow` over the index.
 
 In the public data the index is 1.40 MB (152 kB gzipped), 0.86 MB of it the bullet and powder rows (about 450 bytes per bullet, 390 per powder). `catalogue-budget.test.ts` caps it at 1.5 MB and 160 KB gzipped. The service worker precaches it with the build's static files and answers it from the shell cache (`apps/web/src/lib/offline.ts`), so a list opens offline after the first visit and the index always belongs to its build.
 

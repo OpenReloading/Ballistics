@@ -19,12 +19,12 @@ const browserSources = [
     'shot-groups',
     'svg-drawings',
     'schema',
-    'api',
     'importers',
     'catalog',
     'use-cases',
     'target-recognition',
   ].map((p) => `packages/${p}/src`),
+  'apps/api/src',
 ]
 
 /** Lacking in Chrome and Edge 111, Firefox 121 or Safari 16.4 (MDN browser compatibility data), as each is called; the Set methods `union`, `intersection` and `difference` are left out, as zod's `z.union` would match. */

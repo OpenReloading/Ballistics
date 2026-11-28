@@ -277,7 +277,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `apps/cli/src/metrics.ts`, `apps/cli/test/metrics.test.ts`
 - `packages/importers/src/pressure-history.ts`, `packages/importers/test/pressure-history.test.ts`
 - `packages/use-cases/src/resolve.ts`, `packages/use-cases/test/resolve.test.ts`
-- `packages/api/src/routes/charge-target.ts`, `packages/api/test/charge-target.test.ts`
+- `apps/api/src/routes/charge-target.ts`, `apps/api/test/charge-target.test.ts`
 - `packages/schema/src/target-sheet.ts`, `packages/schema/test/target-sheet.test.ts`
 - `packages/schema/src/overrides.ts`, `packages/schema/test/overrides.test.ts`
 - `packages/schema/src/case-capacity.ts`, `packages/schema/test/case-capacity.test.ts`, `packages/schema/test/case-capacity-unit.test.ts`

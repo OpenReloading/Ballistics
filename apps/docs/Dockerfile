@@ -18,7 +18,7 @@ COPY packages/catalog/package.json packages/catalog/
 COPY packages/catalog-files/package.json packages/catalog-files/
 COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
-COPY packages/api/package.json packages/api/
+COPY apps/api/package.json apps/api/
 COPY packages/svg-drawings/package.json packages/svg-drawings/
 COPY apps/cli/package.json apps/cli/
 COPY apps/web/package.json apps/web/
@@ -28,6 +28,7 @@ COPY apps/docs/package.json apps/docs/
 COPY tooling/test-kit/package.json tooling/test-kit/
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@rangefoundry/docs..."
 COPY packages packages
+COPY apps/api apps/api
 COPY tooling tooling
 # the wrapper of the catalog-files reader that the catalog build writes its bundle with
 COPY tools/src/catalog tools/src/catalog
