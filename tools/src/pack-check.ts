@@ -1,14 +1,52 @@
-/** The npm tarball of each published library, as `pnpm pack --dry-run` lists it after the build: fails on a missing README or entry of `exports`, `main` or `types` (a `*` pattern matching no file), a test file, a source map without its sources, a file outside `files`, a bare import in a packed `.js` or `.d.ts` not in `dependencies` or `peerDependencies`, or a dependency on a private workspace package, which npm never gets. */
-import { execFileSync } from 'node:child_process'
-import { globSync, readFileSync } from 'node:fs'
+/** The npm tarball of each published package, as `pnpm pack --dry-run` lists it after the build: fails on a missing README or entry of `exports`, `bin`, `main` or `types` (a `*` pattern matching no file), a test file, a source map without its sources, a file outside `files`, a bare import in a packed `.js` or `.d.ts` not in `dependencies` or `peerDependencies`, or a dependency on a private workspace package, which npm never gets. Then installs the packed command line offline and runs it. */
+import { execFileSync, spawnSync } from 'node:child_process'
+import {
+  globSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs'
 import { isBuiltin } from 'node:module'
+import { tmpdir } from 'node:os'
 import { dirname, join, matchesGlob, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { parse } from 'yaml'
+import { parse, stringify } from 'yaml'
 import { executable } from './executable.ts'
 
-/** The workspaces published to npm. */
-const published = ['schema', 'svg-drawings', 'importers', 'catalog', 'catalog-files']
+/** The folders of the workspaces published to npm. */
+const published = [
+  'packages/schema',
+  'packages/svg-drawings',
+  'packages/importers',
+  'packages/catalog',
+  'packages/catalog-files',
+  'apps/cli',
+]
+
+/** The folder of the command line, which the check also installs and runs. */
+const cli = 'apps/cli'
+
+/** Marked `private` until the 0.1.0 release publishes them, so a dependency on one passes the private-dependency check. */
+const releasedWith010 = new Set(
+  [
+    'units',
+    'statistics',
+    'locale-format',
+    'ballistics',
+    'shot-groups',
+    'target-recognition',
+    'design-tokens',
+    'ui',
+    'use-cases',
+    'catalog',
+    'importers',
+    'schema',
+    'svg-drawings',
+    'catalog-files',
+  ].map((name) => `@rangefoundry/${name}`),
+)
 
 /** The fields of package.json the check reads. */
 interface Manifest {
@@ -16,6 +54,7 @@ interface Manifest {
   main?: string
   types?: string
   exports?: unknown
+  bin?: string | Record<string, string>
   files?: string[]
   dependencies?: Record<string, string>
   peerDependencies?: Record<string, string>
@@ -92,22 +131,30 @@ function packOf(dir: string): Packed | undefined {
   return listed?.files ? listed : undefined
 }
 
-/** The names of the workspace packages of `root` marked `private`, which are never published. */
-function privateWorkspaces(root: string) {
+/** The workspace packages of `root` by name, each with its folder. */
+function workspaces(root: string) {
   const { packages = [] } = parse(readFileSync(join(root, 'pnpm-workspace.yaml'), 'utf8')) as {
     packages?: string[]
   }
-  const manifests = globSync(
+  const found = globSync(
     packages.map((p) => `${p}/package.json`),
     { cwd: root },
-  ).map(
-    (file) =>
-      JSON.parse(readFileSync(join(root, file), 'utf8')) as Manifest & {
-        private?: boolean
-      },
-  )
-  return new Set(manifests.filter((m) => m.private === true).map((m) => m.name ?? ''))
+  ).map((file) => {
+    const manifest = JSON.parse(readFileSync(join(root, file), 'utf8')) as Manifest & {
+      private?: boolean
+    }
+    return [manifest.name ?? '', { dir: join(root, dirname(file)), manifest }] as const
+  })
+  return new Map(found)
 }
+
+/** The names of the workspace packages marked `private` that the 0.1.0 release does not publish. */
+const privateWorkspaces = (all: ReturnType<typeof workspaces>) =>
+  new Set(
+    [...all]
+      .filter(([name, { manifest }]) => manifest.private === true && !releasedWith010.has(name))
+      .map(([name]) => name),
+  )
 
 /** The dependencies of `manifest` among the private workspace packages `privates`. */
 const privateDependencyProblems = (manifest: Manifest, privates: Set<string>) =>
@@ -125,7 +172,12 @@ export function packProblems(dir: string, privates = new Set<string>()): string[
     .filter((f) => !files.has(f))
     .map((f) => `${f} is not in the tarball`)
   problems.push(...privateDependencyProblems(manifest, privates))
-  const entries = [manifest.main, manifest.types, ...exportTargets(manifest.exports)]
+  const entries = [
+    manifest.main,
+    manifest.types,
+    ...exportTargets(manifest.exports),
+    ...exportTargets(manifest.bin),
+  ]
   for (const entry of new Set(entries.filter((e) => e !== undefined).map((e) => normalize(e))))
     if (!packed(entry, files)) problems.push(`entry point ${entry} is not in the tarball`)
   for (const file of files) {
@@ -138,15 +190,75 @@ export function packProblems(dir: string, privates = new Set<string>()): string[
   return problems
 }
 
+/** The workspace packages `name` depends on, itself included, each once. */
+function closure(name: string, all: ReturnType<typeof workspaces>, seen = new Set<string>()) {
+  seen.add(name)
+  for (const dependency of Object.keys(all.get(name)?.manifest.dependencies ?? {}))
+    if (all.has(dependency) && !seen.has(dependency)) closure(dependency, all, seen)
+  return seen
+}
+
+/** Packs the command line at `dir` of `root` with its workspace dependencies, installs it offline into a new folder, the other dependencies linked from the workspace, and runs its command from a folder whose own `@rangefoundry/catalog` is no JSON; one line per run that fails or writes to stderr. */
+export function installProblems(root: string, dir: string): string[] {
+  const all = workspaces(root)
+  const self = [...all.values()].find((w) => w.dir === join(root, dir))
+  if (!self?.manifest.name) return [`${dir} holds no workspace package`]
+  const { name } = self.manifest
+  const temp = mkdtempSync(join(tmpdir(), 'pack-install-'))
+  const pnpm = (args: string[], cwd: string) =>
+    execFileSync(executable('pnpm'), args, { cwd, encoding: 'utf8', stdio: 'pipe' })
+  const overrides: Record<string, string> = {}
+  for (const packed of closure(name, all)) {
+    const workspace = all.get(packed) as { dir: string; manifest: Manifest }
+    const out = pnpm(['pack', '--json', '--pack-destination', join(temp, 'packed')], workspace.dir)
+    overrides[packed] = `file:${(JSON.parse(out) as { filename: string }).filename}`
+    for (const dependency of Object.keys(workspace.manifest.dependencies ?? {}))
+      if (!all.has(dependency))
+        overrides[dependency] =
+          `link:${realpathSync(join(workspace.dir, 'node_modules', dependency))}`
+  }
+  const app = join(temp, 'app')
+  mkdirSync(app)
+  writeFileSync(join(app, 'package.json'), '{ "name": "pack-install", "private": true }\n')
+  writeFileSync(join(app, 'pnpm-workspace.yaml'), stringify({ overrides }))
+  pnpm(['add', '--offline', '--ignore-scripts', overrides[name] as string], app)
+  const installed = join(app, 'node_modules', name)
+  const bin = exportTargets(self.manifest.bin)[0] ?? ''
+  const decoy = join(temp, 'cwd', 'node_modules', '@rangefoundry', 'catalog')
+  mkdirSync(decoy, { recursive: true })
+  writeFileSync(
+    join(decoy, 'package.json'),
+    '{ "name": "@rangefoundry/catalog", "exports": { "./bundle.json": "./bundle.json" } }\n',
+  )
+  writeFileSync(join(decoy, 'bundle.json'), '{')
+  const runs = [
+    ['--version'],
+    ['operations'],
+    ['run', 'interior', '--input', join(installed, 'examples/interior.json')],
+  ]
+  return runs.flatMap((args) => {
+    const ran = spawnSync(process.execPath, [join(installed, bin), ...args], {
+      cwd: join(temp, 'cwd'),
+      encoding: 'utf8',
+      maxBuffer: 16 * 1024 * 1024,
+    })
+    return ran.status === 0 && ran.stderr === ''
+      ? []
+      : [`${args.join(' ')} exits ${ran.status}: ${ran.stderr.trim()}`]
+  })
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = fileURLToPath(new URL('../../', import.meta.url))
   let failed = false
-  const privates = privateWorkspaces(root)
-  for (const name of published) {
-    const problems = packProblems(join(root, 'packages', name), privates)
-    for (const problem of problems) console.error(`@rangefoundry/${name}: ${problem}`)
+  const all = workspaces(root)
+  const privates = privateWorkspaces(all)
+  for (const dir of published) {
+    const problems = packProblems(join(root, dir), privates)
+    if (dir === cli) problems.push(...installProblems(root, dir))
+    for (const problem of problems) console.error(`${dir}: ${problem}`)
     failed ||= problems.length > 0
   }
   if (failed) process.exit(1)
-  console.log(`pnpm pack: ${published.length} packages checked`)
+  console.log(`pnpm pack: ${published.length} packages checked, the command line installed and run`)
 }

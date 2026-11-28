@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { delimiter } from 'node:path'
 import { type ParseArgsConfig, parseArgs } from 'node:util'
 import type { Options } from './commands.ts'
 import { ExpectedError, internalCode, UsageError } from './errors.ts'
@@ -28,9 +29,12 @@ const usage = `usage:
 
 options:
   --rows <path>      a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS);
-                     catalogue for the published loads of the records, or a folder
-                     laid out as records/loads/ (maker tables only)
-  --records <dir>    a records root, repeatable (default: BALLISTICS_RECORDS, else the repository records)
+                     catalogue for the published loads of a first --records root with every
+                     kind directory, or a folder laid out as records/loads/ (maker tables only)
+  --records <dir>    a records root, repeatable (default: BALLISTICS_RECORDS, roots joined by : or
+                     on Windows ;); a first root with every kind directory, as the records
+                     folder of a repository clone, replaces the catalog bundle, other roots
+                     add their records to it
   --split <name>     validation (default), training or test
   --final            required for the test split
   --group-by <key>   also group by powder, family, cartridge, bullet or construction
@@ -85,8 +89,9 @@ const commandHelp = {
 
 Runs one compute operation offline and writes its answer as JSON: the answer of the
 route POST /v1/<operation> to the body in the --input file (- for stdin). Record ids
-resolve against --records (repeatable, default BALLISTICS_RECORDS, else the repository
-records). A body the schema rejects is bad data (exit 65), a 422 answer a refusal (exit 1).
+resolve against the catalog bundle and the records each --records root (repeatable, default
+BALLISTICS_RECORDS) adds, or a first root with every kind directory in its place. A body
+the schema rejects is bad data (exit 65), a 422 answer a refusal (exit 1).
 
 example:
   node apps/cli/dist/bin.js run interior --input apps/cli/examples/interior.json`,
@@ -247,7 +252,7 @@ function optionsOf(
   const split = values.split ?? 'validation'
   const by = values['group-by']
   checkChoices(values, split, by, choices)
-  const fromEnv = env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+  const fromEnv = env.BALLISTICS_RECORDS?.split(delimiter).filter(Boolean) ?? []
   const options: Options = {
     rows,
     records: values.records ?? fromEnv,
@@ -322,7 +327,7 @@ async function operate(
   const [name, ...extra] = positionals
   if (name === undefined || extra.length > 0 || values.input === undefined)
     throw new UsageError(commandHelp.run)
-  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(delimiter).filter(Boolean) ?? []
   return await runOperation(name, values.input, roots, io.stderr)
 }
 
@@ -341,7 +346,7 @@ async function estimate(args: string[], env: NodeJS.ProcessEnv) {
   )
   if (values.out === undefined) throw new UsageError(commandHelp['estimate-capacities'])
   const { writeEstimatedCapacities } = await import('./capacity.ts')
-  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(delimiter).filter(Boolean) ?? []
   return writeEstimatedCapacities(roots, values.out)
 }
 

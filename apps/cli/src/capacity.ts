@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { lstatSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Cartridge, CatalogueCaseCapacity } from '@rangefoundry/schema'
 import { isEstimatedCapacity } from '@rangefoundry/schema'
@@ -89,12 +89,16 @@ export function estimateCapacities(records: Records) {
   return { fill, estimates }
 }
 
-/** `estimate-capacities`: writes the estimated capacity records of the records of `roots` to `<out>/capacities/`, a folder that must not exist yet. */
+/** `estimate-capacities`: writes the estimated capacity records of the records of `roots` to `<out>/capacities/`, which must not exist yet as a folder, file or symbolic link. */
 export function writeEstimatedCapacities(roots: readonly string[], out: string) {
   const folder = join(out, 'capacities')
-  if (existsSync(folder)) throw new Refusal(`${folder} exists: give a new --out folder`) // NOSONAR: the path is the argument the user gave
+  // lstat, as a dangling symbolic link passes existsSync
+  if (lstatSync(folder, { throwIfNoEntry: false }))
+    // NOSONAR: the path is the argument the user gave
+    throw new Refusal(`${folder} exists: give a new --out folder`)
   const { fill, estimates } = estimateCapacities(loadRecords(roots))
-  mkdirSync(folder, { recursive: true }) // NOSONAR: as above
+  mkdirSync(out, { recursive: true }) // NOSONAR: as above
+  mkdirSync(folder) // NOSONAR: as above; fails on anything created there since the check
   for (const record of estimates)
     writeFileSync(join(folder, `${record.id}.json`), `${JSON.stringify(record, null, 2)}\n`) // NOSONAR: as above
   return { command: 'estimate-capacities', ...fill, written: estimates.length, folder }

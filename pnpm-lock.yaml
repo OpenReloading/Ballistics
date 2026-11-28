@@ -110,9 +110,6 @@ importers:
 
   apps/cli:
     dependencies:
-      '@rangefoundry/api':
-        specifier: workspace:*
-        version: link:../../packages/api
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../../packages/ballistics
@@ -141,6 +138,9 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
+      '@rangefoundry/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -150,6 +150,9 @@ importers:
       ajv:
         specifier: 'catalog:'
         version: 8.20.0
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.25
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
