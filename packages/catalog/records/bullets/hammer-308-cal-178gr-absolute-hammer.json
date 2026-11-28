@@ -1,0 +1,47 @@
+{
+  "id": "hammer-308-cal-178gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8267",
+  "name": ".308 Cal-178gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 11.534
+  },
+  "length": {
+    "value": 37.85
+  },
+  "noseLength": {
+    "value": 22.45
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.205
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

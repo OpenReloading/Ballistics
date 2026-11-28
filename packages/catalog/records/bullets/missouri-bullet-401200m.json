@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-401200m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "401200M",
+  "name": "Steeler, 200 Grain TCFP",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 17.5
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

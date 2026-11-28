@@ -1,0 +1,56 @@
+{
+  "id": "sierra-2850",
+  "manufacturer": "sierra",
+  "productNumber": "2850",
+  "name": "35 CAL 225 GR SBT GAMEKING (SGK)",
+  "caliber": "0.358",
+  "country": "US",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 14.58
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.37
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.192
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/35-cal-225-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

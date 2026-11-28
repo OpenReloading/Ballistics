@@ -1,0 +1,65 @@
+{
+  "id": "berger-30425",
+  "manufacturer": "berger",
+  "productNumber": "30425",
+  "name": "30 Cal 168 gr Hybrid Target",
+  "productLine": "Target",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "length": {
+    "value": 32.69
+  },
+  "noseLength": {
+    "value": 20.193
+  },
+  "baseToOgive": {
+    "value": 14.3
+  },
+  "bearingLength": {
+    "value": 6.833
+  },
+  "base": {
+    "length": {
+      "value": 5.664
+    }
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.515
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.264
+    }
+  ],
+  "recommendedTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "berger-bullets-quick-reference-sheet-2020",
+        "url": "https://bergerbullets.com/pdf/Quick-Reference-Sheets.pdf",
+        "retrieved": "2026-09-05",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base.length",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ]
+      }
+    ]
+  }
+}

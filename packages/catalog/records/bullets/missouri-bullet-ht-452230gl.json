@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-452230gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-452230GL",
+  "name": "Softball!-Grooveless, 230 Grain RN - Grooveless",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 14.904
+  },
+  "length": {
+    "value": 16.36
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

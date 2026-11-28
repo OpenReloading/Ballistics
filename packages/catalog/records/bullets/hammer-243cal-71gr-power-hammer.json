@@ -1,0 +1,47 @@
+{
+  "id": "hammer-243cal-71gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "1325",
+  "name": ".243 Cal-071gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 4.471
+  },
+  "length": {
+    "value": 20.96
+  },
+  "noseLength": {
+    "value": 8.48
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.274
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

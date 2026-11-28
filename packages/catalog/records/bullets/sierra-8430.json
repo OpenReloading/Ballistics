@@ -1,0 +1,52 @@
+{
+  "id": "sierra-8430",
+  "manufacturer": "sierra",
+  "productNumber": "8430",
+  "name": "10MM 150 GR JHP SPORTS MASTER",
+  "caliber": "0.400",
+  "country": "US",
+  "diameter": {
+    "value": 10.16
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/10mm-150-gr-jhp-sports-master/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

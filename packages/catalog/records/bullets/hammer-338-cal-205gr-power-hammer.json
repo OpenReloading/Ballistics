@@ -1,0 +1,37 @@
+{
+  "id": "hammer-338-cal-205gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "5721",
+  "name": ".338 Cal-205gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 13.284
+  },
+  "length": {
+    "value": 35.56
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.394
+    }
+  ],
+  "slowestTwist": {
+    "value": 323.85
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

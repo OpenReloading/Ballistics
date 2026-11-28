@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-ns01",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR NS01",
+  "name": "DGBR NS01 (Safari Raptor, Solid & Lever+, 700 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".550",
+  "diameter": {
+    "value": 13.97
+  },
+  "mass": {
+    "value": 45.359
+  },
+  "length": {
+    "value": 38.46
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.2
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "10",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "sierra-7207",
+  "manufacturer": "sierra",
+  "productNumber": "7207",
+  "name": "6MM 107 GR Tipped MatchKing (TMK)",
+  "caliber": "0.243",
+  "country": "US",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 6.933
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.574
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.292
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6mm-107-gr-tipped-matchking-tmk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

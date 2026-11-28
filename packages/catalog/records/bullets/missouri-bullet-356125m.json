@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-356125m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356125M",
+  "name": "SmallBall!, 124 Grain 9MM RN",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042
+  },
+  "mass": {
+    "value": 8.035
+  },
+  "length": {
+    "value": 14.81
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

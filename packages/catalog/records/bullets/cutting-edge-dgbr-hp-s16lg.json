@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-hp-s16lg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP S16LG",
+  "name": "DGBR-HP S16LG (Safari Raptor, Solid & Lever+, 295 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633
+  },
+  "mass": {
+    "value": 19.116
+  },
+  "length": {
+    "value": 26.49
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.15
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

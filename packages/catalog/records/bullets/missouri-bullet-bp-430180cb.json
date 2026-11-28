@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-430180cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-430180CB",
+  "name": "Cowboy #7 - Black Powder, 180 Grain RNFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "length": {
+    "value": 14.05
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "hammer-284-cal-101gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "10818",
+  "name": ".284 Cal-101gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 6.545
+  },
+  "length": {
+    "value": 26.21
+  },
+  "noseLength": {
+    "value": 16.11
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.163
+    }
+  ],
+  "slowestTwist": {
+    "value": 298.45
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

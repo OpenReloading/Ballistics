@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-358125cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-358125CB",
+  "name": "Cowboy #2 - Black Powder, 125 Grain TCFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 8.1
+  },
+  "length": {
+    "value": 14.25
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

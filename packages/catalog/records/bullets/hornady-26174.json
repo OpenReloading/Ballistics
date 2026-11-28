@@ -1,0 +1,37 @@
+{
+  "id": "hornady-26174",
+  "manufacturer": "hornady",
+  "productNumber": "26174",
+  "name": "6.5mm BTHP Match, .264, 123 gr",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 7.97
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.45
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "78",
+        "fields": ["diameter", "mass", "base.type", "tip.type", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

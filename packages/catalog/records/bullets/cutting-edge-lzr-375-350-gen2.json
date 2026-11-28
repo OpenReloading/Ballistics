@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-lzr-375-350-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 375 350 GEN2",
+  "name": "LZR 375 350 GEN2 (Lazer, 350 gr)",
+  "productLine": "Lazer",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525
+  },
+  "mass": {
+    "value": 22.68
+  },
+  "length": {
+    "value": 52.78
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.807
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.414
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

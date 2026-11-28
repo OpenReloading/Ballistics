@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-311135fp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "311135FP",
+  "name": "#3 Whitetail, 135 Grain RNFP",
+  "caliber": ".311",
+  "diameter": {
+    "value": 7.899
+  },
+  "mass": {
+    "value": 8.748
+  },
+  "length": {
+    "value": 19.38
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v339172",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339172",
+  "name": "HPBT, .264, 142 gr (bullet 2890)",
+  "productLine": "HPBT",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 9.201
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "tip.type"]
+      }
+    ]
+  }
+}

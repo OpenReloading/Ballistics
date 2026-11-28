@@ -1,0 +1,47 @@
+{
+  "id": "hammer-375-cal-248gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "349",
+  "name": ".375 Cal-248gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525
+  },
+  "mass": {
+    "value": 16.07
+  },
+  "length": {
+    "value": 36.45
+  },
+  "noseLength": {
+    "value": 24.41
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.229
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

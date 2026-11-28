@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-z04ne",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR Z04NE",
+  "name": "DGBR Z04NE (Safari Raptor, Solid & Lever+, 900 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".620",
+  "diameter": {
+    "value": 15.748
+  },
+  "mass": {
+    "value": 58.319
+  },
+  "length": {
+    "value": 38.86
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.18
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "10",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

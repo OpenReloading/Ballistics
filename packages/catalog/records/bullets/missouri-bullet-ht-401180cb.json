@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-401180cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-401180CB",
+  "name": "Cowboy #10 - Hi-Tek, 180 Grain RNFP",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "length": {
+    "value": 15.04
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

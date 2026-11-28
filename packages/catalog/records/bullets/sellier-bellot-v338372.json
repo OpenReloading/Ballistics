@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338372",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338372",
+  "name": "SP, .226, 70 gr (bullet 2915)",
+  "productLine": "SP",
+  "caliber": ".226",
+  "diameter": {
+    "value": 5.74
+  },
+  "mass": {
+    "value": 4.536
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.264
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

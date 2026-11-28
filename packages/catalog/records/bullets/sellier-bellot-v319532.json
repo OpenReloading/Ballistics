@@ -1,0 +1,25 @@
+{
+  "id": "sellier-bellot-v319532",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319532",
+  "name": "LFN, .454, 250 gr (for 45 COLT)",
+  "productLine": "LFN",
+  "caliber": ".454",
+  "diameter": {
+    "value": 11.532
+  },
+  "mass": {
+    "value": 16.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

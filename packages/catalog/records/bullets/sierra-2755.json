@@ -1,0 +1,49 @@
+{
+  "id": "sierra-2755",
+  "manufacturer": "sierra",
+  "productNumber": "2755",
+  "name": "35 CAL 155 GR FN PRO-HUNTER",
+  "caliber": "0.355",
+  "country": "US",
+  "diameter": {
+    "value": 9.017
+  },
+  "mass": {
+    "value": 10.044
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.176
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/35-cal-155-gr-fn-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

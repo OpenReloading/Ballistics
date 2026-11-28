@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-esp-i80-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP I80 Raptor",
+  "name": "ESP I80 Raptor (ESP Raptor, 80 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 5.184
+  },
+  "length": {
+    "value": 31.55
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.125
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.275
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "8",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

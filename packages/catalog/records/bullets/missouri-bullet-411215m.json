@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-411215m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "411215M",
+  "name": ".41 Trooper, 215 Grain Keith-Style SWC",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439
+  },
+  "mass": {
+    "value": 13.932
+  },
+  "length": {
+    "value": 18.11
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

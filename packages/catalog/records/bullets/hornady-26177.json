@@ -1,0 +1,35 @@
+{
+  "id": "hornady-26177",
+  "manufacturer": "hornady",
+  "productNumber": "26177",
+  "name": "6.5mm ELD Match, .264, 130 gr",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.424
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.554
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.279
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "75",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

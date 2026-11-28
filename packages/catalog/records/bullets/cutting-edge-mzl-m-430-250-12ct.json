@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mzl-m-430-250-12ct",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MZL M.430 250 12ct",
+  "name": "MZL M.430 250 12ct (MAXIMUS, 250 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 16.2
+  },
+  "length": {
+    "value": 27.15
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.273
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.137
+    }
+  ],
+  "slowestTwist": {
+    "value": 609.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

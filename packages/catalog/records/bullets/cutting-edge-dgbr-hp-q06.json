@@ -1,0 +1,29 @@
+{
+  "id": "cutting-edge-dgbr-hp-q06",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP Q06",
+  "name": "DGBR-HP Q06 (Safari Raptor, Solid & Lever+, 320 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439
+  },
+  "mass": {
+    "value": 20.736
+  },
+  "length": {
+    "value": 34.52
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

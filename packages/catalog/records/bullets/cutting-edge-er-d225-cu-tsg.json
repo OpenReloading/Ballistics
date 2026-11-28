@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-er-d225-cu-tsg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER D225 Cu TSG",
+  "name": "ER D225 Cu TSG (ER Raptor, 225 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 14.58
+  },
+  "length": {
+    "value": 44.73
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.55
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "7",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

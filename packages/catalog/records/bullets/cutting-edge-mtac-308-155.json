@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mtac-308-155",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 308 155",
+  "name": "MTAC 308 155 (MTAC, 155 gr)",
+  "productLine": "MTAC",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.044
+  },
+  "length": {
+    "value": 31.98
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.458
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.229
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

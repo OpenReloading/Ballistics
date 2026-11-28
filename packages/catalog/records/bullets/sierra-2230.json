@@ -1,0 +1,66 @@
+{
+  "id": "sierra-2230",
+  "manufacturer": "sierra",
+  "productNumber": "2230",
+  "name": "30 CAL 200 GR HPBT MATCHKING (SMK)",
+  "caliber": "0.308",
+  "country": "US",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.565
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.282
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-200-gr-hpbt-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

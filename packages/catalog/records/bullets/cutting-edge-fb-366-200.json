@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-fb-366-200",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 366 200",
+  "name": "FB 366 200 (Flat Base Raptor, 200 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".366 (9.3mm)",
+  "diameter": {
+    "value": 9.296
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 35.08
+  },
+  "slowestTwist": {
+    "value": 355.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

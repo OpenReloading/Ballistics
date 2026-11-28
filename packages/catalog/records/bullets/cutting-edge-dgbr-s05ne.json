@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-s05ne",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR S05NE",
+  "name": "DGBR S05NE (Safari Raptor, Solid & Lever+, 480 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".457 NE",
+  "diameter": {
+    "value": 11.608
+  },
+  "mass": {
+    "value": 31.103
+  },
+  "length": {
+    "value": 38.46
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.19
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

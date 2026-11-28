@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-452200rnfpm",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452200RNFPM",
+  "name": "IDP #4-XD, 200 Grain RNFP",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 13.82
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

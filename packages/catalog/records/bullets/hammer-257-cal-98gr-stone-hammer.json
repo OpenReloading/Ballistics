@@ -1,0 +1,47 @@
+{
+  "id": "hammer-257-cal-98gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "811",
+  "name": ".257 Cal-098gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 6.383
+  },
+  "length": {
+    "value": 27.18
+  },
+  "noseLength": {
+    "value": 11.69
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.302
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-dn01",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR DN01",
+  "name": "DGBR DN01 (Safari Raptor, Solid & Lever+, 200 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".348",
+  "diameter": {
+    "value": 8.839
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 26.7
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.18
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "id": "cutting-edge-lzr-338-275-max-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 338 275 MAX GEN2",
+  "name": "LZR 338 275 MAX GEN2 (Lazer, 275 gr)",
+  "productLine": "Lazer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 17.82
+  },
+  "length": {
+    "value": 50.57
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.8
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.763
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.394
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.391
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

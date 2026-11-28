@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-401155m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "401155M",
+  "name": "IDP #9, 155 Grain SWC",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185
+  },
+  "mass": {
+    "value": 10.044
+  },
+  "length": {
+    "value": 14.73
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

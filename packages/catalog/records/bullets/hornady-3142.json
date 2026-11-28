@@ -1,0 +1,25 @@
+{
+  "id": "hornady-3142",
+  "manufacturer": "hornady",
+  "productNumber": "3142",
+  "name": "7.62 x 39mm SST, .310, 123 gr",
+  "caliber": ".310",
+  "diameter": {
+    "value": 7.874
+  },
+  "mass": {
+    "value": 7.97
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "84",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-356125cn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356125CN",
+  "name": "9 Cone, 125 Grain 9MM Cone",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042
+  },
+  "mass": {
+    "value": 8.1
+  },
+  "length": {
+    "value": 15.62
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "hammer-257-cal-90gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8581",
+  "name": ".257 Cal-090gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 5.832
+  },
+  "length": {
+    "value": 26.67
+  },
+  "noseLength": {
+    "value": 15.06
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.177
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "hammer-284-cal-133gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869069985",
+  "name": ".284 Cal-133gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 8.618
+  },
+  "length": {
+    "value": 34.93
+  },
+  "noseLength": {
+    "value": 18.35
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.232
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.461
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

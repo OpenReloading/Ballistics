@@ -1,0 +1,43 @@
+{
+  "id": "sako-266d",
+  "manufacturer": "sako",
+  "productNumber": "266D",
+  "name": "SAKO SUPER HAMMERHEAD 266D",
+  "productLine": "SUPER HAMMERHEAD",
+  "diameter": {
+    "value": 9.3
+  },
+  "mass": {
+    "value": 18.532
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Bonded Soft Point",
+    "structure": "bonded"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.286
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "retrieved": "2026-10-08",
+        "page": "21",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.structure"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

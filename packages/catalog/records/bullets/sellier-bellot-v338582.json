@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338582",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338582",
+  "name": "SP, .458, 405 gr (bullet 2948)",
+  "productLine": "SP",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633
+  },
+  "mass": {
+    "value": 26.244
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.306
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

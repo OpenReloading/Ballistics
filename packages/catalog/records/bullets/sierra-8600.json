@@ -1,0 +1,49 @@
+{
+  "id": "sierra-8600",
+  "manufacturer": "sierra",
+  "productNumber": "8600",
+  "name": "44 CAL 180 GR JHC SPORTS MASTER",
+  "caliber": "0.4295",
+  "country": "US",
+  "diameter": {
+    "value": 10.909
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.13
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/44-cal-180-gr-jhc-sports-master/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

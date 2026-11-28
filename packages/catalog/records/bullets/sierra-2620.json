@@ -1,0 +1,49 @@
+{
+  "id": "sierra-2620",
+  "manufacturer": "sierra",
+  "productNumber": "2620",
+  "name": "338 CAL 225 GR SPT PRO-HUNTER",
+  "caliber": "0.338",
+  "country": "US",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 14.58
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.462
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/338-cal-225-gr-spt-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-mtac-338-254",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 338 254",
+  "name": "MTAC 338 254 (MTAC, 254 gr)",
+  "productLine": "MTAC",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 16.459
+  },
+  "length": {
+    "value": 44.53
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.715
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

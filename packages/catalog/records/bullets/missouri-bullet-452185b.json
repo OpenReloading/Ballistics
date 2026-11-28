@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-452185b",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452185B",
+  "name": ".45 Button, 185 Grain SWC Flat-Base",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 11.988
+  },
+  "length": {
+    "value": 14
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

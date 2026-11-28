@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-356125swc",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356125SWC",
+  "name": "9mm SWC, 125 Grain 9MM SWC",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042
+  },
+  "mass": {
+    "value": 8.294
+  },
+  "length": {
+    "value": 15.82
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

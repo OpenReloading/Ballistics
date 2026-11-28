@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-esp-i70-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP I70 Raptor",
+  "name": "ESP I70 Raptor (ESP Raptor, 70 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 4.536
+  },
+  "length": {
+    "value": 29.03
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.115
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.25
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "8",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

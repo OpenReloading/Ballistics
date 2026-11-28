@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-hp-n05-tsg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP N05 TSG",
+  "name": "DGBR-HP N05 TSG (Safari Raptor, Solid & Lever+, 255 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".366 (9.3mm)",
+  "diameter": {
+    "value": 9.296
+  },
+  "mass": {
+    "value": 16.524
+  },
+  "length": {
+    "value": 34.62
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.17
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

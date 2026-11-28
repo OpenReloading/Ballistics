@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-408-400-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.408 400 MAX",
+  "name": "M.408 400 MAX (MAXIMUS, 400 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".408",
+  "diameter": {
+    "value": 10.363
+  },
+  "mass": {
+    "value": 25.92
+  },
+  "length": {
+    "value": 47.02
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.668
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.334
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

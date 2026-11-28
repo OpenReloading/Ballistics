@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-lzr-338-225-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 338 225 GEN2",
+  "name": "LZR 338 225 GEN2 (Lazer, 225 gr)",
+  "productLine": "Lazer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 14.58
+  },
+  "length": {
+    "value": 43.54
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.623
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.319
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

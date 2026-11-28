@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-429-275-50ct",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.429 275 50ct",
+  "name": "M.429 275 50ct (MAXIMUS, 275 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".429",
+  "diameter": {
+    "value": 10.897
+  },
+  "mass": {
+    "value": 17.82
+  },
+  "length": {
+    "value": 29.18
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.328
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.164
+    }
+  ],
+  "slowestTwist": {
+    "value": 558.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

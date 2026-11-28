@@ -1,0 +1,43 @@
+{
+  "id": "sako-120a",
+  "manufacturer": "sako",
+  "productNumber": "120A",
+  "name": "SAKO SPEEDHEAD 120A",
+  "productLine": "SPEEDHEAD",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 7.97
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "construction": {
+    "raw": "Full metal jacket",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.273
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "retrieved": "2026-10-08",
+        "page": "10, 17",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

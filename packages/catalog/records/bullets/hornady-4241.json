@@ -1,0 +1,25 @@
+{
+  "id": "hornady-4241",
+  "manufacturer": "hornady",
+  "productNumber": "4241",
+  "name": "423 Cal. DGS, .423, 400 gr",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744
+  },
+  "mass": {
+    "value": 25.92
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "89",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

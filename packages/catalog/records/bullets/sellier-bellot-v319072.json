@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v319072",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319072",
+  "name": "FMJ, .309, 73 gr (for 7.65 BROWNING)",
+  "productLine": "FMJ",
+  "caliber": ".309",
+  "diameter": {
+    "value": 7.849
+  },
+  "mass": {
+    "value": 4.73
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

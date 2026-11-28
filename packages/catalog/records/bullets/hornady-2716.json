@@ -1,0 +1,25 @@
+{
+  "id": "hornady-2716",
+  "manufacturer": "hornady",
+  "productNumber": "2716",
+  "name": "6.8mm/270 Cal. SST, .277, 120 gr",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036
+  },
+  "mass": {
+    "value": 7.776
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "84",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

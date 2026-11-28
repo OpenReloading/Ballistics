@@ -1,0 +1,31 @@
+{
+  "id": "hornady-2442",
+  "manufacturer": "hornady",
+  "productNumber": "2442",
+  "name": "6mm BTHP, .243, 87 gr",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 5.638
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "91",
+        "fields": ["diameter", "mass", "base.type", "tip.type"]
+      }
+    ]
+  }
+}

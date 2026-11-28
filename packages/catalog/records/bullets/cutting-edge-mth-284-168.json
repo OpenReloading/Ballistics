@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mth-284-168",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 284 168",
+  "name": "MTH 284 168 (MTH, 168 gr)",
+  "productLine": "MTH",
+  "caliber": ".284 (7mm)",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "length": {
+    "value": 38.89
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.556
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.276
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

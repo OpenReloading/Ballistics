@@ -1,0 +1,51 @@
+{
+  "id": "hammer-358-cal-215gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869048880",
+  "name": ".358 Cal-215gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 13.932
+  },
+  "length": {
+    "value": 37.11
+  },
+  "noseLength": {
+    "value": 21.49
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.228
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.454
+    }
+  ],
+  "slowestTwist": {
+    "value": 381
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

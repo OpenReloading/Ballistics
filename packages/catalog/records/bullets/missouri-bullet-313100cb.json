@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-313100cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "313100CB",
+  "name": "Cowboy #6, 100 Grain RNFP",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "length": {
+    "value": 14.5
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

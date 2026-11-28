@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v319402",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319402",
+  "name": "JHP, .355, 124 gr",
+  "productLine": "JHP",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.017
+  },
+  "mass": {
+    "value": 8.035
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

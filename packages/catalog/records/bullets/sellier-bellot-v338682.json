@@ -1,0 +1,34 @@
+{
+  "id": "sellier-bellot-v338682",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338682",
+  "name": "FMJ, .366, 232 gr (bullet 2946)",
+  "productLine": "FMJ",
+  "caliber": ".366",
+  "diameter": {
+    "value": 9.296
+  },
+  "mass": {
+    "value": 15.033
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.378
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

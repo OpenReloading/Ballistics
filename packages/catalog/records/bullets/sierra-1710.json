@@ -1,0 +1,52 @@
+{
+  "id": "sierra-1710",
+  "manufacturer": "sierra",
+  "productNumber": "1710",
+  "name": "6.5MM 100 GR HP VarmintKing (SVK)",
+  "caliber": "0.264",
+  "country": "US",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.259
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-100-gr-hp-varmintking-svk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "hammer-308-cal-192gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869056644",
+  "name": ".308 Cal-192gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 12.441
+  },
+  "length": {
+    "value": 44.83
+  },
+  "noseLength": {
+    "value": 24.79
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.321
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.662
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

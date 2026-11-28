@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-416-400",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.416 400",
+  "name": "M.416 400 (MAXIMUS, 400 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566
+  },
+  "mass": {
+    "value": 25.92
+  },
+  "length": {
+    "value": 41.58
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.711
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.355
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

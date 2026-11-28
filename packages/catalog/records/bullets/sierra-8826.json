@@ -1,0 +1,49 @@
+{
+  "id": "sierra-8826",
+  "manufacturer": "sierra",
+  "productNumber": "8826",
+  "name": "45 CAL 225 GR JHC SPORTS MASTER",
+  "caliber": "0.4515",
+  "country": "US",
+  "diameter": {
+    "value": 11.468
+  },
+  "mass": {
+    "value": 14.58
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.141
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/45-cal-225-gr-jhc-sports-master/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

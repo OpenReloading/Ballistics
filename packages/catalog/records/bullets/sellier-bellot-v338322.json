@@ -1,0 +1,34 @@
+{
+  "id": "sellier-bellot-v338322",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338322",
+  "name": "FMJ, .226, 70 gr (bullet 2904)",
+  "productLine": "FMJ",
+  "caliber": ".226",
+  "diameter": {
+    "value": 5.74
+  },
+  "mass": {
+    "value": 4.536
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.296
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

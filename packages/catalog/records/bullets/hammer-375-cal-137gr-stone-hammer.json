@@ -1,0 +1,47 @@
+{
+  "id": "hammer-375-cal-137gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869028148",
+  "name": ".375 Cal-137gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525
+  },
+  "mass": {
+    "value": 8.877
+  },
+  "length": {
+    "value": 19.43
+  },
+  "noseLength": {
+    "value": 12.22
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.199
+    }
+  ],
+  "slowestTwist": {
+    "value": 685.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

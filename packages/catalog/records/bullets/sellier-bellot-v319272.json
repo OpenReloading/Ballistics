@@ -1,0 +1,25 @@
+{
+  "id": "sellier-bellot-v319272",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319272",
+  "name": "SP, .355, 124 gr (for 9 mm LUGER, 9 × 21)",
+  "productLine": "SP",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.017
+  },
+  "mass": {
+    "value": 8.035
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-430200m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "430200M",
+  "name": ".44 Stalker, 200 Grain RNFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 14.88
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

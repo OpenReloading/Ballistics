@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338332",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338332",
+  "name": "HPBT, .224, 69 gr (bullet 2887)",
+  "productLine": "HPBT",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 4.471
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "tip.type"]
+      }
+    ]
+  }
+}

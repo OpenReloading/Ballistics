@@ -1,0 +1,48 @@
+{
+  "id": "sierra-2200",
+  "manufacturer": "sierra",
+  "productNumber": "2200",
+  "name": "30 Cal 168 gr HPBT MatchKing",
+  "productLine": "MatchKing",
+  "caliber": ".308",
+  "country": "US",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.462
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.224
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-168-gr-hpbt-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "tip.type", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "sellier-bellot-v318522",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318522",
+  "name": "LRN, .357, 158 gr (for 38 SPECIAL)",
+  "productLine": "LRN",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 10.238
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

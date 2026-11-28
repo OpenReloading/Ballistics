@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v339442",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339442",
+  "name": "HPBT, .338, 300 gr (bullet 2899)",
+  "productLine": "HPBT",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 19.44
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "tip.type"]
+      }
+    ]
+  }
+}

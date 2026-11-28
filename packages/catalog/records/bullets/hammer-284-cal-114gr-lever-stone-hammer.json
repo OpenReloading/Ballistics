@@ -1,0 +1,47 @@
+{
+  "id": "hammer-284-cal-114gr-lever-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869058953",
+  "name": ".284 Cal-114gr Lever Stone Hammer®",
+  "productLine": "Lever Stone Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 7.387
+  },
+  "length": {
+    "value": 26.16
+  },
+  "noseLength": {
+    "value": 11.43
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.269
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mzl-m-430-275",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MZL M.430 275",
+  "name": "MZL M.430 275 (MAXIMUS, 275 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 17.82
+  },
+  "length": {
+    "value": 29.13
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.325
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.163
+    }
+  ],
+  "slowestTwist": {
+    "value": 558.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

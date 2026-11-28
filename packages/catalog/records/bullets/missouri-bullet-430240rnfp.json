@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-430240rnfp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "430240RNFP",
+  "name": "Cowboy #13, 240 Grain RNFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 15.552
+  },
+  "length": {
+    "value": 17.42
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

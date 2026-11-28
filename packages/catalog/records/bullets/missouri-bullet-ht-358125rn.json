@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-358125rn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-358125RN",
+  "name": "Cowboy #17 - Hi-Tek, 125 Grain RNFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 8.1
+  },
+  "length": {
+    "value": 13.39
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-356147m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356147M",
+  "name": "SubSonic, 147 Grain 9MM FP",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042
+  },
+  "mass": {
+    "value": 9.525
+  },
+  "length": {
+    "value": 17.12
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "hammer-358-cal-203gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "902",
+  "name": ".358 Cal-203gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 13.154
+  },
+  "length": {
+    "value": 29.46
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.302
+    }
+  ],
+  "slowestTwist": {
+    "value": 431.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

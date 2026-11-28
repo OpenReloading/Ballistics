@@ -1,0 +1,25 @@
+{
+  "id": "hornady-4507",
+  "manufacturer": "hornady",
+  "productNumber": "4507",
+  "name": "45 Cal. DGS, .458, 500 gr",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633
+  },
+  "mass": {
+    "value": 32.399
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "89",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "hornady-22772",
+  "manufacturer": "hornady",
+  "productNumber": "22772",
+  "name": "22 Cal. ELD-VT, .224, 69 gr",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 4.471
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.424
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.214
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "76",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

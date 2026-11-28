@@ -1,0 +1,25 @@
+{
+  "id": "hornady-3576",
+  "manufacturer": "hornady",
+  "productNumber": "3576",
+  "name": "38 Cal. DGH, .357, 165 gr",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 10.692
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "99",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

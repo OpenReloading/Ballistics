@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mth-308-180-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 308 180 MAX",
+  "name": "MTH 308 180 MAX (MTH, 180 gr)",
+  "productLine": "MTH",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "length": {
+    "value": 37.34
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.508
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.26
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338422",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338422",
+  "name": "SP, .243, 100 gr (bullet 2921)",
+  "productLine": "SP",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.315
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

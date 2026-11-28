@@ -1,0 +1,37 @@
+{
+  "id": "hammer-475-cal-352gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869048154",
+  "name": ".475 Cal-352gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".475",
+  "diameter": {
+    "value": 12.065
+  },
+  "mass": {
+    "value": 22.809
+  },
+  "length": {
+    "value": 30.48
+  },
+  "noseLength": {
+    "value": 16.51
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.296
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

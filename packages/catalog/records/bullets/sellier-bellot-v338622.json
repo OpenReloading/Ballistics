@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338622",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338622",
+  "name": "SP, .277, 150 gr (bullet 2927)",
+  "productLine": "SP",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.266
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

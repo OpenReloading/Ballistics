@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-er-a45-cu-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER A45 Cu Raptor",
+  "name": "ER A45 Cu Raptor (ER Raptor, 45 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 2.916
+  },
+  "length": {
+    "value": 20.6
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.212
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.105
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "7",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-mth-264-130",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 264 130",
+  "name": "MTH 264 130 (MTH, 130 gr)",
+  "productLine": "MTH",
+  "caliber": ".264 (6.5mm)",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.424
+  },
+  "length": {
+    "value": 35.28
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.55
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-esp-j130-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP J130 Raptor",
+  "name": "ESP J130 Raptor (ESP Raptor, 130 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".284 (7mm)",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 8.424
+  },
+  "length": {
+    "value": 38.84
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.135
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.353
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "8",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

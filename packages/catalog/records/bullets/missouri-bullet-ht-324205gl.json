@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-324205gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-324205GL",
+  "name": "#1 Mauser-Grooveless, 205 Grain FP - Grooveless",
+  "caliber": ".324",
+  "diameter": {
+    "value": 8.23
+  },
+  "mass": {
+    "value": 13.284
+  },
+  "length": {
+    "value": 26.64
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

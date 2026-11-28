@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-w18ss",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR W18SS",
+  "name": "DGBR W18SS (Safari Raptor, Solid & Lever+, 375 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".500",
+  "diameter": {
+    "value": 12.7
+  },
+  "mass": {
+    "value": 24.3
+  },
+  "length": {
+    "value": 24.99
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.16
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "10",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

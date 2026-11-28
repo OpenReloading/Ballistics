@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-428200s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-428200S",
+  "name": ".44-40 - Hi-Tek, 200 Grain RNFP",
+  "caliber": ".428",
+  "diameter": {
+    "value": 10.871
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 15.11
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

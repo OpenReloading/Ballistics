@@ -1,0 +1,49 @@
+{
+  "id": "sierra-1210",
+  "manufacturer": "sierra",
+  "productNumber": "1210",
+  "name": "22 CAL 45 GR Hornet VarmintKing (SVK)",
+  "caliber": "0.224",
+  "country": "US",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 2.916
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.131
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/22-cal-45-gr-hornet-varmintking-vk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

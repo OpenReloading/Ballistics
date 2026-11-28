@@ -1,0 +1,43 @@
+{
+  "id": "sako-129a",
+  "manufacturer": "sako",
+  "productNumber": "129A",
+  "name": "SAKO GAMEHEAD 129A",
+  "productLine": "GAMEHEAD",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 7.97
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Soft Point",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.25
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4, 12",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

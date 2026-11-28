@@ -1,0 +1,52 @@
+{
+  "id": "sierra-1913",
+  "manufacturer": "sierra",
+  "productNumber": "1913",
+  "name": "7MM 150 GR SBT GameKing (SGK)",
+  "caliber": "0.284",
+  "country": "US",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.436
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/7mm-150-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

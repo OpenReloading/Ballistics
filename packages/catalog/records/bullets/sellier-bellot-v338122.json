@@ -1,0 +1,34 @@
+{
+  "id": "sellier-bellot-v338122",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338122",
+  "name": "FMJ, .224, 50 gr (bullet 2902)",
+  "productLine": "FMJ",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 3.24
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.235
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

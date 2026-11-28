@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-fb-308-135-culg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 308 135 CuLG",
+  "name": "FB 308 135 CuLG (Flat Base Raptor, 135 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 8.748
+  },
+  "length": {
+    "value": 25.17
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.121
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

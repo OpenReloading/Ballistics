@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-358140cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-358140CB",
+  "name": "Cowboy #14 - Hi-Tek, 140 Grain TCFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 9.072
+  },
+  "length": {
+    "value": 15.57
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

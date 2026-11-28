@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mtac-338-302-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 338 302 MAX",
+  "name": "MTAC 338 302 MAX (MTAC, 302 gr)",
+  "productLine": "MTAC",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 19.569
+  },
+  "length": {
+    "value": 51.16
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.793
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.406
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

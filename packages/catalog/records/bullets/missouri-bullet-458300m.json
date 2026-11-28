@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-458300m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "458300M",
+  "name": "#2 Buffalo, 300 Grain RNFP",
+  "caliber": ".459",
+  "diameter": {
+    "value": 11.659
+  },
+  "mass": {
+    "value": 19.44
+  },
+  "length": {
+    "value": 19.74
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

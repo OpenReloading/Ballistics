@@ -1,0 +1,37 @@
+{
+  "id": "hammer-375-cal-170gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869070143",
+  "name": ".375 Cal-170gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525
+  },
+  "mass": {
+    "value": 11.016
+  },
+  "length": {
+    "value": 29.27
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.288
+    }
+  ],
+  "slowestTwist": {
+    "value": 482.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

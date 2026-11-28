@@ -1,0 +1,47 @@
+{
+  "id": "hammer-264-cal-125gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "274",
+  "name": ".264 Cal-124gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.035
+  },
+  "length": {
+    "value": 35.74
+  },
+  "noseLength": {
+    "value": 19.73
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.245
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=5",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

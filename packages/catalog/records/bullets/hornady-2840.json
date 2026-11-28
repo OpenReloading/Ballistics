@@ -1,0 +1,35 @@
+{
+  "id": "hornady-2840",
+  "manufacturer": "hornady",
+  "productNumber": "2840",
+  "name": "7mm ELD-X, .284, 162 gr",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 10.497
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.631
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.318
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "81",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-357148s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "357148S",
+  "name": "PPC #1, 148 Grain DEWC-BB",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 9.59
+  },
+  "length": {
+    "value": 14.71
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

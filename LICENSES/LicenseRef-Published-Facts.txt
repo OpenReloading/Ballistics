@@ -1,0 +1,5 @@
+The files under this identifier state facts as published by the maker named in each record's
+`manufacturer` field or by the publisher named in its `provenance`. The project claims no rights
+in these facts and grants none. Values a citation marks as derived, computed or fitted are the
+project's own work from the cited source. The publisher's terms apply, as each citation links them
+in `terms`.

@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-fb-228-60",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 228 60",
+  "name": "FB 228 60 (Flat Base Raptor, 60 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".228",
+  "diameter": {
+    "value": 5.791
+  },
+  "mass": {
+    "value": 3.888
+  },
+  "length": {
+    "value": 22.38
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

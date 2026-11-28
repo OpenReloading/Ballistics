@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-esp-f65-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP F65 Raptor",
+  "name": "ESP F65 Raptor (ESP Raptor, 65 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".243 (6mm)",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 4.212
+  },
+  "length": {
+    "value": 29.77
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.245
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "8",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}
