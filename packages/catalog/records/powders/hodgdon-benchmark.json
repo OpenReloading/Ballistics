@@ -7,6 +7,9 @@
   "scope": ["rifle"],
   "grainForm": "extruded",
   "propellantBase": "single",
+  "bulkDensity": {
+    "value": 0.9063
+  },
   "composition": [
     {
       "name": "Nitrocellulose",
@@ -142,6 +145,18 @@
   "provenance": {
     "kind": "derived",
     "sources": [
+      {
+        "source": "lee-precision-powder-vmds-2024-01-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
+      {
+        "source": "lee-precision-knowledge-base-vmd-explanation",
+        "url": "https://support.leeprecision.net/en/knowledgebase/article/vmd-explanation",
+        "retrieved": "2026-10-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
       {
         "title": "Hodgdon SDS \"Extruded Rifle Powders\", February 2022, Benchmark (inner sheet \"Propellant BM2\", Chemwatch 4693-84)",
         "publisher": "Hodgdon Powder Co.",

@@ -14,6 +14,9 @@
       "value": 1.2
     }
   },
+  "bulkDensity": {
+    "value": 0.9391
+  },
   "composition": [
     {
       "name": "Cellulose nitrate",
@@ -164,6 +167,18 @@
   "provenance": {
     "kind": "derived",
     "sources": [
+      {
+        "source": "lee-precision-powder-vmds-2024-01-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
+      {
+        "source": "lee-precision-knowledge-base-vmd-explanation",
+        "url": "https://support.leeprecision.net/en/knowledgebase/article/vmd-explanation",
+        "retrieved": "2026-10-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
       {
         "source": "vihtavuori-safety-data-sheet-n-powder-high",
         "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",

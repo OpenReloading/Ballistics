@@ -7,6 +7,9 @@
   "scope": ["rifle"],
   "grainForm": "extruded",
   "propellantBase": "single",
+  "bulkDensity": {
+    "value": 0.8864
+  },
   "composition": [
     {
       "name": "Nitrocellulose",
@@ -155,6 +158,18 @@
   "provenance": {
     "kind": "derived",
     "sources": [
+      {
+        "source": "lee-precision-powder-vmds-2024-01-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
+      {
+        "source": "lee-precision-knowledge-base-vmd-explanation",
+        "url": "https://support.leeprecision.net/en/knowledgebase/article/vmd-explanation",
+        "retrieved": "2026-10-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
       {
         "source": "hodgdon-sds-extruded-rifle-powders-february-2022",
         "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-extruded-rifle-hodgdon-sds.pdf",

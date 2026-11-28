@@ -4,6 +4,9 @@
   "name": "Reloder 22",
   "scope": ["rifle"],
   "grainForm": "extruded",
+  "bulkDensity": {
+    "value": 0.9297
+  },
   "composition": [
     {
       "name": "Nitrocellulose",
@@ -160,6 +163,18 @@
   "provenance": {
     "kind": "derived",
     "sources": [
+      {
+        "source": "lee-precision-powder-vmds-2024-01-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
+      {
+        "source": "lee-precision-knowledge-base-vmd-explanation",
+        "url": "https://support.leeprecision.net/en/knowledgebase/article/vmd-explanation",
+        "retrieved": "2026-10-08",
+        "fields": ["bulkDensity"],
+        "kind": "published"
+      },
       {
         "source": "alliant-safety-data-sheet-reloder-series",
         "url": "https://www.alliantpowder.com/downloads/sds/Reloder_Series_SDS.pdf",
