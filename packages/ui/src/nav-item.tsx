@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import type { ComponentPropsWithRef, ReactElement } from 'react'
 
+/** The props of `NavItem`: an anchor's props besides its children. */
 export interface NavItemProps extends Omit<ComponentPropsWithRef<'a'>, 'children'> {
   /** A Lucide icon, or an own one on Lucide's grid. */
   icon: LucideIcon

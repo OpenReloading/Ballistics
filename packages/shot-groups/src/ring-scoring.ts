@@ -47,6 +47,7 @@ export interface ScoringFace {
   readonly bulls?: readonly FaceBull[] | undefined
 }
 
+/** The score of one shot on a face. */
 export type RingScore = {
   /** Value of the highest ring the hole touches; 0 outside the face. */
   value: number

@@ -32,7 +32,8 @@ COPY tooling tooling
 COPY tools/src/catalog tools/src/catalog
 # the libraries the docs document and the API its REST page describes (the docs also depend on web, cli and tools,
 # whose files their tests read; the site needs no build of them)
-RUN pnpm --filter "@rangefoundry/api..." --filter "@rangefoundry/svg-drawings..." --filter "@rangefoundry/importers..." run build
+RUN pnpm --filter "@rangefoundry/api..." --filter "@rangefoundry/svg-drawings..." --filter "@rangefoundry/importers..." \
+  --filter "@rangefoundry/locale-format..." --filter "@rangefoundry/target-recognition..." --filter "@rangefoundry/ui..." run build
 # the CLI's result schema, a static folder of the site
 COPY apps/cli/schema apps/cli/schema
 COPY apps/docs apps/docs

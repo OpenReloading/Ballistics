@@ -309,7 +309,7 @@ export function cylinderGapLeakage(input: {
     gap: number;
     exit: number;
     travel: number;
-}): InteriorLoad['leakage'];
+}): InteriorLeakage | undefined;
 
 // @public
 export function defaultSensitivity(form: string | undefined): SensitivityDefault | undefined;
@@ -636,6 +636,16 @@ export type InteriorIssue = Diagnostic<'gasVelocityFactorNegative'> | Diagnostic
 }>;
 
 // @public
+export type InteriorLeakage = {
+    area: readonly {
+        travel: number;
+        area: number;
+    }[];
+    backPressure?: number | undefined;
+    discharge?: number | undefined;
+};
+
+// @public
 export interface InteriorLoad {
     // (undocumented)
     barrel: {
@@ -671,14 +681,7 @@ export interface InteriorLoad {
         factor?: number | undefined;
     };
     ignitionPressure: number;
-    leakage?: {
-        area: readonly {
-            travel: number;
-            area: number;
-        }[];
-        backPressure?: number | undefined;
-        discharge?: number | undefined;
-    } | undefined;
+    leakage?: InteriorLeakage | undefined;
     // (undocumented)
     propellant: {
         specificEnergy: number;

@@ -264,6 +264,7 @@ export type RobustOptions = {
   tolerance: number
   minPoints: number
   rounds?: number
+  /** Whether an ellipse may be the fit; every ellipse when absent. */
   accept?: (e: Ellipse) => boolean
 }
 type Candidate = { conic: Conic; ellipse: Ellipse; inliers: number[] }

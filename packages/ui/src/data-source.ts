@@ -13,12 +13,15 @@ export interface DataPage<Row> {
 
 /** The rows behind a table: the device's index, a catalog read in chunks, or rows in memory. */
 export interface DataSource<Row> {
+  /** The page of rows that answers `query`; `signal` cancels it. */
   query(query: DataQuery, signal?: AbortSignal): Promise<DataPage<Row>>
 }
 
 /** How rows in memory answer a query: whether a row passes a column's filter, and a column's sort value. */
 export interface ArrayColumns<Row> {
+  /** Whether `row` passes the filter `value` of column `id`. */
   matches(row: Row, id: string, value: unknown): boolean
+  /** The value of `row` that column `id` sorts by. */
   sortKey(row: Row, id: string): string | number
 }
 

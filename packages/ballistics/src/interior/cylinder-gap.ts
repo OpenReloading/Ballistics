@@ -1,4 +1,4 @@
-import type { InteriorLoad } from './model.ts'
+import type { InteriorLeakage } from './model.ts'
 
 /** Discharge coefficient of a revolver's cylinder gap: the low end of 0.7 to 1, the smaller leak and so the higher pressure (`apps/docs/docs/models/interior-leakage-heat.md`, "Cylinder gap"). */
 export const cylinderGapDischarge = 0.7
@@ -14,7 +14,7 @@ export function cylinderGapLeakage({
   gap: number
   exit: number
   travel: number
-}): InteriorLoad['leakage'] {
+}): InteriorLeakage | undefined {
   if (!(gap > 0) || !(exit + gap < travel)) return undefined
   const area = Math.PI * boreDiameter * gap
   return {

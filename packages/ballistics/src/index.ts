@@ -199,6 +199,7 @@ export {
   convectiveDefaults,
   type InteriorEnergy,
   type InteriorInvalid,
+  type InteriorLeakage,
   type InteriorLoad,
   type InteriorOptions,
   type InteriorPoint,

@@ -5,53 +5,58 @@
 ```ts
 
 // @public
-export const colors: {
-    readonly light: {
-        readonly accent: "#1971c2";
-        readonly "accent-hover": "#1864ab";
-        readonly "accent-tint": "#e7f5ff";
-        readonly "control-line": "#7b7f91";
-        readonly "error-text": "#c92a2a";
-        readonly ink: "#1d2130";
-        readonly line: "#dcdfe9";
-        readonly link: "#1864ab";
-        readonly "link-hover": "#1d2130";
-        readonly muted: "#555a6d";
-        readonly "on-accent": "#ffffff";
-        readonly page: "#ffffff";
-        readonly select: "#fab005";
-        readonly surface: "#f6f8fc";
-        readonly "surface-alt": "#eef0f6";
-        readonly "warn-border": "#e0b84a";
-        readonly "warn-fill": "#fff6db";
-        readonly "warn-text": "#7a4f00";
-    };
-    readonly dark: {
-        readonly accent: "#4dabf7";
+export interface Colors {
+    // (undocumented)
+    readonly "dark": {
+        readonly "accent": "#4dabf7";
         readonly "accent-hover": "#74c0fc";
         readonly "accent-tint": "#172a40";
         readonly "control-line": "#6f7485";
         readonly "error-text": "#ffa8a8";
-        readonly ink: "#e9ebf1";
-        readonly line: "#2f323f";
-        readonly link: "#74c0fc";
+        readonly "ink": "#e9ebf1";
+        readonly "line": "#2f323f";
+        readonly "link": "#74c0fc";
         readonly "link-hover": "#d0ebff";
-        readonly muted: "#acb0c0";
+        readonly "muted": "#acb0c0";
         readonly "on-accent": "#10121b";
-        readonly page: "#10121b";
-        readonly select: "#fab005";
-        readonly surface: "#161923";
+        readonly "page": "#10121b";
+        readonly "select": "#fab005";
+        readonly "surface": "#161923";
         readonly "surface-alt": "#1e212c";
         readonly "warn-border": "#6b5a12";
         readonly "warn-fill": "#1a1a12";
         readonly "warn-text": "#f5c518";
     };
-};
+    // (undocumented)
+    readonly "light": {
+        readonly "accent": "#1971c2";
+        readonly "accent-hover": "#1864ab";
+        readonly "accent-tint": "#e7f5ff";
+        readonly "control-line": "#7b7f91";
+        readonly "error-text": "#c92a2a";
+        readonly "ink": "#1d2130";
+        readonly "line": "#dcdfe9";
+        readonly "link": "#1864ab";
+        readonly "link-hover": "#1d2130";
+        readonly "muted": "#555a6d";
+        readonly "on-accent": "#ffffff";
+        readonly "page": "#ffffff";
+        readonly "select": "#fab005";
+        readonly "surface": "#f6f8fc";
+        readonly "surface-alt": "#eef0f6";
+        readonly "warn-border": "#e0b84a";
+        readonly "warn-fill": "#fff6db";
+        readonly "warn-text": "#7a4f00";
+    };
+}
 
 // @public
-export const cssVariables: {
-    readonly variables: {};
-    readonly light: {
+export const colors: Colors;
+
+// @public
+export interface CssVariables {
+    // (undocumented)
+    readonly "dark": {
         readonly "--mantine-color-body": "var(--page)";
         readonly "--mantine-color-text": "var(--ink)";
         readonly "--mantine-color-bright": "var(--ink)";
@@ -68,7 +73,8 @@ export const cssVariables: {
         readonly "--mantine-color-blue-filled-hover": "var(--accent-hover)";
         readonly "--mantine-color-blue-light": "var(--accent-tint)";
     };
-    readonly dark: {
+    // (undocumented)
+    readonly "light": {
         readonly "--mantine-color-body": "var(--page)";
         readonly "--mantine-color-text": "var(--ink)";
         readonly "--mantine-color-bright": "var(--ink)";
@@ -85,61 +91,79 @@ export const cssVariables: {
         readonly "--mantine-color-blue-filled-hover": "var(--accent-hover)";
         readonly "--mantine-color-blue-light": "var(--accent-tint)";
     };
-};
+    // (undocumented)
+    readonly "variables": Record<string, never>;
+}
 
 // @public
-export const theme: {
-    readonly fontFamily: "\"Inter Variable\", system-ui, sans-serif";
-    readonly fontSizes: {
-        readonly xs: "0.75rem";
-        readonly sm: "0.8125rem";
-        readonly md: "0.9375rem";
-        readonly lg: "1.0625rem";
-        readonly xl: "1.25rem";
+export const cssVariables: CssVariables;
+
+// @public
+export interface Theme {
+    // (undocumented)
+    readonly "black": "#10121b";
+    // (undocumented)
+    readonly "fontFamily": "\"Inter Variable\", system-ui, sans-serif";
+    // (undocumented)
+    readonly "fontSizes": {
+        readonly "xs": "0.75rem";
+        readonly "sm": "0.8125rem";
+        readonly "md": "0.9375rem";
+        readonly "lg": "1.0625rem";
+        readonly "xl": "1.25rem";
     };
-    readonly spacing: {
-        readonly xs: "0.5rem";
-        readonly sm: "0.625rem";
-        readonly md: "1rem";
-        readonly lg: "1.25rem";
-        readonly xl: "2rem";
-    };
-    readonly radius: {
-        readonly xs: "0px";
-        readonly sm: "0px";
-        readonly md: "0px";
-        readonly lg: "0px";
-        readonly xl: "0px";
-    };
-    readonly headings: {
-        readonly fontFamily: "\"Inter Variable\", system-ui, sans-serif";
-        readonly sizes: {
-            readonly h1: {
-                readonly fontSize: "1.5rem";
-                readonly fontWeight: "650";
-                readonly lineHeight: "1.25";
+    // (undocumented)
+    readonly "headings": {
+        readonly "fontFamily": "\"Inter Variable\", system-ui, sans-serif";
+        readonly "sizes": {
+            readonly "h1": {
+                readonly "fontSize": "1.5rem";
+                readonly "fontWeight": "650";
+                readonly "lineHeight": "1.25";
             };
-            readonly h2: {
-                readonly fontSize: "1.125rem";
-                readonly fontWeight: "600";
-                readonly lineHeight: "1.3";
+            readonly "h2": {
+                readonly "fontSize": "1.125rem";
+                readonly "fontWeight": "600";
+                readonly "lineHeight": "1.3";
             };
-            readonly h3: {
-                readonly fontSize: "1rem";
-                readonly fontWeight: "600";
-                readonly lineHeight: "1.35";
+            readonly "h3": {
+                readonly "fontSize": "1rem";
+                readonly "fontWeight": "600";
+                readonly "lineHeight": "1.35";
             };
         };
     };
-    readonly primaryColor: "blue";
-    readonly primaryShade: {
-        readonly light: 8;
-        readonly dark: 4;
+    // (undocumented)
+    readonly "primaryColor": "blue";
+    // (undocumented)
+    readonly "primaryShade": {
+        readonly "light": 8;
+        readonly "dark": 4;
     };
-    readonly white: "#ffffff";
-    readonly black: "#10121b";
-    readonly respectReducedMotion: true;
-};
+    // (undocumented)
+    readonly "radius": {
+        readonly "xs": "0px";
+        readonly "sm": "0px";
+        readonly "md": "0px";
+        readonly "lg": "0px";
+        readonly "xl": "0px";
+    };
+    // (undocumented)
+    readonly "respectReducedMotion": true;
+    // (undocumented)
+    readonly "spacing": {
+        readonly "xs": "0.5rem";
+        readonly "sm": "0.625rem";
+        readonly "md": "1rem";
+        readonly "lg": "1.25rem";
+        readonly "xl": "2rem";
+    };
+    // (undocumented)
+    readonly "white": "#ffffff";
+}
+
+// @public
+export const theme: Theme;
 
 // (No @packageDocumentation comment for this package)
 

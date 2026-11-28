@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react'
 
+/** The props of `PageBar`. */
 export interface PageBarProps {
   /** The page's only h1. */
   title: string
