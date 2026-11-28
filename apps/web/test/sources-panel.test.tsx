@@ -46,9 +46,11 @@ it('shows 12 digits of the hash, copies the full hash and keeps the rest in the 
 })
 
 it("links a record's Sources panel in a new tab", () => {
+  // A record id with a space, so the test covers URL encoding of the path segment.
+  const recordId = 'a b'
   const html = renderToStaticMarkup(
     <I18nProvider i18n={linguiOf('en')}>
-      <RecordSourcesLink kind="bullets" id="a b" />
+      <RecordSourcesLink kind="bullets" id={recordId} />
     </I18nProvider>,
   )
   expect(html).toBe(
