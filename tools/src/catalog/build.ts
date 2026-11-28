@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from './records.ts'
+import { readRecords } from './catalog-records.ts'
 
 const { bundle, errors } = readRecords()
 if (errors.length > 0) {

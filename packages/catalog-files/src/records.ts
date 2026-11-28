@@ -37,9 +37,6 @@ import {
 import { z } from 'zod'
 import { readKind } from './read-kind.ts'
 
-/** Directory `records/` of the catalog package, the default root of {@link readRecords}. */
-const recordsDir = join(import.meta.dirname, '..', '..', '..', 'packages', 'catalog', 'records')
-
 /** Parses one entry of `load-tables.json` into `tables`, or adds its issues to `found`. */
 function readLoadTable(file: string, entry: unknown, tables: LoadTables, found: string[]) {
   const parsed = loadTable.safeParse(entry)
@@ -147,8 +144,8 @@ function readBundle(
   return { bundle, published, citations: sources.citations }
 }
 
-/** Under `root`, or under several roots read as one set (the first holds every kind directory, the `load-tables.json` of every root lists tables); without `root` the `records/` folder of the catalog package. */
-export function readRecords(root: string | readonly string[] = recordsDir): ReadRecordsResult {
+/** Under `root`, or under several roots read as one set (the first holds every kind directory, the `load-tables.json` of every root lists tables). */
+export function readRecords(root: string | readonly string[]): ReadRecordsResult {
   const roots = typeof root === 'string' ? [root] : [...root]
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')
   const errors: string[] = []
@@ -174,7 +171,7 @@ const folderOf = (kind: string) =>
   folders[kind] ?? kind.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
 
 /** {@link readRecords} with the maker-source rule of the public catalog (`makerRows`) as errors: what `data:validate` checks. Not part of `readRecords`, which also reads private records. */
-export function validateRecords(root?: string | readonly string[]): ReadRecordsResult {
+export function validateRecords(root: string | readonly string[]): ReadRecordsResult {
   const result = readRecords(root)
   const refused = Object.entries(makerRows(result.bundle, result.citations)).flatMap(
     ([kind, rows]) =>

@@ -2,7 +2,8 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { readLoadTables, readRecords } from '../../src/catalog/records.ts'
+import { readLoadTables } from '../../../packages/catalog-files/src/records.ts'
+import { readRecords } from '../../src/catalog/catalog-records.ts'
 
 const fixtures = join(import.meta.dirname, 'fixtures')
 

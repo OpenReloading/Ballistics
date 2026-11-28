@@ -1,8 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { readPublishedLoads } from '@rangefoundry/catalog-files'
 import { compareKeys, type SourceRecord, sourceRecord } from '@rangefoundry/schema'
-import { readPublishedLoads } from '@rangefoundry/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, type Outcome, outcomes } from './evaluate.ts'
 import { fitPowders, notFittedReasons, type PressureKey, priorLines, withFit } from './fit.ts'
@@ -19,7 +18,7 @@ import {
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { foldAggregate, pairedChange, type RowError, rowErrors } from './paired.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
-import { loadRecords, type Records, withoutEstimates } from './records.ts'
+import { loadRecords, packageRecords, type Records, withoutEstimates } from './records.ts'
 import {
   type CompareResult,
   type Evaluation,
@@ -94,10 +93,6 @@ function checkSealed({ split, final }: Options) {
   if (split === 'test' && !final)
     throw new Refusal('the test split is sealed: run it once per model version with --final')
 }
-
-/** The records folder of the catalog package, which `readRecords` reads without roots. */
-const packageRecords = () =>
-  fileURLToPath(new URL('../records', import.meta.resolve('@rangefoundry/catalog')))
 
 /** Whether `path` is a folder of published load files: cartridge folders and no `.csv` file. */
 function isPublishedFolder(path: string) {

@@ -18,9 +18,9 @@ import { resultJsonSchema } from '../src/write-json-schema.ts'
 import { rowsPath } from './data.ts'
 import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
 
-vi.mock('@rangefoundry/tools/catalog', async (original) =>
+vi.mock('@rangefoundry/catalog-files', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
-    await original<typeof import('@rangefoundry/tools/catalog')>(),
+    await original<typeof import('@rangefoundry/catalog-files')>(),
   ),
 )
 

@@ -1,4 +1,6 @@
 import { statSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { readRecords } from '@rangefoundry/catalog-files'
 import type {
   Bullet,
   Cartridge,
@@ -8,7 +10,6 @@ import type {
   PublishedLoads,
 } from '@rangefoundry/schema'
 import { compareKeys, defaultCapacity, isEstimatedCapacity, parseRef } from '@rangefoundry/schema'
-import { readRecords } from '@rangefoundry/tools/catalog'
 import { UsageError } from './errors.ts'
 
 /** The records a run reads, by id; a cartridge's capacity is its default (`defaultCapacity`), only without one its case is the first by id with a stated water capacity, and with neither its capacity is an estimate. */
@@ -46,6 +47,10 @@ export const withoutEstimates = (records: Records): Records => ({
   capacities: new Map([...records.capacities].filter(([, c]) => !isEstimatedCapacity(c))),
 })
 
+/** The records folder of the catalog package, read without roots. */
+export const packageRecords = () =>
+  fileURLToPath(new URL('../records', import.meta.resolve('@rangefoundry/catalog')))
+
 /** Reads the records of `roots` as one set, or the records of the catalog package without roots; a `UsageError` for a root that is not a folder. */
 export function readBundle(roots: readonly string[]) {
   for (const [i, root] of roots.entries())
@@ -54,7 +59,7 @@ export function readBundle(roots: readonly string[]) {
       throw new UsageError(
         `the --records path${roots.length > 1 ? ` ${i + 1} of ${roots.length}` : ''} (or BALLISTICS_RECORDS) does not exist or is not a folder`,
       )
-  return readRecords(roots.length > 0 ? roots : undefined)
+  return readRecords(roots.length > 0 ? roots : packageRecords())
 }
 
 /** The records of {@link readBundle} by id. */
