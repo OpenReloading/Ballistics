@@ -95,16 +95,17 @@ export interface InteriorLoad {
         factor?: number | undefined
       }
   /** Gas leakage past the projectile (`apps/docs/docs/models/interior-leakage-heat.md`); default none. */
-  leakage?:
-    | {
-        /** Leak area over travel, m and m2, interpolated linearly, 0 outside; while held the area at travel 0 applies (0 unless a point is at travel 0). */
-        area: readonly { travel: number; area: number }[]
-        /** Pressure ahead of the projectile, Pa; default the ICAO sea-level pressure. */
-        backPressure?: number | undefined
-        /** Discharge coefficient on the area, default 1. */
-        discharge?: number | undefined
-      }
-    | undefined
+  leakage?: InteriorLeakage | undefined
+}
+
+/** Gas leakage past the projectile (`apps/docs/docs/models/interior-leakage-heat.md`). */
+export type InteriorLeakage = {
+  /** Leak area over travel, m and m2, interpolated linearly, 0 outside; while held the area at travel 0 applies (0 unless a point is at travel 0). */
+  area: readonly { travel: number; area: number }[]
+  /** Pressure ahead of the projectile, Pa; default the ICAO sea-level pressure. */
+  backPressure?: number | undefined
+  /** Discharge coefficient on the area, default 1. */
+  discharge?: number | undefined
 }
 
 /** Defaults of the convective heat model (`apps/docs/docs/models/interior-leakage-heat.md`, "Convective heat loss"): K, Pa s, 1. */

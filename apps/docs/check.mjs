@@ -1,5 +1,6 @@
 // Runs TypeDoc on every package without writing output, after the packages are built (they import each other's dist/): an undocumented export, a TypeDoc warning or an exported variable or function whose rendered type is too long (`scripts/type-length.mts`) fails the run.
-import { join } from 'node:path'
+import { globSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import {
   Application,
   PackageJsonReader,
@@ -9,7 +10,9 @@ import {
 } from 'typedoc'
 import { tooLong } from './scripts/type-length.mts'
 
-const packages = ['schema', 'svg-drawings', 'importers', 'catalog', 'use-cases', 'api']
+const root = join(import.meta.dirname, '..', '..')
+// a package joins the reference with its typedoc.json, as in typedoc.config.mjs
+const packages = globSync('packages/*/typedoc.json', { cwd: root }).map(dirname).sort()
 // zod's own generics, linked from the doc comment to the inferred type
 const exempt = (type) => type.type === 'reference' && type.package === 'zod'
 
@@ -34,8 +37,8 @@ const longTypes = (project) =>
 
 let failed = false
 for (const name of packages) {
-  const dir = join(import.meta.dirname, '..', '..', 'packages', name)
-  console.log(`typedoc packages/${name}`)
+  const dir = join(root, name)
+  console.log(`typedoc ${name}`)
   process.chdir(dir)
   // the check writes nothing, so no source links: a clone without a git remote passes too
   const app = await Application.bootstrapWithPlugins(

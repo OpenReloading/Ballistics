@@ -12,6 +12,7 @@ import {
   useRef,
 } from 'react'
 
+/** The props of `AppFrame`. */
 export interface AppFrameProps {
   /** The product's name or mark, as a link home. */
   brand: ReactNode

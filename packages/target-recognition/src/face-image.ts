@@ -45,6 +45,7 @@ export const imageToGrid = (grid: Grid, p: Point): Point => ({
   y: (p.y + 0.5 - grid.top) / grid.blockSize - 0.5,
 })
 
+/** The mean luma (BT.601) and chroma of `image` over blocks of `s` px, within `area` (image px, the whole image when absent). */
 export function grayGrid(
   image: RgbaImage,
   s: number,

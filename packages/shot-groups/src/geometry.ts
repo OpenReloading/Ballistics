@@ -2,6 +2,7 @@
 
 import { InputError, nth } from '@rangefoundry/statistics'
 
+/** A point in the plane, image px or target units as the function says. */
 export type Point = { x: number; y: number }
 /** A 3 x 3 matrix in row-major order, acting on homogeneous points (x, y, 1). */
 export type Matrix = readonly number[]
@@ -27,8 +28,11 @@ export type Reference =
       height: number
     }
 
+/** The maps of a calibrated photo between image px and target coordinates, and the agreement of its references. */
 export type Calibration = {
+  /** Image px to target coordinates. */
   toTarget: Matrix
+  /** Target coordinates to image px. */
   toImage: Matrix
   /** Known over measured length per reference, in the order given. */
   factors: number[]
@@ -71,6 +75,7 @@ export function mul3(a: Matrix, b: Matrix): Mat3 {
   ]
 }
 
+/** The transpose of `m`. */
 export const transpose3 = (m: Matrix): Mat3 => {
   const k = nine(m)
   return [k[0], k[3], k[6], k[1], k[4], k[7], k[2], k[5], k[8]]
@@ -99,6 +104,7 @@ export const apply3 = (m: Matrix, v: Readonly<Vector3>): Vector3 => {
   ]
 }
 
+/** The determinant of `m`. */
 export const det3 = (m: Matrix): number => {
   const k = nine(m)
   return (
@@ -289,7 +295,9 @@ export function calibrate(
   return { toTarget, toImage: invertMatrix(toTarget), factors, scale, spread }
 }
 
+/** The target coordinates of image point `p`. */
 export const toTarget = (c: Calibration, p: Point): Point => applyMatrix(c.toTarget, p)
+/** The image px of target point `q`. */
 export const toImage = (c: Calibration, q: Point): Point => applyMatrix(c.toImage, q)
 
 /** Re-expressed after the calibration, rotation or origin changed, so it stays on the same photo point (the same hole). */

@@ -73,15 +73,14 @@ const themeFor = (mark: '.' | ',') =>
 const themes = { '.': themeFor('.'), ',': themeFor(',') }
 const resolver: CSSVariablesResolver = () => cssVariables
 
-/** The generated theme with the control sizes as component defaults, the scheme colors it cannot set and `i18n` holding `uiMessages` beside the app's own; `decimalMark` is the mark number inputs write (`.` when absent); only the color scheme besides, as Mantine's theme, class and variable props would undo ui.css or the tokens; load `@rangefoundry/ui/base.css` (or the app's own Mantine styles, tokens and font) and `@rangefoundry/ui/ui.css` with it. */
-export function UiProvider({
-  i18n,
-  decimalMark = '.',
-  ...props
-}: { i18n: I18n; decimalMark?: '.' | ',' } & Pick<
+/** The props of `UiProvider`: the catalogs, the decimal mark and Mantine's color scheme props. */
+export type UiProviderProps = { i18n: I18n; decimalMark?: '.' | ',' } & Pick<
   MantineProviderProps,
   'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'
->): ReactElement {
+>
+
+/** The generated theme with the control sizes as component defaults, the scheme colors it cannot set and `i18n` holding `uiMessages` beside the app's own; `decimalMark` is the mark number inputs write (`.` when absent); only the color scheme besides, as Mantine's theme, class and variable props would undo ui.css or the tokens; load `@rangefoundry/ui/base.css` (or the app's own Mantine styles, tokens and font) and `@rangefoundry/ui/ui.css` with it. */
+export function UiProvider({ i18n, decimalMark = '.', ...props }: UiProviderProps): ReactElement {
   return (
     <I18nProvider i18n={i18n}>
       <MantineProvider {...props} theme={themes[decimalMark]} cssVariablesResolver={resolver} />

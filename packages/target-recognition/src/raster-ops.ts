@@ -11,6 +11,7 @@ const f64 = (a: Float64Array, i: number) => a[i] as number
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const i32 = (a: Int32Array, i: number) => a[i] as number
 
+/** `v` limited to `lo` .. `hi`. */
 export const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v))
 
 export const rectangle = (r: { x: number; y: number; width: number; height: number }): Point[] => [

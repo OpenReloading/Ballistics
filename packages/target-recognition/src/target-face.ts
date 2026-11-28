@@ -410,6 +410,7 @@ export type FacePlane = {
   approximate: boolean
 }
 
+/** The plane of a printed face fitted to a photo, with that face. */
 export type FaceFit<F extends PrintedFace = PrintedFace> = FacePlane & { face: F }
 
 type Member = { ellipse: Ellipse; radius: number; arc: number }
@@ -583,6 +584,7 @@ function misfitOf(m: Member, toFace: Matrix): number {
   return Math.sqrt(sum / 48)
 }
 
+/** What a search of a photo for a printed face found: the black area, the rings and the candidate faces. */
 export type FaceSearch<F extends PrintedFace = PrintedFace> = {
   /** The black area found, image px. */
   black?: Ellipse

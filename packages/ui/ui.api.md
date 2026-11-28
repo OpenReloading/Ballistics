@@ -15,7 +15,7 @@ import { ReactNode } from 'react';
 // @public
 export function AppFrame(input: AppFrameProps): ReactElement;
 
-// @public (undocumented)
+// @public
 export interface AppFrameProps {
     account?: ReactNode;
     brand: ReactNode;
@@ -27,9 +27,7 @@ export interface AppFrameProps {
 
 // @public
 export interface ArrayColumns<Row> {
-    // (undocumented)
     matches(row: Row, id: string, value: unknown): boolean;
-    // (undocumented)
     sortKey(row: Row, id: string): string | number;
 }
 
@@ -71,14 +69,13 @@ export interface DataQuery {
 
 // @public
 export interface DataSource<Row> {
-    // (undocumented)
     query(query: DataQuery, signal?: AbortSignal): Promise<DataPage<Row>>;
 }
 
 // @public
 export function NavItem(input: NavItemProps): ReactElement;
 
-// @public (undocumented)
+// @public
 export interface NavItemProps extends Omit<ComponentPropsWithRef<'a'>, 'children'> {
     icon: LucideIcon;
     // (undocumented)
@@ -88,7 +85,7 @@ export interface NavItemProps extends Omit<ComponentPropsWithRef<'a'>, 'children
 // @public
 export function PageBar(input: PageBarProps): ReactElement;
 
-// @public (undocumented)
+// @public
 export interface PageBarProps {
     actions?: ReactNode;
     status?: ReactNode;
@@ -105,10 +102,13 @@ export const RifleIcon: LucideIcon;
 export const uiMessages: Record<'en' | 'de', Messages>;
 
 // @public
-export function UiProvider(input: {
+export function UiProvider(input: UiProviderProps): ReactElement;
+
+// @public
+export type UiProviderProps = {
     i18n: I18n;
     decimalMark?: '.' | ',';
-} & Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
+} & Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>;
 
 // (No @packageDocumentation comment for this package)
 

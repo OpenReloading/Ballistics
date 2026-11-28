@@ -10,7 +10,7 @@ import { Matrix } from '@rangefoundry/shot-groups';
 import { Point } from '@rangefoundry/shot-groups';
 import { z } from 'zod';
 
-// @public (undocumented)
+// @public
 export const clamp: (v: number, lo: number, hi: number) => number;
 
 // @public
@@ -30,7 +30,7 @@ export type CorrectionStats = {
 // @public
 export function correctionStats(perPhoto: readonly number[]): CorrectionStats;
 
-// @public (undocumented)
+// @public
 export type FaceFit<F extends PrintedFace = PrintedFace> = FacePlane & {
     face: F;
 };
@@ -72,7 +72,7 @@ export type FacePlane = {
     approximate: boolean;
 };
 
-// @public (undocumented)
+// @public
 export type FaceSearch<F extends PrintedFace = PrintedFace> = {
     black?: Ellipse;
     ellipses: Ellipse[];
@@ -107,7 +107,7 @@ export type FlaggedRegion = {
     holeAreas: number;
 };
 
-// @public (undocumented)
+// @public
 export function grayGrid(image: RgbaImage, s: number, area?: {
     x0: number;
     y0: number;

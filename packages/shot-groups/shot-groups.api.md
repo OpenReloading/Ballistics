@@ -24,7 +24,7 @@ export function applyMatrix(m: Matrix, p: Point): Point;
 // @public
 export function calibrate(references: readonly Reference[], rotation: number, origin: Point): Calibration;
 
-// @public (undocumented)
+// @public
 export type Calibration = {
     toTarget: Matrix;
     toImage: Matrix;
@@ -55,7 +55,7 @@ export type Conic = readonly [number, number, number, number, number, number];
 // @public
 export function conicOf(input: Ellipse): Conic;
 
-// @public (undocumented)
+// @public
 export const det3: (m: Matrix) => number;
 
 // @public
@@ -576,7 +576,7 @@ export type RingMarks = {
 // @public
 export function ringPath(a: FaceAlignment, diameter: number): Point[];
 
-// @public (undocumented)
+// @public
 export type RingScore = {
     value: number;
     decimal?: number;
@@ -704,16 +704,16 @@ export interface StageScore {
 // @public
 export function subtendedAngle(length: number, distance: number): number;
 
-// @public (undocumented)
+// @public
 export const toImage: (c: Calibration, q: Point) => Point;
 
 // @public
 export function toMatrix(v: readonly number[]): Mat3;
 
-// @public (undocumented)
+// @public
 export const toTarget: (c: Calibration, p: Point) => Point;
 
-// @public (undocumented)
+// @public
 export const transpose3: (m: Matrix) => Mat3;
 
 // @public
