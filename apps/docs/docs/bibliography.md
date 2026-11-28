@@ -132,7 +132,7 @@ Measurement data imported as values carry their license: public domain in the US
 
 ## Component data sources
 
-Cited by the manufacturer and case capacity records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities and cartridge primer sizes cite. The makers hold the rights to their publications, and the records carry no project license on what the makers published (`packages/catalog/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
+Cited by the manufacturer and case capacity records, grouped by maker or publisher, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities and cartridge primer sizes cite. The makers hold the rights to their publications, and the records carry no project license on what the makers published (`packages/catalog/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
 
 ### ADI World Class Powders
 
@@ -212,8 +212,13 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 - Hammer Bullets store (WooCommerce Store API).
 - Hammer Bullets, about page. <https://hammerbullets.com/about-us/>
 
+### Handloader
+
+- Handloader, "6.8 Western". <https://www.handloadermagazine.com/6-8-western>
+
 ### Hodgdon Powder Co.
 
+- Hodgdon Powder Co., "Handloading the New 7mm PRC". <https://hodgdonpowderco.com/articles/handloading-the-new-7mm-prc/>
 - Hodgdon Powder Co. product page, 700X® Shotshell Powder.
 - Hodgdon Powder Co. product page, Accurate 1680® Rifle Powder.
 - Hodgdon Powder Co. product page, Ramshot Big Game® Rifle Powder.
@@ -398,6 +403,11 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Shooters World
 
 - Shooters World, burn rate chart (image). <https://shootersworldpowder.com/wp-content/uploads/2025/03/burn-rate-chart.png>
+
+### Shooting Times
+
+- Shooting Times, "6.5 PRC vs. Other 6.5mm Cartridges", 2020-02-10. <https://www.shootingtimes.com/editorial/65-prc-vs-other-65mm-cartridges/372107>
+- Shooting Times, "6.8 Western: What You Need to Know About the .277-Caliber Cartridge", 2021-06-02. <https://www.shootingtimes.com/editorial/68-western-short-action-277-caliber-cartridge/393061>
 
 ### Sierra Bullets
 

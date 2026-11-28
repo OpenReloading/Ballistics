@@ -369,6 +369,7 @@
     }
   ],
   "defaults": {
+    "capacity": "catalogue:6-8-western-shooting-times",
     "primerSize": "large-rifle"
   },
   "provenance": {

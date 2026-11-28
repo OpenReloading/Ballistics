@@ -369,6 +369,9 @@
       "value": 40.39
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:7-mm-precision-rifle-cartridge-hodgdon"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

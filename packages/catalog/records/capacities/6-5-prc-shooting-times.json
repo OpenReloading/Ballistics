@@ -1,0 +1,22 @@
+{
+  "id": "6-5-prc-shooting-times",
+  "origin": "catalogue",
+  "cartridge": "catalogue:6-5-prc",
+  "fillLevel": "mouth",
+  "waterCapacity": {
+    "value": 4.38
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "6.5 PRC vs. Other 6.5mm Cartridges",
+        "publisher": "Shooting Times",
+        "edition": "2020-02-10",
+        "url": "https://www.shootingtimes.com/editorial/65-prc-vs-other-65mm-cartridges/372107",
+        "retrieved": "2026-11-18",
+        "terms": "https://www.outdoorsg.com/about/terms-of-service/"
+      }
+    ]
+  }
+}
