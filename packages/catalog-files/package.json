@@ -1,0 +1,45 @@
+{
+  "name": "@rangefoundry/catalog-files",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reads and validates folders of RangeFoundry catalogue record files into the catalog bundle.",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "packages/catalog-files"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/records.d.ts",
+      "default": "./dist/records.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "publint --strict && attw --pack . --profile esm-only"
+  },
+  "dependencies": {
+    "@rangefoundry/catalog": "workspace:*",
+    "@rangefoundry/schema": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "catalog:",
+    "@types/node": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

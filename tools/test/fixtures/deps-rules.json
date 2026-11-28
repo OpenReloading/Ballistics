@@ -176,7 +176,7 @@
     "rules": []
   },
   "apps/cli/src/libraries.ts": {
-    "source": "import { interior } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@rangefoundry/catalog'\nimport { seat } from '@rangefoundry/svg-drawings/seating'\nimport { toSi } from '@rangefoundry/schema'\nimport { readRecords } from '@rangefoundry/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
+    "source": "import { interior } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@rangefoundry/catalog'\nimport { seat } from '@rangefoundry/svg-drawings/seating'\nimport { toSi } from '@rangefoundry/schema'\nimport { readRecords } from '@rangefoundry/catalog-files'\nexport { interior, checkRecords, seat, toSi, readRecords }",
     "rules": []
   },
   "apps/cli/src/api.ts": {

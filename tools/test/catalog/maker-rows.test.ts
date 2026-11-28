@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { makerRows } from '@rangefoundry/catalog'
 import { describe, expect, it } from 'vitest'
-import { readRecords, validateRecords } from '../../src/catalog/records.ts'
+import { readRecords, validateRecords } from '../../src/catalog/catalog-records.ts'
 
 describe('the committed records', () => {
   it('cite no maker source the public catalog refuses, except the manufacturer records', () => {

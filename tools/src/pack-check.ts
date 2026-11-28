@@ -8,7 +8,7 @@ import { parse } from 'yaml'
 import { executable } from './executable.ts'
 
 /** The workspaces published to npm. */
-const published = ['schema', 'svg-drawings', 'importers', 'catalog']
+const published = ['schema', 'svg-drawings', 'importers', 'catalog', 'catalog-files']
 
 /** The fields of package.json the check reads. */
 interface Manifest {

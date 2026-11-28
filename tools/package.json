@@ -4,9 +4,6 @@
   "private": true,
   "license": "AGPL-3.0-only",
   "type": "module",
-  "exports": {
-    "./catalog": "./src/catalog/records.ts"
-  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "api-check": "f=\"${TMPDIR:-/tmp}/openapi.json\" && TMPDIR=\"${TMPDIR:-/tmp}\" node src/openapi.ts && oasdiff breaking ../packages/api/openapi.baseline.json \"$f\" --fail-on ERR",
@@ -23,8 +20,8 @@
   "dependencies": {
     "@rangefoundry/api": "workspace:*",
     "@rangefoundry/catalog": "workspace:*",
-    "@rangefoundry/schema": "workspace:*",
-    "zod": "catalog:"
+    "@rangefoundry/catalog-files": "workspace:*",
+    "@rangefoundry/schema": "workspace:*"
   },
   "devDependencies": {
     "@rangefoundry/svg-drawings": "workspace:*",

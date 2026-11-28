@@ -34,7 +34,7 @@ import example from '!../../examples/catalog/plausibility.ts?raw'
 
 ## Reading a records folder
 
-The reader that validates a folder laid out as `packages/catalog/records/` into the bundle is repository tooling, not part of the package: `readRecords` of `tools/src/catalog/records.ts`, which `pnpm run data:validate` and the package build run. It reads the files and runs `checkRecords` on them. `errors` fail the validation. `warnings` are plausibility findings of published loads, which stay as printed and do not fail it.
+The reader that validates a folder laid out as `packages/catalog/records/` into the bundle is not part of the package: `readRecords` of `@rangefoundry/catalog-files`, which `pnpm run data:validate` and the package build run. It reads the files and runs `checkRecords` on them. `errors` fail the validation. `warnings` are plausibility findings of published loads, which stay as printed and do not fail it.
 
 ## Reference
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readRecords } from '../../src/catalog/records.ts'
+import { readRecords } from '../../src/catalog/catalog-records.ts'
 
 describe('the caliber class records', () => {
   const { bundle, errors } = readRecords()

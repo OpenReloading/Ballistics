@@ -1,4 +1,4 @@
-import { validateRecords } from './records.ts'
+import { validateRecords } from './catalog-records.ts'
 
 const { bundle, errors, warnings } = validateRecords()
 for (const error of errors) console.error(error)
