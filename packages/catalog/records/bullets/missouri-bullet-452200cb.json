@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-452200cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452200CB",
+  "name": "Cowboy #4, 200 Grain RNFP",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 13.77
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

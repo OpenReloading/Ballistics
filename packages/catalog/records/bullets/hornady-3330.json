@@ -1,0 +1,25 @@
+{
+  "id": "hornady-3330",
+  "manufacturer": "hornady",
+  "productNumber": "3330",
+  "name": "338 Cal. RN, .338, 250 gr",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 16.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "87",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

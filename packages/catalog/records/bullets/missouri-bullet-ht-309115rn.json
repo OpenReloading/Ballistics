@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-309115rn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-309115RN",
+  "name": "#1 Carbine - Hi-Tek, 115 Grain RN",
+  "caliber": ".309",
+  "diameter": {
+    "value": 7.849
+  },
+  "mass": {
+    "value": 7.452
+  },
+  "length": {
+    "value": 17.25
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

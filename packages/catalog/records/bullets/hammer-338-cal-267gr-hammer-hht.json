@@ -1,0 +1,47 @@
+{
+  "id": "hammer-338-cal-267gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869042153",
+  "name": ".338 Cal-267gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 17.301
+  },
+  "length": {
+    "value": 47.63
+  },
+  "noseLength": {
+    "value": 24.41
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.334
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

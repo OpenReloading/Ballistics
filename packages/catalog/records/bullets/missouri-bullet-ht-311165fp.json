@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-311165fp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-311165FP",
+  "name": "#4 Whitetail - Hi-Tek, 165 Grain RNFP",
+  "caliber": ".311",
+  "diameter": {
+    "value": 7.899
+  },
+  "mass": {
+    "value": 10.692
+  },
+  "length": {
+    "value": 23.52
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

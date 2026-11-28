@@ -1,0 +1,50 @@
+{
+  "id": "cutting-edge-lzr-264-125",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 264 125",
+  "name": "LZR 264 125 (Lazer, 125 gr)",
+  "productLine": "Lazer",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.1
+  },
+  "length": {
+    "value": 36.65
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.52
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.532
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.273
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.269
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

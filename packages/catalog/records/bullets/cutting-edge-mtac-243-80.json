@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-mtac-243-80",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 243 80",
+  "name": "MTAC 243 80 (MTAC, 80 gr)",
+  "productLine": "MTAC",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 5.184
+  },
+  "length": {
+    "value": 26.44
+  },
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

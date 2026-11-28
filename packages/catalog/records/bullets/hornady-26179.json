@@ -1,0 +1,35 @@
+{
+  "id": "hornady-26179",
+  "manufacturer": "hornady",
+  "productNumber": "26179",
+  "name": "6.5mm A-Tip Match, .264, 135 gr",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.748
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.637
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.321
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "72",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

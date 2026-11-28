@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v339052",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339052",
+  "name": "FMJ, .308, 200 gr (bullet 2950)",
+  "productLine": "FMJ",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

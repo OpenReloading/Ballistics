@@ -1,0 +1,51 @@
+{
+  "id": "hornady-30507",
+  "manufacturer": "hornady",
+  "productNumber": "30507",
+  "name": "30 Cal. HPBT AEROMATCH, .308, 168 gr",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.44
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.221
+    }
+  ],
+  "recommendedTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "77",
+        "fields": ["diameter", "mass", "base.type", "tip.type", "ballisticCoefficients"]
+      },
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["recommendedTwist"]
+      }
+    ]
+  }
+}

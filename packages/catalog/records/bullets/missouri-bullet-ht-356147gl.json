@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-356147gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-356147GL",
+  "name": "SubSonic-Grooveless, 147 Grain FP - Grooveless",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042
+  },
+  "mass": {
+    "value": 9.525
+  },
+  "length": {
+    "value": 16.51
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "sierra-7331",
+  "manufacturer": "sierra",
+  "productNumber": "7331",
+  "name": "25 CAL 131 GR Tipped GameKing (TGK)",
+  "caliber": "0.257",
+  "country": "US",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 8.489
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/25-cal-131-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "construction.raw"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

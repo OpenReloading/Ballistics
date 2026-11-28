@@ -1,0 +1,51 @@
+{
+  "id": "hammer-264-cal-139gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "896",
+  "name": ".264 Cal-139gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.748
+  },
+  "length": {
+    "value": 36.07
+  },
+  "noseLength": {
+    "value": 15.3
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.219
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.448
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

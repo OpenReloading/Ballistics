@@ -1,0 +1,29 @@
+{
+  "id": "cutting-edge-dgsc-g130",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGSC G130",
+  "name": "DGSC G130 (Safari Raptor, Solid & Lever+, 130 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.424
+  },
+  "length": {
+    "value": 29.36
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

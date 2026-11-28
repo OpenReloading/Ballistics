@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v319622",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319622",
+  "name": "FMJ, .308, 85 gr (for 7.62 × 25 TOKAREV)",
+  "productLine": "FMJ",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 5.508
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-lzr-308-200-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 308 200 MAX",
+  "name": "LZR 308 200 MAX (Lazer, 200 gr)",
+  "productLine": "Lazer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 43.05
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.59
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.295
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

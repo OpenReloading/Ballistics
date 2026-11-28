@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-430210cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-430210CB",
+  "name": "Cowboy #20 - Black Powder, 210 Grain RNFP-FB",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 13.608
+  },
+  "length": {
+    "value": 15.32
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

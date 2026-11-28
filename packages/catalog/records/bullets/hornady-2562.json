@@ -1,0 +1,35 @@
+{
+  "id": "hornady-2562",
+  "manufacturer": "hornady",
+  "productNumber": "2562",
+  "name": "25 Cal. A-Tip Match, .257, 138 gr",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528
+  },
+  "mass": {
+    "value": 8.942
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.695
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.35
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "72",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

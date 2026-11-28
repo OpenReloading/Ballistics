@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-lzr-416-475-max-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 416 475 MAX GEN2",
+  "name": "LZR 416 475 MAX GEN2 (Lazer, 475 gr)",
+  "productLine": "Lazer",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566
+  },
+  "mass": {
+    "value": 30.779
+  },
+  "length": {
+    "value": 58.24
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.883
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.453
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "sierra-1755",
+  "manufacturer": "sierra",
+  "productNumber": "1755",
+  "name": "6.5MM 150 GR HPBT/CN MatchKing (SMK)",
+  "caliber": "0.264",
+  "country": "US",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.713
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.354
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-150-gr-hpbt-cn-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

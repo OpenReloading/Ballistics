@@ -1,0 +1,47 @@
+{
+  "id": "hammer-243-cal-075gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869040169",
+  "name": ".243 Cal-075gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 4.86
+  },
+  "length": {
+    "value": 26.42
+  },
+  "noseLength": {
+    "value": 13.79
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.173
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-264-125-fcg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.264 125 FCG",
+  "name": "M.264 125 FCG (MAXIMUS, 125 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.1
+  },
+  "length": {
+    "value": 33.96
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.44
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.22
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

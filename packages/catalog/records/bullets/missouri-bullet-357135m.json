@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-357135m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "357135M",
+  "name": "IDP #8, 135 Grain RN",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 8.748
+  },
+  "length": {
+    "value": 15.75
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

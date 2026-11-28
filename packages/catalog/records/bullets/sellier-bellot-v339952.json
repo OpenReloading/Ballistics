@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v339952",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339952",
+  "name": "TXRG, .366, 250 gr (bullet 2991)",
+  "productLine": "TXRG",
+  "caliber": ".366",
+  "diameter": {
+    "value": 9.296
+  },
+  "mass": {
+    "value": 16.2
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.43
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

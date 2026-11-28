@@ -1,0 +1,37 @@
+{
+  "id": "hammer-366-9-3mm-cal-258gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "2326",
+  "name": ".366 (9.3mm) Cal-258gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".366",
+  "diameter": {
+    "value": 9.296
+  },
+  "mass": {
+    "value": 16.718
+  },
+  "length": {
+    "value": 36.58
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.433
+    }
+  ],
+  "slowestTwist": {
+    "value": 368.3
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

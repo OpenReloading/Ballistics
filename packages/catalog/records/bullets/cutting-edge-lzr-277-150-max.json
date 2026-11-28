@@ -1,0 +1,50 @@
+{
+  "id": "cutting-edge-lzr-277-150-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 277 150 MAX",
+  "name": "LZR 277 150 MAX (Lazer, 150 gr)",
+  "productLine": "Lazer",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "length": {
+    "value": 39.55
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.579
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.573
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.297
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.288
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

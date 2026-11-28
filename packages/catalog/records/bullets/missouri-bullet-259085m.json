@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-259085m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "259085M",
+  "name": "#1 .25-20, 85 Grain RNFP",
+  "caliber": ".259",
+  "diameter": {
+    "value": 6.579
+  },
+  "mass": {
+    "value": 5.508
+  },
+  "length": {
+    "value": 17.63
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

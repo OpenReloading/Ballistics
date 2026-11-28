@@ -2,5 +2,6 @@
   "id": "hornady-2026-product-catalog",
   "title": "Hornady 2026 Product Catalog",
   "publisher": "Hornady Manufacturing",
-  "origin": "manufacturer"
+  "origin": "manufacturer",
+  "terms": "https://www.hornady.com/terms-of-use"
 }

@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-esp-k300-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP K300 Raptor",
+  "name": "ESP K300 Raptor (ESP Raptor, 300 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744
+  },
+  "mass": {
+    "value": 19.44
+  },
+  "length": {
+    "value": 40.16
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.32
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "8",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

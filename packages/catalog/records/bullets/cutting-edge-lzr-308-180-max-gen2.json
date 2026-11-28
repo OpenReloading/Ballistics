@@ -1,0 +1,50 @@
+{
+  "id": "cutting-edge-lzr-308-180-max-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 308 180 MAX GEN2",
+  "name": "LZR 308 180 MAX GEN2 (Lazer, 180 gr)",
+  "productLine": "Lazer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "length": {
+    "value": 39.67
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.544
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.537
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.279
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.265
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

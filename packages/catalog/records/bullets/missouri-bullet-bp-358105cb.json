@@ -1,0 +1,24 @@
+{
+  "id": "missouri-bullet-bp-358105cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-358105CB",
+  "name": "Cowboy #16 - Black Powder, 105 Grain TCFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 6.804
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

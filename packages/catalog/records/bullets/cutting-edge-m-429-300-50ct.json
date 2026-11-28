@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-429-300-50ct",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.429 300 50ct",
+  "name": "M.429 300 50ct (MAXIMUS, 300 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".429",
+  "diameter": {
+    "value": 10.897
+  },
+  "mass": {
+    "value": 19.44
+  },
+  "length": {
+    "value": 31.17
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.357
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.179
+    }
+  ],
+  "slowestTwist": {
+    "value": 508
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

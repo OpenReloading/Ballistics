@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-311167gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-311167GL",
+  "name": "#1 Russian-Grooveless, 167 Grain FP - Grooveless",
+  "caliber": ".312",
+  "diameter": {
+    "value": 7.925
+  },
+  "mass": {
+    "value": 10.821
+  },
+  "length": {
+    "value": 22.83
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

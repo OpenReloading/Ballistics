@@ -1,0 +1,25 @@
+{
+  "id": "hornady-3232",
+  "manufacturer": "hornady",
+  "productNumber": "3232",
+  "name": "8mm SP, .323, 150 gr",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "87",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

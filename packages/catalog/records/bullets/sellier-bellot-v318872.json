@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v318872",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318872",
+  "name": "FMJ, .452, 230 gr (for 45 AUTO, 45 GAP)",
+  "productLine": "FMJ",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 14.904
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

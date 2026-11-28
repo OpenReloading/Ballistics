@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-365093m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "365093M",
+  "name": "Makarov, 93 Grain RN",
+  "caliber": ".365",
+  "diameter": {
+    "value": 9.271
+  },
+  "mass": {
+    "value": 6.026
+  },
+  "length": {
+    "value": 10.57
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

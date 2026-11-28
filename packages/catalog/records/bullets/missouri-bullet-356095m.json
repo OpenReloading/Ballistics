@@ -1,0 +1,24 @@
+{
+  "id": "missouri-bullet-356095m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356095M",
+  "name": ".380, 95 Grain RN",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042
+  },
+  "mass": {
+    "value": 6.156
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

@@ -174,6 +174,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Hornady Manufacturing
 
 - Hornady 2026 Product Catalog.
+- Hornady, rifle bullet product page. <https://www.hornady.com/bullets/rifle/30-cal-308-168-gr-bthp-match>
 - Hornady, contact page. <https://www.hornady.com/contact>
 
 ### IMR
@@ -224,6 +225,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Sellier & Bellot
 
 - Sellier & Bellot, component bullets (pistol and revolver table).
+- Sellier & Bellot, component bullets (rifle table).
 - Sellier & Bellot, contacts page. <https://www.sellier-bellot.cz/en/contacts/>
 
 ### Sierra Bullets
@@ -249,6 +251,10 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Winchester
 
 - Winchester SDS "BALL Powder Propellant", November 2022 (inner sheet St. Marks Powder, revision 10, 12/11/2021).
+
+### Own methods
+
+- Mapping of the maker wording to bullet construction fields. <https://openreloading.github.io/Ballistics/docs/data/bullet-construction>
 
 ### Wikipedia
 

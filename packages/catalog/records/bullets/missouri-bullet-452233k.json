@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-452233k",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452233K",
+  "name": "K-Ball, 233 Grain RN",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 15.098
+  },
+  "length": {
+    "value": 17.86
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

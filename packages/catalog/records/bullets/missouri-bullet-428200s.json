@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-428200s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "428200S",
+  "name": ".44-40, 200 Grain RNFP",
+  "caliber": ".428",
+  "diameter": {
+    "value": 10.871
+  },
+  "mass": {
+    "value": 12.96
+  },
+  "length": {
+    "value": 15.11
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "hornady-41051",
+  "manufacturer": "hornady",
+  "productNumber": "41051",
+  "name": "405 Cal. SP (405 Win), .411, 300 gr",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439
+  },
+  "mass": {
+    "value": 19.44
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "87",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

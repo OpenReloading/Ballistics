@@ -1,0 +1,25 @@
+{
+  "id": "hornady-32005",
+  "manufacturer": "hornady",
+  "productNumber": "32005",
+  "name": "32 Cal. FTX (32 Win Spl), .321, 165 gr",
+  "caliber": ".321",
+  "diameter": {
+    "value": 8.153
+  },
+  "mass": {
+    "value": 10.692
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "94",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

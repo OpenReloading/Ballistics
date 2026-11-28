@@ -1,0 +1,47 @@
+{
+  "id": "hammer-284-cal-67gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869058756",
+  "name": ".284 Cal-067gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 4.342
+  },
+  "length": {
+    "value": 17.02
+  },
+  "noseLength": {
+    "value": 11.15
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.158
+    }
+  ],
+  "slowestTwist": {
+    "value": 431.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

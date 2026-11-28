@@ -1,0 +1,29 @@
+{
+  "id": "cutting-edge-mth-550-600",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 550 600",
+  "name": "MTH 550 600 (MTH, 600 gr)",
+  "productLine": "MTH",
+  "caliber": ".550",
+  "diameter": {
+    "value": 13.97
+  },
+  "mass": {
+    "value": 38.879
+  },
+  "length": {
+    "value": 37.13
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "hammer-338-cal-245gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869065959",
+  "name": ".338 Cal-245gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 15.876
+  },
+  "length": {
+    "value": 47.63
+  },
+  "noseLength": {
+    "value": 26.95
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.366
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.731
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

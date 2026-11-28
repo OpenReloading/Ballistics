@@ -1,0 +1,29 @@
+{
+  "id": "cutting-edge-dgbr-y04ne",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR Y04NE",
+  "name": "DGBR Y04NE (Safari Raptor, Solid & Lever+, 650 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".585",
+  "diameter": {
+    "value": 14.859
+  },
+  "mass": {
+    "value": 42.119
+  },
+  "length": {
+    "value": 31.93
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "10",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-lzr-458-575-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 458 575 MAX",
+  "name": "LZR 458 575 MAX (Lazer, 575 gr)",
+  "productLine": "Lazer",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633
+  },
+  "mass": {
+    "value": 37.259
+  },
+  "length": {
+    "value": 59.74
+  },
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "4",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

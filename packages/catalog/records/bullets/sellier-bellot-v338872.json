@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338872",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338872",
+  "name": "SP, .312, 150 gr (bullet 2939)",
+  "productLine": "SP",
+  "caliber": ".312",
+  "diameter": {
+    "value": 7.925
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.309
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

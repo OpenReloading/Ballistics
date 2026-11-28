@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-fb-r180-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB R180 Raptor",
+  "name": "FB R180 Raptor (Flat Base Raptor, 180 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566
+  },
+  "mass": {
+    "value": 11.664
+  },
+  "length": {
+    "value": 27.91
+  },
+  "slowestTwist": {
+    "value": 431.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-er-l235",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER L235",
+  "name": "ER L235 (ER Raptor, 235 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525
+  },
+  "mass": {
+    "value": 15.228
+  },
+  "length": {
+    "value": 38.58
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.337
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "7",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

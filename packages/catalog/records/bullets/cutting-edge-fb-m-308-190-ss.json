@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-fb-m-308-190-ss",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB M.308 190 SS",
+  "name": "FB M.308 190 SS (MAXIMUS, 190 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 12.312
+  },
+  "length": {
+    "value": 37.13
+  },
+  "slowestTwist": {
+    "value": 228.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

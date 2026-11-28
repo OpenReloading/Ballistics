@@ -7,7 +7,11 @@ it; data from a source without one is CC BY-SA 4.0.
 
 Exceptions: records of data a manufacturer published (a source with `origin` `manufacturer`, such as a
 load table) carry no project license: the manufacturer's own terms apply, as its source states them
-in `terms`. Parameters fitted to such data (`interior` of a powder, sources of kind `fitted`) are the project's own result and fall under CC BY-SA 4.0.
+in `terms`. The same holds for the bullet and powder records of facts a maker or another publisher
+prints (`records/bullets/` and `records/powders/`, except the `demo-` records): the project claims no
+rights in these facts and grants none, and the publisher's terms apply, as each citation links them
+in `terms` (LicenseRef-Published-Facts, ../../LICENSES/LicenseRef-Published-Facts.txt). Values a
+citation marks as derived, computed or fitted are the project's own result and fall under CC BY-SA 4.0. Parameters fitted to such data (`interior` of a powder, sources of kind `fitted`) are the project's own result and fall under CC BY-SA 4.0.
 
 Third-party facts: CC BY-SA 4.0 covers only the project's own selection, structure and drawings.
 The project claims no rights in facts taken from third-party sources (C.I.P. sheets, federation

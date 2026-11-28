@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-fb-338-345-ss",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 338 345 SS",
+  "name": "FB 338 345 SS (Flat Base Raptor, 345 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 22.356
+  },
+  "length": {
+    "value": 56.11
+  },
+  "slowestTwist": {
+    "value": 177.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

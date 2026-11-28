@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-mtac-243-90-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 243 90 MAX",
+  "name": "MTAC 243 90 MAX (MTAC, 90 gr)",
+  "productLine": "MTAC",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172
+  },
+  "mass": {
+    "value": 5.832
+  },
+  "length": {
+    "value": 30.02
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.43
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

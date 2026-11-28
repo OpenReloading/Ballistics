@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-er-h82-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER H82 Raptor",
+  "name": "ER H82 Raptor (ER Raptor, 82 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036
+  },
+  "mass": {
+    "value": 5.314
+  },
+  "length": {
+    "value": 26.67
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.203
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "7",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "hammer-357-cal-150gr-jack-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869035325",
+  "name": ".357 Cal-150gr Jack Hammer®",
+  "productLine": "Jack Hammer",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "length": {
+    "value": 19.94
+  },
+  "noseLength": {
+    "value": 9.48
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.224
+    }
+  ],
+  "slowestTwist": {
+    "value": 558.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

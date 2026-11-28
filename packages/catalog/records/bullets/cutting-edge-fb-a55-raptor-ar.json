@@ -1,0 +1,38 @@
+{
+  "id": "cutting-edge-fb-a55-raptor-ar",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB A55 Raptor- AR",
+  "name": "FB A55 Raptor- AR (Flat Base Raptor, 55 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 3.564
+  },
+  "length": {
+    "value": 21.01
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

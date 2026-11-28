@@ -1,0 +1,25 @@
+{
+  "id": "hornady-44202",
+  "manufacturer": "hornady",
+  "productNumber": "44202",
+  "name": "44 Cal. DGH, .430, 240 gr",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922
+  },
+  "mass": {
+    "value": 15.552
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "99",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

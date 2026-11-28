@@ -1,0 +1,47 @@
+{
+  "id": "hammer-264-cal-112gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869047606",
+  "name": ".264 Cal-112gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 7.257
+  },
+  "length": {
+    "value": 33.02
+  },
+  "noseLength": {
+    "value": 16.99
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.219
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "sierra-1940",
+  "manufacturer": "sierra",
+  "productNumber": "1940",
+  "name": "7MM 175 GR SBT GameKing (SGK)",
+  "caliber": "0.284",
+  "country": "US",
+  "diameter": {
+    "value": 7.214
+  },
+  "mass": {
+    "value": 11.34
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.533
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.271
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/7mm-175-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

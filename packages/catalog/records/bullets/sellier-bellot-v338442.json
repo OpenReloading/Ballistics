@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338442",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338442",
+  "name": "SP, .264, 156 gr (bullet 2926)",
+  "productLine": "SP",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 10.109
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.456
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

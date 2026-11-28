@@ -1,0 +1,29 @@
+{
+  "id": "cutting-edge-dgbr-hp-k05ca",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP K05CA",
+  "name": "DGBR-HP K05CA (Flat Base Raptor, 257 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744
+  },
+  "mass": {
+    "value": 16.653
+  },
+  "length": {
+    "value": 34.62
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "6",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

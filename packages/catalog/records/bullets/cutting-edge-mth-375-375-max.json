@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mth-375-375-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 375 375 MAX",
+  "name": "MTH 375 375 MAX (MTH, 375 gr)",
+  "productLine": "MTH",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525
+  },
+  "mass": {
+    "value": 24.3
+  },
+  "length": {
+    "value": 53.31
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.86
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.432
+    }
+  ],
+  "slowestTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

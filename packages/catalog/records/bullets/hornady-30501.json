@@ -1,0 +1,62 @@
+{
+  "id": "hornady-30501",
+  "manufacturer": "hornady",
+  "productNumber": "30501",
+  "name": "30 Cal .308 168 gr BTHP Match",
+  "productLine": "Match",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ogive": {
+    "form": "secant"
+  },
+  "construction": {
+    "raw": "AMP jacket, swaged lead core",
+    "structure": "cup-and-core",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.45
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hornady Manufacturing",
+        "publisher": "Hornady Manufacturing",
+        "url": "https://www.hornady.com/bullets/rifle/30-cal-308-168-gr-bthp-match",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ogive.form", "base.type", "tip.type", "construction.raw"],
+        "terms": "https://www.hornady.com/terms-of-use"
+      },
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "page": "78",
+        "fields": ["ballisticCoefficients"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.structure", "construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

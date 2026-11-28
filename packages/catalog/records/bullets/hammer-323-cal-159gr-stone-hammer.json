@@ -1,0 +1,37 @@
+{
+  "id": "hammer-323-cal-159gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "847",
+  "name": ".323 Cal-159gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204
+  },
+  "mass": {
+    "value": 9.979
+  },
+  "length": {
+    "value": 29.21
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.345
+    }
+  ],
+  "slowestTwist": {
+    "value": 368.3
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

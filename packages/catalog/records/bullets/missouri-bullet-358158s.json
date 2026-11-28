@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-358158s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "358158S",
+  "name": ".38 Match, 158 Grain SWC",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093
+  },
+  "mass": {
+    "value": 10.238
+  },
+  "length": {
+    "value": 18.01
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

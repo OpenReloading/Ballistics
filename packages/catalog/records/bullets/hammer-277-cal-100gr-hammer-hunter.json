@@ -1,0 +1,51 @@
+{
+  "id": "hammer-277-cal-100gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027588",
+  "name": ".277 Cal-100gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "length": {
+    "value": 26.16
+  },
+  "noseLength": {
+    "value": 15.67
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.155
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.31
+    }
+  ],
+  "slowestTwist": {
+    "value": 292.1
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "missouri-bullet-ht-309215blk",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-309215BLK",
+  "name": "OEM Blackout-Grooveless, 215 Grain FP - Grooveless",
+  "caliber": ".309",
+  "diameter": {
+    "value": 7.849
+  },
+  "mass": {
+    "value": 13.932
+  },
+  "length": {
+    "value": 30.66
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "construction.raw"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.unmapped"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

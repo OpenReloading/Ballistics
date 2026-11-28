@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-476340rnfp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "476340RNFP",
+  "name": ".475 Thumper, 340 Grain RNFP-Flat Base",
+  "caliber": ".476",
+  "diameter": {
+    "value": 12.09
+  },
+  "mass": {
+    "value": 22.032
+  },
+  "length": {
+    "value": 20.93
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

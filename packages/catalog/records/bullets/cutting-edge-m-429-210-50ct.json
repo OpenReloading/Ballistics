@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-m-429-210-50ct",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.429 210 50ct",
+  "name": "M.429 210 50ct (MAXIMUS, 210 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".429",
+  "diameter": {
+    "value": 10.897
+  },
+  "mass": {
+    "value": 13.608
+  },
+  "length": {
+    "value": 21.95
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.195
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.098
+    }
+  ],
+  "slowestTwist": {
+    "value": 762
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "5",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

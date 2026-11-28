@@ -1,0 +1,51 @@
+{
+  "id": "hammer-264-cal-105gr-hammer-aht",
+  "manufacturer": "hammer",
+  "productNumber": "813869049606",
+  "name": ".264 Cal-105gr Hammer AHT®",
+  "productLine": "Hammer AHT",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 6.804
+  },
+  "length": {
+    "value": 31.32
+  },
+  "noseLength": {
+    "value": 15.26
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.196
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.412
+    }
+  ],
+  "slowestTwist": {
+    "value": 247.65
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

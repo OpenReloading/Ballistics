@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338172",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338172",
+  "name": "SP, .224, 50 gr (bullet 2913)",
+  "productLine": "SP",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 3.24
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.177
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

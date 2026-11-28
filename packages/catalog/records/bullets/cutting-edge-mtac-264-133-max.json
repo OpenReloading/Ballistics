@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mtac-264-133-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 264 133 MAX",
+  "name": "MTAC 264 133 MAX (MTAC, 133 gr)",
+  "productLine": "MTAC",
+  "caliber": ".264 (6.5mm)",
+  "diameter": {
+    "value": 6.706
+  },
+  "mass": {
+    "value": 8.618
+  },
+  "length": {
+    "value": 36.2
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.535
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.274
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

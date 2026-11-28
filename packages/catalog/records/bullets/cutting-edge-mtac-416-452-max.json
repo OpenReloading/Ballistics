@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mtac-416-452-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 416 452 MAX",
+  "name": "MTAC 416 452 MAX (MTAC, 452 gr)",
+  "productLine": "MTAC",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566
+  },
+  "mass": {
+    "value": 29.289
+  },
+  "length": {
+    "value": 53.16
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.791
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.406
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "cutting-edge-hghp-22-30",
+  "manufacturer": "cutting-edge",
+  "productNumber": "HGHP 22 30",
+  "name": "HGHP 22 30 (MTH, 30 gr)",
+  "productLine": "MTH",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 1.944
+  },
+  "length": {
+    "value": 15.47
+  },
+  "slowestTwist": {
+    "value": 406.4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "2, 11",
+        "fields": ["diameter", "mass", "length", "slowestTwist"]
+      }
+    ]
+  }
+}

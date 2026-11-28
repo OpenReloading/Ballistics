@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-esp-c100lg-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP C100LG RAPTOR",
+  "name": "ESP C100LG RAPTOR (Safari Raptor, Solid & Lever+, 100 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "length": {
+    "value": 22.78
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "9",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"]
+      }
+    ]
+  }
+}

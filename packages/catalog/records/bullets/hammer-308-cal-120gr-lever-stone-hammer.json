@@ -1,0 +1,47 @@
+{
+  "id": "hammer-308-cal-120gr-lever-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869024508",
+  "name": ".308 Cal-120gr Lever Stone Hammer®",
+  "productLine": "Lever Stone Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 7.776
+  },
+  "length": {
+    "value": 24.13
+  },
+  "noseLength": {
+    "value": 12.75
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.251
+    }
+  ],
+  "slowestTwist": {
+    "value": 381
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

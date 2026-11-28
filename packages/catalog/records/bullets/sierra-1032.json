@@ -1,0 +1,52 @@
+{
+  "id": "sierra-1032",
+  "manufacturer": "sierra",
+  "productNumber": "1032",
+  "name": "20 CAL 32 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.204",
+  "country": "US",
+  "diameter": {
+    "value": 5.182
+  },
+  "mass": {
+    "value": 2.074
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.221
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/20-cal-32-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"]
+      },
+      {
+        "source": "mapping-of-the-maker-wording-tools-src-bullets",
+        "fields": ["construction.core", "construction.jacket"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "hammer-338-cal-213gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "946",
+  "name": ".338 Cal-213gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585
+  },
+  "mass": {
+    "value": 13.608
+  },
+  "length": {
+    "value": 40.77
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.266
+    }
+  ],
+  "slowestTwist": {
+    "value": 266.7
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

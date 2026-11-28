@@ -1,0 +1,25 @@
+{
+  "id": "sellier-bellot-v319482",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319482",
+  "name": "LRN, .314, 100 gr",
+  "productLine": "LRN",
+  "caliber": ".314",
+  "diameter": {
+    "value": 7.976
+  },
+  "mass": {
+    "value": 6.48
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass"]
+      }
+    ]
+  }
+}

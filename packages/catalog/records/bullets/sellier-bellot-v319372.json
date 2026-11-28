@@ -1,0 +1,28 @@
+{
+  "id": "sellier-bellot-v319372",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319372",
+  "name": "FMJ, .363, 95 gr (for 9 mm MAKAROV)",
+  "productLine": "FMJ",
+  "caliber": ".363",
+  "diameter": {
+    "value": 9.22
+  },
+  "mass": {
+    "value": 6.156
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "tip.type"]
+      }
+    ]
+  }
+}

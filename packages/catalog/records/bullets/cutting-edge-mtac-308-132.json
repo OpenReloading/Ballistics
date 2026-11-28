@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-mtac-308-132",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 308 132",
+  "name": "MTAC 308 132 (MTAC, 132 gr)",
+  "productLine": "MTAC",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 8.553
+  },
+  "length": {
+    "value": 28.14
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.367
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.184
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "page": "3",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"]
+      }
+    ]
+  }
+}

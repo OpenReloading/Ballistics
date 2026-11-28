@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-452250m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452250M",
+  "name": "PinBusters!, 250 Grain RNFP",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 16.2
+  },
+  "length": {
+    "value": 16.79
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

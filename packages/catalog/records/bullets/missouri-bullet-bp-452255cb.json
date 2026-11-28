@@ -1,0 +1,27 @@
+{
+  "id": "missouri-bullet-bp-452255cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-452255CB",
+  "name": "Cowboy #9 - Black Powder, 255 Grain SWC",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481
+  },
+  "mass": {
+    "value": 16.524
+  },
+  "length": {
+    "value": 17.5
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "length"]
+      }
+    ]
+  }
+}

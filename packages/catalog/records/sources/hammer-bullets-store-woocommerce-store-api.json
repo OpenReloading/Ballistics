@@ -2,5 +2,6 @@
   "id": "hammer-bullets-store-woocommerce-store-api",
   "title": "Hammer Bullets store (WooCommerce Store API)",
   "publisher": "Hammer Bullets",
-  "origin": "manufacturer"
+  "origin": "manufacturer",
+  "terms": "https://hammerbullets.com/terms-and-conditions/"
 }

@@ -1,0 +1,51 @@
+{
+  "id": "hammer-224-cal-075gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869069854",
+  "name": ".224 Cal-75gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 4.86
+  },
+  "length": {
+    "value": 31.62
+  },
+  "noseLength": {
+    "value": 16.19
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.199
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.421
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ]
+      }
+    ]
+  }
+}

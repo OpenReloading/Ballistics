@@ -1,0 +1,31 @@
+{
+  "id": "sellier-bellot-v338942",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338942",
+  "name": "SP, .308, 110 gr (bullet 2959)",
+  "productLine": "SP",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 7.128
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.157
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ballisticCoefficients"]
+      }
+    ]
+  }
+}
