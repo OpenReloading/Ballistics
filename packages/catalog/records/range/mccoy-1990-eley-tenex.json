@@ -1,0 +1,276 @@
+{
+  "id": "mccoy-1990-eley-tenex",
+  "projectile": "Eley Tenex Bullet",
+  "bulletDiameter": {
+    "value": 5.69
+  },
+  "bulletMass": {
+    "value": 2.59
+  },
+  "rounds": [
+    {
+      "label": "19266(a)",
+      "dragCoefficient": {
+        "value": 0.304
+      },
+      "mach": {
+        "value": 0.945
+      },
+      "totalYaw": {
+        "value": 0.76
+      }
+    },
+    {
+      "label": "19270(a)",
+      "dragCoefficient": {
+        "value": 0.289
+      },
+      "mach": {
+        "value": 0.941
+      },
+      "totalYaw": {
+        "value": 0.61
+      }
+    },
+    {
+      "label": "19271(a)",
+      "dragCoefficient": {
+        "value": 0.275
+      },
+      "mach": {
+        "value": 0.936
+      },
+      "totalYaw": {
+        "value": 0.61
+      }
+    },
+    {
+      "label": "19268(a)",
+      "dragCoefficient": {
+        "value": 0.27
+      },
+      "mach": {
+        "value": 0.931
+      },
+      "totalYaw": {
+        "value": 0.62
+      }
+    },
+    {
+      "label": "19269(a)",
+      "dragCoefficient": {
+        "value": 0.276
+      },
+      "mach": {
+        "value": 0.93
+      },
+      "totalYaw": {
+        "value": 0.79
+      }
+    },
+    {
+      "label": "19267(a)",
+      "dragCoefficient": {
+        "value": 0.283
+      },
+      "mach": {
+        "value": 0.929
+      },
+      "totalYaw": {
+        "value": 0.38
+      }
+    },
+    {
+      "label": "19280(a)*",
+      "dragCoefficient": {
+        "value": 0.275
+      },
+      "mach": {
+        "value": 0.92
+      },
+      "totalYaw": {
+        "value": 2.24
+      }
+    },
+    {
+      "label": "19266(b)",
+      "dragCoefficient": {
+        "value": 0.272
+      },
+      "mach": {
+        "value": 0.914
+      },
+      "totalYaw": {
+        "value": 0.41
+      }
+    },
+    {
+      "label": "19270(b)",
+      "dragCoefficient": {
+        "value": 0.26
+      },
+      "mach": {
+        "value": 0.913
+      },
+      "totalYaw": {
+        "value": 0.4
+      }
+    },
+    {
+      "label": "19271(b)",
+      "dragCoefficient": {
+        "value": 0.261
+      },
+      "mach": {
+        "value": 0.908
+      },
+      "totalYaw": {
+        "value": 0.58
+      }
+    },
+    {
+      "label": "19268(b)",
+      "dragCoefficient": {
+        "value": 0.256
+      },
+      "mach": {
+        "value": 0.901
+      },
+      "totalYaw": {
+        "value": 0.44
+      }
+    },
+    {
+      "label": "19269(b)",
+      "dragCoefficient": {
+        "value": 0.268
+      },
+      "mach": {
+        "value": 0.901
+      },
+      "totalYaw": {
+        "value": 0.73
+      }
+    },
+    {
+      "label": "19267(b)",
+      "dragCoefficient": {
+        "value": 0.266
+      },
+      "mach": {
+        "value": 0.9
+      },
+      "totalYaw": {
+        "value": 0.38
+      }
+    },
+    {
+      "label": "19280(b)*",
+      "dragCoefficient": {
+        "value": 0.264
+      },
+      "mach": {
+        "value": 0.891
+      },
+      "totalYaw": {
+        "value": 2.11
+      }
+    },
+    {
+      "label": "19266(c)",
+      "dragCoefficient": {
+        "value": 0.252
+      },
+      "mach": {
+        "value": 0.886
+      },
+      "totalYaw": {
+        "value": 0.43
+      }
+    },
+    {
+      "label": "19270(c)",
+      "dragCoefficient": {
+        "value": 0.253
+      },
+      "mach": {
+        "value": 0.886
+      },
+      "totalYaw": {
+        "value": 3.64
+      }
+    },
+    {
+      "label": "19271(c)",
+      "dragCoefficient": {
+        "value": 0.248
+      },
+      "mach": {
+        "value": 0.881
+      },
+      "totalYaw": {
+        "value": 3.73
+      }
+    },
+    {
+      "label": "19268(c)",
+      "dragCoefficient": {
+        "value": 0.243
+      },
+      "mach": {
+        "value": 0.875
+      },
+      "totalYaw": {
+        "value": 0.94
+      }
+    },
+    {
+      "label": "19269(c)",
+      "dragCoefficient": {
+        "value": 0.257
+      },
+      "mach": {
+        "value": 0.874
+      },
+      "totalYaw": {
+        "value": 0.2
+      }
+    },
+    {
+      "label": "19267(c)",
+      "dragCoefficient": {
+        "value": 0.251
+      },
+      "mach": {
+        "value": 0.873
+      },
+      "totalYaw": {
+        "value": 0.57
+      }
+    },
+    {
+      "label": "19280(c)*",
+      "dragCoefficient": {
+        "value": 0.25
+      },
+      "mach": {
+        "value": 0.865
+      },
+      "totalYaw": {
+        "value": 2.13
+      }
+    }
+  ],
+  "provenance": {
+    "kind": "measured",
+    "sources": [
+      {
+        "source": "mccoy-r-l-aerodynamic-characteristics-of-caliber",
+        "url": "https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/ADA229713.xhtml",
+        "retrieved": "2026-10-08",
+        "page": "45, 46",
+        "sha256": "bd6d8f928f6239239eaf5b9670f78c8f463bc6622b5a113127be8cfd536ee478"
+      }
+    ]
+  }
+}

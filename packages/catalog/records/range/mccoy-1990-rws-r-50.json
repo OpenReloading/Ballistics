@@ -1,0 +1,96 @@
+{
+  "id": "mccoy-1990-rws-r-50",
+  "projectile": "RWS R-50 Bullet",
+  "bulletDiameter": {
+    "value": 5.69
+  },
+  "bulletMass": {
+    "value": 2.57
+  },
+  "rounds": [
+    {
+      "label": "19286(a)",
+      "dragCoefficient": {
+        "value": 0.297
+      },
+      "mach": {
+        "value": 0.941
+      },
+      "totalYaw": {
+        "value": 0.55
+      }
+    },
+    {
+      "label": "19285(a)",
+      "dragCoefficient": {
+        "value": 0.292
+      },
+      "mach": {
+        "value": 0.94
+      },
+      "totalYaw": {
+        "value": 0.53
+      }
+    },
+    {
+      "label": "19286(b)",
+      "dragCoefficient": {
+        "value": 0.269
+      },
+      "mach": {
+        "value": 0.911
+      },
+      "totalYaw": {
+        "value": 0.52
+      }
+    },
+    {
+      "label": "19285(b)",
+      "dragCoefficient": {
+        "value": 0.268
+      },
+      "mach": {
+        "value": 0.911
+      },
+      "totalYaw": {
+        "value": 0.5
+      }
+    },
+    {
+      "label": "19286(c)",
+      "dragCoefficient": {
+        "value": 0.25
+      },
+      "mach": {
+        "value": 0.884
+      },
+      "totalYaw": {
+        "value": 0.52
+      }
+    },
+    {
+      "label": "19285(c)",
+      "dragCoefficient": {
+        "value": 0.246
+      },
+      "mach": {
+        "value": 0.883
+      },
+      "totalYaw": {
+        "value": 0.53
+      }
+    }
+  ],
+  "provenance": {
+    "kind": "measured",
+    "sources": [
+      {
+        "source": "mccoy-r-l-aerodynamic-characteristics-of-caliber",
+        "url": "https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/ADA229713.xhtml",
+        "retrieved": "2026-10-08",
+        "page": "45, 47",
+        "sha256": "bd6d8f928f6239239eaf5b9670f78c8f463bc6622b5a113127be8cfd536ee478"
+      }
+    ]
+  }
+}

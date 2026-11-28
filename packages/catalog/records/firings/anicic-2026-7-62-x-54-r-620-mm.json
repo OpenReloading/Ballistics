@@ -1,0 +1,37 @@
+{
+  "id": "anicic-2026-7-62-x-54-r-620-mm",
+  "cartridge": "7-62-x-54-r",
+  "ammunition": "7.62x54R ammunition (maker and lot not stated)",
+  "firearm": "7.62x54R ballistic barrel, shortened from 720 mm in 20 mm steps",
+  "roundCount": 10,
+  "barrelLength": {
+    "value": 620
+  },
+  "velocity": {
+    "instrument": "Top Trend V2.205 ballistic chronograph",
+    "point": "initial velocity",
+    "mean": {
+      "value": 793.55
+    }
+  },
+  "pressure": {
+    "instrument": "Kistler 6215 piezoelectric pressure sensor, Kistler 5015A amplifier",
+    "method": "piezo",
+    "position": "25 mm from the rim of the cartridge case",
+    "meanPeak": {
+      "value": 3326.5
+    }
+  },
+  "provenance": {
+    "kind": "measured",
+    "sources": [
+      {
+        "source": "anicic-vuckovic-dordevic-blagojevic-tosic",
+        "url": "https://ara-journal.org/index.php/ara/article/download/8/9/74",
+        "retrieved": "2026-10-08",
+        "page": "78-81",
+        "sha256": "86b003899b4ec38735d6b16004591cd190bf4169241b734a032753b8aa68f1b6"
+      }
+    ]
+  }
+}

@@ -55,6 +55,18 @@ path = ["packages/catalog/records/bullets/demo-*.json", "packages/catalog/record
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
+# Measurements from openly licensed publications (packages/catalog/LICENSE): each record keeps its source's license.
+[[annotations]]
+path = "packages/catalog/records/firings/*.json"
+SPDX-FileCopyrightText = "the authors of the publication each record cites"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Measurements from US Government reports (LICENSES/LicenseRef-US-Gov-PD.txt).
+[[annotations]]
+path = "packages/catalog/records/range/*.json"
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "LicenseRef-US-Gov-PD"
+
 # Records derived from Wikipedia: the Wikipedia contributors hold rights in them too.
 [[annotations]]
 path = "packages/catalog/records/capacities/*-wikipedia.json"
