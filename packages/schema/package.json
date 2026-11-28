@@ -1,6 +1,6 @@
 {
   "name": "@rangefoundry/schema",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Zod schemas, types and stored units of every RangeFoundry record kind.",
   "keywords": [
     "reloading",

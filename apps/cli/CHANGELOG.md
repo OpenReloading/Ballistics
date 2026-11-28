@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.0](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.3...cli-v0.1.0) (2026-11-28)
+
+
+### Features
+
+* **catalog:** maker powders with fitted models, cited by maker ([#1370](https://github.com/OpenReloading/Ballistics/issues/1370)) ([7b7cd24](https://github.com/OpenReloading/Ballistics/commit/7b7cd242154538bb1d6655b02cc30038f93ea401))
+* **cli:** default to the catalog bundle and pack as a publishable command ([#1380](https://github.com/OpenReloading/Ballistics/issues/1380)) ([8ae23b4](https://github.com/OpenReloading/Ballistics/commit/8ae23b416aeebb6a24eef160ef045f320b979665))
+* **cli:** exit with the sysexits subset ([#1377](https://github.com/OpenReloading/Ballistics/issues/1377)) ([a3f15dd](https://github.com/OpenReloading/Ballistics/commit/a3f15ddd9f4a91e34e7805f4b27f508a3adacffb))
+* **cli:** name the format of every JSON result ([#1381](https://github.com/OpenReloading/Ballistics/issues/1381)) ([12167c3](https://github.com/OpenReloading/Ballistics/commit/12167c30c56e4d901150ac0bbf37cb1c37dc97b2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/catalog bumped to 0.1.0
+    * @rangefoundry/svg-drawings bumped to 0.1.0
+    * @rangefoundry/schema bumped to 0.1.0
+  * devDependencies
+    * @rangefoundry/api bumped to 0.1.0
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.2...cli-v0.0.3) (2026-11-12)
 
 

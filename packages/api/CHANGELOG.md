@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.1.0](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.7...api-v0.1.0) (2026-11-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **catalog:** require the cartridge and default to its generic primer and brass case ([#1337](https://github.com/OpenReloading/Ballistics/issues/1337))
+* license the code under AGPL-3.0-only ([#1332](https://github.com/OpenReloading/Ballistics/issues/1332))
+
+### Features
+
+* **catalog:** admit fitted maker sources, maker documents without a URL and more maker fields ([#1364](https://github.com/OpenReloading/Ballistics/issues/1364)) ([665bae4](https://github.com/OpenReloading/Ballistics/commit/665bae49842da816ff9c49fffa3b5c16a845f70f))
+* **catalog:** maker powders with fitted models, cited by maker ([#1370](https://github.com/OpenReloading/Ballistics/issues/1370)) ([7b7cd24](https://github.com/OpenReloading/Ballistics/commit/7b7cd242154538bb1d6655b02cc30038f93ea401))
+* **catalog:** require the cartridge and default to its generic primer and brass case ([#1337](https://github.com/OpenReloading/Ballistics/issues/1337)) ([cb49223](https://github.com/OpenReloading/Ballistics/commit/cb49223d1b47aab5449050a043007c04cab043e3))
+* **interior:** revolver cylinder gap and barrel length from the forcing cone ([#1256](https://github.com/OpenReloading/Ballistics/issues/1256)) ([e9f741a](https://github.com/OpenReloading/Ballistics/commit/e9f741a6e0d04b7f40430850988bb550cd15a455))
+* **schema:** default case capacity on the cartridge ([#1263](https://github.com/OpenReloading/Ballistics/issues/1263)) ([22b4225](https://github.com/OpenReloading/Ballistics/commit/22b4225d252016389403d2a0b71dc276cc60e29b))
+* **schema:** makers' burn-rate charts and stated uses on powders ([#1230](https://github.com/OpenReloading/Ballistics/issues/1230)) ([1c61622](https://github.com/OpenReloading/Ballistics/commit/1c616227fce25dc6bad8f6d4b9f9e2f93286a6f0))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+* **schema:** optional provenance on every record kind ([#1224](https://github.com/OpenReloading/Ballistics/issues/1224)) ([7b69c19](https://github.com/OpenReloading/Ballistics/commit/7b69c19cf0be25e34f9bde004bf5b986cd37f959))
+* **web:** bullet lot, each lot under its record choice and one Lots line ([#1258](https://github.com/OpenReloading/Ballistics/issues/1258)) ([374bf81](https://github.com/OpenReloading/Ballistics/commit/374bf817222370fc2e257f1a277b8e2381b1b3de))
+* **web:** fitted-model views and the powder API show the simulation notice ([#1368](https://github.com/OpenReloading/Ballistics/issues/1368)) ([a9caddc](https://github.com/OpenReloading/Ballistics/commit/a9caddc149f167f399d61653ac9a338307d9bd97))
+
+
+### Chores
+
+* license the code under AGPL-3.0-only ([#1332](https://github.com/OpenReloading/Ballistics/issues/1332)) ([56a3b5a](https://github.com/OpenReloading/Ballistics/commit/56a3b5ae38ac12dd00353cfe1e1e685d08e9f5cf))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/catalog bumped to 0.1.0
+    * @rangefoundry/schema bumped to 0.1.0
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.6...api-v0.0.7) (2026-11-12)
 
 
