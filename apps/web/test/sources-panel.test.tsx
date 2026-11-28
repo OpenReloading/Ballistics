@@ -1,5 +1,5 @@
 import { I18nProvider } from '@lingui/react'
-import type { Source } from '@rangefoundry/schema'
+import type { Provenance, Source } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { groupSources, RecordSourcesLink, Sources } from '../src/components/sources.tsx'
@@ -31,10 +31,63 @@ it('shows the title linked, the publisher, the edition, the retrieval day, the l
   expect(linked).toContain('<span>Example Bullets Inc.</span><span>Stand 2026</span>')
   expect(linked).toContain('<time dateTime="2026-05-01">1 May 2026</time>')
   expect(linked).toContain('>LicenseRef-example-data</td>')
-  expect(linked).toContain('<a href="https://example.com/terms">Terms</a>')
+  expect(linked).toContain('<a href="https://example.com/terms">Terms</a></td>')
   expect(linked).toContain('Checked by hand.')
   expect(render({ ...sheet, terms: 'written permission, 2026-11-02' })).toContain(
-    'Terms: written permission, 2026-11-02',
+    '>written permission, 2026-11-02</td>',
+  )
+})
+
+const renderRecord = (provenance: Provenance) =>
+  renderToStaticMarkup(
+    <Providers>
+      <Sources provenance={provenance} />
+    </Providers>,
+  )
+
+const leadLine =
+  'Facts as Example Powders publishes them. Example Powders has not reviewed this record; its terms apply.'
+const workedLine =
+  'Values of kind derived, computed or fitted are worked out by this project from the cited source'
+const powderSheet: Source = {
+  title: 'Powder sheet',
+  publisher: 'Example Powders',
+  url: 'https://example.com/powders.pdf',
+  terms: 'https://example.com/terms',
+  fields: ['bulkDensity'],
+}
+
+it('shows the Kind column and that the project works out the values when the record kind is derived and no source states one', () => {
+  const html = renderRecord({ kind: 'derived', sources: [powderSheet] })
+  expect(html).toMatch(/Source<\/th><th[^>]*>Kind<\/th>/)
+  expect(html).toContain('>derived</td>')
+  expect(html).toContain(`${leadLine} ${workedLine}`)
+})
+
+it("shows each source's own kind and that the project works out the values when one source is derived", () => {
+  const html = renderRecord({
+    kind: 'published',
+    sources: [powderSheet, { ...powderSheet, page: '4', kind: 'derived', fields: ['country'] }],
+  })
+  expect(html).toContain('>Kind</th>')
+  expect(html).toContain('>published</td>')
+  expect(html).toContain('>derived</td>')
+  expect(html).toContain(workedLine)
+})
+
+it('names each publisher and links its terms, without a Kind column or the second sentence for published values', () => {
+  const html = renderRecord({ kind: 'published', sources: [powderSheet] })
+  expect(html).toContain(leadLine)
+  expect(html).toMatch(/<a href="https:\/\/example.com\/terms">Terms<\/a><\/td>/)
+  expect(html).not.toContain('Kind')
+  expect(html).not.toContain(workedLine)
+  expect(
+    renderRecord({
+      kind: 'published',
+      sources: [powderSheet, { ...powderSheet, publisher: 'Example Magazine', title: 'Test' }],
+    }),
+  ).toContain(
+    'Facts as Example Powders and Example Magazine publish them. They have not reviewed this record; their terms apply.',
   )
 })
 
