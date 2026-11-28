@@ -1654,7 +1654,7 @@ export const source: z.ZodObject<{
     run: z.ZodOptional<z.ZodObject<{
         version: z.ZodString;
         report: z.ZodOptional<z.ZodString>;
-    }>>;
+    }, z.core.$strict>>;
     note: z.ZodOptional<z.ZodString>;
 }>;
 

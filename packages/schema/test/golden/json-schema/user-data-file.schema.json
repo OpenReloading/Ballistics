@@ -3767,6 +3767,7 @@
                               "required": [
                                 "version"
                               ],
+                              "additionalProperties": false,
                               "description": "The fit run behind a `fitted` source."
                             },
                             "note": {
@@ -4709,6 +4710,7 @@
                               "required": [
                                 "version"
                               ],
+                              "additionalProperties": false,
                               "description": "The fit run behind a `fitted` source."
                             },
                             "note": {
@@ -6746,6 +6748,7 @@
                               "required": [
                                 "version"
                               ],
+                              "additionalProperties": false,
                               "description": "The fit run behind a `fitted` source."
                             },
                             "note": {
@@ -8193,6 +8196,7 @@
                               "required": [
                                 "version"
                               ],
+                              "additionalProperties": false,
                               "description": "The fit run behind a `fitted` source."
                             },
                             "note": {
