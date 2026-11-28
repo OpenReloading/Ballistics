@@ -20,7 +20,7 @@ const note = (text: string) => text.replaceAll(', not load data', '')
 
 type Has = (k: keyof Source) => boolean
 
-/** How a record's values came about, in the title of its Sources panel. */
+/** How a record's or a source's values came about: the title of its Sources panel, its Kind column. */
 export const provenanceKinds: Record<Provenance['kind'], MessageDescriptor> = {
   published: /*i18n*/ { id: 'recordSources.kind.published', message: 'published' },
   measured: /*i18n*/ { id: 'recordSources.kind.measured', message: 'measured' },
@@ -32,8 +32,10 @@ export const provenanceKinds: Record<Provenance['kind'], MessageDescriptor> = {
 /** The optional columns in their order. */
 const columns = {
   origin: /*i18n*/ { id: 'recordSources.column.origin', message: 'Origin' },
+  kind: /*i18n*/ { id: 'recordSources.column.kind', message: 'Kind' },
   retrieved: /*i18n*/ { id: 'recordSources.column.retrieved', message: 'Retrieved' },
   license: /*i18n*/ { id: 'recordSources.column.license', message: 'License' },
+  terms: /*i18n*/ { id: 'recordSources.column.terms', message: 'Terms' },
   fields: /*i18n*/ { id: 'recordSources.column.covers', message: 'Covers' },
   note: /*i18n*/ { id: 'recordSources.column.note', message: 'Note' },
 } satisfies Partial<Record<keyof Source, MessageDescriptor>>
@@ -64,27 +66,52 @@ function SourcesHead({ has }: { has: Has }) {
 }
 
 function SourceMeta({ source: s }: { source: Source }) {
-  const { i18n } = useLingui()
   return (
     <span className="source-meta">
       {s.publisher && <span>{s.publisher}</span>}
       {s.edition && <span>{s.edition}</span>}
-      {s.terms && (
-        <span>
-          {isWebLink(s.terms) ? (
-            <a href={s.terms}>{i18n._({ id: 'recordSources.terms', message: 'Terms' })}</a>
-          ) : (
-            i18n._({
-              id: 'recordSources.termsText',
-              message: 'Terms: {terms}',
-              values: { terms: s.terms },
-            })
-          )}
-        </span>
-      )}
       {s.sha256 && <CopyHash hash={s.sha256} />}
     </span>
   )
+}
+
+/** The kinds whose values this project works out from the cited source. */
+const workedKinds: readonly Provenance['kind'][] = ['derived', 'computed', 'fitted']
+
+/** A source whose publisher's terms apply: it names the publisher and links its terms, under no license. */
+const isPublished = (s: Source) =>
+  s.publisher !== undefined &&
+  s.terms !== undefined &&
+  isWebLink(s.terms) &&
+  s.license === undefined &&
+  s.origin !== 'public' &&
+  s.origin !== 'community'
+
+/** Whose facts the record states and whose terms apply, and that the project works out the values the Kind column marks derived, computed or fitted. */
+function SourcesLead({ provenance }: { provenance: Provenance }) {
+  const { i18n } = useLingui()
+  const publishers = [
+    ...new Set(provenance.sources.filter(isPublished).map((s) => s.publisher as string)),
+  ]
+  const worked = provenance.sources.some((s) => workedKinds.includes(s.kind ?? provenance.kind))
+  if (publishers.length === 0 && !worked) return null
+  const names = new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(publishers)
+  const sentences = [
+    publishers.length > 0 &&
+      i18n._({
+        id: 'recordSources.lead',
+        message:
+          '{count, plural, one {Facts as {publishers} publishes them. {publishers} has not reviewed this record; its terms apply.} other {Facts as {publishers} publish them. They have not reviewed this record; their terms apply.}}',
+        values: { count: publishers.length, publishers: names },
+      }),
+    worked &&
+      i18n._({
+        id: 'recordSources.worked',
+        message:
+          'Values of kind derived, computed or fitted are worked out by this project from the cited source; the Kind column shows which.',
+      }),
+  ]
+  return <p>{sentences.filter(Boolean).join(' ')}</p>
 }
 
 const fieldCount = /*i18n*/ {
@@ -114,11 +141,13 @@ function SourceRow({
   source: s,
   has,
   kind,
+  recordKind,
   inGroup,
 }: {
   source: Source
   has: Has
   kind: string | undefined
+  recordKind: Provenance['kind']
   inGroup?: boolean
 }) {
   const { i18n } = useLingui()
@@ -144,6 +173,11 @@ function SourceRow({
           {origin ? i18n._(origin) : s.origin}
         </TableTd>
       )}
+      {has('kind') && (
+        <TableTd role="cell" data-label={i18n._(columns.kind)}>
+          {i18n._(provenanceKinds[s.kind ?? recordKind])}
+        </TableTd>
+      )}
       {has('retrieved') && (
         <TableTd role="cell" className="nowrap" data-label={i18n._(columns.retrieved)}>
           {s.retrieved && <Day day={s.retrieved} />}
@@ -152,6 +186,16 @@ function SourceRow({
       {has('license') && (
         <TableTd role="cell" data-label={i18n._(columns.license)}>
           {s.license}
+        </TableTd>
+      )}
+      {has('terms') && (
+        <TableTd role="cell" data-label={i18n._(columns.terms)}>
+          {s.terms &&
+            (isWebLink(s.terms) ? (
+              <a href={s.terms}>{i18n._({ id: 'recordSources.terms', message: 'Terms' })}</a>
+            ) : (
+              s.terms
+            ))}
         </TableTd>
       )}
       {has('fields') && (
@@ -192,11 +236,13 @@ function SourceGroup({
   has,
   span,
   kind,
+  recordKind,
 }: {
   sources: Source[]
   has: Has
   span: number
   kind: string | undefined
+  recordKind: Provenance['kind']
 }) {
   const { i18n } = useLingui()
   const first = sources[0] as Source
@@ -223,13 +269,13 @@ function SourceGroup({
         </TableTd>
       </TableTr>
       {sources.map((s, i) => (
-        <SourceRow key={keys[i]} source={s} has={has} kind={kind} inGroup />
+        <SourceRow key={keys[i]} source={s} has={has} kind={kind} recordKind={recordKind} inGroup />
       ))}
     </TableTbody>
   )
 }
 
-/** A column no source fills is left out, a document cited at several pages is one group; below 48em a source is a block, each value after its column's name (`data-label`), so every table element carries its ARIA role. */
+/** A column no source fills is left out (Kind while every source's kind, its own or the record's, is `published`), a document cited at several pages is one group; below 48em a source is a block, each value after its column's name (`data-label`), so every table element carries its ARIA role. */
 export function Sources({
   provenance,
   kind,
@@ -240,11 +286,15 @@ export function Sources({
 }) {
   const { i18n } = useLingui()
   const list = provenance.sources
-  const has = (k: keyof Source) => list.some((s) => s[k] !== undefined)
+  const has = (k: keyof Source) =>
+    k === 'kind'
+      ? list.some((s) => (s.kind ?? provenance.kind) !== 'published')
+      : list.some((s) => s[k] !== undefined)
   const span = 1 + columnKeys.filter(has).length
   const groups = groupSources(list)
   return (
     <>
+      <SourcesLead provenance={provenance} />
       <ScrollRegion label={i18n._({ id: 'recordSources.table', message: 'Sources table' })}>
         <Table className="sources" role="table">
           <TableThead role="rowgroup">
@@ -258,10 +308,16 @@ export function Sources({
                 has={has}
                 span={span}
                 kind={kind}
+                recordKind={provenance.kind}
               />
             ) : (
               <TableTbody role="rowgroup" key={documentKey(group[0] as Source)}>
-                <SourceRow source={group[0] as Source} has={has} kind={kind} />
+                <SourceRow
+                  source={group[0] as Source}
+                  has={has}
+                  kind={kind}
+                  recordKind={provenance.kind}
+                />
               </TableTbody>
             ),
           )}
