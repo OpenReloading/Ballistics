@@ -13,7 +13,7 @@ if ! "$bin/oxlint" --version >/dev/null 2>&1 || ! "$bin/biome" --version >/dev/n
   echo 'pre-commit: Oxlint or Biome does not run in this checkout, nothing checked (CI checks it). pnpm install installs them; in the dev container: devcontainer exec --workspace-folder . pnpm run lint' >&2
   exit 0
 fi
-code=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.mts' '*.cts' '*.js' '*.mjs' '*.cjs' ':!packages/units/' ':!packages/locale-format/' ':!packages/design-tokens/' ':!packages/schema/' ':!packages/statistics/' ':!packages/ballistics/' ':!packages/shot-groups/' ':!packages/importers/' ':!packages/catalog/' ':!packages/use-cases/' ':!packages/target-recognition/' ':!packages/ui/' ':!tooling/')
+code=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.mts' '*.cts' '*.js' '*.mjs' '*.cjs' ':!packages/units/' ':!packages/locale-format/' ':!packages/design-tokens/' ':!packages/schema/' ':!packages/statistics/' ':!packages/ballistics/' ':!packages/shot-groups/' ':!packages/importers/' ':!packages/catalog/' ':!packages/use-cases/' ':!packages/target-recognition/' ':!packages/ui/' ':!tooling/' ':!apps/cli/')
 { [ -z "$code" ] || printf '%s\n' "$code" | xargs "$bin/oxlint" --deny-warnings --report-unused-disable-directives; } &&
   "$bin/biome" check --staged --error-on-warnings --no-errors-on-unmatched || {
   echo 'pre-commit: fix the findings above (pnpm run format applies the safe ones), stage the files and commit again' >&2

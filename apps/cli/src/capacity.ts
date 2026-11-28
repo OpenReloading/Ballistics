@@ -2,11 +2,12 @@ import { lstatSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Cartridge, CatalogueCaseCapacity } from '@rangefoundry/schema'
 import { isEstimatedCapacity } from '@rangefoundry/schema'
+import { percentile } from '@rangefoundry/statistics'
 import { storedValue } from '@rangefoundry/svg-drawings/cartridge'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
 import { DataError, Refusal } from './errors.ts'
 import { loadRecords, type Records } from './records.ts'
-import { percentile } from './stats.ts'
+import { systemErrorCode } from './system-error.ts'
 
 /** Volume (mm3) of the cones through the case outline of a cartridge record from the head to the mouth: P1 at the head, P2 at L1, H2 at L2 and the mouth (H1, else H2, else G1) at L3, cartridge values first, else the chamber's; undefined without P1 or L3. */
 export function outlineVolume(cartridge: Pick<Cartridge, 'values'>): number | undefined {
@@ -16,28 +17,50 @@ export function outlineVolume(cartridge: Pick<Cartridge, 'values'>): number | un
   const [p1, l3] = [v('P1'), v('L3')]
   const mouth = v('H1') ?? v('H2') ?? v('G1')
   if (!p1 || !l3 || !mouth) return undefined
-  const points: [number, number][] = [[0, p1]]
+  return conesVolume([[0, p1], ...shoulderPoints(v, l3), [l3, mouth]])
+}
+
+/** A point of a case outline: the distance from the head and the diameter there, mm. */
+type OutlinePoint = readonly [number, number]
+
+/** The outline points P2 at L1 and H2 at L2 of `v`, each kept where it lies past the one before and short of `l3`. */
+function shoulderPoints(v: (symbol: string) => number | undefined, l3: number) {
+  const points: OutlinePoint[] = []
   for (const [l, d] of [
     [v('L1'), v('P2')],
     [v('L2'), v('H2')],
   ])
     if (l && d && l < l3 && l > (points.at(-1)?.[0] ?? 0)) points.push([l, d])
-  points.push([l3, mouth])
+  return points
+}
+
+/** Volume (mm3) of the cones between consecutive `points`. */
+function conesVolume(points: readonly OutlinePoint[]) {
   let volume = 0
-  for (let i = 1; i < points.length; i++) {
-    const [[z0, d0], [z1, d1]] = [points[i - 1] as [number, number], points[i] as [number, number]]
-    const [r0, r1] = [d0 / 2, d1 / 2]
-    volume += ((Math.PI * (z1 - z0)) / 3) * (r0 * r0 + r0 * r1 + r1 * r1)
+  let previous: OutlinePoint | undefined
+  for (const point of points) {
+    if (previous) {
+      const [[z0, d0], [z1, d1]] = [previous, point]
+      const [r0, r1] = [d0 / 2, d1 / 2]
+      volume += ((Math.PI * (z1 - z0)) / 3) * (r0 * r0 + r0 * r1 + r1 * r1)
+    }
+    previous = point
   }
   return volume
 }
+
+/** The median of `xs`, which hold at least one value. */
+const median = (xs: readonly number[]) =>
+  percentile(
+    xs.toSorted((a, b) => a - b),
+    0.5,
+  )
 
 /** The median of water capacity over outline volume (both mm3) of `pairs`, and the root mean square of the relative error each pair's capacity gets from the median of the others. */
 export function fillFactor(pairs: readonly { capacity: number; outline: number }[]) {
   const ratios = pairs.map((p) => p.capacity / p.outline)
   if (ratios.length < 3)
     throw new DataError('fewer than 3 cartridges have a capacity and an outline')
-  const median = (xs: readonly number[]) => percentile(xs, 0.5) as number
   const loo = ratios.map((r, i) => median(ratios.filter((_, j) => j !== i)) / r - 1)
   return {
     factor: median(ratios),
@@ -51,8 +74,8 @@ const milliliters = (grams: number) => (grams * 1000) / waterDensityGramsPerCm3
 /** The fill factor over the cartridges of `records` with a capacity that is no estimate and an outline, and an estimated capacity record for each cartridge with an outline and neither a capacity nor a case with one. */
 export function estimateCapacities(records: Records) {
   const pairs = [...records.capacities].flatMap(([id, c]) => {
-    const outline =
-      records.cartridges.get(id) && outlineVolume(records.cartridges.get(id) as Cartridge)
+    const cartridge = records.cartridges.get(id)
+    const outline = cartridge && outlineVolume(cartridge)
     return outline && !isEstimatedCapacity(c)
       ? [{ capacity: milliliters(c.waterCapacity.value), outline }]
       : []
@@ -104,7 +127,7 @@ export function writeEstimatedCapacities(roots: readonly string[], out: string) 
     mkdirSync(folder) // NOSONAR: as above
   } catch (error) {
     // anything created there since the check
-    if ((error as NodeJS.ErrnoException).code === 'EEXIST') throw exists
+    if (systemErrorCode(error) === 'EEXIST') throw exists
     throw error
   }
   for (const record of estimates)

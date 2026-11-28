@@ -147,6 +147,12 @@ export function pairedChange(baseline: readonly RowError[], candidate: readonly 
   }
 }
 
+/** The median and the P90 of the values of `drawn` clusters. */
+function pooledStat(drawn: readonly number[][]) {
+  const all = sorted(drawn.flat())
+  return { median: sortedPercentile(all, 0.5), p90: sortedPercentile(all, 0.9) }
+}
+
 /** The median and the P90 of the absolute errors of one quantity over the rows of all folds, null without a row that has it. */
 function pooledQuantity(errors: readonly RowError[], quantity: Quantity) {
   const byCartridge = new Map<string, number[]>()
@@ -159,12 +165,8 @@ function pooledQuantity(errors: readonly RowError[], quantity: Quantity) {
   }
   if (byCartridge.size === 0) return null
   const clusters = ordered(byCartridge)
-  const statOf = (drawn: readonly number[][]) => {
-    const all = sorted(drawn.flat())
-    return { median: sortedPercentile(all, 0.5), p90: sortedPercentile(all, 0.9) }
-  }
-  const observed = statOf(clusters)
-  const standardError = bootstrapErrors(clusters, statOf)
+  const observed = pooledStat(clusters)
+  const standardError = bootstrapErrors(clusters, pooledStat)
   return {
     rows: clusters.flat().length,
     cartridges: clusters.length,

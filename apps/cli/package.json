@@ -28,7 +28,8 @@
     "schema": "node src/write-json-schema.ts && biome format --write schema",
     "typecheck": "tsc --noEmit",
     "golden:update": "vitest run test/golden.test.ts --update",
-    "test": "vitest run --coverage && publint --strict"
+    "test": "vitest run --coverage && publint --strict",
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives"
   },
   "dependencies": {
     "@commander-js/extra-typings": "catalog:",
@@ -48,6 +49,8 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "ajv": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
     "publint": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

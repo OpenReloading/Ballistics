@@ -2,7 +2,7 @@ import { barrelClasses } from './metrics.ts'
 import type { Change, CompareResult, FitResult, Metrics, VerifyResult } from './result.ts'
 
 /** A fraction as percent with one decimal, `-` for none. */
-const pct = (x: number | null | undefined) => (x == null ? '-' : `${(100 * x).toFixed(1)}`)
+const pct = (x: number | null | undefined) => (x == null ? '-' : (100 * x).toFixed(1))
 /** A change in percentage points with its sign, `-` for none. */
 const signed = (x: number | null | undefined) =>
   x == null ? '-' : `${x > 0 ? '+' : ''}${(100 * x).toFixed(2)}`
@@ -60,10 +60,12 @@ function screenLines(name: string, s: VerifyResult['screen']) {
   ]
 }
 
+/** A standard error in percent with two decimals. */
+const se = (x: number) => (100 * x).toFixed(2)
+
 /** The lines of `--folds`: the rule, one line per fold and each quantity over all folds with its standard error; none without it. */
 function foldLines(f: VerifyResult['folds']) {
   if (!f) return []
-  const se = (x: number) => (100 * x).toFixed(2)
   const pooled = (['velocity', 'pressure'] as const).flatMap((q) => {
     const a = f.aggregate[q]
     if (!a) return []
@@ -174,12 +176,14 @@ function pressureLines(p: FitResult['pressure']) {
   ]
 }
 
+/** One center of `--energy family`. */
+const center = (name: string, c: { impetus: number; sigma: number; powders: number }) =>
+  `  ${name} impetus ${Math.round(c.impetus)} J/kg sigma ${c.sigma.toFixed(3)} (${c.powders} powders)`
+
 /** The centers of `--energy family` and each powder's fitted energy, J/kg. */
 function energyFamilyLines(r: FitResult) {
   const f = r.energyFamily
   if (!f) return []
-  const center = (name: string, c: { impetus: number; sigma: number; powders: number }) =>
-    `  ${name} impetus ${Math.round(c.impetus)} J/kg sigma ${c.sigma.toFixed(3)} (${c.powders} powders)`
   return [
     `energy family: full weight at ${f.fullWeight.rows} rows over ${f.fullWeight.cartridges} cartridges`,
     ...Object.entries(f.families).map(([name, c]) => center(name, c)),
