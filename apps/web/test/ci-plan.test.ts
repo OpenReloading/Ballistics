@@ -26,12 +26,12 @@ const root = new URL('../../../', import.meta.url).pathname
 const script = new URL('../scripts/ci-plan.mts', import.meta.url).pathname
 
 it('walks the imports of the record pages', () => {
-  expect(closure.files).toContain('apps/web/src/app/cartridges/[id]/page.tsx')
-  expect(closure.files).toContain('apps/web/src/app/targets/[id]/page.tsx')
-  expect(closure.files).toContain('apps/web/src/app/disciplines/[id]/page.tsx')
-  expect(closure.files).toContain('apps/web/src/app/federations/[id]/page.tsx')
+  expect(closure.files).toContain('apps/web/src/routes/cartridges/$id.tsx')
+  expect(closure.files).toContain('apps/web/src/routes/targets/$id.tsx')
+  expect(closure.files).toContain('apps/web/src/routes/disciplines/$id.tsx')
+  expect(closure.files).toContain('apps/web/src/routes/federations/$id.tsx')
   expect(closure.files).toContain('apps/web/src/components/record-page.tsx')
-  expect(closure.files).toContain('apps/web/src/lib/api.ts')
+  expect(closure.files).toContain('apps/web/src/routes/-data.ts')
   expect(closure.files).not.toContain('apps/web/src/components/workbench.tsx')
   expect(closure.packages).toContain('svg-drawings')
 })
@@ -99,14 +99,7 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
 })
 
 it('runs the e2e job for the scripts that build and serve the export', () => {
-  for (const f of [
-    'tools/src/pages.ts',
-    'tools/src/pages-serve.ts',
-    'tools/src/pages-payload.ts',
-    'tools/src/executable.ts',
-    'tools/src/start-site.ts',
-    'tools/src/root-not-found.ts',
-  ])
+  for (const f of ['tools/src/pages.ts', 'tools/src/pages-serve.ts', 'tools/src/executable.ts'])
     expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true })
 })
 
@@ -140,7 +133,7 @@ it('builds with the sample when the web app changed outside the record pages', (
   expect(plan(['apps/web/src/components/workbench.tsx'], closure)).toMatchObject({
     prerender: 'sample',
   })
-  expect(plan(['apps/web/src/app/layout.tsx'], closure)).toMatchObject({
+  expect(plan(['apps/web/src/routes/__root.tsx'], closure)).toMatchObject({
     prerender: 'sample',
   })
   expect(plan(['apps/web/news/2026-10-28-whats-new.md'], closure)).toMatchObject({
@@ -158,10 +151,10 @@ it('prerenders every record when record data, page code or shared parts changed'
     'packages/schema/src/units.ts',
     'packages/api/src/server.ts',
     'packages/svg-drawings/src/index.ts',
-    'apps/web/src/app/bullets/[id]/page.tsx',
+    'apps/web/src/routes/bullets/$id.tsx',
     'apps/web/src/components/record-page.tsx',
-    'apps/web/src/lib/api.ts',
-    'apps/web/next.config.ts',
+    'apps/web/vite.config.mts',
+    'apps/web/scripts/prerender-list.mts',
     'pnpm-lock.yaml',
     'pnpm-workspace.yaml',
     '.github/pnpm/package-lock.json',
@@ -317,9 +310,9 @@ it('reads both scopes while the packages move to @rangefoundry', () => {
     'disciplines',
     'federations',
   ])
-    mkdirSync(path.join(dir, 'apps/web/src/app', r, '[id]'), { recursive: true })
+    put(`apps/web/src/routes/${r}/$id.tsx`, '')
   put(
-    'apps/web/src/app/bullets/[id]/page.tsx',
+    'apps/web/src/routes/bullets/$id.tsx',
     "import { a } from '@rangefoundry/units/convert'\nimport { b } from '@rangefoundry/svg-drawings'\n",
   )
   put('packages/units/package.json', '{"name":"@rangefoundry/units"}')

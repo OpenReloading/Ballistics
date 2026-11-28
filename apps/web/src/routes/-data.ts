@@ -1,7 +1,7 @@
 import { type Catalogue, type CatalogueIndex, openCatalogue } from '@rangefoundry/use-cases/catalog'
 import { createIsomorphicFn } from '@tanstack/react-start'
 
-/** A data file of this build by its path below `api/` without `.json`, undefined when there is none: the prerender reads it from disk, the browser fetches it from its edition's `api/`. */
+/** A data file of this build by its path below `api/` without `.json`, undefined when there is none: the prerender reads it from disk, the browser fetches it from the site's `api/`. */
 export const readData = createIsomorphicFn()
   .server(async (file: string): Promise<unknown> => {
     // oxlint-disable-next-line no-restricted-imports -- only the prerender runs this branch, Start drops it from the client
@@ -40,7 +40,7 @@ export function readCatalogue(): Promise<Catalogue> {
   return opened
 }
 
-/** The record file of each of `items` in `kind`; a missing one throws, as the Next page fails its build. */
+/** The record file of each of `items` in `kind`; a missing one throws, which fails the build. */
 export const readRecords = <T>(kind: string, items: readonly { id: string }[]) =>
   Promise.all(
     items.map(async ({ id }) => {

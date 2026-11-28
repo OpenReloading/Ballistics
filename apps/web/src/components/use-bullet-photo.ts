@@ -1,5 +1,3 @@
-'use client'
-
 import type { MessageDescriptor } from '@lingui/core'
 import { fromSi, toSi } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'

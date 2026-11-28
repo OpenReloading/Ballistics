@@ -1,7 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { storeUnits } from './units.ts'
 import { formValues, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
@@ -31,7 +30,7 @@ const stored = (page: Page, kind: string) =>
       db.close()
       return all.filter((r) => r.kind === kind)
     },
-    [kind, storageName('rangefoundry-user-data')] as const,
+    [kind, 'rangefoundry-user-data'] as const,
   )
 
 const file = [

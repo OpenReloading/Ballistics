@@ -1,5 +1,3 @@
-'use client'
-
 import { Button } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 import { useTranslation } from '../i18n/language.ts'

@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
-import { storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { loadForm, openSavedLoad } from './workbench.ts'
@@ -11,7 +10,7 @@ test('under German the workbench writes and takes a decimal comma and its result
   page,
 }) => {
   test.setTimeout(60_000)
-  await page.addInitScript((store) => localStorage.setItem(store, 'de'), storageName('language'))
+  await page.addInitScript((store) => localStorage.setItem(store, 'de'), 'language')
   await gotoHydrated(page, '/workbench')
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await openSavedLoad(page, 'de')

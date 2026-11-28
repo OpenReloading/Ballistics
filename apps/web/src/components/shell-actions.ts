@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { useMantineColorScheme } from '@mantine/core'
 import { useContext } from 'react'

@@ -1,5 +1,3 @@
-'use client'
-
 import { Anchor } from '@mantine/core'
 import { useTranslation } from '../i18n/language.ts'
 import { howCloseGuide } from '../lib/docs-url.ts'

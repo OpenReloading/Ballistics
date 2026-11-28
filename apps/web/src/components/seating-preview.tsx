@@ -1,4 +1,3 @@
-'use client'
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 
@@ -21,7 +20,6 @@ import {
   seat,
   type Tagged,
 } from '@rangefoundry/svg-drawings/seating'
-import dynamic from 'next/dynamic'
 import {
   type Dispatch,
   type ReactNode,
@@ -36,6 +34,7 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import dynamic from '@/platform/dynamic.tsx'
 import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -102,9 +101,7 @@ type Mode = 'overallLength' | 'baseToOgive'
 type T = Translator['t']
 
 // in the module of every chooser, so their shared dialog is one chunk
-const CaseChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.CaseChooser), {
-  ssr: false,
-})
+const CaseChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.CaseChooser))
 
 const modeHelp = {
   overallLength: msg('Cartridge overall length.'),

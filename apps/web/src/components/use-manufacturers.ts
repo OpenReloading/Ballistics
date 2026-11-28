@@ -1,5 +1,3 @@
-'use client'
-
 import type { UserRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { putRecords, storedRecords } from '@/platform/user-store.ts'

@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
@@ -17,9 +15,9 @@ import { useMediaQuery } from '@mantine/hooks'
 import { boreArea, cylinderGapDischarge } from '@rangefoundry/ballistics'
 import { type Bullet, toSi } from '@rangefoundry/schema'
 import { Ellipsis } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import dynamic from '@/platform/dynamic.tsx'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -1359,24 +1357,17 @@ function CardBody({ panel }: { panel: InputPanel }) {
 }
 
 // one module for every chooser, so their shared dialog is one chunk
-const BulletSearchDialog = dynamic(
-  () => import('./record-choosers.tsx').then((m) => m.BulletSearchDialog),
-  { ssr: false },
+const BulletSearchDialog = dynamic(() =>
+  import('./record-choosers.tsx').then((m) => m.BulletSearchDialog),
 )
 
-const PowderChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.PowderChooser), {
-  ssr: false,
-})
+const PowderChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.PowderChooser))
 
-const CartridgeChooser = dynamic(
-  () => import('./record-choosers.tsx').then((m) => m.CartridgeChooser),
-  { ssr: false },
+const CartridgeChooser = dynamic(() =>
+  import('./record-choosers.tsx').then((m) => m.CartridgeChooser),
 )
 
-const FirearmChooser = dynamic(
-  () => import('./record-choosers.tsx').then((m) => m.FirearmChooser),
-  { ssr: false },
-)
+const FirearmChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.FirearmChooser))
 
 /** The Bullet card's picker: the inline quick search, and a button that opens the search dialog. */
 function BulletPicker() {

@@ -1,5 +1,3 @@
-'use client'
-
 import type { LoadNote, LoadNoteRule } from '@rangefoundry/ballistics'
 import type { Powder, SessionRecord } from '@rangefoundry/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'

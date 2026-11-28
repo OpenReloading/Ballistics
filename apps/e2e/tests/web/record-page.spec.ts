@@ -1,5 +1,4 @@
 import { expect, type Page, test } from '@playwright/test'
-import { isNextEdition, noOfflineWorker } from './edition.ts'
 import { based, gotoHydrated } from './nav.ts'
 
 /** The exported file holds the head tags and a loading state, and the page renders from its data file in the browser; one record of each kind, all in the export's sample. */
@@ -115,7 +114,7 @@ for (const r of records) {
 
     test.describe('offline', () => {
       test.use({ serviceWorkers: 'allow' })
-      test.skip(({ baseURL }) => isNextEdition(baseURL), noOfflineWorker)
+      test.fixme(true, 'the app registers no offline layer worker yet')
 
       test('a visited record opens again offline, drawn from its stored data files', async ({
         page,

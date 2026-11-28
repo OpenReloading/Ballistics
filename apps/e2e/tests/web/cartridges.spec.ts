@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
-import { storageName } from './edition.ts'
 import { isDark } from './luminance.ts'
 import { based, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -573,10 +572,10 @@ test('printed, the outline is to its stated scale with its stroke inside the cas
   await expect(printed('Chamber').locator('.part-cartridge')).toHaveCount(0)
   await expect(printed('Cartridge').locator('.dims-cartridge')).toBeVisible()
   // with dark stored too
-  await page.evaluate((store) => localStorage.setItem(store, 'dark'), storageName('theme'))
+  await page.evaluate((store) => localStorage.setItem(store, 'dark'), 'theme')
   await page.reload()
   expect(await outline.evaluate((e) => getComputedStyle(e).stroke)).toBe(ink)
-  await page.evaluate((store) => localStorage.removeItem(store), storageName('theme'))
+  await page.evaluate((store) => localStorage.removeItem(store), 'theme')
   const words = page
     .getByRole('region', { name: 'Cartridge', exact: true })
     .getByText(/the drawing is at 1:1\.25 \(80 % of life size\)/)

@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, TextInput } from '@mantine/core'
 import { Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'

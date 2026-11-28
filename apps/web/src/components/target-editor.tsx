@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
@@ -93,7 +91,6 @@ import { loadEnglish, ungrouped } from '../i18n/lingui.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { photoGuide } from '../lib/docs-url.ts'
-import { storageName } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
 import { isFaceId } from '../lib/face-records.ts'
 import { calibrateSheetOnFace } from '../lib/face-sheet.ts'
@@ -171,9 +168,9 @@ loadEnglish(englishMessages)
 type Photo = { url: string; width: number; height: number }
 type RefKind = CalibrationReference['kind']
 
-const lastSheet = storageName('target-sheet-last')
+const lastSheet = 'target-sheet-last'
 /** Copies of the sheets whose save had not landed when the page went. */
-const waitingCopy = storageName('target-sheet-waiting')
+const waitingCopy = 'target-sheet-waiting'
 /** A sheet to save, with the `saved` of the stored version it was edited from (none: a new sheet). */
 type WaitingRecord = TargetSheetRecord & { base?: string | undefined }
 
@@ -210,7 +207,7 @@ function dropCopy(id: string, saved?: string) {
     else localStorage.removeItem(waitingCopy)
   } catch {}
 }
-const overlayKey = storageName('target-overlays')
+const overlayKey = 'target-overlays'
 const defaultOverlays: Record<Overlay, boolean> = {
   spread: true,
   box: false,
@@ -2906,7 +2903,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
           ) : (
             <Button
               variant="default"
-              // a plain import() on first use: next/dynamic would count it in the route's weight
+              // a plain import() on first use keeps it out of the route's first load
               onClick={() =>
                 import('./zero-target.tsx').then((m) => setZero(() => m.ZeroTargetMenu))
               }

@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
-import { storageName } from './edition.ts'
 import { safetyAck } from './nav.ts'
 
 // a first visit: nothing accepted yet
@@ -22,7 +21,7 @@ test('the Safety notice must be accepted on the first visit and stays accepted',
 })
 
 test('an acceptance of the earlier Safety text asks again', async ({ page }) => {
-  await page.addInitScript((store) => localStorage.setItem(store, '3'), storageName('safety-ack'))
+  await page.addInitScript((store) => localStorage.setItem(store, '3'), 'safety-ack')
   await page.goto('./')
   const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   await expect(dialog).toBeVisible()
@@ -63,7 +62,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
 }) => {
   await page.addInitScript(([value, store]) => localStorage.setItem(store, value), [
     safetyAck,
-    storageName('safety-ack'),
+    'safety-ack',
   ] as const)
   const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   // the page bar from 75em, named by its text; the phone top bar below, icon only
@@ -123,7 +122,7 @@ test('the Safety buttons pass the axe contrast check in light and dark at 1280 a
 }) => {
   await page.addInitScript(([value, store]) => localStorage.setItem(store, value), [
     safetyAck,
-    storageName('safety-ack'),
+    'safety-ack',
   ] as const)
   for (const colorScheme of ['light', 'dark'] as const)
     for (const width of [1280, 390]) {

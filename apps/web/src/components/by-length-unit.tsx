@@ -1,5 +1,3 @@
-'use client'
-
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { localizeDecimals } from '../i18n/number.ts'

@@ -80,9 +80,6 @@ measured: the static export of the pre-release integration branch at `2c9f2c65`,
 
 ## Where in the app
 
-- `apps/web/weight-budget.json`: the budgets and recorded weights.
-- `apps/web/scripts/check-weight.mts`: `measure`, `routeFiles`, `violations`, `table`.
-- `apps/web/src/lib/offline.ts`: `precacheList`, the whole-app precache.
 - `apps/web/src/components/workbench-results.tsx`, `apps/web/src/components/workbench-figure.tsx`, `apps/web/src/components/workbench-inputs.tsx`: the workbench's existing lazy parts.
 
 ## Confidence

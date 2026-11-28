@@ -157,7 +157,7 @@ test.describe('a printed box label opens its load', () => {
     await page.getByRole('button', { name: 'Scan box label' }).click()
     await scan(page).getByLabel('Label text').fill('OR1:L:00000000-0000-4000-8000-000000000000')
     await page.keyboard.press('Enter')
-    await expect(scan(page)).toContainText('This load is not saved in this browser and edition:')
+    await expect(scan(page)).toContainText('This load is not saved in this browser:')
     // the printed text
     await scan(page).getByLabel('Label text').fill(printed.text)
     await page.keyboard.press('Enter')

@@ -1,5 +1,3 @@
-'use client'
-
 import type { TargetFace } from '@rangefoundry/schema'
 import {
   type FaceEllipse,

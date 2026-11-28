@@ -1,4 +1,3 @@
-'use client'
 import { useLingui } from '@lingui/react'
 
 import { NativeSelect } from '@mantine/core'

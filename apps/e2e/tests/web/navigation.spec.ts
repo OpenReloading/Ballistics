@@ -32,7 +32,7 @@ test('at 1280 px Search and Settings in the sidebar show their names, as a label
   for (const name of ['Search', 'Settings']) {
     const button = nav.getByRole('button', { name, exact: true })
     await button.focus()
-    // the Next rail names its icons by a tooltip, the Start rail by the label under the icon
+    // the rail names each icon by the label under it
     await expect(
       button.getByText(name, { exact: true }).or(page.getByRole('tooltip', { name })),
     ).toBeVisible()

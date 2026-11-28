@@ -1,4 +1,4 @@
-/** The props of each list page from the records it reads, the same for the Next pages and the Start routes. */
+/** The props of each list page from the records it reads, read by the list routes. */
 
 import type { TargetFace } from '@rangefoundry/schema'
 import type {

@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, FileButton, Group, Stack, TextInput } from '@mantine/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { storedRecords } from '@/platform/user-store.ts'
@@ -18,7 +16,7 @@ const frameInterval = 250
 /** The long side, in px, a camera frame is read at. */
 const frameSide = 800
 
-/** The photo is read in this browser and never kept, the camera starts only by its button; a load opens only in the browser and edition that saved it. */
+/** The photo is read in this browser and never kept, the camera starts only by its button; a load opens only in the browser that saved it. */
 export function ScanLabelDialog({
   opened,
   onClose,
@@ -70,7 +68,7 @@ export function ScanLabelDialog({
     else if (found === 'missing')
       show('warning', (t) =>
         t(
-          'This load is not saved in this browser and edition: export it where it was saved and import the file here.',
+          'This load is not saved in this browser: export it where it was saved and import the file here.',
         ),
       )
     else {

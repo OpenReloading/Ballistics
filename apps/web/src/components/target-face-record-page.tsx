@@ -1,5 +1,3 @@
-'use client'
-
 import type { TargetFace, TargetMapping } from '@rangefoundry/schema'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { emptyDirectory, writeDirectory } from '../lib/directory.ts'

@@ -59,7 +59,7 @@ The index and the record file begin with two numbers. `format` is the layout of 
 
 In the public data the index is 1.40 MB (152 kB gzipped), 0.86 MB of it the bullet and powder rows (about 450 bytes per bullet, 390 per powder). `catalogue-budget.test.ts` caps it at 1.5 MB and 160 KB gzipped. The service worker precaches it with the build's static files and answers it from the shell cache (`apps/web/src/lib/offline.ts`), so a list opens offline after the first visit and the index always belongs to its build.
 
-The Pages export of the public data is 340 MB per edition (bullet pages 146 MB, the docs site 58 MB, cartridge pages 48 MB, disciplines 34 MB, powder pages 21 MB, the data files 18 MB), 680 MB for the two editions against the 1 GB limit of the site (`apps/docs/docs/ci-tools.md`).
+The Pages site of the public data is 137 MB (the docs site 56 MB, cartridge pages 27 MB, disciplines 18 MB, the data files 10 MB) against the 1 GB limit of the site (`apps/docs/docs/ci-tools.md`).
 
 `apps/web/test/static-api.test.ts` compares the browser's answers with the API's for every list, paging, filters, ranked queries in both word orders, the default order and the refusals of the query schemas.
 

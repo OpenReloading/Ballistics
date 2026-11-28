@@ -1,5 +1,4 @@
 import type { Page } from '@playwright/test'
-import { storageName } from './edition.ts'
 
 /** Records written to the browser's user store as the app saves them (creating the store if the app has not). */
 export async function putRecords(page: Page, records: object[]) {
@@ -22,6 +21,6 @@ export async function putRecords(page: Page, records: object[]) {
       })
       db.close()
     },
-    [records, storageName('rangefoundry-user-data')] as const,
+    [records, 'rangefoundry-user-data'] as const,
   )
 }

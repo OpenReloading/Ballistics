@@ -13,7 +13,6 @@ const images = ['packages/api', 'apps/web']
 export const notShipped: Record<string, string> = {
   sharp: 'the static export has no image optimization, so the site holds no sharp code',
   '@img/*': 'the sharp binaries: the static export holds none',
-  '@next/swc-*': 'the Next.js compiler, a build tool: the static export holds no native code',
   'lightningcss-*': 'the CSS compiler of Vite, a build tool: the site holds no native code',
 }
 

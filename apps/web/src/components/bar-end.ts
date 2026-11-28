@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState, useSyncExternalStore } from 'react'
 
 /** Newest last: a page left by a client navigation stays hidden with its effects cleaned up, so the last slot is the shown page's. */

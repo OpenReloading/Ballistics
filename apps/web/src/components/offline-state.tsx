@@ -1,11 +1,9 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Button, Code } from '@mantine/core'
 import { WifiOff } from 'lucide-react'
 import { useSyncExternalStore } from 'react'
+import { basePath } from '@/platform/build-env.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
-import { basePath } from '../lib/edition.ts'
 import { offlinePage } from '../lib/offline.ts'
 import { sections } from '../lib/sections.ts'
 import englishMessages from '../locales/en/components/offline-state.json' with { type: 'json' }

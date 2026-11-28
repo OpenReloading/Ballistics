@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Group } from '@mantine/core'
 import { Download } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'

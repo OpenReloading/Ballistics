@@ -1,5 +1,3 @@
-'use client'
-
 import type { Load } from '@rangefoundry/schema'
 import { useCallback, useMemo, useState } from 'react'
 

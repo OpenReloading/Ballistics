@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'

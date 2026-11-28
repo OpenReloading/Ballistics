@@ -1,5 +1,3 @@
-'use client'
-
 import { Modal, type ModalRootProps } from '@mantine/core'
 import type { ComponentProps, ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'

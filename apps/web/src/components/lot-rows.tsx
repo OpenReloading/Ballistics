@@ -1,8 +1,7 @@
-'use client'
 import { useLingui } from '@lingui/react'
 
 import { Button, NumberInput, Text } from '@mantine/core'
-import dynamic from 'next/dynamic'
+import dynamic from '@/platform/dynamic.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
@@ -16,7 +15,6 @@ import type { LotRows } from './use-lot-rows.ts'
 const loadChart = () => import('./lot-chart.tsx').then((m) => m.LotChart)
 
 const LotChart = dynamic(loadChart, {
-  ssr: false,
   loading: () => <div className="chart lot-chart" />,
 })
 

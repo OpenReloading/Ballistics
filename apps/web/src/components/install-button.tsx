@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { useSyncExternalStore } from 'react'

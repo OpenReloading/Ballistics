@@ -1,6 +1,6 @@
 import { PageNotFound } from '../components/page-not-found.tsx'
 
-/** The not-found page, kept out of search indexes as the Next app keeps its own. */
+/** The not-found page, kept out of search indexes. */
 export function NotFoundPage() {
   return (
     <>

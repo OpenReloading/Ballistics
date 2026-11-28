@@ -1,5 +1,3 @@
-'use client'
-
 import AT from 'country-flag-icons/react/3x2/AT'
 import AU from 'country-flag-icons/react/3x2/AU'
 import BE from 'country-flag-icons/react/3x2/BE'

@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { useDeferredValue, useMemo } from 'react'
 import { loadEnglish } from '../i18n/lingui.ts'

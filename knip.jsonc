@@ -97,16 +97,7 @@
     "apps/web": {
       // not loaded: the config reads the prerender list, which only a Start build writes
       "vite": false,
-      "entry": [
-        "vite.config.mts",
-        "src/routes/**/*.tsx",
-        // vite.config.mts resolves the next/* imports to them, which knip does not follow
-        "src/platform/start/*.{ts,tsx}",
-        "scripts/glyph-advances.mts",
-        "src/service-worker.js",
-        // scripts/service-worker.mts copies every export into out/sw.js through a namespace import
-        "src/lib/offline.ts"
-      ]
+      "entry": ["vite.config.mts", "src/routes/**/*.tsx", "scripts/glyph-advances.mts"]
     },
     "apps/e2e": {
       // the web app's catalogue is read by path in the unit tests, declared so the CI plan runs them when it changes

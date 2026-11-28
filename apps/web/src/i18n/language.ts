@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from 'react'
 import { setRefusalWords } from '../lib/core-messages.ts'
-import { storageName } from '../lib/edition.ts'
 import { setShownLanguage } from './shown.ts'
 import { type Catalogue, english as englishText, type Translator, translator } from './translate.ts'
 
@@ -35,7 +34,7 @@ const loadRefusalWords = () =>
   )
 
 /** `localStorage` key of the chosen language. */
-const languageKey = storageName('language')
+const languageKey = 'language'
 
 /** The chosen language, with the functions of the language shown (English until its catalogue is loaded). */
 type Translation = Translator & { chosen: Language }

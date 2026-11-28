@@ -66,9 +66,7 @@ measured: builds of `main` and of the trial in one container, the gate's own `ch
 
 - `apps/web/src/components/directory-table.tsx`: the table the trial was measured against.
 - `apps/web/src/components/bullet-list.tsx`: the list that was swapped.
-- `apps/web/weight-budget.json`: the budget the trial exceeded.
-- `apps/web/scripts/check-weight.mts`: the gate.
-- `apps/web/src/app/layout.tsx`: where the component styles are imported.
+- `apps/web/src/styles.css`: where the component styles are imported.
 
 ## Confidence
 

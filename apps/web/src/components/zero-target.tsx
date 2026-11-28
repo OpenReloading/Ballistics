@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Menu } from '@mantine/core'
 import { parseRef, type ShotGroup, type TargetSheet, userRecord } from '@rangefoundry/schema'
 import { useRef, useState } from 'react'
@@ -143,7 +141,6 @@ export function ZeroTargetMenu({
         svg &&
         createPortal(
           <div className="zero-target">
-            {/* oxlint-disable-next-line nextjs/no-img-element -- the sheet's own SVG at true size, for print only */}
             <img
               ref={image}
               src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`}

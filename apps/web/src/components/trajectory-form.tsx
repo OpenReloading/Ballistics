@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
@@ -21,7 +19,6 @@ import {
 } from '@rangefoundry/ballistics'
 import { type Bullet, toSi } from '@rangefoundry/schema'
 import { Printer } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import {
   type ReactNode,
   type Ref,
@@ -32,6 +29,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import dynamic from '@/platform/dynamic.tsx'
 import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
@@ -77,7 +75,6 @@ import { useFieldUnits, useUnits } from './units-settings.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
 const TruingSession = dynamic(() => import('./truing-session.tsx').then((m) => m.TruingSession), {
-  ssr: false,
   loading: () => <Loading what="the truing" inline />,
 })
 

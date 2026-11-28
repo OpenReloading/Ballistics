@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
 import type { ChronoImport, VelocityUnit } from '@rangefoundry/importers'

@@ -1,4 +1,4 @@
-import { basePath } from '../lib/edition.ts'
+import { basePath } from '@/platform/build-env.ts'
 
 // the social image needs an absolute URL: only the deployment knows its origin
 const origin = process.env.PAGES_URL
@@ -10,7 +10,7 @@ const tags = {
   'image:alt': 'RangeFoundry Workbench',
 }
 
-/** The image tags of every page, the Open Graph ones repeated for Twitter as the Next export has them. */
+/** The image tags of every page, the Open Graph ones repeated for Twitter. */
 export const socialImage = origin
   ? [
       { name: 'twitter:card', content: socialCard },

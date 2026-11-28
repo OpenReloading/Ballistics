@@ -1,5 +1,3 @@
-'use client'
-
 import type { Load } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
 import { storedRecords } from '@/platform/user-store.ts'

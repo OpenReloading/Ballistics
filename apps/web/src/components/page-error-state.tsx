@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Text } from '@mantine/core'
 import { loadEnglish } from '../i18n/lingui.ts'

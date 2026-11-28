@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { Anchor, Button, NativeSelect, Text, TextInput } from '@mantine/core'
@@ -8,8 +6,8 @@ import { type Bullet, toSi, type UserBullet } from '@rangefoundry/schema'
 import { face, type LengthUnit } from '@rangefoundry/svg-drawings'
 import { bulletFigureModel, bulletSymbols } from '@rangefoundry/svg-drawings/bullet'
 import { Camera } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { localizeDecimals } from '../i18n/number.ts'
@@ -67,9 +65,7 @@ import { Workspace } from './workspace.tsx'
 loadEnglish(englishMessages)
 
 /** The photo tool, fetched when it is first opened: its image maths and the sample stay out of the designer's first load. */
-const BulletPhoto = dynamic(() => import('./bullet-photo.tsx').then((m) => m.BulletPhoto), {
-  ssr: false,
-})
+const BulletPhoto = dynamic(() => import('./bullet-photo.tsx').then((m) => m.BulletPhoto))
 
 const choiceLabels: Record<ChoiceKey, [MessageDescriptor, Group]> = {
   'base.type': [/*i18n*/ { id: 'bulletDesigner.baseType', message: 'Base type' }, 'base'],

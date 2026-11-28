@@ -1,8 +1,11 @@
-import type { Page } from '@playwright/test'
-import { projectBase } from './edition.ts'
+import { type Page, test } from '@playwright/test'
+import { defined } from '../../../web/test/defined.ts'
 
 /** The `safety-ack` value of an accepted Safety dialog (`apps/web/src/components/safety-dialog.tsx`). */
 export const safetyAck = '4'
+
+/** The `baseURL` of the project the running test belongs to, with its base path and a trailing slash. */
+const projectBase = () => defined(test.info().project.use.baseURL)
 
 /** Waits for `html[data-hydrated]` and the page bar's `h1[data-hydrated]`: a click or a key before React hydrates the page does nothing, and the page hydrates after the layout. */
 export async function gotoHydrated(page: Page, path: string) {

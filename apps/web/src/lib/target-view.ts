@@ -1,4 +1,4 @@
-/** View units are photo px, or target mm on a drawn target; no React, DOM or Next.js. */
+/** View units are photo px, or target mm on a drawn target; no React or DOM. */
 import { fromSi } from '@rangefoundry/schema'
 
 export type ViewBox = { x: number; y: number; w: number; h: number }

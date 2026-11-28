@@ -5,7 +5,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "test": "playwright test",
-    "smoke": "START_SITE=off playwright test --project=full tests/web/smoke.spec.ts",
+    "smoke": "playwright test --project=full tests/web/smoke.spec.ts",
     "pair-sheets": "node scripts/pair-sheets.mts",
     "drawing-baseline": "sh scripts/baseline.sh",
     "drawing-baseline:full": "DRAWING_BASELINE=full sh scripts/baseline.sh",

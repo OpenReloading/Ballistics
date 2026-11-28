@@ -7,7 +7,6 @@
     "import",
     "react",
     "jsx-a11y",
-    "nextjs",
     "promise",
     "vitest",
     "jest"
@@ -15,7 +14,7 @@
   "categories": {
     "correctness": "off"
   },
-  "ignorePatterns": ["**/test/golden/**", "**/next-env.d.ts", "apps/web/src/routeTree.gen.ts"],
+  "ignorePatterns": ["**/test/golden/**", "apps/web/src/routeTree.gen.ts"],
   "jsPlugins": ["eslint-plugin-regexp"],
   "rules": {
     "array-callback-return": "error",
@@ -71,7 +70,6 @@
     "jsx-a11y/role-supports-aria-props": "error",
     "jsx-a11y/scope": "error",
     "jsx-a11y/tabindex-no-positive": "error",
-    "nextjs/google-font-display": "error",
     "no-array-constructor": "error",
     "no-async-promise-executor": "error",
     "no-case-declarations": "error",
@@ -249,14 +247,6 @@
     {
       "files": ["apps/web/**", "apps/docs/**"],
       "rules": {
-        "nextjs/google-font-preconnect": "error",
-        "nextjs/inline-script-id": "error",
-        "nextjs/no-before-interactive-script-outside-document": "error",
-        "nextjs/no-document-import-in-page": "error",
-        "nextjs/no-head-element": "error",
-        "nextjs/no-head-import-in-document": "error",
-        "nextjs/no-img-element": "error",
-        "nextjs/no-unwanted-polyfillio": "error",
         "react/exhaustive-deps": "error",
         "react/jsx-key": "error",
         "react/no-array-index-key": "error",

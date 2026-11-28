@@ -1,6 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { followNav, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
@@ -52,7 +51,7 @@ const records = (page: Page) =>
           all.onsuccess = () => ok(all.result)
         }
       }),
-    storageName('rangefoundry-user-data'),
+    'rangefoundry-user-data',
   )
 
 /** How many records of `kind` the browser holds. */

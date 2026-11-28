@@ -1,4 +1,2 @@
-/.next/
-/out/
 *.tsbuildinfo
 /public/models/ort/

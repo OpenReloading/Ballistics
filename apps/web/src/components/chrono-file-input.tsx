@@ -1,5 +1,3 @@
-'use client'
-
 import { NativeSelect } from '@mantine/core'
 import type { VelocityUnit } from '@rangefoundry/importers'
 import type { ReactNode } from 'react'

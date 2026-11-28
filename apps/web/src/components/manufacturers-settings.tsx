@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Group, Stack, Text } from '@mantine/core'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteRecord, putRecords, storedRecords } from '@/platform/user-store.ts'

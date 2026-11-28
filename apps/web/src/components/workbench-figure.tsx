@@ -1,9 +1,7 @@
-'use client'
-
 import { ActionIcon, SegmentedControl, Tooltip } from '@mantine/core'
 import { Maximize2 } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { type ComponentProps, useState } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import type { FigureView } from '../lib/figure-views.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -13,7 +11,7 @@ import { useLoad } from './workbench-context.ts'
 
 const SeatingPreview = dynamic(
   () => import('./seating-preview.tsx').then((m) => m.SeatingPreview),
-  { ssr: false, loading: () => <Loading what="the preview" inline /> },
+  { loading: () => <Loading what="the preview" inline /> },
 )
 
 /** The cartridge with the bullet seated live; edits redraw it, no simulation runs. */

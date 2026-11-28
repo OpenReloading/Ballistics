@@ -1,6 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { storeUnits } from './units.ts'
 import { openResultTab, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
@@ -28,7 +27,7 @@ const storedLoads = (page: Page) =>
     })
     db.close()
     return all.filter((r) => r.kind === 'load')
-  }, storageName('rangefoundry-user-data'))
+  }, 'rangefoundry-user-data')
 
 const file = ['string,velocity,velocityUnit', 'A,2795,fps', 'A,2810,fps', 'A,2802,fps'].join('\n')
 const read = (page: Page, name: string) =>

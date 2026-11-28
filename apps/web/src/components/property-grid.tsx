@@ -1,5 +1,3 @@
-'use client'
-
 import { Accordion } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { type FocusEvent, type ReactNode, useLayoutEffect, useState } from 'react'

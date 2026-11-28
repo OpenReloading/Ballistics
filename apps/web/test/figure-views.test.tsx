@@ -3,14 +3,13 @@ import { MantineProvider } from '@mantine/core'
 import type { FigureModel } from '@rangefoundry/svg-drawings/cartridge'
 import { chamberOf, coalRange, previewDrawn } from '@rangefoundry/svg-drawings/seating'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { linguiOf } from '../src/i18n/lingui.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { figureViewBuilder } from '../src/lib/figure-views.ts'
 import { defined, missing } from './defined.ts'
 import { sheetRecord } from './records.ts'
 
-vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { TechnicalDrawing } = await import('../src/components/technical-drawing.tsx')
 const { CartridgeDrawing } = await import('../src/components/cartridge-drawing.tsx')
 

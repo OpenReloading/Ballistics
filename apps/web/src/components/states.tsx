@@ -1,16 +1,10 @@
-'use client'
-
-import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
-import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantine/core'
+import { Alert, Button, EmptyState, Skeleton, Stack, Text } from '@mantine/core'
 import { FunnelX, Info, OctagonExclamationPoint, TriangleExclamationPoint } from 'lucide-react'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
-import { useRouter } from '@/platform/navigation.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { controlSize } from '../lib/theme.ts'
 import englishMessages from '../locales/en/components/states.json' with { type: 'json' }
-import { LibraryTabs } from './library-tabs.tsx'
-import { PageBar } from './page-bar.tsx'
 
 loadEnglish(englishMessages)
 
@@ -332,65 +326,6 @@ export function DataError({ what, retry }: { what: DataKind; retry: () => void }
         message: 'The data file could not be loaded. Check the connection and retry.',
       })}
     </ErrorNote>
-  )
-}
-
-/** A list page's error state: its page bar over `DataError`. */
-export function ListError({
-  title,
-  what,
-  retry,
-}: {
-  title: MessageDescriptor
-  what: DataKind
-  retry: () => void
-}) {
-  return (
-    <>
-      <PageBar title={title} translated />
-      <LibraryTabs />
-      <DataError what={what} retry={retry} />
-    </>
-  )
-}
-
-/** `DataError` in a server page: Retry renders the page's server data again. */
-export function ServerDataError({ what }: { what: DataKind }) {
-  const router = useRouter()
-  return (
-    <>
-      <LibraryTabs />
-      <DataError what={what} retry={() => router.refresh()} />
-    </>
-  )
-}
-
-/** Row widths of the list skeleton, in percent of the name column: uneven, so it reads as text. */
-const skeletonWidths = [62, 48, 70, 55, 66, 42, 58, 74, 50, 64, 46, 68]
-
-/** The filter row and the table's frame where the records will be, so nothing moves when they arrive. */
-export function ListLoading({ what }: { what: Loadable }) {
-  const { i18n } = useLingui()
-  return (
-    <>
-      <LibraryTabs />
-      <div className="directory" role="status">
-        <span className="visually-hidden">{i18n._(loadingLines[what])}…</span>
-        {/* the metrics of the real filter row (DirectoryFilters), so the frame stays where it is */}
-        <Group className="directory-filters" gap="xs" py="xs" aria-hidden="true">
-          <Skeleton height={30} className="directory-search" />
-          <Skeleton height={30} width="7.5rem" />
-        </Group>
-        <div className="directory-scroll page-panel page-panel-flush" aria-hidden="true">
-          <div className="list-skeleton-head" />
-          {Array.from({ length: 32 }, (_, k) => (
-            <div key={k} className="list-skeleton-row">
-              <Skeleton height={12} width={`${skeletonWidths[k % skeletonWidths.length]}%`} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
   )
 }
 

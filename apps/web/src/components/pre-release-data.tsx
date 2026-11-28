@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { useEffect, useRef } from 'react'
 import { deleteDatabase, inStore, refusedEvent } from '@/platform/user-db.ts'

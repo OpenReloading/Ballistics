@@ -1,5 +1,3 @@
-'use client'
-
 import { useLingui } from '@lingui/react'
 import { Crosshair } from 'lucide-react'
 import Link from '@/platform/link.tsx'

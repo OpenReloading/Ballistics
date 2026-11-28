@@ -31,7 +31,6 @@ jobs:
       pull-requests: write
     outputs:
       released: ${{ steps.release.outputs.releases_created }}
-      app: ${{ steps.app.outcome == 'success' }}
       images: ${{ steps.images.outputs.matrix }}
       libraries: ${{ steps.libraries.outputs.names }}
     steps:
@@ -84,20 +83,6 @@ jobs:
             '[["schema", $schema], ["svg-drawings", $drawing], ["importers", $importers], ["catalog", $catalog]]
              | map(select(.[1] == "true") | .[0])')
           echo "names=$names" >> "$GITHUB_OUTPUT"
-
-  # A release created with GITHUB_TOKEN starts no `release: published` workflow, so without the App token this run
-  # starts the Pages build for the new release itself (workflow_dispatch by GITHUB_TOKEN is allowed).
-  pages:
-    needs: release-please
-    if: needs.release-please.outputs.released == 'true' && needs.release-please.outputs.app != 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    permissions:
-      actions: write
-    steps:
-      - env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages.yml --ref main -R "$GITHUB_REPOSITORY"
 
   # The images are built in the run that made the release; no workflow triggers on releases or tags.
   images:

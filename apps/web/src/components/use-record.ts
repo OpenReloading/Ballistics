@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useEffect, useState } from 'react'
 import { dataFile } from '../lib/data-file.ts'
 

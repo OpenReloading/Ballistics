@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'

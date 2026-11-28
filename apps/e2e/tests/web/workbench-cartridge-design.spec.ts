@@ -1,7 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
 import { based } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
@@ -114,7 +113,7 @@ test('a load saved on a design keeps the design by reference and reopens with it
       )
       db.close()
       return all.filter((r) => r.kind === 'load')
-    }, storageName('rangefoundry-user-data'))
+    }, 'rangefoundry-user-data')
   await expect
     .poll(async () => (await stored())[0]?.data.cartridge)
     .toBe('user:6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21')

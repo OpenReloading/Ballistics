@@ -1,5 +1,3 @@
-'use client'
-
 import { type ReactNode, type Ref, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { usePortalBody } from './print.ts'

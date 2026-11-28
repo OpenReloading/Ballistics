@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { isNextEdition, noApi } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { openSavedLoad } from './workbench.ts'
@@ -36,8 +35,7 @@ for (const [path, title] of pages)
 /** The live API: a separate origin from the exported site the project's `baseURL` names. */
 const apiUrl = process.env.API_URL ?? 'http://localhost:3000'
 
-test('the exported data files are what the API answers', async ({ request, baseURL }) => {
-  test.skip(isNextEdition(baseURL), noApi)
+test('the exported data files are what the API answers', async ({ request }) => {
   for (const [kind, id] of [
     ['cartridges', '308-win'],
     ['bullets', 'demo-bullet-168'],
@@ -79,9 +77,7 @@ test('a record page opens another without a page load, back and forward too', as
 test('the workbench runs a saved load in the browser as the API runs its file', async ({
   page,
   request,
-  baseURL,
 }) => {
-  test.skip(isNextEdition(baseURL), noApi)
   await storeUnits(page)
   // the file of Save options > Download for the API goes to a file in the browser's own storage
   await page.addInitScript(() => {

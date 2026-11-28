@@ -22,7 +22,7 @@ import { socialImage } from './-social-image.ts'
 
 const colorSchemeManager = localStorageColorSchemeManager({ key: colorSchemeKey })
 
-// Vite's base with its trailing slash: / or /Ballistics/next/
+// Vite's base with its trailing slash: / or /Ballistics/
 const base = import.meta.env.BASE_URL
 
 export const Route = createRootRoute({
@@ -44,7 +44,7 @@ export const Route = createRootRoute({
       // ui's own rules before the app's: the app's styles bring Mantine's in cascade layers, the tokens and the font
       { rel: 'stylesheet', href: uiCss },
       { rel: 'stylesheet', href: appCss },
-      // the UI faces load before the first paint, as next/font preloads them: a swap after it shifts the text
+      // the UI faces load before the first paint: a swap after it shifts the text
       ...[interRegular, interSemiBold].map((href) => ({
         rel: 'preload',
         href,
@@ -75,7 +75,6 @@ function Document({ children }: { children: ReactNode }) {
   const { language } = useTranslation()
   return (
     <html lang="en" {...mantineHtmlProps} className={uiFont.variable}>
-      {/* oxlint-disable-next-line nextjs/no-head-element -- TanStack Start's shell writes the document's own head */}
       <head>
         {/* oxlint-disable-next-line react/no-danger -- constant script, no user input */}
         <script dangerouslySetInnerHTML={{ __html: colorSchemeScript }} />
@@ -103,7 +102,7 @@ function Document({ children }: { children: ReactNode }) {
 }
 
 function Root() {
-  // the ready signal of the browser specs, as in the Next app's providers
+  // the ready signal of the browser specs
   useEffect(() => {
     document.documentElement.dataset.hydrated = ''
   }, [])

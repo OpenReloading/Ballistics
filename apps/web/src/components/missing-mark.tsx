@@ -1,5 +1,3 @@
-'use client'
-
 import { Badge } from '@mantine/core'
 import { useTranslation } from '../i18n/language.ts'
 

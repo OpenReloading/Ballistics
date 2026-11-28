@@ -1,5 +1,4 @@
 import { expect, type Page } from '@playwright/test'
-import { storageName } from './edition.ts'
 
 const defaultOverrides: Record<string, string> = { lineOfSightOffset: 'cm' }
 
@@ -10,7 +9,7 @@ export const storeUnits = (page: Page, preset = 'metric-grams', overrides = defa
       if (localStorage.getItem(store) === null)
         localStorage.setItem(store, JSON.stringify({ preset: p, overrides: o }))
     },
-    [[preset, overrides], storageName('units')] as const,
+    [[preset, overrides], 'units'] as const,
   )
 
 /** The Settings entry of the sidebar: a button opening the settings dialog, in English or German. */

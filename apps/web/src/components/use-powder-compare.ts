@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { Powder } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'

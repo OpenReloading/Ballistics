@@ -1,5 +1,3 @@
-'use client'
-
 import type { I18n } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import { NativeSelect, Table, Text, TextInput } from '@mantine/core'
@@ -7,7 +5,6 @@ import { useDebouncedValue, useElementSize } from '@mantine/hooks'
 import type { UserCartridge } from '@rangefoundry/schema'
 import { chamberOf } from '@rangefoundry/svg-drawings/seating'
 import { Ruler } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import {
   type CSSProperties,
   memo,
@@ -18,6 +15,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import dynamic from '@/platform/dynamic.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { loadEnglish } from '../i18n/lingui.ts'
 import { formatNumber, localizeNumber } from '../i18n/number.ts'
@@ -76,7 +74,7 @@ loadEnglish(englishMessages)
 
 const SeatingPreview = dynamic(
   () => import('./seating-preview.tsx').then((m) => m.SeatingPreview),
-  { ssr: false, loading: () => <Loading what="the preview" inline /> },
+  { loading: () => <Loading what="the preview" inline /> },
 )
 
 type Translate = Translator['t']

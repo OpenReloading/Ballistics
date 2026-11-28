@@ -1,4 +1,4 @@
-/** The outer ring's square gives perspective and scale in one; pure, no React, DOM or Next.js. */
+/** The outer ring's square gives perspective and scale in one; pure, no React or DOM. */
 import { type ShotGroup, type TargetFace, type TargetSheet, toSi } from '@rangefoundry/schema'
 import type { FaceGeometry, FacePlane } from '@rangefoundry/target-recognition'
 import { english } from '../i18n/translate.ts'

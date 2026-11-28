@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Group, SegmentedControl } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
 import type { ECharts } from 'echarts/core'

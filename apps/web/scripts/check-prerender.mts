@@ -87,7 +87,7 @@ function listedCount(site: string, dir: string) {
   return index[dir.replace(/-(\w)/g, (_, c: string) => c.toUpperCase())]?.length
 }
 
-/** The routes the export must hold that have no `index.html` or no `index.txt`, and the record pages whose HTML lacks one of the record's own head values. */
+/** The routes the export must hold that have no `index.html`, and the record pages whose HTML lacks one of the record's own head values. */
 export function checkPages(site: string, env: Record<string, string | undefined> = process.env) {
   const expected: string[] = []
   const records: { route: string; kind: RecordKind; id: string }[] = []
@@ -105,8 +105,7 @@ export function checkPages(site: string, env: Record<string, string | undefined>
     expected.push(route, ...exported.map((id) => `${route}/${id}`))
     records.push(...exported.map((id) => ({ route, kind: dir, id })))
   }
-  const held = (route: string) =>
-    ['index.html', 'index.txt'].every((f) => existsSync(path.join(site, route, f)))
+  const held = (route: string) => existsSync(path.join(site, route, 'index.html'))
   const missing = expected.filter((route) => !held(route))
   const names = manufacturerNamesOf(site)
   const noHead = records

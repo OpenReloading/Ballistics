@@ -1,5 +1,3 @@
-'use client'
-
 import { Text } from '@mantine/core'
 import { Fragment, useEffect, useState } from 'react'
 import Link from '@/platform/link.tsx'

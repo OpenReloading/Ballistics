@@ -35,55 +35,34 @@ The web app's home page lists the newest five items of `apps/web/news/`, newest 
 
 ## Pages site
 
-`pages.yml` builds one site from two sources and deploys it in one deployment (a deployment replaces the whole site):
-
-- The root shows the latest release: the checkout of the newest GitHub Release's tag, built with `pnpm run pages:build`.
-- `/next/` shows `main`, built with `PAGES_EDITION=next` (`tools/src/pages.ts`).
-- Until the first release exists the root is a page that forwards to `/next/`.
-
-It runs on every push to `main`, when a release is published and on `workflow_dispatch`. A release created with the workflow token starts no workflow of its own, so `release.yml` then dispatches `pages.yml` itself (with the App token, the `release: published` event does).
-
-Both editions share one origin, so the next edition keeps its data under other names: its IndexedDB database, local storage keys and caches are prefixed `next:`, and its service worker has the scope `<site>/next/`. What the next edition stores in the browser is not carried over to the stable edition, and a database that a pre-release version wrote is not read: the app offers to delete it. The stable edition's service worker leaves `/next/` to the network.
+`pages.yml` builds the site from `main` on every push to `main` and on `workflow_dispatch`, and deploys it at the site root.
 
 `pnpm run pages:build` (`tools/src/pages.ts`, after `pnpm run build`) writes the site into `pages/`:
 
-- the web app as a static export under `PAGES_BASE_PATH`, with every record page prerendered from the API over the catalogue built from the data bundle;
+- the web app, a TanStack Start build under `PAGES_BASE_PATH`, with every record page prerendered from the data files of the catalogue built from the data bundle, and its app shell as `404.html` (GitHub Pages answers every miss with it, and the app shows the path's page or Not found);
 - the catalogue index and the records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data license (`data/LICENSE`) and `.nojekyll`.
+
+The log prints the size of the client's scripts and styles.
 
 Settings:
 
-- `PAGES_EDITION`: `stable` (default) or `next`. The next edition is built for `<base>/next`, with browser store names of its own.
-- `PAGES_URL`: the site's origin, which sets the docs' `url` and the app's `metadataBase`.
+- `PAGES_BASE_PATH`: the path the site is served under, empty for a site root, `/Ballistics` on the project site.
+- `PAGES_URL`: the site's origin, which sets the docs' `url`, the social image's address and the sitemap.
 - `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered and no docs site, for the review and e2e loop. The data files stay complete.
-- `--no-docs`: no docs site, every record prerendered (the e2e job's full export).
+- `--no-docs`: no docs site, every record prerendered (the e2e jobs' full build).
 
-`apps/web/.next` stays after the build: CI restores it as the Turbopack cache, and `check-weight` reads its manifests.
-
-GitHub Pages answers every miss of the site with the root `404.html`, also under `/next/`. The stable build therefore puts a script before Next's own scripts in that page (`withNextDispatch` of `tools/src/root-not-found.ts`): a stable miss shows the stable not-found page unchanged; a miss under `/next/` shows "Page not found" with a link to `<base>/next/`, keeps the rest of the stable page as inert text, and replaces the page with `next/404.edition.html` when that file answers ok. The next edition writes no such file until it builds with TanStack Start, so the fallback stays on screen.
-
-The e2e projects `editions-chromium`, `editions-firefox` and `editions-webkit` check that page, by default against the export at `WEB_URL`. To check it on a site of the deployed shape, build both editions, merge them as `pages.yml` does and pass the site in `EDITIONS_URL`:
-
-```sh
-PAGES_BASE_PATH=/Ballistics PAGES_EDITION=next pnpm run static:build
-mv pages pages-next
-PAGES_BASE_PATH=/Ballistics PAGES_EDITION=stable pnpm run static:build
-mv pages-next pages/next
-PAGES_BASE_PATH=/Ballistics PORT=3044 pnpm run pages:serve &
-EDITIONS_URL=http://localhost:3044/Ballistics/ pnpm --filter @rangefoundry/e2e exec playwright test --project "editions-*"
-```
-
-`pnpm run start:build` (`tools/src/start-site.ts`, after `pnpm run build`) writes both editions of the TanStack Start app, which the deployed site does not serve yet, as one site of the deployed shape into `pages-start/`: stable under `PAGES_BASE_PATH`, next under `<base>/next/`, each with its data files under `api/` and its app shell as `404.edition.html`, and a root `404.html` that hands a miss to the shell of its edition (`tools/src/root-not-found.ts`). `--sample` prerenders as `static:build` does; the log prints the client size of each edition. `pnpm run start:serve` serves it on `PORT` (default 3043). The e2e projects `start-chromium`, `start-firefox` and `start-webkit` build and serve it themselves at `/Ballistics`; `START_SITE=off` leaves out the build and those projects.
+`pnpm run pages:serve` serves `pages/` under `PAGES_BASE_PATH` on `PORT` (default 3003), as GitHub Pages does:
 
 ```sh
 pnpm run build
-PAGES_BASE_PATH=/Ballistics PAGES_URL=https://openreloading.github.io pnpm run start:build --sample
-PAGES_BASE_PATH=/Ballistics pnpm run start:serve   # http://localhost:3043/Ballistics/ and .../Ballistics/next/
-pnpm --filter @rangefoundry/e2e exec playwright test --project "start-*"
+PAGES_BASE_PATH=/Ballistics pnpm run static:build
+PAGES_BASE_PATH=/Ballistics pnpm run pages:serve   # http://localhost:3003/Ballistics/
+WEB_URL=http://localhost:3003/Ballistics/ pnpm run test:e2e
 ```
 
 Pass `PAGES_URL` inline only: exported, it also turns on the e2e project `pages` against that site.
 
-Upstream issues to recheck: TanStack/router#8741: drop the `/?root` entry when it closes (fix proposed in TanStack/router#8742; a distinct `spa.maskPath` is reported as another workaround in the issue thread). TanStack/router#8473: when it closes, retry the root `notFoundComponent` instead of the splat route (`apps/web/src/routes/$.tsx`), lift the exact pins of `@tanstack/react-start` and `@tanstack/react-router`, and rerun `apps/e2e/tests/start/hydration.spec.ts`.
+Upstream issues to recheck: TanStack/router#8741: drop the `/?root` entry when it closes (fix proposed in TanStack/router#8742; a distinct `spa.maskPath` is reported as another workaround in the issue thread). TanStack/router#8473: when it closes, retry the root `notFoundComponent` instead of the splat route (`apps/web/src/routes/$.tsx`), lift the exact pins of `@tanstack/react-start` and `@tanstack/react-router`, and rerun `apps/e2e/tests/hydration/hydration.spec.ts`.
 
 ## Self-hosting
 
