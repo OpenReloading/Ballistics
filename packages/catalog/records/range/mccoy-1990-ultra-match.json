@@ -1,0 +1,204 @@
+{
+  "id": "mccoy-1990-ultra-match",
+  "projectile": "Ultra Match Bullet",
+  "bulletDiameter": {
+    "value": 5.69
+  },
+  "bulletMass": {
+    "value": 2.59
+  },
+  "rounds": [
+    {
+      "label": "19276(a)",
+      "dragCoefficient": {
+        "value": 0.54
+      },
+      "mach": {
+        "value": 1.017
+      },
+      "totalYaw": {
+        "value": 0.55
+      }
+    },
+    {
+      "label": "19276(b)",
+      "dragCoefficient": {
+        "value": 0.372
+      },
+      "mach": {
+        "value": 0.962
+      },
+      "totalYaw": {
+        "value": 0.3
+      }
+    },
+    {
+      "label": "19277(a)",
+      "dragCoefficient": {
+        "value": 0.287
+      },
+      "mach": {
+        "value": 0.93
+      },
+      "totalYaw": {
+        "value": 0.83
+      }
+    },
+    {
+      "label": "19276(c)",
+      "dragCoefficient": {
+        "value": 0.28
+      },
+      "mach": {
+        "value": 0.929
+      },
+      "totalYaw": {
+        "value": 0.38
+      }
+    },
+    {
+      "label": "19278(a)",
+      "dragCoefficient": {
+        "value": 0.275
+      },
+      "mach": {
+        "value": 0.926
+      },
+      "totalYaw": {
+        "value": 0.27
+      }
+    },
+    {
+      "label": "19284(a)*",
+      "dragCoefficient": {
+        "value": 0.321
+      },
+      "mach": {
+        "value": 0.924
+      },
+      "totalYaw": {
+        "value": 4.26
+      }
+    },
+    {
+      "label": "19277(b)",
+      "dragCoefficient": {
+        "value": 0.276
+      },
+      "mach": {
+        "value": 0.9
+      },
+      "totalYaw": {
+        "value": 0.97
+      }
+    },
+    {
+      "label": "19278(b)",
+      "dragCoefficient": {
+        "value": 0.265
+      },
+      "mach": {
+        "value": 0.898
+      },
+      "totalYaw": {
+        "value": 0.32
+      }
+    },
+    {
+      "label": "19284(b)*",
+      "dragCoefficient": {
+        "value": 0.311
+      },
+      "mach": {
+        "value": 0.89
+      },
+      "totalYaw": {
+        "value": 4.06
+      }
+    },
+    {
+      "label": "19277(c)",
+      "dragCoefficient": {
+        "value": 0.265
+      },
+      "mach": {
+        "value": 0.872
+      },
+      "totalYaw": {
+        "value": 0.9
+      }
+    },
+    {
+      "label": "19278(c)",
+      "dragCoefficient": {
+        "value": 0.256
+      },
+      "mach": {
+        "value": 0.871
+      },
+      "totalYaw": {
+        "value": 0.2
+      }
+    },
+    {
+      "label": "19284(c)*",
+      "dragCoefficient": {
+        "value": 0.291
+      },
+      "mach": {
+        "value": 0.86
+      },
+      "totalYaw": {
+        "value": 3.68
+      }
+    },
+    {
+      "label": "19279(a)",
+      "dragCoefficient": {
+        "value": 0.249
+      },
+      "mach": {
+        "value": 0.839
+      },
+      "totalYaw": {
+        "value": 0.74
+      }
+    },
+    {
+      "label": "19279(b)",
+      "dragCoefficient": {
+        "value": 0.243
+      },
+      "mach": {
+        "value": 0.815
+      },
+      "totalYaw": {
+        "value": 1.07
+      }
+    },
+    {
+      "label": "19279(c)",
+      "dragCoefficient": {
+        "value": 0.237
+      },
+      "mach": {
+        "value": 0.792
+      },
+      "totalYaw": {
+        "value": 0.93
+      }
+    }
+  ],
+  "provenance": {
+    "kind": "measured",
+    "sources": [
+      {
+        "source": "mccoy-r-l-aerodynamic-characteristics-of-caliber",
+        "url": "https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/ADA229713.xhtml",
+        "retrieved": "2026-10-08",
+        "page": "45, 49",
+        "sha256": "bd6d8f928f6239239eaf5b9670f78c8f463bc6622b5a113127be8cfd536ee478"
+      }
+    ]
+  }
+}

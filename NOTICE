@@ -12,6 +12,13 @@ records) state facts as a maker or another publisher prints them. They carry no 
 in these facts, and the publisher's terms apply, as each citation links them. The project is not
 affiliated with or endorsed by these makers and publishers.
 
+The firing records (packages/catalog/records/firings/) hold values from publications under CC BY 4.0
+(LICENSES/CC-BY-4.0.txt); each record cites its publication, and the authors named there hold the
+rights. The range records (packages/catalog/records/range/) hold values from reports by US
+Government employees, in the public domain in the US (LicenseRef-US-Gov-PD,
+LICENSES/LicenseRef-US-Gov-PD.txt). Values are extracted from the cited publication; no text, table
+or figure is copied.
+
 ---
 
 The hole detection model files (apps/web/public/models/hole-model-*.onnx) are licensed under
