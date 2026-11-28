@@ -1,0 +1,22 @@
+{
+  "id": "7-mm-precision-rifle-cartridge-hodgdon",
+  "origin": "catalogue",
+  "cartridge": "catalogue:7-mm-precision-rifle-cartridge",
+  "caseManufacturer": "catalogue:hornady",
+  "fillLevel": "mouth",
+  "waterCapacity": {
+    "value": 5.21
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Handloading the New 7mm PRC",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://hodgdonpowderco.com/articles/handloading-the-new-7mm-prc/",
+        "retrieved": "2026-11-18",
+        "terms": "https://hodgdonpowderco.com/terms-of-service/"
+      }
+    ]
+  }
+}

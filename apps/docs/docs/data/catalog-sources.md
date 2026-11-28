@@ -14,7 +14,7 @@ Records whose sources are the project's own (the demo records, the [construction
 
 ## Maker and published records
 
-A bullet or powder record from a maker or another publisher (a magazine, a measured density table, a shop's list) holds facts as the publisher prints them. Each citation names:
+A bullet, powder or case capacity record from a maker or another publisher (a magazine, a measured density table, a shop's list) holds facts as the publisher prints them. Each citation names:
 
 - the publisher;
 - the URL, or for a document without one, its title and edition;

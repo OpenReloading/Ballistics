@@ -39,7 +39,13 @@ SPDX-License-Identifier = "CC-BY-SA-4.0"
 
 # Facts makers and other publishers print (packages/catalog/LICENSE).
 [[annotations]]
-path = ["packages/catalog/records/bullets/*.json", "packages/catalog/records/powders/*.json"]
+path = [
+  "packages/catalog/records/bullets/*.json",
+  "packages/catalog/records/powders/*.json",
+  "packages/catalog/records/capacities/6-5-prc-shooting-times.json",
+  "packages/catalog/records/capacities/6-8-western-shooting-times.json",
+  "packages/catalog/records/capacities/7-mm-precision-rifle-cartridge-hodgdon.json",
+]
 SPDX-FileCopyrightText = "NONE"
 SPDX-License-Identifier = "LicenseRef-Published-Facts AND CC-BY-SA-4.0"
 
