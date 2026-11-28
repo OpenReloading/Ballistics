@@ -39,8 +39,8 @@ All errors are absolute relative errors. For the muzzle velocity the error of a 
 
 ```sh
 pnpm run build
-node packages/cli/dist/bin.js verify --rows <rows> --records <records> --params fit-on-training --split validation
-node packages/cli/dist/bin.js verify --rows <rows> --records <records> --params fit-on-training --split test --final
+node apps/cli/dist/bin.js verify --rows <rows> --records <records> --params fit-on-training --split validation
+node apps/cli/dist/bin.js verify --rows <rows> --records <records> --params fit-on-training --split test --final
 ```
 
 `--params fit-on-training` is part of both commands because the powder records were fitted on the training rows of the earlier rule, so a run with `--params records` is not held out under the salted rule ([Split](#split)). `--json` gives the result as data; `--group-by powder` and `--group-by family` give the groups; `--leave-one-powder-out` gives the line of the powder not in the fitted set (`notInFittedSet`), which fills the last row of the results table. The second command is the sealed run and is refused without `--final`. A change to the model is judged with `compare --baseline <verify.json> --candidate <model>` on the same rows. The row and column format and the model version hash are defined on the [command line](../cli.md) page.

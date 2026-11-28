@@ -58,9 +58,9 @@ Public: the cartridge ids of the catalog and the hash rule. The row counts are o
 
 ## Where in the app
 
-- `packages/cli/src/split.ts`, `splitOf` and `splitSalt`.
-- `packages/cli/src/commands.ts`, `splitSalt` in every result and the refusal of a baseline of another salt.
-- `packages/cli/src/result.ts`, the field in the result schema.
+- `apps/cli/src/split.ts`, `splitOf` and `splitSalt`.
+- `apps/cli/src/commands.ts`, `splitSalt` in every result and the refusal of a baseline of another salt.
+- `apps/cli/src/result.ts`, the field in the result schema.
 - Pages: [command line](../cli.md#split), [validation](../models/validation.md#split), [published loads](../data/published-loads.md#hold-out-split).
 
 ## Confidence

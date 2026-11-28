@@ -93,7 +93,7 @@ Measured: load rows that are not in the repository, aggregates per powder family
 - `packages/ballistics/src/interior/model.ts`, `interior`, and `packages/ballistics/src/interior/form.ts`, the two-stage form.
 - `packages/ballistics/src/interior/record-load.ts`, `recordLoad`.
 - `packages/schema/src/powder.ts`, `pressureExponent` of the powder record.
-- `packages/cli/src/commands.ts`, `verify` and `compare`.
+- `apps/cli/src/commands.ts`, `verify` and `compare`.
 - Model pages: [M3](../models/interior-m3.md), [burn laws and form functions](../models/interior-burn-forms.md), [powder fit](../models/interior-powder-fit.md), [validation](../models/validation.md).
 
 ## Confidence

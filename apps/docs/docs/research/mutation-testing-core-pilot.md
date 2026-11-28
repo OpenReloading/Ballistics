@@ -273,8 +273,8 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `apps/web/src/lib/field-spec.ts`, `apps/web/test/field-spec.test.ts`
 - `packages/ballistics/src/cartridge-specs.ts`, `packages/ballistics/test/cartridge-specs.test.ts`
 - `packages/use-cases/src/limits.ts`, `packages/use-cases/test/limits.test.ts`
-- `packages/cli/src/rows.ts`, `packages/cli/test/rows.test.ts`
-- `packages/cli/src/metrics.ts`, `packages/cli/test/metrics.test.ts`
+- `apps/cli/src/rows.ts`, `apps/cli/test/rows.test.ts`
+- `apps/cli/src/metrics.ts`, `apps/cli/test/metrics.test.ts`
 - `packages/importers/src/pressure-history.ts`, `packages/importers/test/pressure-history.test.ts`
 - `packages/use-cases/src/resolve.ts`, `packages/use-cases/test/resolve.test.ts`
 - `packages/api/src/routes/charge-target.ts`, `packages/api/test/charge-target.test.ts`
