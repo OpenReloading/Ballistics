@@ -303,7 +303,8 @@ function fitOf(
       ? undefined
       : familyChoice(options.family, data, model, velocitySigma)
   // a fit on estimated capacities would move the values of every row of the powder, the rows with a measured capacity too
-  const fit = fitPowders(data.rows, withoutEstimates(data.records), model.interior, velocitySigma, {
+  const fit = fitPowders(data.rows, withoutEstimates(data.records), model.interior, {
+    velocitySigma,
     exponent,
     family,
     pressureSigma,

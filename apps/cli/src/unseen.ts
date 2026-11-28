@@ -1,5 +1,5 @@
 import type { Powder } from '@rangefoundry/schema'
-import { percentile } from './stats.ts'
+import { percentile } from '@rangefoundry/statistics'
 
 /** The powder family: propellant base and grain form of the record, `unspecified` where it has none. */
 export const familyOf = (
@@ -9,18 +9,22 @@ export const familyOf = (
     ? `${powder.propellantBase ?? 'unspecified'}/${powder.grainForm ?? 'unspecified'}`
     : 'unknown'
 
-type Interior = NonNullable<Powder['interior']>
-
-const median = (values: number[]) => percentile(values, 0.5) as number
+/** The median of `values`, at least one. */
+const median = (values: readonly number[]) =>
+  percentile(
+    values.toSorted((a, b) => a - b),
+    0.5,
+  )
 
 /** Each field its fit moved (`interior.fitted`) becomes the median of that field over `others` of its family, else over all `others`, its fixed inputs staying its own; undefined without `interior` or without another powder that has one. */
 export function unseenPowder(powder: Powder, others: readonly Powder[]): Powder | undefined {
   const own = powder.interior
-  const fitted = others.flatMap((p) => (p.interior && p.id !== powder.id ? [p] : []))
+  const fitted = others.flatMap((p) =>
+    p.interior && p.id !== powder.id ? [{ powder: p, interior: p.interior }] : [],
+  )
   if (!own || fitted.length === 0) return undefined
-  const family = fitted.filter((p) => familyOf(p) === familyOf(powder))
-  // every powder of `fitted` has interior parameters
-  const set = (family.length > 0 ? family : fitted).map((p) => p.interior as Interior)
+  const family = fitted.filter((f) => familyOf(f.powder) === familyOf(powder))
+  const set = (family.length > 0 ? family : fitted).map((f) => f.interior)
   const moved = new Set(own.fitted)
   return {
     ...powder,
