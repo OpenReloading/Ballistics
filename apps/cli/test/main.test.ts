@@ -251,11 +251,11 @@ describe('exit codes', () => {
   })
 
   it('is 64 for a misspelled option, naming it and the option it is close to', async () => {
-    const { code, stdout, stderr } = await cli(['verify', ...data, '--grop-by', 'powder'], {}, true)
+    const { code, stdout, stderr } = await cli(['verify', ...data, '--per-rows'], {}, true)
     expect(code).toBe(64)
     expect(stdout).toBe('')
     expect(stderr).toMatch(
-      /^Unknown option '--grop-by'\n\(Did you mean --group-by\?\)\n\nusage: ballistics verify /,
+      /^Unknown option '--per-rows'\n\(Did you mean --per-row\?\)\n\nusage: ballistics verify /,
     )
   })
 
