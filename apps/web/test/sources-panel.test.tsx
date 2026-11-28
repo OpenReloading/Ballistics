@@ -75,6 +75,16 @@ it("shows each source's own kind and that the project works out the values when 
   expect(html).toContain(workedLine)
 })
 
+it('says the project works out fitted values from an open-license source, without the publisher line', () => {
+  const html = renderRecord({
+    kind: 'fitted',
+    sources: [{ title: 'Open drag table', origin: 'public', license: 'CC-BY-4.0' }],
+  })
+  expect(html).toContain('>fitted</td>')
+  expect(html).toContain(workedLine)
+  expect(html).not.toContain('Facts as')
+})
+
 it('names each publisher and links its terms, without a Kind column or the second sentence for published values', () => {
   const html = renderRecord({ kind: 'published', sources: [powderSheet] })
   expect(html).toContain(leadLine)

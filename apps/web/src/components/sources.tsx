@@ -93,25 +93,25 @@ function SourcesLead({ provenance }: { provenance: Provenance }) {
   const publishers = [
     ...new Set(provenance.sources.filter(isPublished).map((s) => s.publisher as string)),
   ]
-  if (publishers.length === 0) return null
   const worked = provenance.sources.some((s) => workedKinds.includes(s.kind ?? provenance.kind))
+  if (publishers.length === 0 && !worked) return null
   const names = new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(publishers)
-  return (
-    <p>
-      {i18n._({
+  const sentences = [
+    publishers.length > 0 &&
+      i18n._({
         id: 'recordSources.lead',
         message:
           '{count, plural, one {Facts as {publishers} publishes them. {publishers} has not reviewed this record; its terms apply.} other {Facts as {publishers} publish them. They have not reviewed this record; their terms apply.}}',
         values: { count: publishers.length, publishers: names },
-      })}
-      {worked &&
-        ` ${i18n._({
-          id: 'recordSources.worked',
-          message:
-            'Values of kind derived, computed or fitted are worked out by this project from the cited source; the Kind column shows which.',
-        })}`}
-    </p>
-  )
+      }),
+    worked &&
+      i18n._({
+        id: 'recordSources.worked',
+        message:
+          'Values of kind derived, computed or fitted are worked out by this project from the cited source; the Kind column shows which.',
+      }),
+  ]
+  return <p>{sentences.filter(Boolean).join(' ')}</p>
 }
 
 const fieldCount = /*i18n*/ {

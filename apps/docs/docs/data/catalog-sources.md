@@ -21,7 +21,7 @@ A bullet or powder record from a maker or another publisher (a magazine, a measu
 - the retrieval date, where known;
 - the publisher's terms, as a link in `terms`.
 
-When a source names a publisher and links its terms, under no SPDX `license` and with an `origin` other than `public` or `community`, the record page says the record holds facts as that publisher publishes them, that the publisher has not reviewed the record, and that its terms apply; the Terms column links them. The project claims no rights in these facts.
+When a source names a publisher and links its terms, under no SPDX `license` and with an `origin` other than `public` or `community`, the record page says the record holds facts as that publisher publishes them, that the publisher has not reviewed the record, and that its terms apply; the Terms column links them. Data from a source with `origin` `manufacturer` carries no project license: the manufacturer's terms apply. Data from any other source without a `license` is CC BY-SA 4.0, as the `LICENSE` of `@rangefoundry/catalog` states.
 
 The catalog check (`makerRows` of `@rangefoundry/catalog`) refuses a maker source without a field list, and one without a terms link unless it is a community list of the bullet `length` only. A maker source may supply only the fields of `makerSourceFields` (`@rangefoundry/schema`); a fitted powder source whose field list names only `interior` or fields below it may supply those.
 
