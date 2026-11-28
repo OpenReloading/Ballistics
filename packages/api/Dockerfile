@@ -19,7 +19,7 @@ COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
 COPY packages/api/package.json packages/api/
 COPY packages/svg-drawings/package.json packages/svg-drawings/
-COPY packages/cli/package.json packages/cli/
+COPY apps/cli/package.json apps/cli/
 COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
@@ -62,7 +62,7 @@ COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/target-recognition/package.json packages/target-recognition/
 COPY packages/api/package.json packages/api/
 COPY packages/svg-drawings/package.json packages/svg-drawings/
-COPY packages/cli/package.json packages/cli/
+COPY apps/cli/package.json apps/cli/
 COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
