@@ -46,22 +46,34 @@ export function rowsFromPublished(
 type Load = PublishedLoads['loads'][number]
 type Charge = Load['charges'][number]
 
+/** Where a charge is printed: the file id, its cartridge and the charge's position in the file. */
+interface Place {
+  table: string
+  cartridge: string
+  line: number
+}
+
+/** The bullet of a row: the printed record, else {@link standInId} with the printed mass as `bulletMass`. */
+function bulletOf(cartridge: string, load: Load) {
+  const bullet = load.bullet.record
+  return {
+    bullet: bullet ? id(bullet) : standInId(cartridge, load.bullet.mass.value),
+    ...(bullet === undefined && { bulletMass: load.bullet.mass.value }),
+  }
+}
+
 /** The row of one printed charge with a velocity and a powder record. */
 function rowOf(
-  file: PublishedLoads,
-  cartridge: string,
+  { table, cartridge, line }: Place,
   load: Load,
   c: Charge & { velocity: NonNullable<Charge['velocity']> },
   powder: string,
-  line: number,
 ): Row {
-  const bullet = load.bullet.record
   const distance = c.velocity.point?.distance
   return {
     line,
     cartridge,
-    bullet: bullet ? id(bullet) : standInId(cartridge, load.bullet.mass.value),
-    ...(bullet === undefined && { bulletMass: load.bullet.mass.value }),
+    ...bulletOf(cartridge, load),
     printedBullet: load.bullet.printed,
     powder: id(powder),
     charge: c.charge.value,
@@ -71,7 +83,7 @@ function rowOf(
     muzzleDistance: distance && distance.value / 1000,
     barrel: load.barrel?.length?.value,
     coal: load.coal?.value,
-    table: file.id,
+    table,
   }
 }
 
@@ -90,7 +102,7 @@ function fileRows(
       const powder = load.powder.record
       if (velocity === undefined) skip('noVelocity')
       else if (powder === undefined) skip('noPowderRecord')
-      else rows.push(rowOf(file, cartridge, load, { ...c, velocity }, powder, line))
+      else rows.push(rowOf({ table: file.id, cartridge, line }, load, { ...c, velocity }, powder))
     }
   return rows
 }
@@ -106,7 +118,9 @@ const det = ([a0, a1, a2]: Vector, [b0, b1, b2]: Vector, [c0, c1, c2]: Vector) =
   a0 * (b1 * c2 - b2 * c1) - b0 * (a1 * c2 - a2 * c1) + c0 * (a1 * b2 - a2 * b1)
 
 /** The bullet length (mm) for a mass (g) and diameter (mm): the log-linear least-squares fit ln L = a + b ln m + c ln d over every bullet record with a length, from the normal equations; undefined with fewer than 3 such records or a singular system. */
-export function lengthModel(bullets: Iterable<Bullet>) {
+export function lengthModel(
+  bullets: Iterable<Bullet>,
+): ((mass: number, diameter: number) => number) | undefined {
   const points = [...bullets].flatMap((b) =>
     b.length && b.diameter
       ? [
@@ -117,7 +131,7 @@ export function lengthModel(bullets: Iterable<Bullet>) {
         ]
       : [],
   )
-  if (points.length < 3) return
+  if (points.length < 3) return undefined
   // the columns of X'X and X'y
   const column = (j: 0 | 1 | 2): Vector => {
     const out: Vector = [0, 0, 0]
@@ -128,7 +142,7 @@ export function lengthModel(bullets: Iterable<Bullet>) {
   const rhs: Vector = [0, 0, 0]
   for (const { x, y } of points) for (const i of [0, 1, 2] as const) rhs[i] += x[i] * y
   const d = det(c0, c1, c2)
-  if (Math.abs(d) < 1e-9) return
+  if (Math.abs(d) < 1e-9) return undefined
   const a = det(rhs, c1, c2) / d
   const b = det(c0, rhs, c2) / d
   const c = det(c0, c1, rhs) / d
@@ -138,6 +152,12 @@ export function lengthModel(bullets: Iterable<Bullet>) {
 
 /** As `apps/docs/docs/models/validation.md` takes them: a stand-in bullet per cartridge and printed mass ({@link standInId}: the cartridge's smallest G1, the printed mass and the length of {@link lengthModel}; no construction or drag, so a stand-in row printed at a distance stays uncorrected), and a row without a barrel length the median printed barrel of its cartridge, else 610 mm for a case (L3) longer than 33 mm and 120 mm for a shorter one; adds the stand-ins to `records.bullets`. */
 export function fillInputs(rows: readonly Row[], records: Records): Row[] {
+  addStandIns(rows, records)
+  return withBarrels(rows, records)
+}
+
+/** Adds to `records.bullets` the stand-in bullet of each row that names one without a record. */
+function addStandIns(rows: readonly Row[], records: Records) {
   const length = lengthModel(records.bullets.values())
   for (const row of rows) {
     if (records.bullets.has(row.bullet) || !row.bullet.startsWith('stand-in-')) continue
@@ -147,6 +167,16 @@ export function fillInputs(rows: readonly Row[], records: Records): Row[] {
     if (diameter === undefined || mass === undefined || !length) continue
     records.bullets.set(row.bullet, standIn(row.bullet, mass, diameter, length(mass, diameter)))
   }
+}
+
+/** The barrel (mm) of a case (L3) in mm: 610 longer than 33 mm, else 120; undefined without a case length. */
+function caseBarrel(caseLength: number | undefined): number | undefined {
+  if (caseLength === undefined) return undefined
+  return caseLength > 33 ? 610 : 120
+}
+
+/** `rows`, each without a barrel length given the median printed barrel of its cartridge, else {@link caseBarrel}. */
+function withBarrels(rows: readonly Row[], records: Records): Row[] {
   const barrels = new Map<string, number[]>()
   for (const r of rows)
     if (r.barrel !== undefined)
@@ -155,15 +185,14 @@ export function fillInputs(rows: readonly Row[], records: Records): Row[] {
     if (r.barrel !== undefined) return r
     const median = percentile(barrels.get(r.cartridge) ?? [], 0.5)
     const caseLength = cartridgeValue(records.cartridges.get(r.cartridge), 'L3')
-    const barrel = median ?? (caseLength === undefined ? undefined : caseLength > 33 ? 610 : 120)
-    return { ...r, barrel }
+    return { ...r, barrel: median ?? caseBarrel(caseLength) }
   })
 }
 
 /** A bullet record that stands in for a printed bullet without a record. */
-function standIn(id: string, mass: number, diameter: number, length: number): Bullet {
+function standIn(bulletId: string, mass: number, diameter: number, length: number): Bullet {
   return {
-    id,
+    id: bulletId,
     manufacturer: 'stand-in',
     name: `Stand-in ${mass} g`,
     nameOnly: true,
@@ -176,5 +205,5 @@ function standIn(id: string, mass: number, diameter: number, length: number): Bu
         { title: 'Stand-in of the command line: cartridge G1, printed mass, modeled length' },
       ],
     },
-  } as Bullet
+  }
 }

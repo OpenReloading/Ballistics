@@ -1,10 +1,10 @@
 import { handgunBarrelLengthLimit } from '@rangefoundry/ballistics'
 import { compareKeys, fromSi } from '@rangefoundry/schema'
+import { percentile } from '@rangefoundry/statistics'
 import type { Outcome } from './evaluate.ts'
 import { reasons } from './evaluate.ts'
 import { basisOf } from './fit.ts'
 import type { Change, Evaluation, Metrics } from './result.ts'
-import { percentile } from './stats.ts'
 
 type Used = Outcome & { prediction: { velocity: number; pressure: number } }
 
@@ -32,10 +32,20 @@ const pressureError = (o: Used) => {
   return error === undefined ? undefined : Math.abs(error)
 }
 
-const stats = (errors: number[]) =>
-  errors.length === 0
-    ? null
-    : { median: percentile(errors, 0.5) as number, p90: percentile(errors, 0.9) as number }
+/** Percentile `q` (0 to 1) of `values`, at least one. */
+const percentileOf = (values: readonly number[], q: number) =>
+  percentile(
+    values.toSorted((a, b) => a - b),
+    q,
+  )
+
+/** The median and the P90 of `errors`, at least one. */
+const summary = (errors: readonly number[]) => ({
+  median: percentileOf(errors, 0.5),
+  p90: percentileOf(errors, 0.9),
+})
+
+const stats = (errors: readonly number[]) => (errors.length === 0 ? null : summary(errors))
 
 /** The classes of {@link barrelClassOf}. */
 export const barrelClasses = ['handgun', 'rifle'] as const
@@ -44,8 +54,10 @@ export const barrelClasses = ['handgun', 'rifle'] as const
 export type BarrelClass = (typeof barrelClasses)[number]
 
 /** The class of a barrel length in mm: `handgun` under `handgunBarrelLengthLimit`, the limit of the start-pressure rule, else `rifle`; undefined without a length. */
-export const barrelClassOf = (barrel: number | undefined): BarrelClass | undefined =>
-  barrel === undefined ? undefined : barrel < handgunBarrelLengthLimit * 1000 ? 'handgun' : 'rifle'
+export function barrelClassOf(barrel: number | undefined): BarrelClass | undefined {
+  if (barrel === undefined) return undefined
+  return barrel < handgunBarrelLengthLimit * 1000 ? 'handgun' : 'rifle'
+}
 
 /** `valueOf` of the rows of each barrel class in `used`; a class without a row is left out. */
 const perBarrel = <T>(used: readonly Used[], valueOf: (rows: Used[]) => T) =>
@@ -71,7 +83,7 @@ export function halfWidthOf(training: readonly Outcome[]) {
   const used = training.filter(isUsed)
   return {
     byBarrel: perBarrel(used, (rows) => ({
-      halfWidth: percentile(rows.map(bandDistance), 0.9) as number,
+      halfWidth: percentileOf(rows.map(bandDistance), 0.9),
       trainingRows: rows.length,
     })),
     trainingRows: used.length,
@@ -123,10 +135,7 @@ export function metricsOf(items: readonly Outcome[], halfWidth: HalfWidth): Metr
     pressureByBasis: Object.fromEntries(
       [...bases]
         .toSorted(([a], [b]) => compareKeys(a, b))
-        .map(([basis, errors]) => [
-          basis,
-          { ...(stats(errors) as NonNullable<ReturnType<typeof stats>>), rows: errors.length },
-        ]),
+        .map(([basis, errors]) => [basis, { ...summary(errors), rows: errors.length }]),
     ),
     interval:
       used.length === 0 || used.some((o) => widthOf(o) === null)
