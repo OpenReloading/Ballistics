@@ -1,0 +1,4 @@
+exit 70
+--- stdout
+--- stderr
+error: no space left on the device

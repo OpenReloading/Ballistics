@@ -1,0 +1,32 @@
+exit 0
+--- stdout
+{
+  "schemaVersion": 2,
+  "notice": "simulation, not load data",
+  "format": "rangefoundry-cli-fit",
+  "command": "fit",
+  "inputs": {
+    "rows": "9ccecaaaa38860d49da04d0abf27c06494b2ee9dbce1dcb27ad607903ea9b030",
+    "records": "7595eaf50cfa271d50eac4f6fc0347fd17300adadedbc121fad43d7673c6f2f1"
+  },
+  "model": "m3",
+  "modelVersion": "<sha256>",
+  "split": "training",
+  "splitSalt": "2026-11-12",
+  "velocitySigma": 0.03,
+  "powders": {
+    "demo-powder-dp40": {
+      "vivacity": {
+        "value": 0.6033064749413409,
+        "standardUncertainty": 0.0148016482194092
+      },
+      "factor": 0.9857948936950015,
+      "rows": 3,
+      "cartridges": 1,
+      "chiSquarePerDegree": 0.002801989819676655,
+      "iterations": 4
+    }
+  },
+  "notFitted": {}
+}
+--- stderr

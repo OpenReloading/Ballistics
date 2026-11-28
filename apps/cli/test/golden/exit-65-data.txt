@@ -1,0 +1,4 @@
+exit 65
+--- stdout
+--- stderr
+{"error":{"kind":"data","message":"rows.csv:2: charge_g is not a number"}}

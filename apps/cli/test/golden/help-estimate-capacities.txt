@@ -1,0 +1,29 @@
+exit 0
+--- stdout
+usage: ballistics estimate-capacities --out <dir> [--records <dir>]
+
+Writes a capacity record (provenance kind derived) for each cartridge of the
+records that has a case outline and neither a capacity nor a case with one, to
+<dir>/capacities/, a folder that must not exist yet: the outline volume times
+the median of capacity over outline volume of the cartridges with a capacity
+record. Pass <dir> as one more --records root: verify and compare report its
+rows as estimatedCapacity, apart from the other rows, and fit does not read
+them. Writes the fill factor, its cartridges, its leave-one-out error and the
+count as JSON.
+
+options:
+  --out <dir>      the folder to write capacities/ into
+  --records <dir>  a records root, repeatable (default: BALLISTICS_RECORDS,
+                   roots joined by : or on Windows ;); a first root with every
+                   kind directory, as the records folder of a repository clone,
+                   replaces the catalog bundle, other roots add their records to
+                   it; the sources an added record cites must be records of the
+                   adding roots
+  -h, --help       this text
+
+example:
+  node apps/cli/dist/bin.js estimate-capacities --out /tmp/estimates
+
+exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
+unreadable input, 70 internal error
+--- stderr

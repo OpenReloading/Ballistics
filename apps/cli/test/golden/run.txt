@@ -1,0 +1,387 @@
+exit 0
+--- stdout
+{
+  "notice": "simulation, not load data",
+  "model": "m3",
+  "units": {
+    "time": "s",
+    "travel": "m",
+    "velocity": "m/s",
+    "pressure": "Pa",
+    "gasTemperature": "K",
+    "energy": "J",
+    "burntFraction": "1",
+    "efficiency": "1",
+    "mass": "kg"
+  },
+  "result": {
+    "valid": true,
+    "points": [
+      {
+        "time": 0,
+        "travel": 0,
+        "velocity": 0,
+        "burntFraction": 0.0006569517439082657,
+        "meanPressure": 1000000.0000000001,
+        "basePressure": 1000000.0000000001,
+        "breechPressure": 1000000.0000000001,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0001,
+        "travel": 0.000024535408624927543,
+        "velocity": 0.5725497330399135,
+        "burntFraction": 0.0015665976787901951,
+        "meanPressure": 2383079.266947767,
+        "basePressure": 2169896.4571249634,
+        "breechPressure": 2489670.6718591684,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0002,
+        "travel": 0.00014019484155070893,
+        "velocity": 1.9344725658720237,
+        "burntFraction": 0.0037303705303308433,
+        "meanPressure": 5657554.622863443,
+        "basePressure": 5151447.500051377,
+        "breechPressure": 5910608.184269475,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0003,
+        "travel": 0.0004718720985439982,
+        "velocity": 5.151687324374523,
+        "burntFraction": 0.008841762882530111,
+        "meanPressure": 13296871.137599565,
+        "basePressure": 12107374.678005993,
+        "breechPressure": 13891619.367396351,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0004,
+        "travel": 0.0013094793792609446,
+        "velocity": 12.621817266271874,
+        "burntFraction": 0.02071003028806744,
+        "meanPressure": 30500852.95344426,
+        "basePressure": 27772342.14610739,
+        "breechPressure": 31865108.35711269,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0005,
+        "travel": 0.003298693016880326,
+        "velocity": 29.293670015096964,
+        "burntFraction": 0.04719765608678847,
+        "meanPressure": 66252448.36085752,
+        "basePressure": 60325711.76627601,
+        "breechPressure": 69215816.65814826,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0006,
+        "travel": 0.007752673546592257,
+        "velocity": 63.55301680898049,
+        "burntFraction": 0.10162764486226822,
+        "meanPressure": 129024900.27062349,
+        "basePressure": 117482736.66813959,
+        "breechPressure": 134795982.07186544,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0007,
+        "travel": 0.016903490596575813,
+        "velocity": 124.34587540621466,
+        "burntFraction": 0.19821310024133998,
+        "meanPressure": 209853466.53753832,
+        "basePressure": 191080632.4702825,
+        "breechPressure": 219239883.57116625,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0008,
+        "travel": 0.03354322384315365,
+        "velocity": 212.2780826566205,
+        "burntFraction": 0.3379165535044139,
+        "meanPressure": 273273599.06799644,
+        "basePressure": 248827398.5123929,
+        "breechPressure": 285496699.3457982,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0008958021672213691,
+        "travel": 0.058552634577914014,
+        "velocity": 310.9434742154547,
+        "burntFraction": 0.4946724948066705,
+        "meanPressure": 292900010.2009452,
+        "basePressure": 266698092.35549322,
+        "breechPressure": 306000969.1236712,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0008958021673517752,
+        "travel": 0.05855263461846291,
+        "velocity": 310.9434743527404,
+        "burntFraction": 0.49467249502478494,
+        "meanPressure": 292900010.2009452,
+        "basePressure": 266698092.35549322,
+        "breechPressure": 306000969.1236712,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0008958021674247612,
+        "travel": 0.05855263464115746,
+        "velocity": 310.9434744295769,
+        "burntFraction": 0.49467249514685996,
+        "meanPressure": 292900010.2009452,
+        "basePressure": 266698092.35549322,
+        "breechPressure": 306000969.1236712,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0009,
+        "travel": 0.05986719886423745,
+        "velocity": 315.3626035047738,
+        "burntFraction": 0.5016934447115875,
+        "meanPressure": 292867702.29146194,
+        "basePressure": 266668674.6104366,
+        "breechPressure": 305967216.13197464,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.001,
+        "travel": 0.0966105036038883,
+        "velocity": 418.5417840689012,
+        "burntFraction": 0.665620727790181,
+        "meanPressure": 277189258.48773754,
+        "basePressure": 252392775.30033606,
+        "breechPressure": 289587500.08143824,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0011,
+        "travel": 0.14327387674823908,
+        "velocity": 512.8873818458197,
+        "burntFraction": 0.8155135397842034,
+        "meanPressure": 246715098.9916469,
+        "basePressure": 224644738.6984644,
+        "breechPressure": 257750279.1382381,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0012,
+        "travel": 0.19880079265727854,
+        "velocity": 595.7160649824036,
+        "burntFraction": 0.9471087018442379,
+        "meanPressure": 214492897.30961728,
+        "basePressure": 195305034.29150453,
+        "breechPressure": 224086828.8186736,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0012445893837554989,
+        "travel": 0.226113597767691,
+        "velocity": 629.0069283638736,
+        "burntFraction": 1,
+        "meanPressure": 201089349.00842944,
+        "basePressure": 183100525.4549597,
+        "breechPressure": 210083760.7851643,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0013,
+        "travel": 0.2620212574115368,
+        "velocity": 666.1010638559062,
+        "burntFraction": 1,
+        "meanPressure": 172471260.10833332,
+        "basePressure": 157042521.18490413,
+        "breechPressure": 180185629.5700479,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0014,
+        "travel": 0.3314790827654458,
+        "velocity": 720.763894190499,
+        "burntFraction": 1,
+        "meanPressure": 134106777.94154176,
+        "basePressure": 122110005.4739278,
+        "breechPressure": 140105164.17534873,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0015,
+        "travel": 0.405791554807403,
+        "velocity": 763.889490748809,
+        "burntFraction": 1,
+        "meanPressure": 107395801.47131716,
+        "basePressure": 97788509.32691817,
+        "breechPressure": 112199447.54351664,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0016,
+        "travel": 0.4839863094631537,
+        "velocity": 798.8568954382721,
+        "burntFraction": 1,
+        "meanPressure": 88179031.58964519,
+        "basePressure": 80290811.51133826,
+        "breechPressure": 92123141.62879865,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0017,
+        "travel": 0.5653651641795109,
+        "velocity": 827.8678554083092,
+        "burntFraction": 1,
+        "meanPressure": 73925066.22127116,
+        "basePressure": 67311961.25579002,
+        "breechPressure": 77231618.70401171,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0017415651836419873,
+        "travel": 0.5999999993958761,
+        "velocity": 838.542260788552,
+        "burntFraction": 1,
+        "meanPressure": 69065567.1220618,
+        "basePressure": 62887177.73095084,
+        "breechPressure": 72154761.81761728,
+        "gasTemperature": null
+      }
+    ],
+    "peakBreechPressure": 306000969.1236712,
+    "maxPressureTime": 0.0008958021672213691,
+    "maxPressureTravel": 0.058552634577914014,
+    "maxBasePressure": 266698092.35549322,
+    "maxMeanPressure": 292900010.2009452,
+    "muzzleVelocity": 838.542260788552,
+    "muzzleTime": 0.0017415651836419873,
+    "muzzleMeanPressure": 69065567.1220618,
+    "muzzleBasePressure": 62887177.73095084,
+    "muzzleBreechPressure": 72154761.81761728,
+    "shotStartTime": 0,
+    "barrelTime": 0.0017415651836419873,
+    "burnout": {
+      "time": 0.0012445893837554989,
+      "travel": 0.226113597767691
+    },
+    "muzzleBurntFraction": 1,
+    "muzzleEnergy": 3339.977334859785,
+    "efficiency": 0.3058587302985151,
+    "energy": {
+      "gas": 7251.884541013638,
+      "translation": 3339.9773348597855,
+      "rotation": 0,
+      "gasKinetic": 328.1381241265754,
+      "resistance": 0,
+      "heat": 0,
+      "leakage": 0
+    },
+    "tenPercentPressureTime": 0.0003929617925297122,
+    "steps": 117
+  },
+  "pressureRange": {
+    "quantity": "maxPressure",
+    "nominalPressure": 306000969.1236712,
+    "lowPressure": 277885154.56440353,
+    "highPressure": 336588167.78715867,
+    "complete": true,
+    "tolerances": {
+      "chargeFraction": 0.005,
+      "volumeFraction": 0.01,
+      "massFraction": 0,
+      "burnRateFraction": 0.03,
+      "temperatureKelvin": 5,
+      "startPressureFraction": 0.2
+    },
+    "cases": [
+      {
+        "input": "chargeFraction",
+        "side": 1,
+        "maxPressure": 310878195.8023955
+      },
+      {
+        "input": "chargeFraction",
+        "side": -1,
+        "maxPressure": 301194095.62824064
+      },
+      {
+        "input": "volumeFraction",
+        "side": 1,
+        "maxPressure": 299870677.16037166
+      },
+      {
+        "input": "volumeFraction",
+        "side": -1,
+        "maxPressure": 312389083.0720396
+      },
+      {
+        "input": "burnRateFraction",
+        "side": 1,
+        "maxPressure": 324491267.00328004
+      },
+      {
+        "input": "burnRateFraction",
+        "side": -1,
+        "maxPressure": 288056070.60516155
+      },
+      {
+        "input": "temperatureKelvin",
+        "side": 1,
+        "maxPressure": 306000969.1236712
+      },
+      {
+        "input": "temperatureKelvin",
+        "side": -1,
+        "maxPressure": 306000969.1236712
+      },
+      {
+        "input": "startPressureFraction",
+        "side": 1,
+        "maxPressure": 306000969.1236712
+      },
+      {
+        "input": "startPressureFraction",
+        "side": -1,
+        "maxPressure": 306000969.1236712
+      },
+      {
+        "input": "all",
+        "side": 1,
+        "sides": {
+          "chargeFraction": 1,
+          "volumeFraction": -1,
+          "massFraction": 0,
+          "burnRateFraction": 1,
+          "temperatureKelvin": 0,
+          "startPressureFraction": 0
+        },
+        "maxPressure": 336588167.78715867
+      },
+      {
+        "input": "all",
+        "side": -1,
+        "sides": {
+          "chargeFraction": -1,
+          "volumeFraction": 1,
+          "massFraction": 0,
+          "burnRateFraction": -1,
+          "temperatureKelvin": 0,
+          "startPressureFraction": 0
+        },
+        "maxPressure": 277885154.56440353
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "noCartridge",
+      "severity": "info",
+      "inputs": [
+        "cartridge"
+      ],
+      "message": "No cartridge id was given, so no CIP Pmax was checked.",
+      "fix": "Give a cartridge id."
+    }
+  ]
+}
+--- stderr

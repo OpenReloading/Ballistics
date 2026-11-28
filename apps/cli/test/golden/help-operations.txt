@@ -1,0 +1,17 @@
+exit 0
+--- stdout
+usage: ballistics operations
+
+Writes every operation of run as JSON: its name, summary, description, and the
+JSON Schema (2020-12) of its input body and of its answer.
+
+options:
+  --json      output format JSON, the only one
+  -h, --help  this text
+
+example:
+  node apps/cli/dist/bin.js operations
+
+exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
+unreadable input, 70 internal error
+--- stderr

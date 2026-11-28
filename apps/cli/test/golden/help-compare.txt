@@ -1,0 +1,75 @@
+exit 0
+--- stdout
+usage: ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
+
+options:
+  --rows <path>                       a rows file, a folder of .csv files or -
+                                      for stdin (default: BALLISTICS_ROWS);
+                                      catalogue for the published loads of a
+                                      first --records root with every kind
+                                      directory, or a folder laid out as
+                                      records/loads/ (maker tables only)
+  --baseline <m3|module|verify.json>  m3, a module or a saved verify result
+  --candidate <m3|module>             m3 or a module
+  --records <dir>                     a records root, repeatable (default:
+                                      BALLISTICS_RECORDS, roots joined by : or
+                                      on Windows ;); a first root with every
+                                      kind directory, as the records folder of a
+                                      repository clone, replaces the catalog
+                                      bundle, other roots add their records to
+                                      it; the sources an added record cites must
+                                      be records of the adding roots
+  --split <name>                      the split (default: validation) (choices:
+                                      "test", "validation", "training")
+  --final                             required for the test split
+  --group-by <key>                    also group by powder, family, cartridge,
+                                      bullet or construction
+  --params <params>                   the powder parameters of the records
+                                      (default), or the burn coefficients fitted
+                                      to the training rows (choices: "records",
+                                      "fit-on-training")
+  --fit <fit.json>                    instead of --params: evaluate the values
+                                      of a saved fit of the same rows and
+                                      records without fitting; the result is
+                                      marked as a screen with this build version
+                                      and carries the fit model version
+  --velocity-sigma <fraction>         fit and --params fit-on-training: velocity
+                                      sigma of a row, a fraction of its velocity
+                                      (default 0.03)
+  --exponent <exponent>               fit and --params fit-on-training: choose
+                                      the pressure exponent per powder family
+                                      and fit each burn coefficient at it
+                                      (choices: "family")
+  --family <fit.json>                 with --exponent family: take the family
+                                      choice of a saved fit of the same rows,
+                                      records, velocity sigma and build instead
+                                      of making it
+  --pressure-sigma <fraction>         fit and --params fit-on-training: fit the
+                                      printed pressures too, with this sigma, a
+                                      fraction of the pressure, and one factor
+                                      per key
+  --pressure-factor <key>             with --pressure-sigma: the key of a
+                                      pressure factor, basis (the row's pressure
+                                      basis, default), table, cartridge or
+                                      table-cartridge (both)
+  --energy <energy>                   fit and --params fit-on-training: prior,
+                                      each powder's energy is its prior from
+                                      thermochemistry times one energy-level
+                                      factor chosen on the training pressures
+                                      and only the burn coefficient is fitted
+                                      per powder; family, each powder's energy
+                                      is fitted with its burn coefficient, under
+                                      a prior on its family's median impetus
+                                      (all reference powders' for a family with
+                                      fewer than 5) that tightens as its used
+                                      rows (below 20) or cartridges (below 4)
+                                      fall (choices: "prior", "family")
+  --json                              output format JSON (default: JSON unless
+                                      stdout is a terminal)
+  --table                             output format a table (default on a
+                                      terminal)
+  -h, --help                          this text
+
+exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
+unreadable input, 70 internal error
+--- stderr

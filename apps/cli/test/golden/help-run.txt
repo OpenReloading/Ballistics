@@ -1,0 +1,28 @@
+exit 0
+--- stdout
+usage: ballistics run <operation> --input <file|-> [--records <dir>]
+
+Runs one compute operation offline and writes its answer as JSON: the answer of
+the route POST /v1/<operation> to the body in the --input file (- for stdin).
+Record ids resolve against the catalog bundle and the records each --records
+root (repeatable, default BALLISTICS_RECORDS) adds, or a first root with every
+kind directory in its place. A body the schema rejects is bad data (exit 65), a
+422 answer a refusal (exit 1).
+
+options:
+  --input <file|->  the body, - for stdin
+  --records <dir>   a records root, repeatable (default: BALLISTICS_RECORDS,
+                    roots joined by : or on Windows ;); a first root with every
+                    kind directory, as the records folder of a repository clone,
+                    replaces the catalog bundle, other roots add their records
+                    to it; the sources an added record cites must be records of
+                    the adding roots
+  --json            output format JSON, the only one
+  -h, --help        this text
+
+example:
+  node apps/cli/dist/bin.js run interior --input apps/cli/examples/interior.json
+
+exit codes: 0 done, 1 refused run, 64 bad command line, 65 bad data, 66 missing or
+unreadable input, 70 internal error
+--- stderr

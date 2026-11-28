@@ -27,6 +27,7 @@
     "build": "tsc -p tsconfig.build.json",
     "schema": "node src/write-json-schema.ts && biome format --write schema",
     "typecheck": "tsc --noEmit",
+    "golden:update": "vitest run test/golden.test.ts --update",
     "test": "vitest run --coverage && publint --strict"
   },
   "dependencies": {

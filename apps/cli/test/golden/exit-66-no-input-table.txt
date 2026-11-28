@@ -1,0 +1,4 @@
+exit 66
+--- stdout
+--- stderr
+the --input cannot be read: ENOENT

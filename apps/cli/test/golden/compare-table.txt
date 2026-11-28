@@ -1,0 +1,14 @@
+exit 0
+--- stdout
+baseline m3  version <sha256>
+candidate <repo>/apps/cli/test/fixtures/worse-model.mjs  version <sha256>
+split validation  salt 2026-11-12  change = candidate minus baseline, percentage points
+group                     used  v med %  v P90 %  p med %  p P90 %  cover %
+all                          0    +8.10   +10.32     0.00     0.00     0.00
+family double/extruded       0    +9.10   +10.62     0.00     0.00     0.00
+family single/ball           0    +5.95    +8.63        -        -     0.00
+family unknown               0        -        -        -        -        -
+family unspecified/flake     0        -        -        -        -        -
+paired velocity: median +8.10 (se 1.01), P90 +10.32 (se 0.30) over 5 rows of 2 cartridges
+paired pressure: median 0.00 (se 0.00), P90 0.00 (se 0.00) over 2 rows of 1 cartridges
+--- stderr
