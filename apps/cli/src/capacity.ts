@@ -4,7 +4,7 @@ import type { Cartridge, CatalogueCaseCapacity } from '@rangefoundry/schema'
 import { isEstimatedCapacity } from '@rangefoundry/schema'
 import { storedValue } from '@rangefoundry/svg-drawings/cartridge'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
-import { UsageError } from './errors.ts'
+import { DataError, Refusal } from './errors.ts'
 import { loadRecords, type Records } from './records.ts'
 import { percentile } from './stats.ts'
 
@@ -36,7 +36,7 @@ export function outlineVolume(cartridge: Pick<Cartridge, 'values'>): number | un
 export function fillFactor(pairs: readonly { capacity: number; outline: number }[]) {
   const ratios = pairs.map((p) => p.capacity / p.outline)
   if (ratios.length < 3)
-    throw new UsageError('fewer than 3 cartridges have a capacity and an outline')
+    throw new DataError('fewer than 3 cartridges have a capacity and an outline')
   const median = (xs: readonly number[]) => percentile(xs, 0.5) as number
   const loo = ratios.map((r, i) => median(ratios.filter((_, j) => j !== i)) / r - 1)
   return {
@@ -92,7 +92,7 @@ export function estimateCapacities(records: Records) {
 /** `estimate-capacities`: writes the estimated capacity records of the records of `roots` to `<out>/capacities/`, a folder that must not exist yet. */
 export function writeEstimatedCapacities(roots: readonly string[], out: string) {
   const folder = join(out, 'capacities')
-  if (existsSync(folder)) throw new UsageError(`${folder} exists: give a new --out folder`) // NOSONAR: the path is the argument the user gave
+  if (existsSync(folder)) throw new Refusal(`${folder} exists: give a new --out folder`) // NOSONAR: the path is the argument the user gave
   const { fill, estimates } = estimateCapacities(loadRecords(roots))
   mkdirSync(folder, { recursive: true }) // NOSONAR: as above
   for (const record of estimates)
